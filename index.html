@@ -10,30 +10,63 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #050508;
-            --bg-elevated: #0a0a12;
+            --bg: #030308;
+            --bg-elevated: #08080f;
             --bg-card: rgba(255,255,255,0.03);
             --border: rgba(255,255,255,0.06);
             --border-hover: rgba(255,255,255,0.12);
-            --text: #fafafa;
-            --text-secondary: #a1a1aa;
-            --text-muted: #52525b;
-            --purple: #8b5cf6;
-            --purple-glow: rgba(139,92,246,0.4);
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            --purple: #a855f7;
+            --purple-deep: #7c3aed;
+            --pink: #ec4899;
             --blue: #3b82f6;
             --green: #10b981;
-            --pink: #ec4899;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+        }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
             overflow-x: hidden;
+        }
+
+        /* ===== CANVAS BACKGROUND ===== */
+        #aurora-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ===== SECTIONS (FULL SNAP) ===== */
+        section {
+            min-height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 40px;
+            width: 100%;
         }
 
         /* ===== NAV ===== */
@@ -43,97 +76,98 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            padding: 16px 0;
-            background: rgba(5,5,8,0.8);
-            backdrop-filter: blur(20px);
+            padding: 20px 0;
+            background: rgba(3,3,8,0.7);
+            backdrop-filter: blur(30px);
             border-bottom: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        nav.scrolled {
+            padding: 12px 0;
+            background: rgba(3,3,8,0.95);
         }
 
         .nav-container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 0 32px;
+            padding: 0 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .nav-brand {
-            font-size: 1.25rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            font-size: 1.3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-decoration: none;
+            letter-spacing: -0.02em;
         }
 
-        .nav-links { display: flex; gap: 32px; align-items: center; }
+        .nav-links { display: flex; gap: 40px; align-items: center; }
 
         .nav-links a {
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 500;
-            transition: color 0.2s;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--purple);
+            transition: width 0.3s;
         }
 
         .nav-links a:hover { color: var(--text); }
+        .nav-links a:hover::after { width: 100%; }
 
         .btn-nav {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            border-radius: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--purple-deep), var(--pink));
+            border-radius: 10px;
             color: white !important;
             font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
         }
+
+        .btn-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(168,85,247,0.3);
+        }
+
+        .btn-nav::after { display: none !important; }
 
         /* ===== HERO ===== */
         .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             text-align: center;
-            position: relative;
-            padding: 120px 32px;
-            overflow: hidden;
-        }
-
-        .hero-glow {
-            position: absolute;
-            top: -200px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 800px;
-            height: 600px;
-            background: radial-gradient(ellipse, var(--purple-glow) 0%, transparent 70%);
-            filter: blur(60px);
-            opacity: 0.6;
-            animation: glowPulse 4s ease-in-out infinite;
-        }
-
-        @keyframes glowPulse {
-            0%, 100% { opacity: 0.4; transform: translateX(-50%) scale(1); }
-            50% { opacity: 0.6; transform: translateX(-50%) scale(1.1); }
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 1000px;
         }
 
         .hero-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: rgba(139,92,246,0.1);
-            border: 1px solid rgba(139,92,246,0.3);
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(168,85,247,0.1);
+            border: 1px solid rgba(168,85,247,0.3);
             border-radius: 9999px;
             font-size: 0.85rem;
             color: var(--purple);
-            margin-bottom: 32px;
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 0.8s 0.2s forwards;
         }
 
         .hero-badge::before {
@@ -146,20 +180,23 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
         }
 
         .hero h1 {
-            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-size: clamp(3.5rem, 8vw, 6rem);
             font-weight: 900;
             line-height: 1.05;
             letter-spacing: -0.04em;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeUp 0.8s 0.4s forwards;
         }
 
         .hero h1 .gradient {
-            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #3b82f6 100%);
+            background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 50%, var(--blue) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -167,9 +204,12 @@
         .hero-sub {
             font-size: 1.25rem;
             color: var(--text-secondary);
-            max-width: 650px;
+            max-width: 600px;
             margin: 0 auto 48px;
             line-height: 1.7;
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeUp 0.8s 0.6s forwards;
         }
 
         .hero-actions {
@@ -177,131 +217,105 @@
             gap: 16px;
             justify-content: center;
             flex-wrap: wrap;
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeUp 0.8s 0.8s forwards;
+        }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .btn {
-            padding: 16px 32px;
-            border-radius: 12px;
+            padding: 18px 36px;
+            border-radius: 14px;
             font-weight: 600;
             font-size: 1rem;
             text-decoration: none;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            background: linear-gradient(135deg, var(--purple-deep), var(--pink));
             color: white;
             border: none;
+            box-shadow: 0 4px 20px rgba(168,85,247,0.3);
         }
 
         .btn-primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 20px 60px var(--purple-glow);
+            box-shadow: 0 12px 40px rgba(168,85,247,0.4);
         }
 
         .btn-secondary {
-            background: transparent;
+            background: rgba(255,255,255,0.05);
             color: var(--text);
             border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
         }
 
         .btn-secondary:hover {
-            border-color: var(--border-hover);
-            background: var(--bg-card);
+            border-color: var(--purple);
+            background: rgba(168,85,247,0.1);
         }
 
-        /* ===== STATS ===== */
-        .stats {
-            padding: 80px 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            background: var(--bg-elevated);
-        }
-
-        .stats-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 48px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 3rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-
-        .stat-label { color: var(--text-secondary); font-size: 0.9rem; }
-
-        /* ===== CATEGORIES ===== */
-        .categories {
-            padding: 160px 0;
-        }
-
-        .section-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 32px;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 80px;
-        }
-
+        /* ===== SECTION HEADERS ===== */
         .section-tag {
             display: inline-block;
-            padding: 6px 12px;
-            background: rgba(139,92,246,0.1);
-            border: 1px solid rgba(139,92,246,0.2);
-            border-radius: 6px;
+            padding: 6px 14px;
+            background: rgba(168,85,247,0.1);
+            border: 1px solid rgba(168,85,247,0.25);
+            border-radius: 8px;
             font-size: 0.75rem;
             color: var(--purple);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
-            margin-bottom: 16px;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            margin-bottom: 20px;
         }
 
         .section-title {
-            font-size: clamp(2rem, 4vw, 3rem);
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
             font-weight: 800;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.03em;
             margin-bottom: 16px;
+            line-height: 1.1;
         }
 
         .section-desc {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 550px;
+            line-height: 1.7;
         }
 
-        .categories-grid {
+        /* ===== STATS SECTION ===== */
+        .stats-section {
+            text-align: center;
+        }
+
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            margin-top: 64px;
         }
 
-        .category-card {
-            padding: 40px;
-            background: var(--bg-elevated);
+        .stat-card {
+            padding: 40px 24px;
+            background: rgba(255,255,255,0.02);
             border: 1px solid var(--border);
             border-radius: 20px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s;
             position: relative;
             overflow: hidden;
         }
 
-        .category-card::before {
+        .stat-card::before {
             content: '';
             position: absolute;
             top: 0;
@@ -313,160 +327,113 @@
             transition: opacity 0.4s;
         }
 
-        .category-card:hover {
-            border-color: var(--border-hover);
+        .stat-card:hover {
+            border-color: rgba(168,85,247,0.3);
             transform: translateY(-8px);
-            box-shadow: 0 20px 60px rgba(139,92,246,0.1);
+            box-shadow: 0 20px 60px rgba(168,85,247,0.1);
         }
 
-        .category-card:hover::before { opacity: 1; }
+        .stat-card:hover::before { opacity: 1; }
 
-        .category-icon {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.2));
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            margin-bottom: 24px;
+        .stat-value {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 8px;
         }
 
-        .category-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 12px;
+        .stat-label { color: var(--text-secondary); font-size: 0.95rem; }
+
+        /* ===== CATEGORIES SECTION ===== */
+        .categories-section {
+            text-align: center;
         }
 
-        .category-desc {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-bottom: 20px;
-        }
-
-        .category-count {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: var(--purple);
-        }
-
-        /* ===== FEATURED APIs ===== */
-        .featured {
-            padding: 160px 0;
-            background: var(--bg-elevated);
-        }
-
-        .api-grid {
+        .categories-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 64px;
         }
 
-        .api-card {
-            padding: 32px;
-            background: var(--bg);
+        .cat-card {
+            padding: 32px 24px;
+            background: rgba(255,255,255,0.02);
             border: 1px solid var(--border);
             border-radius: 16px;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
         }
 
-        .api-card:hover {
+        .cat-card:hover {
             border-color: var(--purple);
-            transform: translateY(-4px);
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(168,85,247,0.15);
+            background: rgba(168,85,247,0.05);
         }
 
-        .api-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .cat-icon {
+            font-size: 2rem;
             margin-bottom: 16px;
         }
 
-        .api-method {
-            padding: 4px 10px;
-            background: rgba(16,185,129,0.2);
-            color: var(--green);
-            border-radius: 6px;
+        .cat-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .cat-count {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .api-price {
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--green);
-            font-weight: 600;
-        }
-
-        .api-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .api-desc {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-
-        .api-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .api-tag {
-            padding: 4px 10px;
-            background: rgba(139,92,246,0.1);
-            border-radius: 6px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--purple);
         }
 
         /* ===== HOW IT WORKS ===== */
-        .how-it-works {
-            padding: 160px 0;
+        .how-section {
+            text-align: center;
         }
 
-        .steps-grid {
+        .steps-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 48px;
+            gap: 40px;
+            margin-top: 72px;
             position: relative;
         }
 
-        .steps-grid::before {
+        .steps-container::before {
             content: '';
             position: absolute;
-            top: 48px;
-            left: 15%;
-            right: 15%;
+            top: 56px;
+            left: 20%;
+            right: 20%;
             height: 2px;
             background: linear-gradient(90deg, transparent, var(--purple), transparent);
         }
 
-        .step {
-            text-align: center;
+        .step-card {
             position: relative;
         }
 
-        .step-number {
-            width: 96px;
-            height: 96px;
-            background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.2));
+        .step-num {
+            width: 112px;
+            height: 112px;
+            background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(236,72,153,0.15));
             border: 2px solid var(--purple);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            font-weight: 800;
-            margin: 0 auto 32px;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 0 auto 28px;
             position: relative;
             z-index: 1;
+            color: var(--purple);
         }
 
         .step-title {
@@ -477,79 +444,137 @@
 
         .step-desc { color: var(--text-secondary); font-size: 0.95rem; }
 
-        /* ===== DASHBOARD PREVIEW ===== */
-        .dashboard {
-            padding: 160px 0;
-            background: var(--bg-elevated);
+        /* ===== FEATURES SECTION ===== */
+        .features-section {
+            text-align: center;
         }
 
-        .dashboard-preview {
-            background: var(--bg);
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 64px;
+        }
+
+        .feature-card {
+            padding: 40px 32px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            text-align: left;
+            transition: all 0.4s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-6px);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(236,72,153,0.2));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 24px;
+        }
+
+        .feature-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc { color: var(--text-secondary); font-size: 0.95rem; }
+
+        /* ===== DASHBOARD PREVIEW ===== */
+        .dashboard-section {
+            text-align: center;
+        }
+
+        .dashboard-frame {
+            margin-top: 64px;
+            background: rgba(255,255,255,0.02);
             border: 1px solid var(--border);
             border-radius: 24px;
             overflow: hidden;
             box-shadow: 0 40px 100px rgba(0,0,0,0.5);
         }
 
-        .dashboard-header {
+        .frame-header {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             padding: 16px 24px;
             background: rgba(255,255,255,0.03);
             border-bottom: 1px solid var(--border);
         }
 
-        .dashboard-dot { width: 12px; height: 12px; border-radius: 50%; }
-        .dashboard-dot:nth-child(1) { background: #ef4444; }
-        .dashboard-dot:nth-child(2) { background: #f59e0b; }
-        .dashboard-dot:nth-child(3) { background: #10b981; }
+        .frame-dot { width: 14px; height: 14px; border-radius: 50%; }
+        .frame-dot:nth-child(1) { background: #ef4444; }
+        .frame-dot:nth-child(2) { background: #f59e0b; }
+        .frame-dot:nth-child(3) { background: #10b981; }
 
-        .dashboard-body {
-            padding: 48px;
-            min-height: 500px;
+        .frame-url {
+            margin-left: 16px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .dashboard-grid {
+        .frame-body {
             display: grid;
-            grid-template-columns: 250px 1fr;
-            gap: 32px;
+            grid-template-columns: 220px 1fr;
+            min-height: 400px;
         }
 
-        .dashboard-sidebar {
+        .frame-sidebar {
+            padding: 24px;
             border-right: 1px solid var(--border);
-            padding-right: 32px;
         }
 
-        .sidebar-title {
-            font-size: 0.75rem;
+        .sidebar-label {
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             color: var(--text-muted);
             margin-bottom: 16px;
         }
 
-        .sidebar-nav { list-style: none; }
+        .sidebar-items { list-style: none; }
 
-        .sidebar-nav li {
+        .sidebar-items li {
             padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 4px;
+            border-radius: 10px;
+            margin-bottom: 6px;
             color: var(--text-secondary);
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .sidebar-nav li:hover { background: var(--bg-card); color: var(--text); }
-        .sidebar-nav li.active { background: rgba(139,92,246,0.1); color: var(--purple); }
+        .sidebar-items li:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+        .sidebar-items li.active { background: rgba(168,85,247,0.15); color: var(--purple); }
 
-        .dashboard-content h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 24px;
+        .frame-content {
+            padding: 32px;
         }
 
-        .dashboard-stats {
+        .frame-content h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .dash-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
@@ -557,86 +582,70 @@
         }
 
         .dash-stat {
-            padding: 24px;
-            background: var(--bg-elevated);
+            padding: 20px;
+            background: rgba(255,255,255,0.03);
             border: 1px solid var(--border);
             border-radius: 12px;
+            text-align: left;
         }
 
-        .dash-stat-value {
-            font-size: 1.75rem;
+        .dash-stat-val {
+            font-size: 1.5rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            background: linear-gradient(135deg, var(--purple), var(--pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .dash-stat-label {
             color: var(--text-secondary);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             margin-top: 4px;
         }
 
-        .dashboard-table {
+        .dash-table {
             width: 100%;
             border-collapse: collapse;
+            text-align: left;
         }
 
-        .dashboard-table th,
-        .dashboard-table td {
-            padding: 16px;
-            text-align: left;
+        .dash-table th {
+            padding: 12px 16px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
             border-bottom: 1px solid var(--border);
         }
 
-        .dashboard-table th {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-        }
-
-        .dashboard-table td {
+        .dash-table td {
+            padding: 14px 16px;
+            font-size: 0.85rem;
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
         }
 
-        .status-active {
+        .status-pill {
             display: inline-block;
-            padding: 4px 10px;
-            background: rgba(16,185,129,0.2);
+            padding: 4px 12px;
+            background: rgba(16,185,129,0.15);
             color: var(--green);
-            border-radius: 6px;
+            border-radius: 9999px;
             font-size: 0.75rem;
+            font-weight: 600;
         }
 
         /* ===== CTA ===== */
-        .cta {
-            padding: 200px 0;
-            text-align: center;
-            position: relative;
-        }
+        .cta-section { text-align: center; }
 
-        .cta::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(139,92,246,0.15) 0%, transparent 70%);
-        }
-
-        .cta-content { position: relative; z-index: 1; }
-
-        .cta h2 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
+        .cta-section h2 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
             font-weight: 900;
             letter-spacing: -0.03em;
             margin-bottom: 24px;
         }
 
-        .cta p {
+        .cta-section p {
             font-size: 1.2rem;
             color: var(--text-secondary);
             margin-bottom: 48px;
@@ -647,21 +656,24 @@
 
         /* ===== FOOTER ===== */
         footer {
+            min-height: auto;
+            scroll-snap-align: none;
             padding: 80px 0 40px;
             border-top: 1px solid var(--border);
+            background: var(--bg);
         }
 
         .footer-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 32px;
+            padding: 0 40px;
         }
 
         .footer-grid {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1fr;
             gap: 48px;
-            margin-bottom: 64px;
+            margin-bottom: 48px;
         }
 
         .footer-brand p {
@@ -672,10 +684,10 @@
         }
 
         .footer-title {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             color: var(--text-muted);
             margin-bottom: 20px;
         }
@@ -687,10 +699,10 @@
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.9rem;
-            transition: color 0.2s;
+            transition: color 0.3s;
         }
 
-        .footer-links a:hover { color: var(--text); }
+        .footer-links a:hover { color: var(--purple); }
 
         .footer-bottom {
             display: flex;
@@ -702,329 +714,250 @@
 
         .footer-copy { color: var(--text-muted); font-size: 0.85rem; }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) {
-            .categories-grid, .api-grid, .steps-grid { grid-template-columns: repeat(2, 1fr); }
-            .dashboard-grid { grid-template-columns: 1fr; }
-            .footer-grid { grid-template-columns: 1fr 1fr; }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .categories-grid, .api-grid, .steps-grid { grid-template-columns: 1fr; }
-            .dashboard-stats { grid-template-columns: 1fr; }
-            .footer-grid { grid-template-columns: 1fr; }
-            .footer-bottom { flex-direction: column; gap: 24px; }
-        }
-
         /* ===== SCROLL ANIMATIONS ===== */
-        .reveal {
+        .anim {
             opacity: 0;
-            transform: translateY(60px);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(50px);
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .reveal.active {
+        .anim.visible {
             opacity: 1;
             transform: translateY(0);
         }
 
-        .reveal-left {
-            opacity: 0;
-            transform: translateX(-60px);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        .anim-delay-1 { transition-delay: 0.1s; }
+        .anim-delay-2 { transition-delay: 0.2s; }
+        .anim-delay-3 { transition-delay: 0.3s; }
+        .anim-delay-4 { transition-delay: 0.4s; }
+
+        /* ===== SCROLL INDICATOR ===== */
+        .scroll-indicator {
+            position: fixed;
+            right: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        .reveal-left.active {
-            opacity: 1;
-            transform: translateX(0);
+        .scroll-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        .reveal-right {
-            opacity: 0;
-            transform: translateX(60px);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        .scroll-dot.active {
+            background: var(--purple);
+            border-color: var(--purple);
+            box-shadow: 0 0 15px rgba(168,85,247,0.5);
+            transform: scale(1.3);
         }
 
-        .reveal-right.active {
-            opacity: 1;
-            transform: translateX(0);
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .categories-grid { grid-template-columns: repeat(3, 1fr); }
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .frame-body { grid-template-columns: 1fr; }
+            .frame-sidebar { display: none; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
         }
 
-        .reveal-scale {
-            opacity: 0;
-            transform: scale(0.9);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .reveal-scale.active {
-            opacity: 1;
-            transform: scale(1);
+        @media (max-width: 768px) {
+            html { scroll-snap-type: none; }
+            .nav-links { display: none; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .categories-grid { grid-template-columns: repeat(2, 1fr); }
+            .steps-container { grid-template-columns: 1fr; }
+            .steps-container::before { display: none; }
+            .features-grid { grid-template-columns: 1fr; }
+            .dash-stats { grid-template-columns: 1fr; }
+            .scroll-indicator { display: none; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; gap: 24px; }
+            section { min-height: auto; scroll-snap-align: none; }
         }
     </style>
 </head>
 <body>
+    <!-- Aurora Canvas -->
+    <canvas id="aurora-canvas"></canvas>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator" id="scrollIndicator">
+        <div class="scroll-dot active" data-section="0"></div>
+        <div class="scroll-dot" data-section="1"></div>
+        <div class="scroll-dot" data-section="2"></div>
+        <div class="scroll-dot" data-section="3"></div>
+        <div class="scroll-dot" data-section="4"></div>
+        <div class="scroll-dot" data-section="5"></div>
+        <div class="scroll-dot" data-section="6"></div>
+    </div>
+
     <!-- Nav -->
-    <nav>
+    <nav id="mainNav">
         <div class="nav-container">
             <a href="#" class="nav-brand">AETHERIUS</a>
             <div class="nav-links">
+                <a href="#hero">Home</a>
+                <a href="#stats">Stats</a>
                 <a href="#categories">APIs</a>
-                <a href="#featured">Featured</a>
-                <a href="#how-it-works">How It Works</a>
+                <a href="#how">How It Works</a>
+                <a href="#features">Features</a>
                 <a href="#dashboard">Dashboard</a>
-                <a href="#faq">FAQ</a>
-                <a href="https://x.com/aetheriusxAPI" class="btn-nav">Get API Key</a>
+                <a href="https://x.com/aetheriusxAPI" class="btn-nav">Get Started</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero -->
-    <section class="hero">
-        <div class="hero-glow"></div>
-        <div class="hero-content">
+    <!-- Section 1: Hero -->
+    <section id="hero" class="hero-section">
+        <div class="section-inner">
             <div class="hero-badge">
-                <span></span> 500+ APIs Available
+                <span></span> Building on Base Mainnet
             </div>
             <h1>
-                The API Marketplace for<br>
-                <span class="gradient">AI Agents</span>
+                The Operating System for<br>
+                <span class="gradient">AI Agent Commerce</span>
             </h1>
             <p class="hero-sub">
-                One platform. Hundreds of APIs. Pay per request in USDC on Base.
-                Built for machines that think, browse, and transact autonomously.
+                Infrastructure that lets AI agents discover, pay for, and consume APIs autonomously. 
+                500+ endpoints. USDC payments. Zero friction.
             </p>
             <div class="hero-actions">
-                <a href="#categories" class="btn btn-primary">Explore APIs</a>
-                <a href="#dashboard" class="btn btn-secondary">View Dashboard</a>
+                <a href="#categories" class="btn btn-primary">Explore APIs →</a>
+                <a href="#how" class="btn btn-secondary">See How It Works</a>
             </div>
         </div>
     </section>
 
-    <!-- Stats -->
-    <section class="stats">
-        <div class="stats-grid">
-            <div class="reveal">
-                <div class="stat-value">500+</div>
-                <div class="stat-label">Available APIs</div>
-            </div>
-            <div class="reveal">
-                <div class="stat-value">12</div>
-                <div class="stat-label">Categories</div>
-            </div>
-            <div class="reveal">
-                <div class="stat-value">$0.001</div>
-                <div class="stat-label">Starting Price</div>
-            </div>
-            <div class="reveal">
-                <div class="stat-value">&lt;50ms</div>
-                <div class="stat-label">Avg Latency</div>
+    <!-- Section 2: Stats -->
+    <section id="stats" class="stats-section">
+        <div class="section-inner">
+            <div class="section-tag anim">By The Numbers</div>
+            <h2 class="section-title anim">Built for Scale</h2>
+            <p class="section-desc anim" style="margin: 0 auto;">Every metric designed for machine-to-machine commerce at planetary scale.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card anim anim-delay-1">
+                    <div class="stat-value">500+</div>
+                    <div class="stat-label">Available APIs</div>
+                </div>
+                <div class="stat-card anim anim-delay-2">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Categories</div>
+                </div>
+                <div class="stat-card anim anim-delay-3">
+                    <div class="stat-value">$0.001</div>
+                    <div class="stat-label">Starting Price</div>
+                </div>
+                <div class="stat-card anim anim-delay-4">
+                    <div class="stat-value">&lt;50ms</div>
+                    <div class="stat-label">Avg Latency</div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Categories -->
-    <section class="categories" id="categories">
-        <div class="section-container">
-            <div class="section-header">
-                <div class="section-tag">Categories</div>
-                <h2 class="section-title">500+ APIs Across 12 Categories</h2>
-                <p class="section-desc">
-                    From maps to machine learning. From weather to web scraping.
-                    Everything AI agents need to interact with the world.
-                </p>
-            </div>
-
+    <!-- Section 3: Categories -->
+    <section id="categories" class="categories-section">
+        <div class="section-inner">
+            <div class="section-tag anim">Categories</div>
+            <h2 class="section-title anim">500+ APIs Across 12 Verticals</h2>
+            <p class="section-desc anim" style="margin: 0 auto;">From maps to machine learning. Everything AI agents need.</p>
+            
             <div class="categories-grid">
-                <div class="category-card reveal">
-                    <div class="category-icon">🗺️</div>
-                    <h3 class="category-title">Maps & Location</h3>
-                    <p class="category-desc">Business search, geocoding, routing, places, reviews</p>
-                    <div class="category-count">45+ APIs</div>
+                <div class="cat-card anim anim-delay-1">
+                    <div class="cat-icon">🗺️</div>
+                    <div class="cat-title">Maps & Location</div>
+                    <div class="cat-count">45+ APIs</div>
                 </div>
-                <div class="category-card reveal">
-                    <div class="category-icon">₿</div>
-                    <h3 class="category-title">Crypto & DeFi</h3>
-                    <p class="category-desc">Token data, prices, analytics, wallet tracking, DEX</p>
-                    <div class="category-count">85+ APIs</div>
+                <div class="cat-card anim anim-delay-2">
+                    <div class="cat-icon">₿</div>
+                    <div class="cat-title">Crypto & DeFi</div>
+                    <div class="cat-count">85+ APIs</div>
                 </div>
-                <div class="category-card reveal">
-                    <div class="category-icon">🌐</div>
-                    <h3 class="category-title">Web & Scraping</h3>
-                    <p class="category-desc">HTML parsing, screenshots, proxies, headless browser</p>
-                    <div class="category-count">35+ APIs</div>
+                <div class="cat-card anim anim-delay-3">
+                    <div class="cat-icon">🌐</div>
+                    <div class="cat-title">Web & Scraping</div>
+                    <div class="cat-count">35+ APIs</div>
                 </div>
-                <div class="category-card reveal">
-                    <div class="category-icon">🤖</div>
-                    <h3 class="category-title">AI & ML</h3>
-                    <p class="category-desc">LLM inference, embeddings, image generation, NLP</p>
-                    <div class="category-count">60+ APIs</div>
+                <div class="cat-card anim anim-delay-4">
+                    <div class="cat-icon">🤖</div>
+                    <div class="cat-title">AI & ML</div>
+                    <div class="cat-count">60+ APIs</div>
                 </div>
-                <div class="category-card reveal">
-                    <div class="category-icon">💰</div>
-                    <h3 class="category-title">Finance</h3>
-                    <p class="category-desc">Stock data, forex, market news, financial analysis</p>
-                    <div class="category-count">70+ APIs</div>
+                <div class="cat-card anim anim-delay-1">
+                    <div class="cat-icon">💰</div>
+                    <div class="cat-title">Finance</div>
+                    <div class="cat-count">70+ APIs</div>
                 </div>
-                <div class="category-card reveal">
-                    <div class="category-icon">📧</div>
-                    <h3 class="category-title">Communication</h3>
-                    <p class="category-desc">Email validation, SMS, notifications, webhooks</p>
-                    <div class="category-count">25+ APIs</div>
+                <div class="cat-card anim anim-delay-2">
+                    <div class="cat-icon">📧</div>
+                    <div class="cat-title">Communication</div>
+                    <div class="cat-count">25+ APIs</div>
                 </div>
-                <div class="category-card reveal">
-                    <div class="category-icon">🌤️</div>
-                    <h3 class="category-title">Weather & Environment</h3>
-                    <p class="category-desc">Forecasts, air quality, UV index, severe alerts</p>
-                    <div class="category-count">20+ APIs</div>
+                <div class="cat-card anim anim-delay-3">
+                    <div class="cat-icon">🌤️</div>
+                    <div class="cat-title">Weather</div>
+                    <div class="cat-count">20+ APIs</div>
                 </div>
-                <div class="category-card reveal">
-                    <div class="category-icon">📰</div>
-                    <h3 class="category-title">News & Media</h3>
-                    <p class="category-desc">News aggregation, sentiment, RSS, content analysis</p>
-                    <div class="category-count">40+ APIs</div>
+                <div class="cat-card anim anim-delay-4">
+                    <div class="cat-icon">📰</div>
+                    <div class="cat-title">News & Media</div>
+                    <div class="cat-count">40+ APIs</div>
                 </div>
-                <div class="category-card reveal">
-                    <div class="category-icon">🔐</div>
-                    <h3 class="category-title">Security</h3>
-                    <p class="category-desc">Threat intel, vulnerability scan, domain check, DNS</p>
-                    <div class="category-count">30+ APIs</div>
+                <div class="cat-card anim anim-delay-1">
+                    <div class="cat-icon">🔐</div>
+                    <div class="cat-title">Security</div>
+                    <div class="cat-count">30+ APIs</div>
                 </div>
-                <div class="category-card reveal">
-                    <div class="category-icon">📊</div>
-                    <h3 class="category-title">Data & Analytics</h3>
-                    <p class="category-desc">Statistics, datasets, visualization, ETL pipelines</p>
-                    <div class="category-count">55+ APIs</div>
+                <div class="cat-card anim anim-delay-2">
+                    <div class="cat-icon">📊</div>
+                    <div class="cat-title">Data & Analytics</div>
+                    <div class="cat-count">55+ APIs</div>
                 </div>
-                <div class="category-card reveal">
-                    <div class="category-icon">🎮</div>
-                    <h3 class="category-title">Gaming</h3>
-                    <p class="category-desc">Player stats, achievements, leaderboards, game data</p>
-                    <div class="category-count">25+ APIs</div>
+                <div class="cat-card anim anim-delay-3">
+                    <div class="cat-icon">🎮</div>
+                    <div class="cat-title">Gaming</div>
+                    <div class="cat-count">25+ APIs</div>
                 </div>
-                <div class="category-card reveal">
-                    <div class="category-icon">🏥</div>
-                    <h3 class="category-title">Health & Science</h3>
-                    <p class="category-desc">Medical data, research papers, clinical trials</p>
-                    <div class="category-count">35+ APIs</div>
+                <div class="cat-card anim anim-delay-4">
+                    <div class="cat-icon">🏥</div>
+                    <div class="cat-title">Health & Science</div>
+                    <div class="cat-count">35+ APIs</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Featured APIs -->
-    <section class="featured" id="featured">
-        <div class="section-container">
-            <div class="section-header">
-                <div class="section-tag">Featured</div>
-                <h2 class="section-title">Most Popular APIs</h2>
-                <p class="section-desc">
-                    Start with these battle-tested endpoints.
-                </p>
-            </div>
-
-            <div class="api-grid">
-                <div class="api-card reveal">
-                    <div class="api-header">
-                        <span class="api-method">GET</span>
-                        <span class="api-price">$0.01</span>
-                    </div>
-                    <div class="api-name">/v1/maps/search</div>
-                    <div class="api-desc">Search businesses worldwide with OpenStreetMap data</div>
-                    <div class="api-tags">
-                        <span class="api-tag">Maps</span>
-                        <span class="api-tag">Search</span>
-                    </div>
-                </div>
-                <div class="api-card reveal">
-                    <div class="api-header">
-                        <span class="api-method">GET</span>
-                        <span class="api-price">$0.005</span>
-                    </div>
-                    <div class="api-name">/v1/token/price</div>
-                    <div class="api-desc">Real-time crypto prices across 1000+ tokens</div>
-                    <div class="api-tags">
-                        <span class="api-tag">Crypto</span>
-                        <span class="api-tag">Price</span>
-                    </div>
-                </div>
-                <div class="api-card reveal">
-                    <div class="api-header">
-                        <span class="api-method">GET</span>
-                        <span class="api-price">$0.01</span>
-                    </div>
-                    <div class="api-name">/v1/web/scrape</div>
-                    <div class="api-desc">Extract content from any webpage as structured JSON</div>
-                    <div class="api-tags">
-                        <span class="api-tag">Web</span>
-                        <span class="api-tag">Scraping</span>
-                    </div>
-                </div>
-                <div class="api-card reveal">
-                    <div class="api-header">
-                        <span class="api-method">GET</span>
-                        <span class="api-price">$0.02</span>
-                    </div>
-                    <div class="api-name">/v1/token/analyze</div>
-                    <div class="api-desc">Risk analysis and holder distribution for any token</div>
-                    <div class="api-tags">
-                        <span class="api-tag">Crypto</span>
-                        <span class="api-tag">Analytics</span>
-                    </div>
-                </div>
-                <div class="api-card reveal">
-                    <div class="api-header">
-                        <span class="api-method">GET</span>
-                        <span class="api-price">$0.005</span>
-                    </div>
-                    <div class="api-name">/v1/email/validate</div>
-                    <div class="api-desc">Verify email syntax, MX records, and disposable check</div>
-                    <div class="api-tags">
-                        <span class="api-tag">Email</span>
-                        <span class="api-tag">Validation</span>
-                    </div>
-                </div>
-                <div class="api-card reveal">
-                    <div class="api-header">
-                        <span class="api-method">GET</span>
-                        <span class="api-price">$0.008</span>
-                    </div>
-                    <div class="api-name">/v1/data/weather</div>
-                    <div class="api-desc">7-day weather forecast for any coordinates</div>
-                    <div class="api-tags">
-                        <span class="api-tag">Weather</span>
-                        <span class="api-tag">Forecast</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="how-it-works" id="how-it-works">
-        <div class="section-container">
-            <div class="section-header">
-                <div class="section-tag">How It Works</div>
-                <h2 class="section-title">Three Steps to Start</h2>
-                <p class="section-desc">
-                    From zero to API access in under a minute.
-                </p>
-            </div>
-
-            <div class="steps-grid">
-                <div class="step reveal">
-                    <div class="step-number">1</div>
+    <!-- Section 4: How It Works -->
+    <section id="how" class="how-section">
+        <div class="section-inner">
+            <div class="section-tag anim">How It Works</div>
+            <h2 class="section-title anim">Three Steps to Start</h2>
+            <p class="section-desc anim" style="margin: 0 auto;">From zero to API access in under a minute.</p>
+            
+            <div class="steps-container">
+                <div class="step-card anim anim-delay-1">
+                    <div class="step-num">01</div>
                     <h3 class="step-title">Connect Wallet</h3>
                     <p class="step-desc">Link your crypto wallet with USDC on Base. No account needed.</p>
                 </div>
-                <div class="step reveal">
-                    <div class="step-number">2</div>
+                <div class="step-card anim anim-delay-2">
+                    <div class="step-num">02</div>
                     <h3 class="step-title">Choose API</h3>
                     <p class="step-desc">Browse 500+ endpoints. Pick what your agent needs.</p>
                 </div>
-                <div class="step reveal">
-                    <div class="step-number">3</div>
+                <div class="step-card anim anim-delay-3">
+                    <div class="step-num">03</div>
                     <h3 class="step-title">Pay & Use</h3>
                     <p class="step-desc">x402 handles payment automatically. Get data instantly.</p>
                 </div>
@@ -1032,100 +965,134 @@
         </div>
     </section>
 
-    <!-- Dashboard Preview -->
-    <section class="dashboard" id="dashboard">
-        <div class="section-container">
-            <div class="section-header">
-                <div class="section-tag">Dashboard</div>
-                <h2 class="section-title">Monitor Everything</h2>
-                <p class="section-desc">
-                    Track usage, manage endpoints, analyze spending.
-                </p>
-            </div>
-
-            <div class="dashboard-preview reveal-scale">
-                <div class="dashboard-header">
-                    <div class="dashboard-dot"></div>
-                    <div class="dashboard-dot"></div>
-                    <div class="dashboard-dot"></div>
+    <!-- Section 5: Features -->
+    <section id="features" class="features-section">
+        <div class="section-inner">
+            <div class="section-tag anim">Features</div>
+            <h2 class="section-title anim">Built for the Agent Economy</h2>
+            <p class="section-desc anim" style="margin: 0 auto;">Every feature designed for machine-to-machine commerce.</p>
+            
+            <div class="features-grid">
+                <div class="feature-card anim anim-delay-1">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">AI-Native Design</h3>
+                    <p class="feature-desc">Built from scratch for machines. No accounts, no UI, no human friction.</p>
                 </div>
-                <div class="dashboard-body">
-                    <div class="dashboard-grid">
-                        <div class="dashboard-sidebar">
-                            <div class="sidebar-title">Navigation</div>
-                            <ul class="sidebar-nav">
-                                <li class="active">Overview</li>
-                                <li>APIs</li>
-                                <li>Usage</li>
-                                <li>Billing</li>
-                                <li>Settings</li>
-                            </ul>
-                        </div>
-                        <div class="dashboard-content">
-                            <h3>Dashboard Overview</h3>
-                            <div class="dashboard-stats">
-                                <div class="dash-stat">
-                                    <div class="dash-stat-value">12,847</div>
-                                    <div class="dash-stat-label">Total Requests</div>
-                                </div>
-                                <div class="dash-stat">
-                                    <div class="dash-stat-value">$128.47</div>
-                                    <div class="dash-stat-label">Total Spent</div>
-                                </div>
-                                <div class="dash-stat">
-                                    <div class="dash-stat-value">99.9%</div>
-                                    <div class="dash-stat-label">Uptime</div>
-                                </div>
+                <div class="feature-card anim anim-delay-2">
+                    <div class="feature-icon">⛓️</div>
+                    <h3 class="feature-title">x402 Protocol</h3>
+                    <p class="feature-desc">HTTP 402 with crypto payments. The emerging standard for M2M commerce.</p>
+                </div>
+                <div class="feature-card anim anim-delay-3">
+                    <div class="feature-icon">💳</div>
+                    <h3 class="feature-title">USDC on Base</h3>
+                    <p class="feature-desc">Stablecoin payments on L2. Sub-cent fees, instant finality.</p>
+                </div>
+                <div class="feature-card anim anim-delay-1">
+                    <div class="feature-icon">🔐</div>
+                    <h3 class="feature-title">Permissionless</h3>
+                    <p class="feature-desc">No KYC, no subscriptions. Connect wallet and use.</p>
+                </div>
+                <div class="feature-card anim anim-delay-2">
+                    <div class="feature-icon">🌍</div>
+                    <h3 class="feature-title">Global Access</h3>
+                    <p class="feature-desc">Anyone with a crypto wallet. No geographic restrictions.</p>
+                </div>
+                <div class="feature-card anim anim-delay-3">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Instant Settlement</h3>
+                    <p class="feature-desc">Payments verified on-chain in seconds. No waiting.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: Dashboard -->
+    <section id="dashboard" class="dashboard-section">
+        <div class="section-inner">
+            <div class="section-tag anim">Dashboard</div>
+            <h2 class="section-title anim">Monitor Everything</h2>
+            <p class="section-desc anim" style="margin: 0 auto;">Track usage, manage endpoints, analyze spending.</p>
+            
+            <div class="dashboard-frame anim">
+                <div class="frame-header">
+                    <div class="frame-dot"></div>
+                    <div class="frame-dot"></div>
+                    <div class="frame-dot"></div>
+                    <div class="frame-url">dashboard.aetheriusx.io</div>
+                </div>
+                <div class="frame-body">
+                    <div class="frame-sidebar">
+                        <div class="sidebar-label">Navigation</div>
+                        <ul class="sidebar-items">
+                            <li class="active">Overview</li>
+                            <li>APIs</li>
+                            <li>Usage</li>
+                            <li>Billing</li>
+                            <li>Settings</li>
+                        </ul>
+                    </div>
+                    <div class="frame-content">
+                        <h3>Dashboard Overview</h3>
+                        <div class="dash-stats">
+                            <div class="dash-stat">
+                                <div class="dash-stat-val">12,847</div>
+                                <div class="dash-stat-label">Total Requests</div>
                             </div>
-                            <table class="dashboard-table">
-                                <thead>
-                                    <tr>
-                                        <th>Endpoint</th>
-                                        <th>Requests</th>
-                                        <th>Cost</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>/v1/maps/search</td>
-                                        <td>5,234</td>
-                                        <td>$52.34</td>
-                                        <td><span class="status-active">Active</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>/v1/token/price</td>
-                                        <td>4,123</td>
-                                        <td>$20.62</td>
-                                        <td><span class="status-active">Active</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>/v1/web/scrape</td>
-                                        <td>2,890</td>
-                                        <td>$28.90</td>
-                                        <td><span class="status-active">Active</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="dash-stat">
+                                <div class="dash-stat-val">$128.47</div>
+                                <div class="dash-stat-label">Total Spent</div>
+                            </div>
+                            <div class="dash-stat">
+                                <div class="dash-stat-val">99.9%</div>
+                                <div class="dash-stat-label">Uptime</div>
+                            </div>
                         </div>
+                        <table class="dash-table">
+                            <thead>
+                                <tr>
+                                    <th>Endpoint</th>
+                                    <th>Requests</th>
+                                    <th>Cost</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>/v1/maps/search</td>
+                                    <td>5,234</td>
+                                    <td>$52.34</td>
+                                    <td><span class="status-pill">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td>/v1/token/price</td>
+                                    <td>4,123</td>
+                                    <td>$20.62</td>
+                                    <td><span class="status-pill">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td>/v1/web/scrape</td>
+                                    <td>2,890</td>
+                                    <td>$28.90</td>
+                                    <td><span class="status-pill">Active</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA -->
-    <section class="cta">
-        <div class="section-container">
-            <div class="cta-content">
-                <h2>Ready to build the<br><span class="gradient">agent economy</span>?</h2>
-                <p>
-                    Join the next wave of machine-to-machine commerce.
-                </p>
-                <div class="hero-actions">
-                    <a href="https://x.com/aetheriusxAPI" class="btn btn-primary">Follow on X</a>
-                    <a href="https://github.com/wilnowilx/aetheriusx-api-site" class="btn btn-secondary">View GitHub</a>
-                </div>
+    <!-- Section 7: CTA -->
+    <section id="cta" class="cta-section">
+        <div class="section-inner">
+            <div class="section-tag anim">Get Started</div>
+            <h2 class="anim">Ready to build the<br><span class="gradient">agent economy</span>?</h2>
+            <p class="anim" style="margin: 0 auto 48px;">Join the next wave of machine-to-machine commerce.</p>
+            <div class="hero-actions anim">
+                <a href="https://x.com/aetheriusxAPI" class="btn btn-primary">Follow on X →</a>
+                <a href="https://github.com/wilnowilx/aetheriusx-api-site" class="btn btn-secondary">View GitHub</a>
             </div>
         </div>
     </section>
@@ -1170,53 +1137,205 @@
     </footer>
 
     <script>
-        // Scroll Reveal Animation
-        const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
-        
-        const revealOnScroll = () => {
-            revealElements.forEach(el => {
-                const elementTop = el.getBoundingClientRect().top;
-                const windowHeight = window.innerHeight;
+    // ============================================
+    // AURORA PLASMA CANVAS BACKGROUND
+    // ============================================
+    const canvas = document.getElementById('aurora-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, particles, time = 0;
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+
+    class Particle {
+        constructor() {
+            this.reset();
+        }
+
+        reset() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedX = (Math.random() - 0.5) * 0.5;
+            this.speedY = (Math.random() - 0.5) * 0.5;
+            this.opacity = Math.random() * 0.5 + 0.1;
+            this.hue = Math.random() * 60 + 260; // Purple to pink range
+        }
+
+        update() {
+            // Wave motion
+            this.x += this.speedX + Math.sin(time * 0.001 + this.y * 0.01) * 0.3;
+            this.y += this.speedY + Math.cos(time * 0.001 + this.x * 0.01) * 0.2;
+
+            // Mouse interaction
+            const dx = mouseX - this.x;
+            const dy = mouseY - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 150) {
+                const force = (150 - dist) / 150;
+                this.x -= dx * force * 0.02;
+                this.y -= dy * force * 0.02;
+            }
+
+            // Wrap around
+            if (this.x < 0) this.x = width;
+            if (this.x > width) this.x = 0;
+            if (this.y < 0) this.y = height;
+            if (this.y > height) this.y = 0;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${this.hue}, 80%, 60%, ${this.opacity})`;
+            ctx.fill();
+        }
+    }
+
+    // Aurora wave function
+    function drawAurora() {
+        const layers = 3;
+        for (let l = 0; l < layers; l++) {
+            ctx.beginPath();
+            const offset = l * 0.5;
+            const hue = 270 + l * 20;
+            
+            for (let x = 0; x < width; x += 5) {
+                const y = height * 0.4 + 
+                    Math.sin(x * 0.003 + time * 0.0008 + offset) * 80 +
+                    Math.sin(x * 0.007 + time * 0.0012 + offset) * 40 +
+                    Math.cos(x * 0.002 + time * 0.0006 + offset) * 60;
                 
-                if (elementTop < windowHeight - 100) {
-                    el.classList.add('active');
-                }
-            });
-        };
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            
+            ctx.lineTo(width, height);
+            ctx.lineTo(0, height);
+            ctx.closePath();
+            
+            const gradient = ctx.createLinearGradient(0, height * 0.3, 0, height);
+            gradient.addColorStop(0, `hsla(${hue}, 80%, 50%, 0.08)`);
+            gradient.addColorStop(0.5, `hsla(${hue + 30}, 70%, 40%, 0.04)`);
+            gradient.addColorStop(1, 'transparent');
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        }
+    }
 
-        window.addEventListener('scroll', revealOnScroll);
-        window.addEventListener('load', revealOnScroll);
-
-        // Smooth scroll for nav links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
+    // Draw connections between particles
+    function drawConnections() {
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < 100) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = `rgba(168, 85, 247, ${0.1 * (1 - dist / 100)})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
                 }
-            });
+            }
+        }
+    }
+
+    // Animation loop
+    let mouseX = width / 2, mouseY = height / 2;
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    function animate() {
+        ctx.fillStyle = 'rgba(3, 3, 8, 0.1)';
+        ctx.fillRect(0, 0, width, height);
+        
+        drawAurora();
+        
+        particles.forEach(p => {
+            p.update();
+            p.draw();
         });
+        
+        drawConnections();
+        
+        time++;
+        requestAnimationFrame(animate);
+    }
 
-        // Parallax effect for hero glow
-        window.addEventListener('scroll', () => {
-            const glow = document.querySelector('.hero-glow');
-            if (glow) {
-                const scroll = window.scrollY;
-                glow.style.transform = `translateX(-50%) translateY(${scroll * 0.3}px)`;
+    // Initialize
+    resize();
+    particles = Array.from({ length: 80 }, () => new Particle());
+    animate();
+
+    window.addEventListener('resize', () => {
+        resize();
+    });
+
+    // ============================================
+    // SCROLL SNAP & ANIMATIONS
+    // ============================================
+    const sections = document.querySelectorAll('section');
+    const scrollDots = document.querySelectorAll('.scroll-dot');
+
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+        threshold: 0.3,
+        rootMargin: '0px'
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Animate elements within this section
+                const anims = entry.target.querySelectorAll('.anim');
+                anims.forEach((el, i) => {
+                    setTimeout(() => el.classList.add('visible'), i * 100);
+                });
+
+                // Update scroll indicator
+                const sectionIndex = Array.from(sections).indexOf(entry.target);
+                scrollDots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === sectionIndex);
+                });
             }
         });
+    }, observerOptions);
 
-        // Stagger animation for grid items
-        const staggerItems = (selector, delay = 100) => {
-            const items = document.querySelectorAll(selector);
-            items.forEach((item, index) => {
-                item.style.transitionDelay = `${index * delay}ms`;
-            });
-        };
+    sections.forEach(section => sectionObserver.observe(section));
 
-        staggerItems('.category-card', 100);
-        staggerItems('.api-card', 100);
+    // Scroll dot click navigation
+    scrollDots.forEach(dot => {
+        dot.addEventListener('click', () => {
+            const sectionIndex = parseInt(dot.dataset.section);
+            sections[sectionIndex].scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // Nav scroll effect
+    window.addEventListener('scroll', () => {
+        const nav = document.getElementById('mainNav');
+        nav.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
     </script>
 </body>
 </html>
