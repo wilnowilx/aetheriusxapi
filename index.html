@@ -3,26 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AETHERIUS | The Operating System for AI Agent Commerce</title>
-    <meta name="description" content="Infrastructure layer for machine-to-machine commerce. Crypto-native APIs where AI agents pay per request in USDC on Base.">
-    <meta property="og:title" content="AETHERIUS - AI Agent Commerce Infrastructure">
-    <meta property="og:description" content="The operating system for AI agent commerce. Built on x402 protocol on Base.">
-    <meta property="og:type" content="website">
+    <title>AETHERIUS | The AI Agent Commerce Platform</title>
+    <meta name="description" content="500+ APIs where AI agents pay per request in USDC on Base. The operating system for machine-to-machine commerce.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #000000;
-            --bg-elevated: #0a0a0f;
+            --bg: #050508;
+            --bg-elevated: #0a0a12;
             --bg-card: rgba(255,255,255,0.03);
-            --border: rgba(255,255,255,0.08);
-            --border-hover: rgba(255,255,255,0.15);
+            --border: rgba(255,255,255,0.06);
+            --border-hover: rgba(255,255,255,0.12);
             --text: #fafafa;
             --text-secondary: #a1a1aa;
             --text-muted: #52525b;
-            --blue: #3b82f6;
             --purple: #8b5cf6;
+            --purple-glow: rgba(139,92,246,0.4);
+            --blue: #3b82f6;
             --green: #10b981;
             --pink: #ec4899;
         }
@@ -46,15 +44,15 @@
             right: 0;
             z-index: 1000;
             padding: 16px 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(5,5,8,0.8);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
         }
 
-        nav .container {
-            max-width: 1200px;
+        .nav-container {
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -63,11 +61,10 @@
         .nav-brand {
             font-size: 1.25rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-decoration: none;
-            letter-spacing: -0.02em;
         }
 
         .nav-links { display: flex; gap: 32px; align-items: center; }
@@ -82,9 +79,9 @@
 
         .nav-links a:hover { color: var(--text); }
 
-        .nav-cta {
+        .btn-nav {
             padding: 10px 20px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
             border-radius: 8px;
             color: white !important;
             font-weight: 600;
@@ -98,41 +95,52 @@
             justify-content: center;
             text-align: center;
             position: relative;
-            padding: 120px 24px;
+            padding: 120px 32px;
+            overflow: hidden;
         }
 
-        .hero::before {
-            content: '';
+        .hero-glow {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(ellipse 80% 50% at 50% 0%, rgba(59,130,246,0.15) 0%, transparent 50%),
-                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139,92,246,0.1) 0%, transparent 50%);
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(ellipse, var(--purple-glow) 0%, transparent 70%);
+            filter: blur(60px);
+            opacity: 0.6;
+            animation: glowPulse 4s ease-in-out infinite;
         }
 
-        .hero-content { position: relative; z-index: 1; max-width: 900px; }
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.4; transform: translateX(-50%) scale(1); }
+            50% { opacity: 0.6; transform: translateX(-50%) scale(1.1); }
+        }
 
-        .hero-eyebrow {
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+        }
+
+        .hero-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
             padding: 8px 16px;
-            background: rgba(16,185,129,0.1);
-            border: 1px solid rgba(16,185,129,0.3);
+            background: rgba(139,92,246,0.1);
+            border: 1px solid rgba(139,92,246,0.3);
             border-radius: 9999px;
             font-size: 0.85rem;
-            color: var(--green);
+            color: var(--purple);
             margin-bottom: 32px;
         }
 
-        .hero-eyebrow::before {
+        .hero-badge::before {
             content: '';
             width: 8px;
             height: 8px;
-            background: var(--green);
+            background: var(--purple);
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
@@ -143,15 +151,15 @@
         }
 
         .hero h1 {
-            font-size: clamp(3rem, 8vw, 6rem);
+            font-size: clamp(3rem, 8vw, 5.5rem);
             font-weight: 900;
-            line-height: 1;
+            line-height: 1.05;
             letter-spacing: -0.04em;
             margin-bottom: 24px;
         }
 
         .hero h1 .gradient {
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #3b82f6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -159,7 +167,7 @@
         .hero-sub {
             font-size: 1.25rem;
             color: var(--text-secondary);
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto 48px;
             line-height: 1.7;
         }
@@ -177,17 +185,19 @@
             font-weight: 600;
             font-size: 1rem;
             text-decoration: none;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            cursor: pointer;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
             color: white;
+            border: none;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(59,130,246,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 60px var(--purple-glow);
         }
 
         .btn-secondary {
@@ -201,54 +211,53 @@
             background: var(--bg-card);
         }
 
-        /* ===== METRICS ===== */
-        .metrics {
+        /* ===== STATS ===== */
+        .stats {
             padding: 80px 0;
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
+            background: var(--bg-elevated);
         }
 
-        .metrics-grid {
+        .stats-grid {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 32px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 32px;
+            gap: 48px;
             text-align: center;
         }
 
-        .metric-value {
+        .stat-value {
             font-size: 3rem;
             font-weight: 900;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             line-height: 1;
             margin-bottom: 8px;
         }
 
-        .metric-label { color: var(--text-secondary); font-size: 0.9rem; }
+        .stat-label { color: var(--text-secondary); font-size: 0.9rem; }
 
-        /* ===== VISION ===== */
-        .vision {
+        /* ===== CATEGORIES ===== */
+        .categories {
             padding: 160px 0;
         }
 
-        .vision .container {
+        .section-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 32px;
         }
 
-        .vision-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            align-items: center;
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
         }
 
-        .vision-content .tag {
+        .section-tag {
             display: inline-block;
             padding: 6px 12px;
             background: rgba(139,92,246,0.1);
@@ -256,122 +265,6 @@
             border-radius: 6px;
             font-size: 0.75rem;
             color: var(--purple);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
-            margin-bottom: 24px;
-        }
-
-        .vision-content h2 {
-            font-size: 3rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin-bottom: 24px;
-            line-height: 1.1;
-        }
-
-        .vision-content p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            margin-bottom: 32px;
-            line-height: 1.7;
-        }
-
-        .vision-visual {
-            position: relative;
-        }
-
-        .vision-card {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 48px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .vision-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
-        }
-
-        .vision-card h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 24px;
-        }
-
-        .flow-diagram {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .flow-step {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-        }
-
-        .flow-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        .flow-text {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .flow-text strong { color: var(--text); }
-
-        .flow-arrow {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 1.2rem;
-        }
-
-        /* ===== ENDPOINTS ===== */
-        .endpoints {
-            padding: 160px 0;
-            background: var(--bg-elevated);
-        }
-
-        .endpoints .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 64px;
-        }
-
-        .section-tag {
-            display: inline-block;
-            padding: 6px 12px;
-            background: rgba(59,130,246,0.1);
-            border: 1px solid rgba(59,130,246,0.2);
-            border-radius: 6px;
-            font-size: 0.75rem;
-            color: var(--blue);
             text-transform: uppercase;
             letter-spacing: 0.05em;
             font-weight: 600;
@@ -392,284 +285,334 @@
             margin: 0 auto;
         }
 
-        .endpoint-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .endpoint-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 24px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            transition: all 0.2s;
-        }
-
-        .endpoint-card:hover {
-            border-color: var(--border-hover);
-            transform: translateY(-2px);
-        }
-
-        .endpoint-method {
-            display: inline-block;
-            padding: 2px 8px;
-            background: rgba(16,185,129,0.2);
-            color: var(--green);
-            border-radius: 4px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-right: 8px;
-        }
-
-        .endpoint-name {
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--text);
-            font-size: 0.9rem;
-        }
-
-        .endpoint-desc {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-top: 4px;
-        }
-
-        .endpoint-price {
-            padding: 6px 14px;
-            background: rgba(16,185,129,0.1);
-            border: 1px solid rgba(16,185,129,0.2);
-            border-radius: 9999px;
-            color: var(--green);
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        /* ===== TECH ===== */
-        .tech {
-            padding: 160px 0;
-        }
-
-        .tech .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        .tech-grid {
+        .categories-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
         }
 
-        .tech-card {
+        .category-card {
             padding: 40px;
             background: var(--bg-elevated);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            transition: all 0.3s;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .tech-card:hover {
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--purple), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .category-card:hover {
             border-color: var(--border-hover);
-            transform: translateY(-4px);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(139,92,246,0.1);
         }
 
-        .tech-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 12px;
+        .category-card:hover::before { opacity: 1; }
+
+        .category-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.2));
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             margin-bottom: 24px;
         }
 
-        .tech-card:nth-child(2) .tech-icon { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
-        .tech-card:nth-child(3) .tech-icon { background: linear-gradient(135deg, #10b981, #06b6d4); }
-
-        .tech-title {
+        .category-title {
             font-size: 1.25rem;
             font-weight: 700;
             margin-bottom: 12px;
         }
 
-        .tech-desc { color: var(--text-secondary); font-size: 0.95rem; }
+        .category-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
 
-        /* ===== TRACTION ===== */
-        .traction {
+        .category-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--purple);
+        }
+
+        /* ===== FEATURED APIs ===== */
+        .featured {
             padding: 160px 0;
             background: var(--bg-elevated);
         }
 
-        .traction .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        .traction-grid {
+        .api-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 64px;
-            align-items: center;
-        }
-
-        .traction-content .tag {
-            display: inline-block;
-            padding: 6px 12px;
-            background: rgba(16,185,129,0.1);
-            border: 1px solid rgba(16,185,129,0.2);
-            border-radius: 6px;
-            font-size: 0.75rem;
-            color: var(--green);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
-            margin-bottom: 24px;
-        }
-
-        .traction-content h2 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin-bottom: 24px;
-            line-height: 1.2;
-        }
-
-        .traction-content p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            margin-bottom: 32px;
-            line-height: 1.7;
-        }
-
-        .traction-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 24px;
         }
 
-        .traction-stat {
-            padding: 24px;
+        .api-card {
+            padding: 32px;
             background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+
+        .api-card:hover {
+            border-color: var(--purple);
+            transform: translateY(-4px);
+        }
+
+        .api-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .api-method {
+            padding: 4px 10px;
+            background: rgba(16,185,129,0.2);
+            color: var(--green);
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .api-price {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        .api-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .api-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .api-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .api-tag {
+            padding: 4px 10px;
+            background: rgba(139,92,246,0.1);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--purple);
+        }
+
+        /* ===== HOW IT WORKS ===== */
+        .how-it-works {
+            padding: 160px 0;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 48px;
+            position: relative;
+        }
+
+        .steps-grid::before {
+            content: '';
+            position: absolute;
+            top: 48px;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--purple), transparent);
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 96px;
+            height: 96px;
+            background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.2));
+            border: 2px solid var(--purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 auto 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .step-desc { color: var(--text-secondary); font-size: 0.95rem; }
+
+        /* ===== DASHBOARD PREVIEW ===== */
+        .dashboard {
+            padding: 160px 0;
+            background: var(--bg-elevated);
+        }
+
+        .dashboard-preview {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 24px;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dashboard-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dashboard-dot:nth-child(1) { background: #ef4444; }
+        .dashboard-dot:nth-child(2) { background: #f59e0b; }
+        .dashboard-dot:nth-child(3) { background: #10b981; }
+
+        .dashboard-body {
+            padding: 48px;
+            min-height: 500px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 32px;
+        }
+
+        .dashboard-sidebar {
+            border-right: 1px solid var(--border);
+            padding-right: 32px;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .sidebar-nav { list-style: none; }
+
+        .sidebar-nav li {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav li:hover { background: var(--bg-card); color: var(--text); }
+        .sidebar-nav li.active { background: rgba(139,92,246,0.1); color: var(--purple); }
+
+        .dashboard-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .dash-stat {
+            padding: 24px;
+            background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: 12px;
         }
 
-        .traction-stat-value {
-            font-size: 2rem;
+        .dash-stat-value {
+            font-size: 1.75rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .traction-stat-label {
+        .dash-stat-label {
             color: var(--text-secondary);
             font-size: 0.85rem;
             margin-top: 4px;
         }
 
-        .traction-code {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-        }
-
-        .code-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 16px 20px;
-            background: rgba(255,255,255,0.03);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .code-dot { width: 12px; height: 12px; border-radius: 50%; }
-        .code-dot:nth-child(1) { background: #ef4444; }
-        .code-dot:nth-child(2) { background: #f59e0b; }
-        .code-dot:nth-child(3) { background: #10b981; }
-
-        .code-body {
-            padding: 24px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            line-height: 1.8;
-            overflow-x: auto;
-        }
-
-        .code-body .comment { color: #52525b; }
-        .code-body .keyword { color: #8b5cf6; }
-        .code-body .string { color: #10b981; }
-        .code-body .function { color: #3b82f6; }
-
-        /* ===== FAQ ===== */
-        .faq {
-            padding: 160px 0;
-        }
-
-        .faq .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        .faq-item {
-            border-bottom: 1px solid var(--border);
-        }
-
-        .faq-question {
+        .dashboard-table {
             width: 100%;
-            padding: 24px 0;
-            background: none;
-            border: none;
-            color: var(--text);
-            font-size: 1.1rem;
-            font-weight: 600;
+            border-collapse: collapse;
+        }
+
+        .dashboard-table th,
+        .dashboard-table td {
+            padding: 16px;
             text-align: left;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-bottom: 1px solid var(--border);
         }
 
-        .faq-question::after {
-            content: '+';
-            font-size: 1.5rem;
+        .dashboard-table th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             color: var(--text-muted);
-            transition: transform 0.2s;
         }
 
-        .faq-item.active .faq-question::after {
-            transform: rotate(45deg);
-        }
-
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .faq-item.active .faq-answer {
-            max-height: 200px;
-        }
-
-        .faq-answer p {
-            padding-bottom: 24px;
+        .dashboard-table td {
             color: var(--text-secondary);
-            line-height: 1.7;
+            font-size: 0.9rem;
+        }
+
+        .status-active {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(16,185,129,0.2);
+            color: var(--green);
+            border-radius: 6px;
+            font-size: 0.75rem;
         }
 
         /* ===== CTA ===== */
         .cta {
-            padding: 160px 0;
+            padding: 200px 0;
             text-align: center;
             position: relative;
         }
@@ -681,16 +624,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(59,130,246,0.1) 0%, transparent 50%);
+            background: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(139,92,246,0.15) 0%, transparent 70%);
         }
 
-        .cta .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-            position: relative;
-            z-index: 1;
-        }
+        .cta-content { position: relative; z-index: 1; }
 
         .cta h2 {
             font-size: clamp(2.5rem, 5vw, 4rem);
@@ -714,10 +651,10 @@
             border-top: 1px solid var(--border);
         }
 
-        footer .container {
+        .footer-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 32px;
         }
 
         .footer-grid {
@@ -767,358 +704,411 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
-            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-            .vision-grid { grid-template-columns: 1fr; }
-            .tech-grid { grid-template-columns: 1fr; }
-            .traction-grid { grid-template-columns: 1fr; }
+            .categories-grid, .api-grid, .steps-grid { grid-template-columns: repeat(2, 1fr); }
+            .dashboard-grid { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr 1fr; }
         }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
-            .endpoint-grid { grid-template-columns: 1fr; }
-            .traction-stats { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .categories-grid, .api-grid, .steps-grid { grid-template-columns: 1fr; }
+            .dashboard-stats { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; }
             .footer-bottom { flex-direction: column; gap: 24px; }
         }
 
-        /* ===== ANIMATIONS ===== */
-        .fade-in {
+        /* ===== SCROLL ANIMATIONS ===== */
+        .reveal {
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s, transform 0.6s;
+            transform: translateY(60px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .fade-in.visible {
+        .reveal.active {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-60px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal-left.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(60px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal-right.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal-scale.active {
+            opacity: 1;
+            transform: scale(1);
         }
     </style>
 </head>
 <body>
     <!-- Nav -->
     <nav>
-        <div class="container">
+        <div class="nav-container">
             <a href="#" class="nav-brand">AETHERIUS</a>
             <div class="nav-links">
-                <a href="#vision">Vision</a>
-                <a href="#endpoints">APIs</a>
-                <a href="#tech">Tech</a>
-                <a href="#traction">Traction</a>
+                <a href="#categories">APIs</a>
+                <a href="#featured">Featured</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#dashboard">Dashboard</a>
                 <a href="#faq">FAQ</a>
-                <a href="https://x.com/aetheriusxAPI" class="nav-cta">Build with us</a>
+                <a href="https://x.com/aetheriusxAPI" class="btn-nav">Get API Key</a>
             </div>
         </div>
     </nav>
 
     <!-- Hero -->
     <section class="hero">
+        <div class="hero-glow"></div>
         <div class="hero-content">
-            <div class="hero-eyebrow fade-in">
-                <span></span> Building on Base Mainnet
+            <div class="hero-badge">
+                <span></span> 500+ APIs Available
             </div>
-            <h1 class="fade-in">
-                The Operating System for<br>
-                <span class="gradient">AI Agent Commerce</span>
+            <h1>
+                The API Marketplace for<br>
+                <span class="gradient">AI Agents</span>
             </h1>
-            <p class="hero-sub fade-in">
-                Infrastructure that lets AI agents discover, pay for, and consume APIs autonomously. 
-                Built on x402 protocol. Powered by USDC on Base.
+            <p class="hero-sub">
+                One platform. Hundreds of APIs. Pay per request in USDC on Base.
+                Built for machines that think, browse, and transact autonomously.
             </p>
-            <div class="hero-actions fade-in">
-                <a href="#endpoints" class="btn btn-primary">Explore APIs</a>
-                <a href="#vision" class="btn btn-secondary">Read the Vision</a>
+            <div class="hero-actions">
+                <a href="#categories" class="btn btn-primary">Explore APIs</a>
+                <a href="#dashboard" class="btn btn-secondary">View Dashboard</a>
             </div>
         </div>
     </section>
 
-    <!-- Metrics -->
-    <section class="metrics">
-        <div class="metrics-grid">
-            <div class="fade-in">
-                <div class="metric-value">10</div>
-                <div class="metric-label">Live Endpoints</div>
+    <!-- Stats -->
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="reveal">
+                <div class="stat-value">500+</div>
+                <div class="stat-label">Available APIs</div>
             </div>
-            <div class="fade-in">
-                <div class="metric-value">$0.005</div>
-                <div class="metric-label">Minimum Price</div>
+            <div class="reveal">
+                <div class="stat-value">12</div>
+                <div class="stat-label">Categories</div>
             </div>
-            <div class="fade-in">
-                <div class="metric-value">&lt;1s</div>
-                <div class="metric-label">Settlement</div>
+            <div class="reveal">
+                <div class="stat-value">$0.001</div>
+                <div class="stat-label">Starting Price</div>
             </div>
-            <div class="fade-in">
-                <div class="metric-value">100%</div>
-                <div class="metric-label">On-chain</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Vision -->
-    <section class="vision" id="vision">
-        <div class="container">
-            <div class="vision-grid">
-                <div class="vision-content fade-in">
-                    <div class="tag">Our Vision</div>
-                    <h2>AI agents will be the largest consumers of APIs on the internet</h2>
-                    <p>
-                        By 2027, AI agents will autonomously consume billions of API requests. 
-                        They need infrastructure that speaks their language — programmatic, 
-                        instant, and trustless.
-                    </p>
-                    <p>
-                        aetheriusxAPI is building the operating system for this new economy. 
-                        We don't just sell APIs — we create the infrastructure layer where 
-                        machines transact with machines.
-                    </p>
-                    <a href="#traction" class="btn btn-primary">See Our Traction</a>
-                </div>
-
-                <div class="vision-visual fade-in">
-                    <div class="vision-card">
-                        <h3>How It Works</h3>
-                        <div class="flow-diagram">
-                            <div class="flow-step">
-                                <div class="flow-icon">🤖</div>
-                                <div class="flow-text"><strong>AI Agent</strong> needs business data</div>
-                            </div>
-                            <div class="flow-arrow">↓</div>
-                            <div class="flow-step">
-                                <div class="flow-icon">📡</div>
-                                <div class="flow-text"><strong>HTTP Request</strong> to aetheriusxAPI</div>
-                            </div>
-                            <div class="flow-arrow">↓</div>
-                            <div class="flow-step">
-                                <div class="flow-icon">💳</div>
-                                <div class="flow-text"><strong>x402 Payment</strong> in USDC on Base</div>
-                            </div>
-                            <div class="flow-arrow">↓</div>
-                            <div class="flow-step">
-                                <div class="flow-icon">✅</div>
-                                <div class="flow-text"><strong>Data Delivered</strong> instantly</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="reveal">
+                <div class="stat-value">&lt;50ms</div>
+                <div class="stat-label">Avg Latency</div>
             </div>
         </div>
     </section>
 
-    <!-- Endpoints -->
-    <section class="endpoints" id="endpoints">
-        <div class="container">
+    <!-- Categories -->
+    <section class="categories" id="categories">
+        <div class="section-container">
             <div class="section-header">
-                <div class="section-tag">APIs</div>
-                <h2 class="section-title">Pay Per Request</h2>
+                <div class="section-tag">Categories</div>
+                <h2 class="section-title">500+ APIs Across 12 Categories</h2>
                 <p class="section-desc">
-                    10 live endpoints. No subscriptions. No minimums. Pay only for what you use.
+                    From maps to machine learning. From weather to web scraping.
+                    Everything AI agents need to interact with the world.
                 </p>
             </div>
 
-            <div class="endpoint-grid">
-                <div class="endpoint-card">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-name">/v1/maps/search</span>
-                        <div class="endpoint-desc">Business search</div>
-                    </div>
-                    <div class="endpoint-price">$0.01</div>
+            <div class="categories-grid">
+                <div class="category-card reveal">
+                    <div class="category-icon">🗺️</div>
+                    <h3 class="category-title">Maps & Location</h3>
+                    <p class="category-desc">Business search, geocoding, routing, places, reviews</p>
+                    <div class="category-count">45+ APIs</div>
                 </div>
-                <div class="endpoint-card">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-name">/v1/maps/reviews</span>
-                        <div class="endpoint-desc">Reviews scraper</div>
-                    </div>
-                    <div class="endpoint-price">$0.02</div>
+                <div class="category-card reveal">
+                    <div class="category-icon">₿</div>
+                    <h3 class="category-title">Crypto & DeFi</h3>
+                    <p class="category-desc">Token data, prices, analytics, wallet tracking, DEX</p>
+                    <div class="category-count">85+ APIs</div>
                 </div>
-                <div class="endpoint-card">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-name">/v1/maps/nearby</span>
-                        <div class="endpoint-desc">Nearby places</div>
-                    </div>
-                    <div class="endpoint-price">$0.015</div>
+                <div class="category-card reveal">
+                    <div class="category-icon">🌐</div>
+                    <h3 class="category-title">Web & Scraping</h3>
+                    <p class="category-desc">HTML parsing, screenshots, proxies, headless browser</p>
+                    <div class="category-count">35+ APIs</div>
                 </div>
-                <div class="endpoint-card">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-name">/v1/token/analyze</span>
-                        <div class="endpoint-desc">Token risk analysis</div>
-                    </div>
-                    <div class="endpoint-price">$0.02</div>
+                <div class="category-card reveal">
+                    <div class="category-icon">🤖</div>
+                    <h3 class="category-title">AI & ML</h3>
+                    <p class="category-desc">LLM inference, embeddings, image generation, NLP</p>
+                    <div class="category-count">60+ APIs</div>
                 </div>
-                <div class="endpoint-card">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-name">/v1/token/holders</span>
-                        <div class="endpoint-desc">Holder distribution</div>
-                    </div>
-                    <div class="endpoint-price">$0.03</div>
+                <div class="category-card reveal">
+                    <div class="category-icon">💰</div>
+                    <h3 class="category-title">Finance</h3>
+                    <p class="category-desc">Stock data, forex, market news, financial analysis</p>
+                    <div class="category-count">70+ APIs</div>
                 </div>
-                <div class="endpoint-card">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-name">/v1/token/price</span>
-                        <div class="endpoint-desc">Real-time price</div>
-                    </div>
-                    <div class="endpoint-price">$0.005</div>
+                <div class="category-card reveal">
+                    <div class="category-icon">📧</div>
+                    <h3 class="category-title">Communication</h3>
+                    <p class="category-desc">Email validation, SMS, notifications, webhooks</p>
+                    <div class="category-count">25+ APIs</div>
                 </div>
-                <div class="endpoint-card">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-name">/v1/web/scrape</span>
-                        <div class="endpoint-desc">Web scraper</div>
-                    </div>
-                    <div class="endpoint-price">$0.01</div>
+                <div class="category-card reveal">
+                    <div class="category-icon">🌤️</div>
+                    <h3 class="category-title">Weather & Environment</h3>
+                    <p class="category-desc">Forecasts, air quality, UV index, severe alerts</p>
+                    <div class="category-count">20+ APIs</div>
                 </div>
-                <div class="endpoint-card">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-name">/v1/web/screenshot</span>
-                        <div class="endpoint-desc">Screenshot capture</div>
-                    </div>
-                    <div class="endpoint-price">$0.025</div>
+                <div class="category-card reveal">
+                    <div class="category-icon">📰</div>
+                    <h3 class="category-title">News & Media</h3>
+                    <p class="category-desc">News aggregation, sentiment, RSS, content analysis</p>
+                    <div class="category-count">40+ APIs</div>
                 </div>
-                <div class="endpoint-card">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-name">/v1/email/validate</span>
-                        <div class="endpoint-desc">Email verification</div>
-                    </div>
-                    <div class="endpoint-price">$0.005</div>
+                <div class="category-card reveal">
+                    <div class="category-icon">🔐</div>
+                    <h3 class="category-title">Security</h3>
+                    <p class="category-desc">Threat intel, vulnerability scan, domain check, DNS</p>
+                    <div class="category-count">30+ APIs</div>
                 </div>
-                <div class="endpoint-card">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-name">/v1/data/weather</span>
-                        <div class="endpoint-desc">Weather forecast</div>
-                    </div>
-                    <div class="endpoint-price">$0.008</div>
+                <div class="category-card reveal">
+                    <div class="category-icon">📊</div>
+                    <h3 class="category-title">Data & Analytics</h3>
+                    <p class="category-desc">Statistics, datasets, visualization, ETL pipelines</p>
+                    <div class="category-count">55+ APIs</div>
+                </div>
+                <div class="category-card reveal">
+                    <div class="category-icon">🎮</div>
+                    <h3 class="category-title">Gaming</h3>
+                    <p class="category-desc">Player stats, achievements, leaderboards, game data</p>
+                    <div class="category-count">25+ APIs</div>
+                </div>
+                <div class="category-card reveal">
+                    <div class="category-icon">🏥</div>
+                    <h3 class="category-title">Health & Science</h3>
+                    <p class="category-desc">Medical data, research papers, clinical trials</p>
+                    <div class="category-count">35+ APIs</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Tech -->
-    <section class="tech" id="tech">
-        <div class="container">
+    <!-- Featured APIs -->
+    <section class="featured" id="featured">
+        <div class="section-container">
             <div class="section-header">
-                <div class="section-tag">Technology</div>
-                <h2 class="section-title">Built for Scale</h2>
+                <div class="section-tag">Featured</div>
+                <h2 class="section-title">Most Popular APIs</h2>
                 <p class="section-desc">
-                    Modern stack designed for machine-to-machine commerce at scale.
+                    Start with these battle-tested endpoints.
                 </p>
             </div>
 
-            <div class="tech-grid">
-                <div class="tech-card">
-                    <div class="tech-icon">⛓️</div>
-                    <h3 class="tech-title">x402 Protocol</h3>
-                    <p class="tech-desc">The emerging standard for HTTP-native crypto payments. Every request is a micro-transaction.</p>
+            <div class="api-grid">
+                <div class="api-card reveal">
+                    <div class="api-header">
+                        <span class="api-method">GET</span>
+                        <span class="api-price">$0.01</span>
+                    </div>
+                    <div class="api-name">/v1/maps/search</div>
+                    <div class="api-desc">Search businesses worldwide with OpenStreetMap data</div>
+                    <div class="api-tags">
+                        <span class="api-tag">Maps</span>
+                        <span class="api-tag">Search</span>
+                    </div>
                 </div>
-                <div class="tech-card">
-                    <div class="tech-icon">💳</div>
-                    <h3 class="tech-title">USDC on Base</h3>
-                    <p class="tech-desc">Stablecoin payments on Ethereum L2. Sub-cent fees, instant finality.</p>
+                <div class="api-card reveal">
+                    <div class="api-header">
+                        <span class="api-method">GET</span>
+                        <span class="api-price">$0.005</span>
+                    </div>
+                    <div class="api-name">/v1/token/price</div>
+                    <div class="api-desc">Real-time crypto prices across 1000+ tokens</div>
+                    <div class="api-tags">
+                        <span class="api-tag">Crypto</span>
+                        <span class="api-tag">Price</span>
+                    </div>
                 </div>
-                <div class="tech-card">
-                    <div class="tech-icon">🤖</div>
-                    <h3 class="tech-title">AI-Native Design</h3>
-                    <p class="tech-desc">Built from scratch for machines. No accounts, no UI, no human friction.</p>
+                <div class="api-card reveal">
+                    <div class="api-header">
+                        <span class="api-method">GET</span>
+                        <span class="api-price">$0.01</span>
+                    </div>
+                    <div class="api-name">/v1/web/scrape</div>
+                    <div class="api-desc">Extract content from any webpage as structured JSON</div>
+                    <div class="api-tags">
+                        <span class="api-tag">Web</span>
+                        <span class="api-tag">Scraping</span>
+                    </div>
+                </div>
+                <div class="api-card reveal">
+                    <div class="api-header">
+                        <span class="api-method">GET</span>
+                        <span class="api-price">$0.02</span>
+                    </div>
+                    <div class="api-name">/v1/token/analyze</div>
+                    <div class="api-desc">Risk analysis and holder distribution for any token</div>
+                    <div class="api-tags">
+                        <span class="api-tag">Crypto</span>
+                        <span class="api-tag">Analytics</span>
+                    </div>
+                </div>
+                <div class="api-card reveal">
+                    <div class="api-header">
+                        <span class="api-method">GET</span>
+                        <span class="api-price">$0.005</span>
+                    </div>
+                    <div class="api-name">/v1/email/validate</div>
+                    <div class="api-desc">Verify email syntax, MX records, and disposable check</div>
+                    <div class="api-tags">
+                        <span class="api-tag">Email</span>
+                        <span class="api-tag">Validation</span>
+                    </div>
+                </div>
+                <div class="api-card reveal">
+                    <div class="api-header">
+                        <span class="api-method">GET</span>
+                        <span class="api-price">$0.008</span>
+                    </div>
+                    <div class="api-name">/v1/data/weather</div>
+                    <div class="api-desc">7-day weather forecast for any coordinates</div>
+                    <div class="api-tags">
+                        <span class="api-tag">Weather</span>
+                        <span class="api-tag">Forecast</span>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Traction -->
-    <section class="traction" id="traction">
-        <div class="container">
-            <div class="traction-grid">
-                <div class="traction-content fade-in">
-                    <div class="tag">Traction</div>
-                    <h2>Built and shipping on Base</h2>
-                    <p>
-                        We're not just building slides — we're building product. 
-                        Live endpoints, real payments, growing usage.
-                    </p>
-                    <div class="traction-stats">
-                        <div class="traction-stat">
-                            <div class="traction-stat-value">5</div>
-                            <div class="traction-stat-label">Endpoints live on mainnet</div>
-                        </div>
-                        <div class="traction-stat">
-                            <div class="traction-stat-value">$0</div>
-                            <div class="traction-stat-label">Platform fees</div>
-                        </div>
-                        <div class="traction-stat">
-                            <div class="traction-stat-value">24/7</div>
-                            <div class="traction-stat-label">Uptime</div>
-                        </div>
-                        <div class="traction-stat">
-                            <div class="traction-stat-value">&lt;100ms</div>
-                            <div class="traction-stat-label">Avg response time</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="traction-code fade-in">
-                    <div class="code-header">
-                        <div class="code-dot"></div>
-                        <div class="code-dot"></div>
-                        <div class="code-dot"></div>
-                    </div>
-                    <pre class="code-body"><span class="comment"># AI Agent pays $0.01 for business search</span>
-<span class="keyword">import</span> httpx
-
-response = httpx.<span class="function">get</span>(
-    <span class="string">"https://api.aetheriusx.io/v1/maps/search"</span>,
-    params={
-        <span class="string">"q"</span>: <span class="string">"coffee shops"</span>,
-        <span class="string">"location"</span>: <span class="string">"Mexico City"</span>
-    },
-    headers={
-        <span class="string">"X-Wallet"</span>: <span class="string">"0x..."</span>
-    }
-)
-
-<span class="comment"># Response:</span>
-<span class="comment"># { "count": 42, "results": [...] }</span></pre>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="faq" id="faq">
-        <div class="container">
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-container">
             <div class="section-header">
-                <div class="section-tag">FAQ</div>
-                <h2 class="section-title">Questions & Answers</h2>
+                <div class="section-tag">How It Works</div>
+                <h2 class="section-title">Three Steps to Start</h2>
+                <p class="section-desc">
+                    From zero to API access in under a minute.
+                </p>
             </div>
 
-            <div class="faq-item">
-                <button class="faq-question">What is aetheriusxAPI?</button>
-                <div class="faq-answer">
-                    <p>aetheriusxAPI is a crypto-native API marketplace where AI agents pay per request in USDC on Base. Built on x402 protocol, it enables machine-to-machine commerce without accounts, subscriptions, or credit cards.</p>
+            <div class="steps-grid">
+                <div class="step reveal">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Connect Wallet</h3>
+                    <p class="step-desc">Link your crypto wallet with USDC on Base. No account needed.</p>
+                </div>
+                <div class="step reveal">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Choose API</h3>
+                    <p class="step-desc">Browse 500+ endpoints. Pick what your agent needs.</p>
+                </div>
+                <div class="step reveal">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Pay & Use</h3>
+                    <p class="step-desc">x402 handles payment automatically. Get data instantly.</p>
                 </div>
             </div>
-            <div class="faq-item">
-                <button class="faq-question">How do payments work?</button>
-                <div class="faq-answer">
-                    <p>Payments use the x402 protocol. When an AI agent makes a request, the server responds with HTTP 402 (Payment Required). The agent pays in USDC on Base, and the server verifies the payment before returning data.</p>
-                </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Preview -->
+    <section class="dashboard" id="dashboard">
+        <div class="section-container">
+            <div class="section-header">
+                <div class="section-tag">Dashboard</div>
+                <h2 class="section-title">Monitor Everything</h2>
+                <p class="section-desc">
+                    Track usage, manage endpoints, analyze spending.
+                </p>
             </div>
-            <div class="faq-item">
-                <button class="faq-question">Why Base?</button>
-                <div class="faq-answer">
-                    <p>Base offers sub-cent transaction fees, instant finality, and deep Coinbase integration. It's the ideal L2 for micropayments where every API call costs $0.005-$0.03.</p>
+
+            <div class="dashboard-preview reveal-scale">
+                <div class="dashboard-header">
+                    <div class="dashboard-dot"></div>
+                    <div class="dashboard-dot"></div>
+                    <div class="dashboard-dot"></div>
                 </div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question">What can I build with this?</button>
-                <div class="faq-answer">
-                    <p>AI agents that autonomously fetch data, research tools that aggregate information, trading bots that analyze tokens, and any application that needs programmatic access to data with instant payment.</p>
+                <div class="dashboard-body">
+                    <div class="dashboard-grid">
+                        <div class="dashboard-sidebar">
+                            <div class="sidebar-title">Navigation</div>
+                            <ul class="sidebar-nav">
+                                <li class="active">Overview</li>
+                                <li>APIs</li>
+                                <li>Usage</li>
+                                <li>Billing</li>
+                                <li>Settings</li>
+                            </ul>
+                        </div>
+                        <div class="dashboard-content">
+                            <h3>Dashboard Overview</h3>
+                            <div class="dashboard-stats">
+                                <div class="dash-stat">
+                                    <div class="dash-stat-value">12,847</div>
+                                    <div class="dash-stat-label">Total Requests</div>
+                                </div>
+                                <div class="dash-stat">
+                                    <div class="dash-stat-value">$128.47</div>
+                                    <div class="dash-stat-label">Total Spent</div>
+                                </div>
+                                <div class="dash-stat">
+                                    <div class="dash-stat-value">99.9%</div>
+                                    <div class="dash-stat-label">Uptime</div>
+                                </div>
+                            </div>
+                            <table class="dashboard-table">
+                                <thead>
+                                    <tr>
+                                        <th>Endpoint</th>
+                                        <th>Requests</th>
+                                        <th>Cost</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>/v1/maps/search</td>
+                                        <td>5,234</td>
+                                        <td>$52.34</td>
+                                        <td><span class="status-active">Active</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>/v1/token/price</td>
+                                        <td>4,123</td>
+                                        <td>$20.62</td>
+                                        <td><span class="status-active">Active</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>/v1/web/scrape</td>
+                                        <td>2,890</td>
+                                        <td>$28.90</td>
+                                        <td><span class="status-active">Active</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1126,21 +1116,23 @@ response = httpx.<span class="function">get</span>(
 
     <!-- CTA -->
     <section class="cta">
-        <div class="container">
-            <h2>Ready to build the<br><span class="gradient">agent economy</span>?</h2>
-            <p>
-                Join us in building the infrastructure for machine-to-machine commerce.
-            </p>
-            <div class="hero-actions">
-                <a href="https://x.com/aetheriusxAPI" class="btn btn-primary">Follow on X</a>
-                <a href="https://github.com/wilnowilx/aetheriusx-api-site" class="btn btn-secondary">View GitHub</a>
+        <div class="section-container">
+            <div class="cta-content">
+                <h2>Ready to build the<br><span class="gradient">agent economy</span>?</h2>
+                <p>
+                    Join the next wave of machine-to-machine commerce.
+                </p>
+                <div class="hero-actions">
+                    <a href="https://x.com/aetheriusxAPI" class="btn btn-primary">Follow on X</a>
+                    <a href="https://github.com/wilnowilx/aetheriusx-api-site" class="btn btn-secondary">View GitHub</a>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer>
-        <div class="container">
+        <div class="footer-container">
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="#" class="nav-brand">AETHERIUS</a>
@@ -1149,7 +1141,7 @@ response = httpx.<span class="function">get</span>(
                 <div>
                     <div class="footer-title">Product</div>
                     <ul class="footer-links">
-                        <li><a href="#endpoints">APIs</a></li>
+                        <li><a href="#categories">APIs</a></li>
                         <li><a href="#">Documentation</a></li>
                         <li><a href="#">Pricing</a></li>
                     </ul>
@@ -1178,32 +1170,53 @@ response = httpx.<span class="function">get</span>(
     </footer>
 
     <script>
-        // Intersection Observer
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
+        // Scroll Reveal Animation
+        const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+        
+        const revealOnScroll = () => {
+            revealElements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (elementTop < windowHeight - 100) {
+                    el.classList.add('active');
                 }
             });
-        }, { threshold: 0.1 });
+        };
 
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        window.addEventListener('scroll', revealOnScroll);
+        window.addEventListener('load', revealOnScroll);
 
-        // FAQ
-        document.querySelectorAll('.faq-question').forEach(btn => {
-            btn.addEventListener('click', () => {
-                btn.parentElement.classList.toggle('active');
-            });
-        });
-
-        // Smooth scroll
+        // Smooth scroll for nav links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
-                if (target) target.scrollIntoView({ behavior: 'smooth' });
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
             });
         });
+
+        // Parallax effect for hero glow
+        window.addEventListener('scroll', () => {
+            const glow = document.querySelector('.hero-glow');
+            if (glow) {
+                const scroll = window.scrollY;
+                glow.style.transform = `translateX(-50%) translateY(${scroll * 0.3}px)`;
+            }
+        });
+
+        // Stagger animation for grid items
+        const staggerItems = (selector, delay = 100) => {
+            const items = document.querySelectorAll(selector);
+            items.forEach((item, index) => {
+                item.style.transitionDelay = `${index * delay}ms`;
+            });
+        };
+
+        staggerItems('.category-card', 100);
+        staggerItems('.api-card', 100);
     </script>
 </body>
 </html>
