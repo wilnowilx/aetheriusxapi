@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AETHERIUS | aetheriusxAPI - AI Agent Commerce Infrastructure</title>
+    <title>aetheriusxAPI - The AI Agent Commerce Infrastructure | AETHERIUS</title>
+    <meta name="description" content="Crypto-native APIs where AI agents pay per request in USDC on Base. x402 protocol. No subscriptions, no KYC, no friction.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -21,13 +22,14 @@
             --accent-purple: #8b5cf6;
             --accent-pink: #ec4899;
             --accent-green: #10b981;
+            --accent-orange: #f97316;
             --gradient-1: linear-gradient(135deg, #3b82f6, #8b5cf6);
             --gradient-2: linear-gradient(135deg, #8b5cf6, #ec4899);
             --gradient-3: linear-gradient(135deg, #06b6d4, #3b82f6);
+            --gradient-hero: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         html { scroll-behavior: smooth; }
 
         body {
@@ -47,8 +49,8 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            padding: 20px 0;
-            background: rgba(9,9,11,0.8);
+            padding: 16px 0;
+            background: rgba(9,9,11,0.85);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
         }
@@ -59,14 +61,31 @@
             align-items: center;
         }
 
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
         .nav-logo {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 800;
             background: var(--gradient-1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-decoration: none;
             letter-spacing: -0.02em;
+        }
+
+        .nav-product {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.3);
+            border-radius: 4px;
+            color: var(--accent-purple);
+            font-weight: 600;
+            letter-spacing: 0.05em;
         }
 
         .nav-links { display: flex; gap: 32px; align-items: center; }
@@ -81,15 +100,16 @@
 
         .nav-links a:hover { color: var(--text-primary); }
 
-        .nav-cta {
+        .btn-nav {
             padding: 10px 20px;
             background: var(--gradient-1);
             border-radius: 8px;
             color: white !important;
             font-weight: 600;
+            transition: opacity 0.2s;
         }
 
-        .nav-cta:hover { opacity: 0.9; }
+        .btn-nav:hover { opacity: 0.9; }
 
         /* ===== HERO ===== */
         .hero {
@@ -98,32 +118,46 @@
             align-items: center;
             position: relative;
             padding-top: 80px;
+            overflow: hidden;
         }
 
         .hero::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
             background: 
-                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,0.15) 0%, transparent 50%),
-                radial-gradient(ellipse 60% 40% at 80% 50%, rgba(139,92,246,0.08) 0%, transparent 50%);
+                radial-gradient(ellipse 60% 40% at 50% 0%, rgba(59,130,246,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 40% 30% at 80% 50%, rgba(139,92,246,0.1) 0%, transparent 50%),
+                radial-gradient(ellipse 40% 30% at 20% 80%, rgba(236,72,153,0.08) 0%, transparent 50%);
+            animation: heroGlow 10s ease-in-out infinite alternate;
         }
 
-        .hero-content { position: relative; z-index: 1; text-align: center; max-width: 900px; margin: 0 auto; }
+        @keyframes heroGlow {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-5%, 5%) rotate(5deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
 
         .hero-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
             padding: 8px 16px;
-            background: rgba(59,130,246,0.1);
-            border: 1px solid rgba(59,130,246,0.2);
+            background: rgba(16,185,129,0.1);
+            border: 1px solid rgba(16,185,129,0.3);
             border-radius: 9999px;
             font-size: 0.85rem;
-            color: var(--accent-blue);
+            color: var(--accent-green);
             margin-bottom: 32px;
             font-weight: 500;
         }
@@ -138,29 +172,29 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
         }
 
         .hero h1 {
-            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-size: clamp(2.5rem, 7vw, 5rem);
             font-weight: 900;
-            line-height: 1.05;
+            line-height: 1.1;
             letter-spacing: -0.03em;
             margin-bottom: 24px;
         }
 
         .hero h1 .gradient {
-            background: var(--gradient-1);
+            background: var(--gradient-hero);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .hero p {
+        .hero-subtitle {
             font-size: 1.25rem;
             color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 48px;
+            max-width: 650px;
+            margin: 0 auto 40px;
             line-height: 1.7;
         }
 
@@ -169,6 +203,7 @@
             gap: 16px;
             justify-content: center;
             flex-wrap: wrap;
+            margin-bottom: 64px;
         }
 
         .btn-primary {
@@ -206,25 +241,23 @@
             background: var(--bg-card);
         }
 
-        /* ===== STATS ===== */
-        .stats {
-            padding: 80px 0;
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            padding: 48px 0;
+            background: var(--bg-secondary);
             border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 32px;
-        }
-
-        .stat {
             text-align: center;
-            padding: 32px;
         }
 
         .stat-value {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: 800;
             background: var(--gradient-1);
             -webkit-background-clip: text;
@@ -235,13 +268,218 @@
 
         .stat-label {
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
+
+        /* ===== OLD VS NEW ===== */
+        .old-vs-new {
+            padding: 120px 0;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            margin-top: 64px;
+        }
+
+        .comparison-card {
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .comparison-card.old {
+            background: rgba(239,68,68,0.05);
+            border-color: rgba(239,68,68,0.2);
+        }
+
+        .comparison-card.new {
+            background: rgba(16,185,129,0.05);
+            border-color: rgba(16,185,129,0.2);
+        }
+
+        .comparison-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 24px;
+        }
+
+        .comparison-card.old .comparison-tag {
+            background: rgba(239,68,68,0.2);
+            color: #ef4444;
+        }
+
+        .comparison-card.new .comparison-tag {
+            background: rgba(16,185,129,0.2);
+            color: #10b981;
+        }
+
+        .comparison-list {
+            list-style: none;
+        }
+
+        .comparison-list li {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            color: var(--text-secondary);
+        }
+
+        .comparison-list li:last-child { border-bottom: none; }
+
+        .comparison-list .step {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .comparison-card.old .step {
+            background: rgba(239,68,68,0.2);
+            color: #ef4444;
+        }
+
+        .comparison-card.new .step {
+            background: rgba(16,185,129,0.2);
+            color: #10b981;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        /* ===== CODE SECTION ===== */
+        .code-section {
+            padding: 120px 0;
+            background: var(--bg-secondary);
+        }
+
+        .code-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+        }
+
+        .code-content h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .code-content p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 32px;
+            line-height: 1.7;
+        }
+
+        .code-features {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+
+        .code-features li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-secondary);
+        }
+
+        .code-features li::before {
+            content: '✓';
+            width: 20px;
+            height: 20px;
+            background: rgba(16,185,129,0.2);
+            color: var(--accent-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .code-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .code-dot:nth-child(1) { background: #ef4444; }
+        .code-dot:nth-child(2) { background: #f59e0b; }
+        .code-dot:nth-child(3) { background: #10b981; }
+
+        .code-tabs {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+        }
+
+        .code-tab {
+            padding: 6px 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .code-tab.active {
+            background: rgba(59,130,246,0.2);
+            color: var(--accent-blue);
+        }
+
+        .code-body {
+            padding: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            overflow-x: auto;
+            min-height: 300px;
+        }
+
+        .code-body .comment { color: #52525b; }
+        .code-body .keyword { color: #8b5cf6; }
+        .code-body .string { color: #10b981; }
+        .code-body .function { color: #3b82f6; }
+        .code-body .variable { color: #ec4899; }
+        .code-body .number { color: #f97316; }
 
         /* ===== FEATURES ===== */
         .features {
             padding: 120px 0;
-            background: var(--bg-secondary);
         }
 
         .section-header {
@@ -323,69 +561,42 @@
 
         .feature-desc { color: var(--text-secondary); font-size: 0.95rem; }
 
-        /* ===== HOW IT WORKS ===== */
-        .how-it-works {
-            padding: 120px 0;
-        }
-
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 48px;
-            position: relative;
-        }
-
-        .steps-grid::before {
-            content: '';
-            position: absolute;
-            top: 40px;
-            left: 15%;
-            right: 15%;
-            height: 2px;
-            background: var(--gradient-1);
-            opacity: 0.3;
-        }
-
-        .step {
-            text-align: center;
-            position: relative;
-        }
-
-        .step-number {
-            width: 80px;
-            height: 80px;
-            background: var(--bg-primary);
-            border: 2px solid var(--accent-blue);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin: 0 auto 24px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .step-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .step-desc { color: var(--text-secondary); font-size: 0.95rem; }
-
         /* ===== ENDPOINTS ===== */
         .endpoints {
             padding: 120px 0;
             background: var(--bg-secondary);
         }
 
+        .endpoint-categories {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-btn.active, .category-btn:hover {
+            background: rgba(59,130,246,0.1);
+            border-color: rgba(59,130,246,0.3);
+            color: var(--accent-blue);
+        }
+
         .endpoint-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-            max-width: 900px;
+            gap: 16px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -393,7 +604,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 24px 28px;
+            padding: 20px 24px;
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -407,9 +618,21 @@
 
         .endpoint-info { flex: 1; }
 
+        .endpoint-method {
+            display: inline-block;
+            padding: 2px 8px;
+            background: rgba(16,185,129,0.2);
+            color: var(--accent-green);
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
         .endpoint-name {
             font-family: 'JetBrains Mono', monospace;
-            color: var(--accent-blue);
+            color: var(--text-primary);
             font-size: 0.9rem;
             font-weight: 500;
         }
@@ -431,107 +654,101 @@
             white-space: nowrap;
         }
 
-        /* ===== CODE EXAMPLE ===== */
-        .code-section {
-            padding: 120px 0;
+        /* ===== ZEROS ===== */
+        .zeros {
+            padding: 100px 0;
         }
 
-        .code-wrapper {
+        .zeros-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 64px;
-            align-items: center;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 24px;
         }
 
-        .code-content h2 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin-bottom: 24px;
+        .zero-item {
+            text-align: center;
+            padding: 32px 16px;
         }
 
-        .code-content p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            margin-bottom: 32px;
-            line-height: 1.7;
-        }
-
-        .code-block {
-            background: var(--bg-secondary);
+        .zero-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
-            overflow: hidden;
-        }
-
-        .code-header {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 16px 20px;
-            background: rgba(255,255,255,0.03);
-            border-bottom: 1px solid var(--border);
+            justify-content: center;
+            font-size: 1.5rem;
         }
 
-        .code-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
+        .zero-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
 
-        .code-dot:nth-child(1) { background: #ef4444; }
-        .code-dot:nth-child(2) { background: #f59e0b; }
-        .code-dot:nth-child(3) { background: #10b981; }
-
-        .code-lang {
-            margin-left: auto;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .code-body {
-            padding: 24px;
-            font-family: 'JetBrains Mono', monospace;
+        .zero-desc {
+            color: var(--text-secondary);
             font-size: 0.85rem;
-            line-height: 1.8;
-            overflow-x: auto;
         }
 
-        .code-body .comment { color: #52525b; }
-        .code-body .keyword { color: #8b5cf6; }
-        .code-body .string { color: #10b981; }
-        .code-body .function { color: #3b82f6; }
-        .code-body .variable { color: #ec4899; }
-
-        /* ===== TECH STACK ===== */
-        .tech-stack {
+        /* ===== FAQ ===== */
+        .faq {
             padding: 120px 0;
             background: var(--bg-secondary);
         }
 
-        .tech-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 16px;
+        .faq-grid {
             max-width: 800px;
             margin: 0 auto;
         }
 
-        .tech-badge {
-            padding: 12px 24px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            transition: all 0.2s;
+        .faq-item {
+            border-bottom: 1px solid var(--border);
         }
 
-        .tech-badge:hover {
-            border-color: var(--border-hover);
+        .faq-question {
+            width: 100%;
+            padding: 24px 0;
+            background: none;
+            border: none;
             color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question::after {
+            content: '+';
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        .faq-item.active .faq-question::after {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+        }
+
+        .faq-answer p {
+            padding-bottom: 24px;
+            color: var(--text-secondary);
+            line-height: 1.7;
         }
 
         /* ===== CTA ===== */
@@ -551,10 +768,7 @@
             background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(59,130,246,0.1) 0%, transparent 50%);
         }
 
-        .cta-content {
-            position: relative;
-            z-index: 1;
-        }
+        .cta-content { position: relative; z-index: 1; }
 
         .cta-section h2 {
             font-size: clamp(2.5rem, 5vw, 4rem);
@@ -574,28 +788,41 @@
 
         /* ===== FOOTER ===== */
         footer {
-            padding: 60px 0;
+            padding: 80px 0 40px;
             border-top: 1px solid var(--border);
         }
 
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 64px;
         }
 
-        .footer-logo {
-            font-size: 1.25rem;
+        .footer-brand p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 16px;
+            line-height: 1.7;
+        }
+
+        .footer-title {
+            font-size: 0.8rem;
             font-weight: 700;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 20px;
         }
 
-        .footer-links { display: flex; gap: 32px; }
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li { margin-bottom: 12px; }
 
         .footer-links a {
-            color: var(--text-muted);
+            color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.9rem;
             transition: color 0.2s;
@@ -603,47 +830,86 @@
 
         .footer-links a:hover { color: var(--text-primary); }
 
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+        }
+
         .footer-copy { color: var(--text-muted); font-size: 0.85rem; }
 
+        .footer-social {
+            display: flex;
+            gap: 16px;
+        }
+
+        .footer-social a {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .footer-social a:hover {
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+        }
+
         /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .zeros-grid { grid-template-columns: repeat(3, 1fr); }
+            .footer-top { grid-template-columns: 1fr 1fr; }
+        }
+
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .features-grid { grid-template-columns: 1fr; }
-            .steps-grid { grid-template-columns: 1fr; gap: 48px; }
-            .steps-grid::before { display: none; }
-            .endpoint-grid { grid-template-columns: 1fr; }
+            .comparison-grid { grid-template-columns: 1fr; }
             .code-wrapper { grid-template-columns: 1fr; }
-            .footer-content { flex-direction: column; gap: 24px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .endpoint-grid { grid-template-columns: 1fr; }
+            .zeros-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-top { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; gap: 24px; }
         }
 
         /* ===== ANIMATIONS ===== */
         .fade-in {
             opacity: 0;
             transform: translateY(20px);
-            animation: fadeIn 0.8s forwards;
+            transition: opacity 0.6s, transform 0.6s;
         }
 
-        @keyframes fadeIn {
-            to { opacity: 1; transform: translateY(0); }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
-
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .delay-4 { animation-delay: 0.4s; }
     </style>
 </head>
 <body>
     <!-- Nav -->
     <nav>
         <div class="container">
-            <a href="#" class="nav-logo">AETHERIUS</a>
+            <a href="#" class="nav-brand">
+                <span class="nav-logo">AETHERIUS</span>
+                <span class="nav-product">aetheriusxAPI</span>
+            </a>
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#endpoints">Endpoints</a>
                 <a href="#docs">Docs</a>
-                <a href="#contact" class="nav-cta">Get Started</a>
+                <a href="#faq">FAQ</a>
+                <a href="https://x.com/aetheriusxAPI" class="btn-nav">Get Started</a>
             </div>
         </div>
     </nav>
@@ -653,17 +919,17 @@
         <div class="container">
             <div class="hero-content">
                 <div class="hero-badge fade-in">
-                    <span></span> Now on Base Mainnet
+                    <span></span> Live on Base Mainnet
                 </div>
-                <h1 class="fade-in delay-1">
-                    <span class="gradient">aetheriusxAPI</span><br>
-                    The AI Agent Economy Infrastructure
+                <h1 class="fade-in">
+                    The API Marketplace for<br>
+                    <span class="gradient">AI Agents</span>
                 </h1>
-                <p class="fade-in delay-2">
+                <p class="hero-subtitle fade-in">
                     Crypto-native APIs where AI agents pay per request in USDC. 
-                    No subscriptions, no credit cards, no human intervention.
+                    Built on x402 protocol. No subscriptions, no KYC, no friction.
                 </p>
-                <div class="hero-cta fade-in delay-3">
+                <div class="hero-cta fade-in">
                     <a href="#endpoints" class="btn-primary">Explore APIs</a>
                     <a href="#docs" class="btn-secondary">Read Documentation</a>
                 </div>
@@ -672,24 +938,168 @@
     </section>
 
     <!-- Stats -->
-    <section class="stats">
+    <section class="stats-bar">
         <div class="container">
             <div class="stats-grid">
-                <div class="stat fade-in">
-                    <div class="stat-value">5</div>
+                <div class="fade-in">
+                    <div class="stat-value">10+</div>
                     <div class="stat-label">Live Endpoints</div>
                 </div>
-                <div class="stat fade-in delay-1">
-                    <div class="stat-value">$0.01</div>
+                <div class="fade-in">
+                    <div class="stat-value">$0.005</div>
                     <div class="stat-label">Starting Price</div>
                 </div>
-                <div class="stat fade-in delay-2">
+                <div class="fade-in">
                     <div class="stat-value">&lt;1s</div>
                     <div class="stat-label">Settlement Time</div>
                 </div>
-                <div class="stat fade-in delay-3">
+                <div class="fade-in">
                     <div class="stat-value">0%</div>
                     <div class="stat-label">Platform Fee</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Old vs New -->
+    <section class="old-vs-new">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Why x402</div>
+                <h2 class="section-title">The Old Way vs The New Way</h2>
+                <p class="section-desc">
+                    Traditional API access requires accounts, subscriptions, and credit cards. 
+                    We built something better.
+                </p>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-card old">
+                    <span class="comparison-tag">The Old Way</span>
+                    <ul class="comparison-list">
+                        <li>
+                            <span class="step">1</span>
+                            <div>
+                                <div class="step-title">Create account</div>
+                                Sign up, verify email, set password
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step">2</span>
+                            <div>
+                                <div class="step-title">Add payment method</div>
+                                Enter credit card, KYC required
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step">3</span>
+                            <div>
+                                <div class="step-title">Buy credits or subscription</div>
+                                Prepaid commitment, overpay or run out
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step">4</span>
+                            <div>
+                                <div class="step-title">Manage API keys</div>
+                                Store securely, rotate regularly
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step">5</span>
+                            <div>
+                                <div class="step-title">Make payment</div>
+                                Slow transactions, chargebacks, fees
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card new">
+                    <span class="comparison-tag">With aetheriusxAPI</span>
+                    <ul class="comparison-list">
+                        <li>
+                            <span class="step">1</span>
+                            <div>
+                                <div class="step-title">Connect wallet</div>
+                                One click, no account needed
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step">2</span>
+                            <div>
+                                <div class="step-title">Make request</div>
+                                x402 handles payment automatically
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step">3</span>
+                            <div>
+                                <div class="step-title">Get data</div>
+                                Instant JSON response, payment verified on-chain
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Section -->
+    <section class="code-section" id="docs">
+        <div class="container">
+            <div class="code-wrapper">
+                <div class="code-content">
+                    <div class="section-tag">Developer First</div>
+                    <h2>Integrate in Minutes, Not Days</h2>
+                    <p>
+                        Simple REST API with x402 payment middleware. 
+                        Your AI agent sends USDC, gets data back. 
+                        That's it.
+                    </p>
+                    <ul class="code-features">
+                        <li>RESTful JSON responses</li>
+                        <li>x402 payment middleware built-in</li>
+                        <li>No API keys to manage</li>
+                        <li>Works with any HTTP client</li>
+                        <li>Full OpenAPI/Swagger docs</li>
+                    </ul>
+                    <a href="#" class="btn-primary">View Full Documentation</a>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-dot"></div>
+                        <div class="code-dot"></div>
+                        <div class="code-dot"></div>
+                        <div class="code-tabs">
+                            <button class="code-tab active">Python</button>
+                            <button class="code-tab">JavaScript</button>
+                            <button class="code-tab">cURL</button>
+                        </div>
+                    </div>
+                    <pre class="code-body"><span class="comment"># AI Agent pays $0.01 for business search</span>
+<span class="keyword">import</span> httpx
+
+<span class="comment"># x402 handles payment automatically</span>
+response = httpx.<span class="function">get</span>(
+    <span class="string">"https://api.aetheriusx.io/v1/maps/search"</span>,
+    params={
+        <span class="string">"q"</span>: <span class="string">"coffee shops"</span>,
+        <span class="string">"location"</span>: <span class="string">"Mexico City"</span>
+    },
+    headers={
+        <span class="string">"X-Wallet"</span>: <span class="variable">"0xYourWallet"</span>
+    }
+)
+
+<span class="comment"># Response: JSON with business data</span>
+data = response.<span class="function">json</span>()
+<span class="comment"># {</span>
+<span class="comment">#   "query": "coffee shops",</span>
+<span class="comment">#   "results": [...],</span>
+<span class="comment">#   "count": 42</span>
+<span class="comment"># }</span></pre>
                 </div>
             </div>
         </div>
@@ -699,11 +1109,10 @@
     <section class="features" id="features">
         <div class="container">
             <div class="section-header">
-                <div class="section-tag">Why Aetherius</div>
+                <div class="section-tag">Features</div>
                 <h2 class="section-title">Built for the Agent Economy</h2>
                 <p class="section-desc">
-                    Traditional APIs require credit cards and subscriptions. 
-                    We built infrastructure for machines that pay for themselves.
+                    Every feature designed for machine-to-machine commerce.
                 </p>
             </div>
 
@@ -742,37 +1151,6 @@
         </div>
     </section>
 
-    <!-- How It Works -->
-    <section class="how-it-works">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-tag">How It Works</div>
-                <h2 class="section-title">Three Steps to Start</h2>
-                <p class="section-desc">
-                    From wallet to data in seconds.
-                </p>
-            </div>
-
-            <div class="steps-grid">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3 class="step-title">Connect Wallet</h3>
-                    <p class="step-desc">Link your crypto wallet with USDC on Base network.</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3 class="step-title">Make Request</h3>
-                    <p class="step-desc">Call any endpoint. x402 handles payment automatically.</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3 class="step-title">Get Data</h3>
-                    <p class="step-desc">Receive instant JSON response. Payment verified on-chain.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Endpoints -->
     <section class="endpoints" id="endpoints">
         <div class="container">
@@ -784,116 +1162,183 @@
                 </p>
             </div>
 
+            <div class="endpoint-categories">
+                <button class="category-btn active">All</button>
+                <button class="category-btn">Maps</button>
+                <button class="category-btn">Crypto</button>
+                <button class="category-btn">Web</button>
+                <button class="category-btn">Data</button>
+            </div>
+
             <div class="endpoint-grid">
                 <div class="endpoint-card">
                     <div class="endpoint-info">
-                        <div class="endpoint-name">GET /maps/search</div>
+                        <span class="endpoint-method">GET</span>
+                        <span class="endpoint-name">/v1/maps/search</span>
                         <div class="endpoint-desc">Google Maps business search</div>
                     </div>
                     <div class="endpoint-price">$0.01</div>
                 </div>
                 <div class="endpoint-card">
                     <div class="endpoint-info">
-                        <div class="endpoint-name">GET /maps/reviews</div>
+                        <span class="endpoint-method">GET</span>
+                        <span class="endpoint-name">/v1/maps/reviews</span>
                         <div class="endpoint-desc">Business reviews scraper</div>
                     </div>
                     <div class="endpoint-price">$0.02</div>
                 </div>
                 <div class="endpoint-card">
                     <div class="endpoint-info">
-                        <div class="endpoint-name">GET /token/analyze</div>
+                        <span class="endpoint-method">GET</span>
+                        <span class="endpoint-name">/v1/maps/nearby</span>
+                        <div class="endpoint-desc">Nearby places by coordinates</div>
+                    </div>
+                    <div class="endpoint-price">$0.015</div>
+                </div>
+                <div class="endpoint-card">
+                    <div class="endpoint-info">
+                        <span class="endpoint-method">GET</span>
+                        <span class="endpoint-name">/v1/token/analyze</span>
                         <div class="endpoint-desc">Crypto token risk analysis</div>
                     </div>
                     <div class="endpoint-price">$0.02</div>
                 </div>
                 <div class="endpoint-card">
                     <div class="endpoint-info">
-                        <div class="endpoint-name">GET /web/scrape</div>
+                        <span class="endpoint-method">GET</span>
+                        <span class="endpoint-name">/v1/token/holders</span>
+                        <div class="endpoint-desc">Token holder distribution</div>
+                    </div>
+                    <div class="endpoint-price">$0.03</div>
+                </div>
+                <div class="endpoint-card">
+                    <div class="endpoint-info">
+                        <span class="endpoint-method">GET</span>
+                        <span class="endpoint-name">/v1/token/price</span>
+                        <div class="endpoint-desc">Real-time token price</div>
+                    </div>
+                    <div class="endpoint-price">$0.005</div>
+                </div>
+                <div class="endpoint-card">
+                    <div class="endpoint-info">
+                        <span class="endpoint-method">GET</span>
+                        <span class="endpoint-name">/v1/web/scrape</span>
                         <div class="endpoint-desc">Universal web scraper</div>
                     </div>
                     <div class="endpoint-price">$0.01</div>
                 </div>
                 <div class="endpoint-card">
                     <div class="endpoint-info">
-                        <div class="endpoint-name">GET /email/validate</div>
+                        <span class="endpoint-method">GET</span>
+                        <span class="endpoint-name">/v1/web/screenshot</span>
+                        <div class="endpoint-desc">Website screenshot capture</div>
+                    </div>
+                    <div class="endpoint-price">$0.025</div>
+                </div>
+                <div class="endpoint-card">
+                    <div class="endpoint-info">
+                        <span class="endpoint-method">GET</span>
+                        <span class="endpoint-name">/v1/email/validate</span>
                         <div class="endpoint-desc">Email verification service</div>
                     </div>
                     <div class="endpoint-price">$0.005</div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Code Example -->
-    <section class="code-section" id="docs">
-        <div class="container">
-            <div class="code-wrapper">
-                <div class="code-content">
-                    <div class="section-tag">Developer First</div>
-                    <h2>Integrate in Minutes</h2>
-                    <p>
-                        Simple REST API with x402 payment middleware. 
-                        Your AI agent sends USDC, gets data back. 
-                        That's it.
-                    </p>
-                    <a href="#" class="btn-primary">View Full Documentation</a>
-                </div>
-
-                <div class="code-block">
-                    <div class="code-header">
-                        <div class="code-dot"></div>
-                        <div class="code-dot"></div>
-                        <div class="code-dot"></div>
-                        <span class="code-lang">python</span>
+                <div class="endpoint-card">
+                    <div class="endpoint-info">
+                        <span class="endpoint-method">GET</span>
+                        <span class="endpoint-name">/v1/data/weather</span>
+                        <div class="endpoint-desc">Weather forecast by location</div>
                     </div>
-                    <pre class="code-body"><span class="comment"># AI Agent pays $0.01 for business search</span>
-<span class="keyword">import</span> httpx
-
-<span class="comment"># x402 handles payment automatically</span>
-response = httpx.<span class="function">get</span>(
-    <span class="string">"https://api.aetheriusx.io/maps/search"</span>,
-    params={
-        <span class="string">"q"</span>: <span class="string">"coffee shops"</span>,
-        <span class="string">"location"</span>: <span class="string">"Mexico City"</span>
-    },
-    headers={
-        <span class="string">"X-Wallet"</span>: <span class="variable">"0xYourWallet"</span>
-    }
-)
-
-<span class="comment"># Response: JSON with business data</span>
-data = response.<span class="function">json</span>()
-<span class="comment"># { "results": [...], "count": 42 }</span></pre>
+                    <div class="endpoint-price">$0.008</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Tech Stack -->
-    <section class="tech-stack">
+    <!-- Zeros -->
+    <section class="zeros">
+        <div class="container">
+            <div class="zeros-grid">
+                <div class="zero-item">
+                    <div class="zero-icon">💰</div>
+                    <div class="zero-title">Zero Platform Fees</div>
+                    <div class="zero-desc">Only pay network gas fees</div>
+                </div>
+                <div class="zero-item">
+                    <div class="zero-icon">⏱️</div>
+                    <div class="zero-title">Zero Wait Time</div>
+                    <div class="zero-desc">Instant settlement on-chain</div>
+                </div>
+                <div class="zero-item">
+                    <div class="zero-icon">📝</div>
+                    <div class="zero-title">Zero Paperwork</div>
+                    <div class="zero-desc">No KYC, no forms, no accounts</div>
+                </div>
+                <div class="zero-item">
+                    <div class="zero-icon">🌍</div>
+                    <div class="zero-title">Zero Restrictions</div>
+                    <div class="zero-desc">Global access, no borders</div>
+                </div>
+                <div class="zero-item">
+                    <div class="zero-icon">🔑</div>
+                    <div class="zero-title">Zero API Keys</div>
+                    <div class="zero-desc">Wallet is your identity</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
         <div class="container">
             <div class="section-header">
-                <div class="section-tag">Tech Stack</div>
-                <h2 class="section-title">Built with Modern Tech</h2>
+                <div class="section-tag">FAQ</div>
+                <h2 class="section-title">Frequently Asked Questions</h2>
             </div>
 
-            <div class="tech-grid">
-                <div class="tech-badge">FastAPI</div>
-                <div class="tech-badge">x402 Protocol</div>
-                <div class="tech-badge">Base L2</div>
-                <div class="tech-badge">USDC</div>
-                <div class="tech-badge">Python</div>
-                <div class="tech-badge">Coinbase CDP</div>
-                <div class="tech-badge">Uvicorn</div>
-                <div class="tech-badge">OpenStreetMap</div>
-                <div class="tech-badge">Nginx</div>
-                <div class="tech-badge">Systemd</div>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <button class="faq-question">What is aetheriusxAPI?</button>
+                    <div class="faq-answer">
+                        <p>aetheriusxAPI is a crypto-native API marketplace where AI agents pay per request in USDC on Base. Built on x402 protocol, it enables machine-to-machine commerce without accounts, subscriptions, or credit cards.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How do payments work?</button>
+                    <div class="faq-answer">
+                        <p>Payments use the x402 protocol. When an AI agent makes a request, the server responds with HTTP 402 (Payment Required). The agent pays in USDC on Base, and the server verifies the payment before returning data.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">What chains are supported?</button>
+                    <div class="faq-answer">
+                        <p>Currently, we support Base (Ethereum L2) with USDC payments. We plan to expand to other EVM chains and Solana in the future.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Do I need an API key?</button>
+                    <div class="faq-answer">
+                        <p>No. Your wallet address is your identity. No API keys, no accounts, no subscriptions. Connect your wallet and start using the APIs.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">What can I build with this?</button>
+                    <div class="faq-answer">
+                        <p>AI agents that autonomously fetch data, research tools that aggregate information, trading bots that analyze tokens, and any application that needs programmatic access to data with instant payment.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Is there a minimum payment?</button>
+                    <div class="faq-answer">
+                        <p>No minimums. Pay only for what you use. Our cheapest endpoint costs $0.005 per request.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- CTA -->
-    <section class="cta-section" id="contact">
+    <section class="cta-section">
         <div class="container">
             <div class="cta-content">
                 <h2>Start Building<br>the <span class="gradient">Agent Economy</span></h2>
@@ -902,7 +1347,7 @@ data = response.<span class="function">json</span>()
                 </p>
                 <div class="hero-cta">
                     <a href="https://x.com/aetheriusxAPI" class="btn-primary">Follow on X</a>
-                    <a href="https://github.com/wilnowilx" class="btn-secondary">View GitHub</a>
+                    <a href="https://github.com/wilnowilx/aetheriusx-api-site" class="btn-secondary">View GitHub</a>
                 </div>
             </div>
         </div>
@@ -911,15 +1356,48 @@ data = response.<span class="function">json</span>()
     <!-- Footer -->
     <footer>
         <div class="container">
-            <div class="footer-content">
-                <span class="footer-logo">AETHERIUS</span>
-                <div class="footer-links">
-                    <a href="https://x.com/aetheriusxAPI">Twitter</a>
-                    <a href="https://github.com/wilnowilx/aetheriusx-api-site">GitHub</a>
-                    <a href="https://x402.org">x402</a>
-                    <a href="https://base.org">Base</a>
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a href="#" class="nav-brand">
+                        <span class="nav-logo">AETHERIUS</span>
+                        <span class="nav-product">aetheriusxAPI</span>
+                    </a>
+                    <p>The infrastructure layer for AI agent commerce. Crypto-native APIs where machines pay for themselves.</p>
                 </div>
+                <div>
+                    <div class="footer-title">Product</div>
+                    <ul class="footer-links">
+                        <li><a href="#endpoints">Endpoints</a></li>
+                        <li><a href="#docs">Documentation</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Status</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="footer-title">Developers</div>
+                    <ul class="footer-links">
+                        <li><a href="https://docs.x402.org">x402 Docs</a></li>
+                        <li><a href="https://github.com/wilnowilx/aetheriusx-api-site">GitHub</a></li>
+                        <li><a href="#">API Reference</a></li>
+                        <li><a href="#">SDKs</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="footer-title">Company</div>
+                    <ul class="footer-links">
+                        <li><a href="https://x.com/aetheriusxAPI">Twitter</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
                 <span class="footer-copy">2026 AETHERIUS. aetheriusxAPI - All rights reserved.</span>
+                <div class="footer-social">
+                    <a href="https://x.com/aetheriusxAPI">X</a>
+                    <a href="https://github.com/wilnowilx/aetheriusx-api-site">GH</a>
+                </div>
             </div>
         </div>
     </footer>
@@ -929,26 +1407,29 @@ data = response.<span class="function">json</span>()
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
+                    entry.target.classList.add('visible');
                 }
             });
         }, { threshold: 0.1 });
 
-        document.querySelectorAll('.feature-card, .endpoint-card, .step, .stat').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(20px)';
-            el.style.transition = 'opacity 0.6s, transform 0.6s';
-            observer.observe(el);
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // FAQ accordion
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
+                item.classList.toggle('active');
+            });
         });
 
-        // Smooth scroll for nav links
+        // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
             });
         });
     </script>
