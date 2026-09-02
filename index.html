@@ -3,27 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AETHERIUS | The AI Agent Commerce Platform</title>
-    <meta name="description" content="500+ APIs where AI agents pay per request in USDC on Base. The operating system for machine-to-machine commerce.">
+    <title>AETHERIUS — AI Agent Commerce Platform | x402 API Marketplace</title>
+    <meta name="description" content="120+ APIs where AI agents pay per request in USDC on Base. The operating system for machine-to-machine commerce. Built on x402 protocol.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #030308;
-            --bg-elevated: #0a0a14;
+            --bg: #06060e;
             --bg-card: rgba(255,255,255,0.025);
             --border: rgba(255,255,255,0.06);
             --border-hover: rgba(255,255,255,0.15);
-            --text: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #475569;
+            --text: #f0f0f5;
+            --text-sec: #8a8a9a;
+            --text-muted: #4a4a5a;
             --purple: #a855f7;
             --purple-deep: #7c3aed;
             --purple-light: #c084fc;
+            --magenta: #d946ef;
+            --magenta-light: #e879f9;
             --pink: #ec4899;
-            --pink-light: #f472b6;
-            --blue: #3b82f6;
             --cyan: #06b6d4;
             --green: #10b981;
             --orange: #f59e0b;
@@ -33,17 +32,15 @@
         html {
             scroll-behavior: smooth;
             scroll-snap-type: y proximity;
-            overflow-y: scroll;
             scrollbar-width: thin;
             scrollbar-color: var(--purple-deep) var(--bg);
         }
-
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: var(--purple-deep); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--purple-deep); border-radius: 3px; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
@@ -51,47 +48,30 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ===== CANVAS ===== */
-        #plasma-canvas, #particles-canvas {
+        #bg-canvas {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
+            z-index: 0;
             pointer-events: none;
         }
-        #plasma-canvas { z-index: 0; }
-        #particles-canvas { z-index: 1; }
 
-        /* ===== SECTIONS ===== */
         section {
             min-height: 100vh;
             scroll-snap-align: start;
             position: relative;
-            z-index: 2;
+            z-index: 1;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .section-inner {
+        .inner {
             max-width: 1200px;
             margin: 0 auto;
             padding: 100px 40px;
             width: 100%;
         }
-
-        /* ===== SVG ICONS ===== */
-        .svg-icon {
-            width: 24px;
-            height: 24px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .svg-icon-lg { width: 32px; height: 32px; }
-        .svg-icon-xl { width: 48px; height: 48px; }
 
         /* ===== NAV ===== */
         nav {
@@ -99,19 +79,18 @@
             top: 0; left: 0; right: 0;
             z-index: 1000;
             padding: 20px 0;
-            background: rgba(3,3,8,0.4);
-            backdrop-filter: blur(30px) saturate(180%);
+            background: rgba(6,6,14,0.5);
+            backdrop-filter: blur(30px);
             border-bottom: 1px solid transparent;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s;
         }
-
         nav.scrolled {
             padding: 14px 0;
-            background: rgba(3,3,8,0.9);
+            background: rgba(6,6,14,0.92);
             border-bottom-color: var(--border);
         }
 
-        .nav-container {
+        .nav-wrap {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 40px;
@@ -120,28 +99,20 @@
             align-items: center;
         }
 
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .nav-brand svg { color: var(--purple); }
-
-        .nav-brand-text {
-            font-size: 1.3rem;
+        .brand {
+            font-size: 1.35rem;
             font-weight: 900;
-            background: linear-gradient(135deg, var(--purple), var(--pink), var(--cyan));
+            background: linear-gradient(135deg, var(--purple) 0%, var(--magenta) 60%, var(--pink) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.02em;
+            text-decoration: none;
+            letter-spacing: -0.03em;
         }
 
-        .nav-links { display: flex; gap: 8px; align-items: center; }
+        .nav-links { display: flex; gap: 6px; align-items: center; }
 
         .nav-links a {
-            color: var(--text-secondary);
+            color: var(--text-sec);
             text-decoration: none;
             font-size: 0.88rem;
             font-weight: 500;
@@ -149,31 +120,96 @@
             border-radius: 10px;
             transition: all 0.3s;
         }
-
-        .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+        .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.04); }
         .nav-links a.active { color: var(--purple-light); background: rgba(168,85,247,0.1); }
 
         .btn-nav {
             padding: 12px 24px !important;
-            background: linear-gradient(135deg, var(--purple-deep), var(--pink)) !important;
-            border-radius: 12px !important;
+            background: linear-gradient(135deg, var(--purple-deep), var(--magenta)) !important;
             color: white !important;
             font-weight: 600 !important;
             margin-left: 8px;
         }
+        .btn-nav:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(168,85,247,0.4); }
 
-        .btn-nav:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(168,85,247,0.4);
-        }
-
-        .nav-mobile-toggle {
+        .mobile-toggle {
             display: none;
             background: none;
             border: none;
             color: var(--text);
             cursor: pointer;
-            padding: 8px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 18px 36px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        .btn:hover::before { left: 100%; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--purple-deep), var(--magenta));
+            color: white;
+            box-shadow: 0 8px 30px rgba(168,85,247,0.35);
+        }
+        .btn-primary:hover { transform: translateY(-4px); box-shadow: 0 16px 50px rgba(168,85,247,0.5); }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { border-color: var(--purple); background: rgba(168,85,247,0.08); }
+
+        /* ===== SECTION TAG ===== */
+        .stag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: rgba(168,85,247,0.08);
+            border: 1px solid rgba(168,85,247,0.25);
+            border-radius: 10px;
+            font-size: 0.72rem;
+            color: var(--purple-light);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .stitle {
+            font-size: clamp(2.5rem, 5vw, 3.8rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .sdesc {
+            font-size: 1.2rem;
+            color: var(--text-sec);
+            max-width: 550px;
+            line-height: 1.7;
         }
 
         /* ===== HERO ===== */
@@ -184,8 +220,8 @@
             align-items: center;
             gap: 10px;
             padding: 12px 24px;
-            background: rgba(168,85,247,0.08);
-            border: 1px solid rgba(168,85,247,0.25);
+            background: rgba(168,85,247,0.06);
+            border: 1px solid rgba(168,85,247,0.2);
             border-radius: 9999px;
             font-size: 0.85rem;
             color: var(--purple-light);
@@ -194,21 +230,18 @@
             animation: fadeUp 0.8s 0.2s forwards;
         }
 
-        .hero-badge-dot {
+        .hero-dot {
             width: 10px; height: 10px;
             background: var(--green);
             border-radius: 50%;
+            box-shadow: 0 0 12px var(--green);
             animation: pulse 2s infinite;
-            box-shadow: 0 0 10px var(--green);
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.4); }
-        }
+        @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.5; transform:scale(1.4); } }
 
         .hero h1 {
-            font-size: clamp(3.2rem, 7.5vw, 6rem);
+            font-size: clamp(3.2rem, 7vw, 5.8rem);
             font-weight: 900;
             line-height: 1.02;
             letter-spacing: -0.04em;
@@ -217,22 +250,19 @@
             animation: fadeUp 1s 0.4s forwards;
         }
 
-        .hero h1 .gradient {
-            background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 40%, var(--cyan) 100%);
+        .hero h1 .grad {
+            background: linear-gradient(135deg, var(--purple) 0%, var(--magenta) 50%, var(--pink) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-size: 200% 200%;
-            animation: gradientShift 4s ease infinite;
+            animation: gShift 4s ease infinite;
         }
 
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
+        @keyframes gShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
         .hero-sub {
             font-size: 1.25rem;
-            color: var(--text-secondary);
+            color: var(--text-sec);
             max-width: 620px;
             margin: 0 auto 56px;
             line-height: 1.7;
@@ -249,93 +279,48 @@
             animation: fadeUp 1s 0.8s forwards;
         }
 
-        @keyframes fadeUp {
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* ===== TRUSTED BY ===== */
+        .trusted-section {
+            padding: 60px 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.01);
         }
 
-        .btn {
-            padding: 18px 36px;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 1rem;
-            text-decoration: none;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
-            border: none;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before { left: 100%; }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--purple-deep), var(--pink));
-            color: white;
-            box-shadow: 0 8px 32px rgba(168,85,247,0.35);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 16px 50px rgba(168,85,247,0.5);
-        }
-
-        .btn-secondary {
-            background: rgba(255,255,255,0.04);
-            color: var(--text);
-            border: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--purple);
-            background: rgba(168,85,247,0.1);
-            transform: translateY(-4px);
-        }
-
-        /* ===== SECTION HEADERS ===== */
-        .section-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 18px;
-            background: rgba(168,85,247,0.1);
-            border: 1px solid rgba(168,85,247,0.3);
-            border-radius: 10px;
-            font-size: 0.75rem;
-            color: var(--purple-light);
+        .trusted-section h3 {
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-weight: 700;
-            margin-bottom: 24px;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            font-weight: 600;
         }
 
-        .section-tag svg { width: 16px; height: 16px; }
-
-        .section-title {
-            font-size: clamp(2.5rem, 5vw, 3.8rem);
-            font-weight: 900;
-            letter-spacing: -0.03em;
-            margin-bottom: 20px;
-            line-height: 1.1;
+        .trusted-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 64px;
+            flex-wrap: wrap;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
-        .section-desc {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            max-width: 550px;
-            line-height: 1.7;
+        .trusted-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            opacity: 0.35;
+            transition: all 0.3s;
+            letter-spacing: -0.02em;
+        }
+
+        .trusted-logo:hover {
+            opacity: 0.7;
+            color: var(--purple-light);
         }
 
         /* ===== STATS ===== */
@@ -357,29 +342,24 @@
             position: relative;
             overflow: hidden;
         }
-
         .stat-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--purple), var(--pink), var(--cyan));
-            opacity: 0;
-            transition: opacity 0.4s;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--purple), var(--magenta), var(--pink));
+            opacity: 0; transition: opacity 0.4s;
         }
-
         .stat-card:hover {
             border-color: rgba(168,85,247,0.4);
             transform: translateY(-12px) scale(1.02);
             box-shadow: 0 24px 60px rgba(168,85,247,0.15);
         }
-
         .stat-card:hover::before { opacity: 1; }
 
         .stat-icon {
             width: 56px; height: 56px;
             margin: 0 auto 20px;
-            background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(236,72,153,0.15));
+            background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(217,70,239,0.12));
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -387,22 +367,22 @@
             color: var(--purple-light);
         }
 
-        .stat-value {
+        .stat-val {
             font-size: 3.2rem;
             font-weight: 900;
-            background: linear-gradient(135deg, var(--purple), var(--pink), var(--cyan));
+            background: linear-gradient(135deg, var(--purple), var(--magenta), var(--cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             line-height: 1;
             margin-bottom: 12px;
         }
 
-        .stat-label { color: var(--text-secondary); font-size: 0.95rem; }
+        .stat-label { color: var(--text-sec); font-size: 0.95rem; }
 
         /* ===== CATEGORIES ===== */
-        .categories-section { text-align: center; }
+        .cats-section { text-align: center; }
 
-        .categories-grid {
+        .cats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
@@ -419,52 +399,34 @@
             position: relative;
             overflow: hidden;
         }
-
         .cat-card::after {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at center, rgba(168,85,247,0.12), transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s;
+            background: radial-gradient(circle at center, rgba(168,85,247,0.1), transparent 70%);
+            opacity: 0; transition: opacity 0.4s;
         }
-
         .cat-card:hover {
             border-color: var(--purple);
             transform: translateY(-8px) scale(1.03);
             box-shadow: 0 24px 60px rgba(168,85,247,0.2);
         }
-
         .cat-card:hover::after { opacity: 1; }
 
         .cat-icon {
             width: 56px; height: 56px;
             margin: 0 auto 18px;
-            background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(236,72,153,0.12));
+            background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(217,70,239,0.1));
             border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--purple-light);
-            position: relative;
-            z-index: 1;
+            position: relative; z-index: 1;
         }
 
-        .cat-title {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .cat-count {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: var(--purple-light);
-            position: relative;
-            z-index: 1;
-        }
+        .cat-title { font-size: 1rem; font-weight: 700; margin-bottom: 8px; position: relative; z-index: 1; }
+        .cat-count { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--magenta-light); position: relative; z-index: 1; }
 
         /* ===== HOW IT WORKS ===== */
         .how-section { text-align: center; }
@@ -472,58 +434,52 @@
         .steps-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 32px;
+            gap: 24px;
             margin-top: 72px;
             position: relative;
         }
-
         .steps-grid::before {
             content: '';
             position: absolute;
-            top: 56px; left: 12%; right: 12%;
+            top: 50px; left: 12%; right: 12%;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--purple), var(--pink), var(--cyan), transparent);
+            background: linear-gradient(90deg, transparent, var(--purple), var(--magenta), var(--pink), transparent);
         }
 
-        .step-card { position: relative; z-index: 1; }
+        .step-card { position: relative; z-index: 1; text-align: center; }
 
-        .step-num {
-            width: 112px; height: 112px;
-            background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(236,72,153,0.12));
+        .step-icon {
+            width: 100px; height: 100px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(217,70,239,0.12));
             border: 2px solid var(--purple);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 28px;
-            position: relative;
             color: var(--purple-light);
-            box-shadow: 0 0 40px rgba(168,85,247,0.2);
+            position: relative;
+            box-shadow: 0 0 30px rgba(168,85,247,0.2);
         }
+        .step-icon svg { width: 40px; height: 40px; }
 
-        .step-num svg { width: 48px; height: 48px; }
-
-        .step-num::after {
-            content: '';
+        .step-num {
             position: absolute;
-            top: -10px; left: -10px; right: -10px; bottom: -10px;
-            border: 1px solid rgba(168,85,247,0.15);
+            top: -8px; right: -8px;
+            width: 32px; height: 32px;
+            background: var(--magenta);
             border-radius: 50%;
-            animation: rotate 12s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 4px 12px rgba(217,70,239,0.4);
         }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .step-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .step-desc { color: var(--text-secondary); font-size: 0.95rem; }
+        .step-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+        .step-desc { color: var(--text-sec); font-size: 0.9rem; max-width: 220px; margin: 0 auto; }
 
         /* ===== FEATURES ===== */
         .features-section { text-align: center; }
@@ -542,151 +498,122 @@
             border-radius: 24px;
             text-align: left;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
         }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(168,85,247,0.05), transparent);
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-
         .feature-card:hover {
             border-color: var(--border-hover);
             transform: translateY(-10px);
-            background: rgba(255,255,255,0.04);
         }
-
-        .feature-card:hover::before { opacity: 1; }
 
         .feature-icon {
             width: 64px; height: 64px;
-            background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(236,72,153,0.15));
+            background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(217,70,239,0.12));
             border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 28px;
             color: var(--purple-light);
-            position: relative;
-            z-index: 1;
         }
+        .feature-icon svg { width: 30px; height: 30px; }
 
-        .feature-icon svg { width: 32px; height: 32px; }
+        .feature-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 12px; }
+        .feature-desc { color: var(--text-sec); font-size: 0.95rem; }
 
-        .feature-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .feature-desc {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* ===== CODE SECTION ===== */
+        /* ===== CODE - TERMINAL ===== */
         .code-section { text-align: center; }
 
-        .code-container {
+        .code-wrap {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1.1fr 0.9fr;
             gap: 48px;
             margin-top: 72px;
             align-items: start;
         }
 
-        .code-tabs {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 0;
-            background: rgba(255,255,255,0.03);
-            border-radius: 14px 14px 0 0;
-            padding: 8px 8px 0;
-            border: 1px solid var(--border);
-            border-bottom: none;
-        }
-
-        .code-tab {
-            padding: 10px 20px;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            cursor: pointer;
-            border-radius: 8px 8px 0 0;
-            transition: all 0.3s;
-        }
-
-        .code-tab:hover { color: var(--text-secondary); }
-        .code-tab.active { background: rgba(0,0,0,0.4); color: var(--purple-light); }
-
-        .code-block {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border);
-            border-top: none;
-            border-radius: 0 0 20px 20px;
+        .terminal {
+            background: #0c0c14;
+            border: 1px solid rgba(168,85,247,0.3);
+            border-radius: 16px;
             overflow: hidden;
             text-align: left;
         }
 
-        .code-body {
-            padding: 28px;
+        .term-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 20px;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .term-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .term-dot:nth-child(1) { background: #ef4444; }
+        .term-dot:nth-child(2) { background: #f59e0b; }
+        .term-dot:nth-child(3) { background: #10b981; }
+
+        .term-title {
+            margin-left: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .term-tabs {
+            display: flex;
+            gap: 2px;
+            padding: 0 16px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .term-tab {
+            padding: 10px 16px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .term-tab:hover { color: var(--text-sec); }
+        .term-tab.active { color: var(--purple-light); border-bottom-color: var(--purple); }
+
+        .term-body {
+            padding: 24px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.82rem;
             line-height: 1.9;
-            overflow-x: auto;
+            min-height: 300px;
         }
 
-        .code-body .kw { color: var(--purple-light); }
-        .code-body .str { color: var(--green); }
-        .code-body .cmt { color: var(--text-muted); }
-        .code-body .fn { color: var(--pink); }
-        .code-body .var { color: var(--cyan); }
-        .code-body .num { color: var(--orange); }
+        .term-body .prompt { color: var(--green); }
+        .term-body .cmd { color: var(--text); }
+        .term-body .flag { color: var(--cyan); }
+        .term-body .str { color: var(--magenta-light); }
+        .term-body .cmt { color: var(--text-muted); }
+        .term-body .kw { color: var(--purple-light); }
+        .term-body .fn { color: var(--pink); }
+        .term-body .num { color: var(--orange); }
+        .term-body .out { color: var(--text-sec); }
 
         .code-info { text-align: left; }
+        .code-info h3 { font-size: 1.8rem; font-weight: 800; margin-bottom: 20px; }
+        .code-info p { color: var(--text-sec); margin-bottom: 32px; line-height: 1.7; }
 
-        .code-info h3 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-        }
-
-        .code-info p {
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-            line-height: 1.7;
-        }
-
-        .code-features { list-style: none; }
-
-        .code-features li {
+        .code-list { list-style: none; }
+        .code-list li {
             padding: 14px 0;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: 14px;
-            color: var(--text-secondary);
+            color: var(--text-sec);
         }
+        .code-list li svg { width: 22px; height: 22px; color: var(--green); flex-shrink: 0; }
 
-        .code-features li svg {
-            width: 24px; height: 24px;
-            color: var(--green);
-            flex-shrink: 0;
-        }
-
-        /* ===== DOCS SECTION ===== */
+        /* ===== DOCS ===== */
         .docs-section { text-align: center; }
 
         .docs-grid {
@@ -702,9 +629,11 @@
             border: 1px solid var(--border);
             border-radius: 24px;
             text-align: left;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.5s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
-
         .docs-card:hover {
             border-color: var(--border-hover);
             transform: translateY(-8px);
@@ -712,7 +641,7 @@
 
         .docs-card-icon {
             width: 56px; height: 56px;
-            background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(6,182,212,0.12));
+            background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(6,182,212,0.1));
             border-radius: 14px;
             display: flex;
             align-items: center;
@@ -720,21 +649,10 @@
             margin-bottom: 24px;
             color: var(--cyan);
         }
-
         .docs-card-icon svg { width: 28px; height: 28px; }
 
-        .docs-card h3 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .docs-card p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
+        .docs-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 12px; }
+        .docs-card p { color: var(--text-sec); font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px; }
 
         .docs-link {
             display: inline-flex;
@@ -743,17 +661,15 @@
             color: var(--purple-light);
             font-weight: 600;
             font-size: 0.9rem;
-            text-decoration: none;
             transition: gap 0.3s;
         }
-
         .docs-link:hover { gap: 12px; }
         .docs-link svg { width: 18px; height: 18px; }
 
-        /* ===== ENDPOINTS TABLE ===== */
-        .endpoints-section { text-align: center; }
+        /* ===== RATE LIMITS ===== */
+        .limits-section { text-align: center; }
 
-        .endpoints-table {
+        .limits-table {
             margin-top: 64px;
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -762,9 +678,9 @@
             text-align: left;
         }
 
-        .endpoints-header {
+        .limits-header {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
             padding: 18px 28px;
             background: rgba(255,255,255,0.03);
             border-bottom: 1px solid var(--border);
@@ -772,313 +688,48 @@
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: var(--text-muted);
+            font-weight: 700;
         }
 
-        .endpoints-row {
+        .limits-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
             padding: 18px 28px;
             border-bottom: 1px solid var(--border);
             transition: background 0.3s;
             align-items: center;
         }
+        .limits-row:last-child { border-bottom: none; }
+        .limits-row:hover { background: rgba(255,255,255,0.02); }
 
-        .endpoints-row:last-child { border-bottom: none; }
-        .endpoints-row:hover { background: rgba(255,255,255,0.02); }
-
-        .endpoint-method {
+        .tier-badge {
             display: inline-block;
-            padding: 4px 10px;
-            background: rgba(16,185,129,0.15);
-            color: var(--green);
+            padding: 4px 12px;
             border-radius: 6px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-right: 10px;
-        }
-
-        .endpoint-path {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: var(--text);
-        }
-
-        .endpoint-price {
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--purple-light);
-        }
-
-        .endpoint-latency {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .endpoint-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .endpoint-status::before {
-            content: '';
-            width: 8px; height: 8px;
-            background: var(--green);
-            border-radius: 50%;
-        }
-
-        /* ===== DASHBOARD ===== */
-        .dashboard-section { text-align: center; }
-
-        .dashboard-frame {
-            margin-top: 72px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 28px;
-            overflow: hidden;
-            box-shadow: 0 60px 120px rgba(0,0,0,0.6);
-        }
-
-        .frame-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 18px 28px;
-            background: rgba(255,255,255,0.03);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .frame-dots { display: flex; gap: 8px; }
-        .frame-dot { width: 14px; height: 14px; border-radius: 50%; }
-        .frame-dot:nth-child(1) { background: #ef4444; }
-        .frame-dot:nth-child(2) { background: #f59e0b; }
-        .frame-dot:nth-child(3) { background: #10b981; }
-
-        .frame-url {
-            margin-left: 16px;
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .frame-body {
-            display: grid;
-            grid-template-columns: 240px 1fr;
-            min-height: 420px;
-        }
-
-        .frame-sidebar {
-            padding: 28px;
-            border-right: 1px solid var(--border);
-            background: rgba(255,255,255,0.01);
-        }
-
-        .sidebar-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .sidebar-items { list-style: none; }
-
-        .sidebar-items li {
-            padding: 14px 18px;
-            border-radius: 12px;
-            margin-bottom: 6px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .sidebar-items li svg { width: 20px; height: 20px; }
-        .sidebar-items li:hover { background: rgba(255,255,255,0.05); color: var(--text); }
-        .sidebar-items li.active { background: rgba(168,85,247,0.15); color: var(--purple-light); }
-
-        .frame-content { padding: 36px; }
-
-        .frame-content h3 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 28px;
-            text-align: left;
-        }
-
-        .dash-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin-bottom: 36px;
-        }
-
-        .dash-stat {
-            padding: 24px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            text-align: left;
-        }
-
-        .dash-stat-val {
-            font-size: 1.6rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--purple), var(--pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .dash-stat-label {
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            margin-top: 6px;
-        }
-
-        .dash-table { width: 100%; border-collapse: collapse; text-align: left; }
-
-        .dash-table th {
-            padding: 14px 18px;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .dash-table td {
-            padding: 16px 18px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .status-pill {
-            display: inline-block;
-            padding: 5px 14px;
-            background: rgba(16,185,129,0.15);
-            color: var(--green);
-            border-radius: 9999px;
-            font-size: 0.75rem;
+            font-size: 0.78rem;
             font-weight: 600;
         }
-
-        /* ===== PRICING ===== */
-        .pricing-section { text-align: center; }
-
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            margin-top: 72px;
-            align-items: start;
-        }
-
-        .pricing-card {
-            padding: 48px 36px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 28px;
-            text-align: center;
-            transition: all 0.5s;
-            position: relative;
-        }
-
-        .pricing-card.featured {
-            border-color: var(--purple);
-            box-shadow: 0 0 60px rgba(168,85,247,0.15);
-        }
-
-        .pricing-card.featured::before {
-            content: 'MOST POPULAR';
-            position: absolute;
-            top: -14px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 6px 20px;
-            background: linear-gradient(135deg, var(--purple-deep), var(--pink));
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            border-radius: 9999px;
-        }
-
-        .pricing-card:hover {
-            transform: translateY(-12px);
-            border-color: var(--border-hover);
-        }
-
-        .pricing-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .pricing-desc {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 28px;
-        }
-
-        .pricing-price {
-            font-size: 3rem;
-            font-weight: 900;
-            margin-bottom: 8px;
-        }
-
-        .pricing-price span {
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        .pricing-features {
-            list-style: none;
-            margin: 32px 0;
-            text-align: left;
-        }
-
-        .pricing-features li {
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .pricing-features li svg {
-            width: 20px; height: 20px;
-            color: var(--green);
-            flex-shrink: 0;
-        }
+        .tier-free { background: rgba(255,255,255,0.08); color: var(--text-sec); }
+        .tier-pro { background: rgba(168,85,247,0.15); color: var(--purple-light); }
+        .tier-ent { background: rgba(217,70,239,0.15); color: var(--magenta-light); }
 
         /* ===== CTA ===== */
         .cta-section { text-align: center; }
 
         .cta-box {
             padding: 80px 60px;
-            background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(236,72,153,0.08));
-            border: 1px solid rgba(168,85,247,0.25);
+            background: linear-gradient(135deg, rgba(168,85,247,0.06), rgba(217,70,239,0.06));
+            border: 1px solid rgba(168,85,247,0.2);
             border-radius: 32px;
             position: relative;
             overflow: hidden;
         }
-
         .cta-box::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 30% 50%, rgba(168,85,247,0.12), transparent 50%),
-                        radial-gradient(circle at 70% 50%, rgba(236,72,153,0.12), transparent 50%);
+            background: radial-gradient(circle at 30% 50%, rgba(168,85,247,0.1), transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(217,70,239,0.1), transparent 50%);
         }
 
         .cta-box h2 {
@@ -1091,7 +742,7 @@
 
         .cta-box p {
             font-size: 1.2rem;
-            color: var(--text-secondary);
+            color: var(--text-sec);
             margin-bottom: 48px;
             max-width: 500px;
             margin-left: auto; margin-right: auto;
@@ -1109,12 +760,14 @@
         footer {
             min-height: auto;
             scroll-snap-align: none;
-            padding: 100px 0 50px;
+            padding: 80px 0 40px;
             border-top: 1px solid var(--border);
             background: var(--bg);
+            position: relative;
+            z-index: 1;
         }
 
-        .footer-container {
+        .footer-wrap {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 40px;
@@ -1123,177 +776,120 @@
         .footer-grid {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 56px;
-            margin-bottom: 60px;
+            gap: 48px;
+            margin-bottom: 48px;
         }
 
         .footer-brand p {
-            color: var(--text-secondary);
+            color: var(--text-sec);
             font-size: 0.95rem;
-            margin-top: 20px;
+            margin-top: 16px;
             line-height: 1.7;
         }
 
-        .footer-title {
-            font-size: 0.75rem;
+        .footer-col h4 {
+            font-size: 0.72rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: var(--text-muted);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
-        .footer-links { list-style: none; }
-        .footer-links li { margin-bottom: 14px; }
+        .footer-col ul { list-style: none; }
+        .footer-col li { margin-bottom: 12px; }
 
-        .footer-links a {
-            color: var(--text-secondary);
+        .footer-col a {
+            color: var(--text-sec);
             text-decoration: none;
             font-size: 0.9rem;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            transition: color 0.3s;
         }
-
-        .footer-links a:hover { color: var(--purple-light); }
+        .footer-col a:hover { color: var(--purple-light); }
 
         .footer-bottom {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 40px;
+            padding-top: 32px;
             border-top: 1px solid var(--border);
         }
 
         .footer-copy { color: var(--text-muted); font-size: 0.85rem; }
 
-        .footer-socials {
-            display: flex;
-            gap: 16px;
-        }
+        .footer-socials { display: flex; gap: 12px; }
 
         .footer-socials a {
             width: 40px; height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.04);
             border-radius: 10px;
-            color: var(--text-secondary);
+            color: var(--text-sec);
             transition: all 0.3s;
         }
-
-        .footer-socials a:hover {
-            background: rgba(168,85,247,0.15);
-            color: var(--purple-light);
-        }
+        .footer-socials a:hover { background: rgba(168,85,247,0.12); color: var(--purple-light); }
 
         /* ===== ANIMATIONS ===== */
         .anim {
             opacity: 0;
-            transform: translateY(60px);
+            transform: translateY(50px);
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        .anim.vis { opacity: 1; transform: translateY(0); }
+        .ad1 { transition-delay: 0.15s; }
+        .ad2 { transition-delay: 0.3s; }
+        .ad3 { transition-delay: 0.45s; }
+        .ad4 { transition-delay: 0.6s; }
 
-        .anim.visible { opacity: 1; transform: translateY(0); }
-        .anim-delay-1 { transition-delay: 0.15s; }
-        .anim-delay-2 { transition-delay: 0.3s; }
-        .anim-delay-3 { transition-delay: 0.45s; }
-        .anim-delay-4 { transition-delay: 0.6s; }
-
-        /* ===== SCROLL INDICATOR ===== */
-        .scroll-indicator {
+        /* ===== SCROLL DOTS ===== */
+        .scroll-dots {
             position: fixed;
-            right: 32px;
+            right: 28px;
             top: 50%;
             transform: translateY(-50%);
             z-index: 100;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
         }
 
-        .scroll-dot {
-            width: 12px; height: 12px;
+        .sdot {
+            width: 10px; height: 10px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.12);
-            border: 2px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.06);
             cursor: pointer;
             transition: all 0.4s;
         }
-
-        .scroll-dot.active {
+        .sdot.active {
             background: var(--purple);
             border-color: var(--purple);
-            box-shadow: 0 0 20px rgba(168,85,247,0.6);
+            box-shadow: 0 0 16px rgba(168,85,247,0.5);
             transform: scale(1.4);
-        }
-
-        /* ===== GESTURE HINT ===== */
-        .gesture-hint {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            opacity: 0.6;
-            animation: fadeInOut 3s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-        .gesture-hint svg {
-            width: 24px;
-            height: 24px;
-            color: var(--text-secondary);
-            animation: bounce 1.5s infinite;
-        }
-
-        .gesture-hint span {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(8px); }
-        }
-
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.7; }
         }
 
         /* ===== MOBILE NAV ===== */
         .mobile-nav {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(3,3,8,0.95);
+            background: rgba(6,6,14,0.96);
             backdrop-filter: blur(30px);
             z-index: 999;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 24px;
+            gap: 20px;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s;
         }
-
-        .mobile-nav.open {
-            opacity: 1;
-            pointer-events: all;
-        }
+        .mobile-nav.open { opacity: 1; pointer-events: all; }
 
         .mobile-nav a {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: var(--text);
             text-decoration: none;
@@ -1301,10 +897,9 @@
             border-radius: 12px;
             transition: all 0.3s;
         }
+        .mobile-nav a:hover { background: rgba(168,85,247,0.12); color: var(--purple-light); }
 
-        .mobile-nav a:hover { background: rgba(168,85,247,0.15); color: var(--purple-light); }
-
-        .mobile-nav-close {
+        .mobile-close {
             position: absolute;
             top: 24px; right: 24px;
             background: none;
@@ -1316,96 +911,69 @@
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .categories-grid { grid-template-columns: repeat(3, 1fr); }
+            .cats-grid { grid-template-columns: repeat(3, 1fr); }
             .features-grid { grid-template-columns: repeat(2, 1fr); }
-            .code-container { grid-template-columns: 1fr; }
-            .frame-body { grid-template-columns: 1fr; }
-            .frame-sidebar { display: none; }
+            .code-wrap { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr 1fr; }
-            .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin-left: auto; margin-right: auto; }
             .docs-grid { grid-template-columns: 1fr 1fr; }
         }
 
         @media (max-width: 768px) {
             html { scroll-snap-type: none; }
             .nav-links { display: none; }
-            .nav-mobile-toggle { display: flex; }
-            .stats-grid { grid-template-columns: 1fr 1fr; }
-            .categories-grid { grid-template-columns: repeat(2, 1fr); }
+            .mobile-toggle { display: flex; }
+            .stats-grid, .cats-grid { grid-template-columns: 1fr 1fr; }
             .steps-grid { grid-template-columns: 1fr 1fr; }
             .steps-grid::before { display: none; }
             .features-grid { grid-template-columns: 1fr; }
-            .dash-stats { grid-template-columns: 1fr; }
-            .scroll-indicator { display: none; }
+            .scroll-dots { display: none; }
             .footer-grid { grid-template-columns: 1fr; }
-            .footer-bottom { flex-direction: column; gap: 24px; }
+            .footer-bottom { flex-direction: column; gap: 20px; }
             section { min-height: auto; scroll-snap-align: none; }
             .cta-box { padding: 60px 24px; }
             .cta-actions { flex-direction: column; align-items: center; }
-            .gesture-hint { display: none; }
-            .endpoints-header, .endpoints-row { grid-template-columns: 1fr; gap: 8px; }
-            .endpoints-header { display: none; }
-            .endpoints-row { padding: 20px; }
+            .limits-header, .limits-row { grid-template-columns: 1fr; gap: 8px; }
+            .limits-header { display: none; }
             .docs-grid { grid-template-columns: 1fr; }
+            .limits-table { margin: 64px 10px 0; }
+            .trusted-logos { gap: 32px; }
         }
     </style>
 </head>
 <body>
-    <!-- Canvas -->
-    <canvas id="plasma-canvas"></canvas>
-    <canvas id="particles-canvas"></canvas>
+    <canvas id="bg-canvas"></canvas>
 
-    <!-- Scroll Indicator -->
-    <div class="scroll-indicator" id="scrollIndicator">
-        <div class="scroll-dot active" data-section="0"></div>
-        <div class="scroll-dot" data-section="1"></div>
-        <div class="scroll-dot" data-section="2"></div>
-        <div class="scroll-dot" data-section="3"></div>
-        <div class="scroll-dot" data-section="4"></div>
-        <div class="scroll-dot" data-section="5"></div>
-        <div class="scroll-dot" data-section="6"></div>
-        <div class="scroll-dot" data-section="7"></div>
-        <div class="scroll-dot" data-section="8"></div>
-        <div class="scroll-dot" data-section="9"></div>
-        <div class="scroll-dot" data-section="10"></div>
-    </div>
-
-    <!-- Gesture Hint -->
-    <div class="gesture-hint" id="gestureHint">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14M19 12l-7 7-7-7"/>
-        </svg>
-        <span>Scroll to explore</span>
+    <!-- Scroll Dots -->
+    <div class="scroll-dots" id="scrollDots">
+        <div class="sdot active" data-s="0"></div>
+        <div class="sdot" data-s="1"></div>
+        <div class="sdot" data-s="2"></div>
+        <div class="sdot" data-s="3"></div>
+        <div class="sdot" data-s="4"></div>
+        <div class="sdot" data-s="5"></div>
+        <div class="sdot" data-s="6"></div>
+        <div class="sdot" data-s="7"></div>
     </div>
 
     <!-- Mobile Nav -->
     <div class="mobile-nav" id="mobileNav">
-        <button class="mobile-nav-close" onclick="closeMobileNav()">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 6L6 18M6 6l12 12"/>
-            </svg>
+        <button class="mobile-close" onclick="closeMobile()">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
-        <a href="#hero" onclick="closeMobileNav()">Home</a>
-        <a href="#stats" onclick="closeMobileNav()">Stats</a>
-        <a href="#categories" onclick="closeMobileNav()">APIs</a>
-        <a href="#how" onclick="closeMobileNav()">How It Works</a>
-        <a href="#features" onclick="closeMobileNav()">Features</a>
-        <a href="#code" onclick="closeMobileNav()">Code</a>
-        <a href="#docs" onclick="closeMobileNav()">Docs</a>
-        <a href="#pricing" onclick="closeMobileNav()">Pricing</a>
+        <a href="#hero" onclick="closeMobile()">Home</a>
+        <a href="#stats" onclick="closeMobile()">Stats</a>
+        <a href="#categories" onclick="closeMobile()">APIs</a>
+        <a href="#how" onclick="closeMobile()">How It Works</a>
+        <a href="#features" onclick="closeMobile()">Features</a>
+        <a href="#code" onclick="closeMobile()">Code</a>
+        <a href="#limits" onclick="closeMobile()">Rate Limits</a>
+        <a href="#cta" onclick="closeMobile()">Get Started</a>
     </div>
 
     <!-- Nav -->
     <nav id="mainNav">
-        <div class="nav-container">
-            <a href="#hero" class="nav-brand">
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                    <path d="M16 2L2 9v14l14 7 14-7V9L16 2z" stroke="currentColor" stroke-width="2" fill="none"/>
-                    <path d="M16 2v28M2 9l14 7 14-7M2 23l14-7 14 7" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
-                    <circle cx="16" cy="16" r="4" fill="currentColor" opacity="0.8"/>
-                </svg>
-                <span class="nav-brand-text">AETHERIUS</span>
-            </a>
+        <div class="nav-wrap">
+            <a href="#hero" class="brand">AETHERIUS</a>
             <div class="nav-links">
                 <a href="#hero" class="active">Home</a>
                 <a href="#stats">Stats</a>
@@ -1413,314 +981,208 @@
                 <a href="#how">How It Works</a>
                 <a href="#features">Features</a>
                 <a href="#code">Code</a>
-                <a href="#docs">Docs</a>
-                <a href="#pricing">Pricing</a>
+                <a href="#limits">Limits</a>
                 <a href="#cta" class="btn-nav">Get Started</a>
             </div>
-            <button class="nav-mobile-toggle" onclick="openMobileNav()">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12h18M3 6h18M3 18h18"/>
-                </svg>
+            <button class="mobile-toggle" onclick="openMobile()">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
             </button>
         </div>
     </nav>
 
-    <!-- Section 1: Hero -->
-    <section id="hero" class="hero-section">
-        <div class="section-inner">
+    <!-- HERO -->
+    <section id="hero" class="hero">
+        <div class="inner">
             <div class="hero-badge">
-                <div class="hero-badge-dot"></div>
+                <div class="hero-dot"></div>
                 Live on Base Mainnet
             </div>
-            <h1>
-                The Operating System for<br>
-                <span class="gradient">AI Agent Commerce</span>
-            </h1>
-            <p class="hero-sub">
-                Infrastructure that lets AI agents discover, pay for, and consume APIs autonomously. 
-                500+ endpoints. USDC payments. Zero human friction.
-            </p>
+            <h1>The Infrastructure for<br><span class="grad">Autonomous AI Agents</span></h1>
+            <p class="hero-sub">120+ APIs your agents can pay for in USDC on Base. No accounts, no subscriptions, no human friction. Just code.</p>
             <div class="hero-actions">
                 <a href="#cta" class="btn btn-primary">
                     Start Building
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </a>
                 <a href="#code" class="btn btn-secondary">
-                    View Documentation
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
-                    </svg>
+                    View Docs
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- Section 2: Trusted By -->
-    <section id="trusted" class="trusted-section">
-        <div class="section-inner" style="padding: 0 40px;">
+    <!-- TRUSTED BY -->
+    <section id="trusted" class="trusted-section" style="min-height: auto; padding: 60px 0;">
+        <div class="inner" style="padding: 0 40px;">
             <h3>Trusted by builders on</h3>
-            <div class="trusted-grid">
-                <div class="trusted-item">Base</div>
-                <div class="trusted-item">Ethereum</div>
-                <div class="trusted-item">x402</div>
-                <div class="trusted-item">Coinbase</div>
+            <div class="trusted-logos">
+                <div class="trusted-logo">Base</div>
+                <div class="trusted-logo">Ethereum</div>
+                <div class="trusted-logo">x402</div>
+                <div class="trusted-logo">Coinbase</div>
+                <div class="trusted-logo">USDC</div>
             </div>
         </div>
     </section>
 
-    <!-- Section 3: Stats -->
+    <!-- STATS -->
     <section id="stats" class="stats-section">
-        <div class="section-inner">
-            <div class="section-tag anim">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                </svg>
-                By The Numbers
+        <div class="inner">
+            <div class="stag anim">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                Platform Metrics
             </div>
-            <h2 class="section-title anim">Built for Scale</h2>
-            <p class="section-desc anim" style="margin: 0 auto;">Every metric designed for machine-to-machine commerce at planetary scale.</p>
+            <h2 class="stitle anim">Built for Scale</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">Machine-to-machine commerce at planetary scale.</p>
             
             <div class="stats-grid">
-                <div class="stat-card anim anim-delay-1">
+                <div class="stat-card anim ad1">
                     <div class="stat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                            <path d="M22 6l-10 7L2 6"/>
-                        </svg>
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
                     </div>
-                    <div class="stat-value">500+</div>
-                    <div class="stat-label">Available APIs</div>
+                    <div class="stat-val">120+</div>
+                    <div class="stat-label">Live APIs</div>
                 </div>
-                <div class="stat-card anim anim-delay-2">
+                <div class="stat-card anim ad2">
                     <div class="stat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7"/>
-                            <rect x="14" y="3" width="7" height="7"/>
-                            <rect x="14" y="14" width="7" height="7"/>
-                            <rect x="3" y="14" width="7" height="7"/>
-                        </svg>
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                     </div>
-                    <div class="stat-value">12</div>
+                    <div class="stat-val">12</div>
                     <div class="stat-label">Categories</div>
                 </div>
-                <div class="stat-card anim anim-delay-3">
+                <div class="stat-card anim ad3">
                     <div class="stat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 6v6l4 2"/>
-                        </svg>
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                     </div>
-                    <div class="stat-value">$0.001</div>
+                    <div class="stat-val">$0.001</div>
                     <div class="stat-label">Starting Price</div>
                 </div>
-                <div class="stat-card anim anim-delay-4">
+                <div class="stat-card anim ad4">
                     <div class="stat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                        </svg>
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                     </div>
-                    <div class="stat-value">&lt;50ms</div>
+                    <div class="stat-val">&lt;50ms</div>
                     <div class="stat-label">Avg Latency</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section 4: Categories -->
-    <section id="categories" class="categories-section">
-        <div class="section-inner">
-            <div class="section-tag anim">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7"/>
-                    <rect x="14" y="3" width="7" height="7"/>
-                    <rect x="14" y="14" width="7" height="7"/>
-                    <rect x="3" y="14" width="7" height="7"/>
-                </svg>
-                Categories
+    <!-- CATEGORIES -->
+    <section id="categories" class="cats-section">
+        <div class="inner">
+            <div class="stag anim">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                API Categories
             </div>
-            <h2 class="section-title anim">500+ APIs Across 12 Verticals</h2>
-            <p class="section-desc anim" style="margin: 0 auto;">From maps to machine learning. Everything AI agents need to build the future.</p>
+            <h2 class="stitle anim">12 Verticals, 120+ Endpoints</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">Each category has 10+ production APIs. More added weekly.</p>
             
-            <div class="categories-grid">
-                <div class="cat-card anim anim-delay-1">
-                    <div class="cat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                    </div>
+            <div class="cats-grid">
+                <div class="cat-card anim ad1">
+                    <div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
                     <div class="cat-title">Maps & Location</div>
-                    <div class="cat-count">45+ APIs</div>
+                    <div class="cat-count">10+ APIs</div>
                 </div>
-                <div class="cat-card anim anim-delay-2">
-                    <div class="cat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 6v12M8 10l4-4 4 4"/>
-                        </svg>
-                    </div>
+                <div class="cat-card anim ad2">
+                    <div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10l4-4 4 4"/></svg></div>
                     <div class="cat-title">Crypto & DeFi</div>
-                    <div class="cat-count">85+ APIs</div>
+                    <div class="cat-count">15+ APIs</div>
                 </div>
-                <div class="cat-card anim anim-delay-3">
-                    <div class="cat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                        </svg>
-                    </div>
+                <div class="cat-card anim ad3">
+                    <div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
                     <div class="cat-title">Web & Scraping</div>
-                    <div class="cat-count">35+ APIs</div>
+                    <div class="cat-count">10+ APIs</div>
                 </div>
-                <div class="cat-card anim anim-delay-4">
-                    <div class="cat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/>
-                            <path d="M6 10v1a6 6 0 0 0 12 0v-1M12 19v3M8 22h8"/>
-                        </svg>
-                    </div>
+                <div class="cat-card anim ad4">
+                    <div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1M12 19v3"/></svg></div>
                     <div class="cat-title">AI & ML</div>
-                    <div class="cat-count">60+ APIs</div>
+                    <div class="cat-count">12+ APIs</div>
                 </div>
-                <div class="cat-card anim anim-delay-1">
-                    <div class="cat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="1" x2="12" y2="23"/>
-                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                        </svg>
-                    </div>
+                <div class="cat-card anim ad1">
+                    <div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
                     <div class="cat-title">Finance</div>
-                    <div class="cat-count">70+ APIs</div>
+                    <div class="cat-count">10+ APIs</div>
                 </div>
-                <div class="cat-card anim anim-delay-2">
-                    <div class="cat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                            <path d="M22 6l-10 7L2 6"/>
-                        </svg>
-                    </div>
+                <div class="cat-card anim ad2">
+                    <div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg></div>
                     <div class="cat-title">Communication</div>
-                    <div class="cat-count">25+ APIs</div>
+                    <div class="cat-count">10+ APIs</div>
                 </div>
-                <div class="cat-card anim anim-delay-3">
-                    <div class="cat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 18a5 5 0 0 0-10 0"/>
-                            <line x1="12" y1="9" x2="12" y2="2"/>
-                            <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/>
-                            <line x1="1" y1="18" x2="3" y2="18"/>
-                            <line x1="21" y1="18" x2="23" y2="18"/>
-                            <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/>
-                            <line x1="23" y1="22" x2="1" y2="22"/>
-                        </svg>
-                    </div>
+                <div class="cat-card anim ad3">
+                    <div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="9" x2="12" y2="2"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/></svg></div>
                     <div class="cat-title">Weather</div>
-                    <div class="cat-count">20+ APIs</div>
+                    <div class="cat-count">10+ APIs</div>
                 </div>
-                <div class="cat-card anim anim-delay-4">
-                    <div class="cat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/>
-                        </svg>
-                    </div>
+                <div class="cat-card anim ad4">
+                    <div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/></svg></div>
                     <div class="cat-title">News & Media</div>
-                    <div class="cat-count">40+ APIs</div>
+                    <div class="cat-count">10+ APIs</div>
                 </div>
-                <div class="cat-card anim anim-delay-1">
-                    <div class="cat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                        </svg>
-                    </div>
+                <div class="cat-card anim ad1">
+                    <div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
                     <div class="cat-title">Security</div>
-                    <div class="cat-count">30+ APIs</div>
+                    <div class="cat-count">10+ APIs</div>
                 </div>
-                <div class="cat-card anim anim-delay-2">
-                    <div class="cat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
-                            <path d="M22 12A10 10 0 0 0 12 2v10z"/>
-                        </svg>
-                    </div>
+                <div class="cat-card anim ad2">
+                    <div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></div>
                     <div class="cat-title">Data & Analytics</div>
-                    <div class="cat-count">55+ APIs</div>
+                    <div class="cat-count">10+ APIs</div>
                 </div>
-                <div class="cat-card anim anim-delay-3">
-                    <div class="cat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="2" y="6" width="20" height="12" rx="2"/>
-                            <path d="M6 12h4M14 12h4M9 10v4M15 10v4"/>
-                        </svg>
-                    </div>
+                <div class="cat-card anim ad3">
+                    <div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M14 12h4"/></svg></div>
                     <div class="cat-title">Gaming</div>
-                    <div class="cat-count">25+ APIs</div>
+                    <div class="cat-count">10+ APIs</div>
                 </div>
-                <div class="cat-card anim anim-delay-4">
-                    <div class="cat-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                        </svg>
-                    </div>
+                <div class="cat-card anim ad4">
+                    <div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
                     <div class="cat-title">Health & Science</div>
-                    <div class="cat-count">35+ APIs</div>
+                    <div class="cat-count">10+ APIs</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section 5: How It Works -->
+    <!-- HOW IT WORKS -->
     <section id="how" class="how-section">
-        <div class="section-inner">
-            <div class="section-tag anim">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 16v-4M12 8h.01"/>
-                </svg>
+        <div class="inner">
+            <div class="stag anim">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
                 How It Works
             </div>
-            <h2 class="section-title anim">Four Steps to Autonomous Access</h2>
-            <p class="section-desc anim" style="margin: 0 auto;">From zero to API access in under a minute. No accounts, no KYC.</p>
+            <h2 class="stitle anim">Four Steps to Autonomous Access</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">From zero to API access in under a minute.</p>
             
             <div class="steps-grid">
-                <div class="step-card anim anim-delay-1">
-                    <div class="step-num">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                        </svg>
+                <div class="step-card anim ad1">
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <span class="step-num">1</span>
                     </div>
                     <h3 class="step-title">Connect Wallet</h3>
-                    <p class="step-desc">Link your crypto wallet with USDC on Base. No registration needed.</p>
+                    <p class="step-desc">Your crypto wallet is your identity. No signup, no KYC.</p>
                 </div>
-                <div class="step-card anim anim-delay-2">
-                    <div class="step-num">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"/>
-                            <path d="M21 21l-4.35-4.35"/>
-                        </svg>
+                <div class="step-card anim ad2">
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                        <span class="step-num">2</span>
                     </div>
                     <h3 class="step-title">Choose API</h3>
-                    <p class="step-desc">Browse 500+ endpoints. Pick exactly what your agent needs.</p>
+                    <p class="step-desc">Browse 120+ endpoints. Pick what your agent needs.</p>
                 </div>
-                <div class="step-card anim anim-delay-3">
-                    <div class="step-num">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M16 8l-4 4-4-4"/>
-                        </svg>
+                <div class="step-card anim ad3">
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                        <span class="step-num">3</span>
                     </div>
                     <h3 class="step-title">Pay Per Request</h3>
-                    <p class="step-desc">x402 handles payment automatically. USDC, sub-cent fees.</p>
+                    <p class="step-desc">x402 handles payment. USDC on Base. Sub-cent fees.</p>
                 </div>
-                <div class="step-card anim anim-delay-4">
-                    <div class="step-num">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                        </svg>
+                <div class="step-card anim ad4">
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        <span class="step-num">4</span>
                     </div>
                     <h3 class="step-title">Get Data</h3>
                     <p class="step-desc">Instant response. The agent gets exactly what it needs.</p>
@@ -1729,75 +1191,44 @@
         </div>
     </section>
 
-    <!-- Section 6: Features -->
+    <!-- FEATURES -->
     <section id="features" class="features-section">
-        <div class="section-inner">
-            <div class="section-tag anim">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
+        <div class="inner">
+            <div class="stag anim">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 Features
             </div>
-            <h2 class="section-title anim">Built for the Agent Economy</h2>
-            <p class="section-desc anim" style="margin: 0 auto;">Every feature designed for machine-to-machine commerce.</p>
+            <h2 class="stitle anim">Built for the Agent Economy</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">Every feature designed for machine-to-machine commerce.</p>
             
             <div class="features-grid">
-                <div class="feature-card anim anim-delay-1">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/>
-                            <path d="M6 10v1a6 6 0 0 0 12 0v-1"/>
-                        </svg>
-                    </div>
+                <div class="feature-card anim ad1">
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1"/></svg></div>
                     <h3 class="feature-title">AI-Native Design</h3>
-                    <p class="feature-desc">Built from scratch for machines. No accounts, no UI, no human friction. Agents pay and use directly.</p>
+                    <p class="feature-desc">Built for machines. No accounts, no UI, no human friction. Agents pay and use directly.</p>
                 </div>
-                <div class="feature-card anim anim-delay-2">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-                        </svg>
-                    </div>
+                <div class="feature-card anim ad2">
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
                     <h3 class="feature-title">x402 Protocol</h3>
                     <p class="feature-desc">HTTP 402 with crypto payments. The emerging standard for machine-to-machine commerce.</p>
                 </div>
-                <div class="feature-card anim anim-delay-3">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                            <line x1="1" y1="10" x2="23" y2="10"/>
-                        </svg>
-                    </div>
+                <div class="feature-card anim ad3">
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
                     <h3 class="feature-title">USDC on Base</h3>
-                    <p class="feature-desc">Stablecoin payments on L2. Sub-cent transaction fees, instant finality, global reach.</p>
+                    <p class="feature-desc">Stablecoin payments on L2. Sub-cent fees, instant finality, global reach.</p>
                 </div>
-                <div class="feature-card anim anim-delay-1">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                        </svg>
-                    </div>
+                <div class="feature-card anim ad1">
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
                     <h3 class="feature-title">Permissionless</h3>
-                    <p class="feature-desc">No KYC, no subscriptions, no geographic restrictions. Connect wallet and use.</p>
+                    <p class="feature-desc">No KYC, no subscriptions. Connect wallet and use. That's it.</p>
                 </div>
-                <div class="feature-card anim anim-delay-2">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                        </svg>
-                    </div>
+                <div class="feature-card anim ad2">
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
                     <h3 class="feature-title">Global Access</h3>
-                    <p class="feature-desc">Anyone with a crypto wallet can access. No bank account needed. No borders.</p>
+                    <p class="feature-desc">Anyone with a crypto wallet. No bank account needed. No borders.</p>
                 </div>
-                <div class="feature-card anim anim-delay-3">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                        </svg>
-                    </div>
+                <div class="feature-card anim ad3">
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
                     <h3 class="feature-title">Instant Settlement</h3>
                     <p class="feature-desc">Payments verified on-chain in seconds. No waiting, no intermediaries.</p>
                 </div>
@@ -1805,537 +1236,243 @@
         </div>
     </section>
 
-    <!-- Section 7: Code Example -->
+    <!-- CODE - TERMINAL -->
     <section id="code" class="code-section">
-        <div class="section-inner">
-            <div class="section-tag anim">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="16 18 22 12 16 6"/>
-                    <polyline points="8 6 2 12 8 18"/>
-                </svg>
+        <div class="inner">
+            <div class="stag anim">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
                 For Developers
             </div>
-            <h2 class="section-title anim">Integrate in Minutes</h2>
-            <p class="section-desc anim" style="margin: 0 auto;">Simple, powerful, and designed for machines.</p>
+            <h2 class="stitle anim">Integrate in Minutes</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">One SDK. Every API. Zero configuration.</p>
             
-            <div class="code-container anim">
+            <div class="code-wrap anim">
                 <div>
-                    <div class="code-tabs">
-                        <button class="code-tab active" onclick="switchTab(this, 'python')">Python</button>
-                        <button class="code-tab" onclick="switchTab(this, 'javascript')">JavaScript</button>
-                        <button class="code-tab" onclick="switchTab(this, 'curl')">cURL</button>
-                    </div>
-                    <div class="code-block">
-                        <div class="code-body" id="code-python">
-<span class="cmt"># Install: pip install aetheriusx</span>
-<span class="kw">from</span> aetheriusx <span class="kw">import</span> <span class="fn">Client</span>
+                    <div class="terminal">
+                        <div class="term-header">
+                            <div class="term-dot"></div>
+                            <div class="term-dot"></div>
+                            <div class="term-dot"></div>
+                            <span class="term-title">terminal</span>
+                        </div>
+                        <div class="term-tabs">
+                            <button class="term-tab active" onclick="switchCode(this, 'py')">Python</button>
+                            <button class="term-tab" onclick="switchCode(this, 'js')">JavaScript</button>
+                            <button class="term-tab" onclick="switchCode(this, 'curl')">cURL</button>
+                        </div>
+                        <div class="term-body" id="code-py">
+<span class="cmt"># Install the SDK</span>
+<span class="prompt">$</span> <span class="cmd">pip install aetheriusx</span>
 
 <span class="cmt"># Initialize with your wallet</span>
-client = <span class="fn">Client</span>(<span class="str">"0xYourWalletAddress"</span>)
+<span class="prompt">$</span> <span class="cmd">python</span>
+<span class="kw">>>> from</span> aetheriusx <span class="kw">import</span> <span class="fn">Client</span>
+<span class="kw">>>> client</span> = <span class="fn">Client</span>(<span class="str">"0xYourWallet"</span>)
 
-<span class="cmt"># Call any API - payment is automatic</span>
-response = client.<span class="fn">get</span>(
-    <span class="str">"/v1/crypto/price"</span>,
-    params={<span class="str">"token"</span>: <span class="str">"ETH"</span>}
-)
+<span class="cmt"># Call any API — payment is automatic</span>
+<span class="kw">>>> resp</span> = client.<span class="fn">get</span>(<span class="str">"/v1/crypto/price"</span>,
+        params={<span class="str">"token"</span>: <span class="str">"ETH"</span>})
 
-<span class="cmt"># Response with data</span>
-<span class="kw">print</span>(response.data)
-<span class="cmt"># {"price": 2384.50, "change_24h": 2.3}</span>
+<span class="kw">>>> print</span>(resp.data)
+<span class="out">{</span><span class="str">"price"</span>: <span class="num">2384.50</span>, <span class="str">"change"</span>: <span class="num">2.3</span><span class="out">}</span>
+<span class="prompt">$</span> <span class="cmt"># That's it. Payment handled.</span>
                         </div>
-                        <div class="code-body" id="code-javascript" style="display:none">
-<span class="cmt">// Install: npm install aetheriusx</span>
-<span class="kw">import</span> { <span class="fn">Client</span> } <span class="kw">from</span> <span class="str">'aetheriusx'</span>;
+                        <div class="term-body" id="code-js" style="display:none">
+<span class="cmt">// Install the SDK</span>
+<span class="prompt">$</span> <span class="cmd">npm install aetheriusx</span>
 
 <span class="cmt">// Initialize with your wallet</span>
-<span class="kw">const</span> client = <span class="kw">new</span> <span class="fn">Client</span>(<span class="str">'0xYourWalletAddress'</span>);
+<span class="kw">import</span> { <span class="fn">Client</span> } <span class="kw">from</span> <span class="str">'aetheriusx'</span>;
 
-<span class="cmt">// Call any API - payment is automatic</span>
-<span class="kw">const</span> response = <span class="kw">await</span> client.<span class="fn">get</span>(
-    <span class="str">'/v1/crypto/price'</span>,
-    { params: { token: <span class="str">'ETH'</span> } }
+<span class="kw">const</span> client = <span class="kw">new</span> <span class="fn">Client</span>(<span class="str">'0xYourWallet'</span>);
+
+<span class="cmt">// Call any API — payment is automatic</span>
+<span class="kw">const</span> resp = <span class="kw">await</span> client.<span class="fn">get</span>(
+  <span class="str">'/v1/crypto/price'</span>,
+  { params: { token: <span class="str">'ETH'</span> } }
 );
 
-<span class="cmt">// Response with data</span>
-console.<span class="fn">log</span>(response.data);
-<span class="cmt">// { price: 2384.50, change_24h: 2.3 }</span>
+console.<span class="fn">log</span>(resp.data);
+<span class="out">// { price: 2384.50, change: 2.3 }</span>
                         </div>
-                        <div class="code-body" id="code-curl" style="display:none">
+                        <div class="term-body" id="code-curl" style="display:none">
 <span class="cmt"># Make a request with x402 payment</span>
-curl -X GET <span class="str">"https://api.aetheriusx.io/v1/crypto/price?token=ETH"</span> \
-  -H <span class="str">"X-PAYMENT: 0x...payment-proof"</span> \
-  -H <span class="str">"Content-Type: application/json"</span>
+<span class="prompt">$</span> <span class="cmd">curl</span> <span class="flag">-X GET</span> \
+  <span class="str">"https://api.aetheriusx.io/v1/crypto/price?token=ETH"</span> \
+  <span class="flag">-H</span> <span class="str">"X-PAYMENT: 0x...proof"</span> \
+  <span class="flag">-H</span> <span class="str">"Content-Type: application/json"</span>
 
 <span class="cmt"># Response</span>
-{
-  <span class="str">"data"</span>: {
+<span class="out">{</span>
+  <span class="str">"data"</span>: <span class="out">{</span>
     <span class="str">"price"</span>: <span class="num">2384.50</span>,
     <span class="str">"change_24h"</span>: <span class="num">2.3</span>
-  }
-}
+  <span class="out">}</span>
+<span class="out">}</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="code-info">
                     <h3>One line of code.</h3>
-                    <p>
-                        The Aetheriusx SDK handles everything: wallet connection, payment negotiation, 
-                        request signing, and response parsing. Just import and call.
-                    </p>
-                    <ul class="code-features">
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                            Auto-negotiates payment via x402
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                            Supports Python, JavaScript, Go, Rust
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                            Type-safe with full IDE support
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                            Built-in retry and error handling
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                            Zero configuration needed
-                        </li>
+                    <p>The SDK handles wallet connection, payment negotiation, request signing, and response parsing. Just import and call.</p>
+                    <ul class="code-list">
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Auto-negotiates payment via x402</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Python, JavaScript, Go, Rust</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Type-safe with full IDE support</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Built-in retry and error handling</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Zero configuration needed</li>
                     </ul>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section 8: Docs -->
+    <!-- DOCS -->
     <section id="docs" class="docs-section">
-        <div class="section-inner">
-            <div class="section-tag anim">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <path d="M14 2v6h6"/>
-                </svg>
+        <div class="inner">
+            <div class="stag anim">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
                 Documentation
             </div>
-            <h2 class="section-title anim">Everything You Need</h2>
-            <p class="section-desc anim" style="margin: 0 auto;">Complete guides, references, and examples.</p>
+            <h2 class="stitle anim">Everything You Need</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">Complete guides, references, and examples.</p>
             
             <div class="docs-grid">
-                <div class="docs-card anim anim-delay-1">
+                <a href="https://github.com/wilnowilx/aetheriusx-api-site/blob/main/docs/API.md" target="_blank" class="docs-card anim ad1">
                     <div class="docs-card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
                     </div>
                     <h3>Getting Started</h3>
-                    <p>Quick start guide to connect your first API. From zero to first request in 5 minutes.</p>
-                    <a href="#" class="docs-link">
-                        Read guide
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </a>
-                </div>
-                <div class="docs-card anim anim-delay-2">
+                    <p>Quick start guide. From zero to first request in 5 minutes.</p>
+                    <span class="docs-link">Read guide <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+                </a>
+                <a href="https://github.com/wilnowilx/aetheriusx-api-site/blob/main/docs/API.md" target="_blank" class="docs-card anim ad2">
                     <div class="docs-card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="16 18 22 12 16 6"/>
-                            <polyline points="8 6 2 12 8 18"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
                     </div>
                     <h3>API Reference</h3>
-                    <p>Complete endpoint documentation with parameters, responses, and code examples.</p>
-                    <a href="#" class="docs-link">
-                        Explore APIs
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </a>
-                </div>
-                <div class="docs-card anim anim-delay-3">
+                    <p>Complete endpoint documentation with parameters and responses.</p>
+                    <span class="docs-link">Explore APIs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+                </a>
+                <a href="https://github.com/wilnowilx/aetheriusx-api-site" target="_blank" class="docs-card anim ad3">
                     <div class="docs-card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-                            <line x1="12" y1="17" x2="12.01" y2="17"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     </div>
                     <h3>Guides & Tutorials</h3>
-                    <p>Step-by-step tutorials for common use cases: DeFi bots, data aggregators, AI agents.</p>
-                    <a href="#" class="docs-link">
-                        View tutorials
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </a>
-                </div>
+                    <p>Tutorials for DeFi bots, data aggregators, and AI agents.</p>
+                    <span class="docs-link">View tutorials <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- Section 9: Endpoints -->
-    <section id="endpoints" class="endpoints-section">
-        <div class="section-inner">
-            <div class="section-tag anim">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                    <path d="M22 6l-10 7L2 6"/>
-                </svg>
-                Endpoints
+    <!-- RATE LIMITS -->
+    <section id="limits" class="limits-section">
+        <div class="inner">
+            <div class="stag anim">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Rate Limits
             </div>
-            <h2 class="section-title anim">Featured Endpoints</h2>
-            <p class="section-desc anim" style="margin: 0 auto;">Popular APIs available right now.</p>
+            <h2 class="stitle anim">Fair Use, Transparent Limits</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">Every tier has clear limits. No hidden throttling.</p>
             
-            <div class="endpoints-table anim">
-                <div class="endpoints-header">
-                    <span>Endpoint</span>
-                    <span>Price</span>
-                    <span>Latency</span>
-                    <span>Status</span>
+            <div class="limits-table anim">
+                <div class="limits-header">
+                    <span>Tier</span>
+                    <span>Requests / min</span>
+                    <span>Requests / day</span>
+                    <span>Burst</span>
                 </div>
-                <div class="endpoints-row">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-path">/v1/crypto/price</span>
-                    </div>
-                    <span class="endpoint-price">$0.002</span>
-                    <span class="endpoint-latency">~30ms</span>
-                    <span class="endpoint-status">Active</span>
+                <div class="limits-row">
+                    <div><span class="tier-badge tier-free">Free</span></div>
+                    <span>10</span>
+                    <span>100</span>
+                    <span>20</span>
                 </div>
-                <div class="endpoints-row">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-path">/v1/maps/search</span>
-                    </div>
-                    <span class="endpoint-price">$0.005</span>
-                    <span class="endpoint-latency">~45ms</span>
-                    <span class="endpoint-status">Active</span>
+                <div class="limits-row">
+                    <div><span class="tier-badge tier-pro">Pro</span></div>
+                    <span>100</span>
+                    <span>10,000</span>
+                    <span>200</span>
                 </div>
-                <div class="endpoints-row">
-                    <div>
-                        <span class="endpoint-method">POST</span>
-                        <span class="endpoint-path">/v1/web/scrape</span>
-                    </div>
-                    <span class="endpoint-price">$0.01</span>
-                    <span class="endpoint-latency">~120ms</span>
-                    <span class="endpoint-status">Active</span>
-                </div>
-                <div class="endpoints-row">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-path">/v1/ai/embed</span>
-                    </div>
-                    <span class="endpoint-price">$0.003</span>
-                    <span class="endpoint-latency">~80ms</span>
-                    <span class="endpoint-status">Active</span>
-                </div>
-                <div class="endpoints-row">
-                    <div>
-                        <span class="endpoint-method">GET</span>
-                        <span class="endpoint-path">/v1/finance/market</span>
-                    </div>
-                    <span class="endpoint-price">$0.002</span>
-                    <span class="endpoint-latency">~25ms</span>
-                    <span class="endpoint-status">Active</span>
+                <div class="limits-row">
+                    <div><span class="tier-badge tier-ent">Enterprise</span></div>
+                    <span>1,000</span>
+                    <span>Unlimited</span>
+                    <span>Custom</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section 10: Dashboard -->
-    <section id="dashboard" class="dashboard-section">
-        <div class="section-inner">
-            <div class="section-tag anim">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="3" y1="9" x2="21" y2="9"/>
-                    <line x1="9" y1="21" x2="9" y2="9"/>
-                </svg>
-                Dashboard
-            </div>
-            <h2 class="section-title anim">Monitor Everything</h2>
-            <p class="section-desc anim" style="margin: 0 auto;">Track usage, manage endpoints, analyze spending in real-time.</p>
-            
-            <div class="dashboard-frame anim">
-                <div class="frame-header">
-                    <div class="frame-dots">
-                        <div class="frame-dot"></div>
-                        <div class="frame-dot"></div>
-                        <div class="frame-dot"></div>
-                    </div>
-                    <div class="frame-url">dashboard.aetheriusx.io</div>
-                </div>
-                <div class="frame-body">
-                    <div class="frame-sidebar">
-                        <div class="sidebar-label">Navigation</div>
-                        <ul class="sidebar-items">
-                            <li class="active">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                                    <line x1="3" y1="9" x2="21" y2="9"/>
-                                </svg>
-                                Overview
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                    <path d="M22 6l-10 7L2 6"/>
-                                </svg>
-                                APIs
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                                </svg>
-                                Usage
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                                    <line x1="1" y1="10" x2="23" y2="10"/>
-                                </svg>
-                                Billing
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="3"/>
-                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                                </svg>
-                                Settings
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="frame-content">
-                        <h3>Dashboard Overview</h3>
-                        <div class="dash-stats">
-                            <div class="dash-stat">
-                                <div class="dash-stat-val">12,847</div>
-                                <div class="dash-stat-label">Total Requests</div>
-                            </div>
-                            <div class="dash-stat">
-                                <div class="dash-stat-val">$128.47</div>
-                                <div class="dash-stat-label">Total Spent</div>
-                            </div>
-                            <div class="dash-stat">
-                                <div class="dash-stat-val">99.9%</div>
-                                <div class="dash-stat-label">Uptime</div>
-                            </div>
-                        </div>
-                        <table class="dash-table">
-                            <thead>
-                                <tr>
-                                    <th>Endpoint</th>
-                                    <th>Requests</th>
-                                    <th>Cost</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>/v1/maps/search</td>
-                                    <td>5,234</td>
-                                    <td>$52.34</td>
-                                    <td><span class="status-pill">Active</span></td>
-                                </tr>
-                                <tr>
-                                    <td>/v1/token/price</td>
-                                    <td>4,123</td>
-                                    <td>$20.62</td>
-                                    <td><span class="status-pill">Active</span></td>
-                                </tr>
-                                <tr>
-                                    <td>/v1/web/scrape</td>
-                                    <td>2,890</td>
-                                    <td>$28.90</td>
-                                    <td><span class="status-pill">Active</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Section 11: Pricing -->
-    <section id="pricing" class="pricing-section">
-        <div class="section-inner">
-            <div class="section-tag anim">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="1" x2="12" y2="23"/>
-                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                </svg>
-                Pricing
-            </div>
-            <h2 class="section-title anim">Pay Per Request</h2>
-            <p class="section-desc anim" style="margin: 0 auto;">No subscriptions. No minimums. Pay only for what you use.</p>
-            
-            <div class="pricing-grid">
-                <div class="pricing-card anim anim-delay-1">
-                    <div class="pricing-name">Starter</div>
-                    <div class="pricing-desc">For individual developers</div>
-                    <div class="pricing-price">$0.001 <span>/request</span></div>
-                    <ul class="pricing-features">
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            Access to all 500+ APIs
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            USDC payments on Base
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            Community support
-                        </li>
-                    </ul>
-                    <a href="#cta" class="btn btn-secondary" style="width: 100%; justify-content: center;">Get Started</a>
-                </div>
-                <div class="pricing-card featured anim anim-delay-2">
-                    <div class="pricing-name">Pro</div>
-                    <div class="pricing-desc">For teams and businesses</div>
-                    <div class="pricing-price">$0.0008 <span>/request</span></div>
-                    <ul class="pricing-features">
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            20% volume discount
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            Priority rate limits
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            Dedicated support
-                        </li>
-                    </ul>
-                    <a href="#cta" class="btn btn-primary" style="width: 100%; justify-content: center;">Get Started</a>
-                </div>
-                <div class="pricing-card anim anim-delay-3">
-                    <div class="pricing-name">Enterprise</div>
-                    <div class="pricing-desc">Custom pricing for scale</div>
-                    <div class="pricing-price">Custom</div>
-                    <ul class="pricing-features">
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            Custom SLA
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            Dedicated infrastructure
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            24/7 support
-                        </li>
-                    </ul>
-                    <a href="#cta" class="btn btn-secondary" style="width: 100%; justify-content: center;">Contact Sales</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Section 12: CTA -->
+    <!-- CTA -->
     <section id="cta" class="cta-section">
-        <div class="section-inner">
+        <div class="inner">
             <div class="cta-box">
-                <div class="section-tag anim">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                    </svg>
+                <div class="stag anim">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                     Get Started
                 </div>
-                <h2 class="anim">Ready to Build the<br><span class="gradient">Agent Economy</span>?</h2>
-                <p class="anim">Join the next wave of machine-to-machine commerce. Start building today.</p>
+                <h2 class="anim">Ready to Build the<br><span class="grad">Agent Economy</span>?</h2>
+                <p class="anim">Start building today. First 100 requests free.</p>
                 <div class="cta-actions anim">
                     <a href="https://x.com/aetheriusxAPI" class="btn btn-primary">
                         Follow on X
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                            <polyline points="15 3 21 3 21 9"/>
-                            <line x1="10" y1="14" x2="21" y2="3"/>
-                        </svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     </a>
                     <a href="https://github.com/wilnowilx/aetheriusx-api-site" class="btn btn-secondary">
                         View GitHub
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-                        </svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
                     </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- FOOTER -->
     <footer>
-        <div class="footer-container">
+        <div class="footer-wrap">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <a href="#hero" class="nav-brand">
-                        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-                            <path d="M16 2L2 9v14l14 7 14-7V9L16 2z" stroke="currentColor" stroke-width="2" fill="none"/>
-                            <path d="M16 2v28M2 9l14 7 14-7M2 23l14-7 14 7" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
-                            <circle cx="16" cy="16" r="4" fill="currentColor" opacity="0.8"/>
-                        </svg>
-                        <span class="nav-brand-text">AETHERIUS</span>
-                    </a>
-                    <p>Building the operating system for AI agent commerce. Infrastructure for machines that pay for themselves.</p>
+                    <a href="#hero" class="brand">AETHERIUS</a>
+                    <p>The operating system for AI agent commerce. Infrastructure for machines that pay for themselves.</p>
                 </div>
-                <div>
-                    <div class="footer-title">Product</div>
-                    <ul class="footer-links">
+                <div class="footer-col">
+                    <h4>Product</h4>
+                    <ul>
                         <li><a href="#categories">APIs</a></li>
-                        <li><a href="#docs">Documentation</a></li>
-                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="https://github.com/wilnowilx/aetheriusx-api-site/blob/main/docs/API.md" target="_blank">Documentation</a></li>
+                        <li><a href="#limits">Rate Limits</a></li>
                         <li><a href="#">Status</a></li>
                     </ul>
                 </div>
-                <div>
-                    <div class="footer-title">Developers</div>
-                    <ul class="footer-links">
-                        <li><a href="https://docs.x402.org">x402 Docs</a></li>
-                        <li><a href="https://github.com/wilnowilx/aetheriusx-api-site">GitHub</a></li>
+                <div class="footer-col">
+                    <h4>Developers</h4>
+                    <ul>
+                        <li><a href="https://docs.x402.org" target="_blank">x402 Docs</a></li>
+                        <li><a href="https://github.com/wilnowilx/aetheriusx-api-site" target="_blank">GitHub</a></li>
                         <li><a href="#">SDK</a></li>
-                        <li><a href="#endpoints">API Reference</a></li>
+                        <li><a href="https://github.com/wilnowilx/aetheriusx-api-site/blob/main/docs/API.md" target="_blank">API Reference</a></li>
                     </ul>
                 </div>
-                <div>
-                    <div class="footer-title">Company</div>
-                    <ul class="footer-links">
-                        <li><a href="https://x.com/aetheriusxAPI">Twitter</a></li>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="https://x.com/aetheriusxAPI" target="_blank">Twitter</a></li>
                         <li><a href="#">Blog</a></li>
                         <li><a href="#">Contact</a></li>
-                        <li><a href="#">Careers</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
                 <span class="footer-copy">2026 AETHERIUS. All rights reserved.</span>
                 <div class="footer-socials">
-                    <a href="https://x.com/aetheriusxAPI">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                        </svg>
+                    <a href="https://x.com/aetheriusxAPI" target="_blank">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                     </a>
-                    <a href="https://github.com/wilnowilx/aetheriusx-api-site">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                        </svg>
+                    <a href="https://github.com/wilnowilx/aetheriusx-api-site" target="_blank">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                     </a>
                 </div>
             </div>
@@ -2344,203 +1481,149 @@ curl -X GET <span class="str">"https://api.aetheriusx.io/v1/crypto/price?token=E
 
     <script>
     // ============================================
-    // PLASMA CANVAS
+    // BACKGROUND CANVAS
     // ============================================
-    const plasmaCanvas = document.getElementById('plasma-canvas');
-    const pCtx = plasmaCanvas.getContext('2d');
-    let pWidth, pHeight;
-
-    function resizePlasma() {
-        pWidth = plasmaCanvas.width = window.innerWidth;
-        pHeight = plasmaCanvas.height = window.innerHeight;
-    }
-
-    function plasma(x, y, t) {
-        const v1 = Math.sin(x * 0.008 + t * 0.0004);
-        const v2 = Math.sin(y * 0.01 + t * 0.0006);
-        const v3 = Math.sin((x + y) * 0.006 + t * 0.0005);
-        const v4 = Math.sin(Math.sqrt(x * x + y * y) * 0.004 + t * 0.0007);
-        return (v1 + v2 + v3 + v4) / 4;
-    }
-
-    function drawPlasma() {
-        const imageData = pCtx.createImageData(pWidth, pHeight);
-        const data = imageData.data;
-        const step = 5;
-        
-        for (let y = 0; y < pHeight; y += step) {
-            for (let x = 0; x < pWidth; x += step) {
-                const v = plasma(x, y, globalTime);
-                const r = Math.floor(70 + v * 50);
-                const g = Math.floor(15 + Math.sin(v * Math.PI) * 35);
-                const b = Math.floor(90 + v * 70);
-                
-                for (let dy = 0; dy < step && y + dy < pHeight; dy++) {
-                    for (let dx = 0; dx < step && x + dx < pWidth; dx++) {
-                        const i = ((y + dy) * pWidth + (x + dx)) * 4;
-                        data[i] = r;
-                        data[i + 1] = g;
-                        data[i + 2] = b;
-                        data[i + 3] = 20;
-                    }
-                }
-            }
-        }
-        pCtx.putImageData(imageData, 0, 0);
-    }
-
-    // ============================================
-    // PARTICLES
-    // ============================================
-    const particlesCanvas = document.getElementById('particles-canvas');
-    const ptCtx = particlesCanvas.getContext('2d');
-    let ptWidth, ptHeight;
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, mouseX = -999, mouseY = -999;
     const particles = [];
-    const PARTICLE_COUNT = 100;
-    const CONNECTION_DIST = 110;
-    let mouseX = -1000, mouseY = -1000;
+    const PCOUNT = 90;
+    const CDIST = 130;
+    let gTime = 0;
 
-    class Particle {
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+
+    class P {
         constructor() {
-            this.x = Math.random() * ptWidth;
-            this.y = Math.random() * ptHeight;
-            this.vx = (Math.random() - 0.5) * 0.6;
-            this.vy = (Math.random() - 0.5) * 0.6;
-            this.size = Math.random() * 2 + 0.5;
-            this.hue = Math.random() * 60 + 260;
-            this.alpha = Math.random() * 0.5 + 0.2;
-            this.pulse = Math.random() * 0.02 + 0.008;
-            this.offset = Math.random() * Math.PI * 2;
+            this.x = Math.random() * W;
+            this.y = Math.random() * H;
+            this.vx = (Math.random() - 0.5) * 0.5;
+            this.vy = (Math.random() - 0.5) * 0.5;
+            this.r = Math.random() * 2 + 0.8;
+            this.hue = 260 + Math.random() * 60;
+            this.a = Math.random() * 0.5 + 0.2;
+            this.ps = Math.random() * 0.015 + 0.006;
+            this.po = Math.random() * Math.PI * 2;
+            this.pulsePhase = Math.random() * Math.PI * 2;
+            this.pulseSpeed = Math.random() * 0.008 + 0.003;
         }
 
         update(t) {
-            this.x += this.vx + Math.sin(t * this.pulse + this.offset) * 0.35;
-            this.y += this.vy + Math.cos(t * this.pulse * 0.7 + this.offset) * 0.25;
-            
-            const dx = mouseX - this.x;
-            const dy = mouseY - this.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 160) {
-                const f = (160 - dist) / 160;
-                this.x -= dx * f * 0.025;
-                this.y -= dy * f * 0.025;
-            }
-            
-            if (this.x < -20) this.x = ptWidth + 20;
-            if (this.x > ptWidth + 20) this.x = -20;
-            if (this.y < -20) this.y = ptHeight + 20;
-            if (this.y > ptHeight + 20) this.y = -20;
+            this.x += this.vx + Math.sin(t * this.ps + this.po) * 0.3;
+            this.y += this.vy + Math.cos(t * this.ps * 0.7 + this.po) * 0.2;
+            const dx = mouseX - this.x, dy = mouseY - this.y, d = Math.sqrt(dx*dx+dy*dy);
+            if (d < 150) { const f = (150-d)/150; this.x -= dx*f*0.02; this.y -= dy*f*0.02; }
+            if (this.x < -20) this.x = W+20; if (this.x > W+20) this.x = -20;
+            if (this.y < -20) this.y = H+20; if (this.y > H+20) this.y = -20;
         }
 
         draw(t) {
-            const p = Math.sin(t * this.pulse + this.offset) * 0.3 + 0.7;
-            const s = this.size * p;
-            
-            ptCtx.beginPath();
-            ptCtx.arc(this.x, this.y, s, 0, Math.PI * 2);
-            ptCtx.fillStyle = `hsla(${this.hue}, 80%, 65%, ${this.alpha * p})`;
-            ptCtx.fill();
-            
-            ptCtx.beginPath();
-            ptCtx.arc(this.x, this.y, s * 3, 0, Math.PI * 2);
-            const g = ptCtx.createRadialGradient(this.x, this.y, 0, this.x, this.y, s * 3);
-            g.addColorStop(0, `hsla(${this.hue}, 80%, 65%, ${0.12 * p})`);
+            const pulse = Math.sin(t * this.pulseSpeed + this.pulsePhase);
+            const size = this.r * (1 + pulse * 0.4);
+            const alpha = this.a * (0.7 + pulse * 0.3);
+
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, size * 4, 0, Math.PI * 2);
+            const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, size * 4);
+            g.addColorStop(0, `hsla(${this.hue}, 80%, 65%, ${0.12 * alpha})`);
             g.addColorStop(1, 'transparent');
-            ptCtx.fillStyle = g;
-            ptCtx.fill();
+            ctx.fillStyle = g;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, size, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${this.hue}, 80%, 65%, ${alpha})`;
+            ctx.fill();
         }
     }
 
     function drawConnections() {
         for (let i = 0; i < particles.length; i++) {
-            for (let j = i + 1; j < particles.length; j++) {
-                const dx = particles[i].x - particles[j].x;
-                const dy = particles[i].y - particles[j].y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                
-                if (dist < CONNECTION_DIST) {
-                    const a = (1 - dist / CONNECTION_DIST) * 0.2;
-                    ptCtx.beginPath();
-                    ptCtx.moveTo(particles[i].x, particles[i].y);
-                    ptCtx.lineTo(particles[j].x, particles[j].y);
-                    const g = ptCtx.createLinearGradient(particles[i].x, particles[i].y, particles[j].x, particles[j].y);
-                    g.addColorStop(0, `hsla(${particles[i].hue}, 80%, 65%, ${a})`);
-                    g.addColorStop(1, `hsla(${particles[j].hue}, 80%, 65%, ${a})`);
-                    ptCtx.strokeStyle = g;
-                    ptCtx.lineWidth = 0.8;
-                    ptCtx.stroke();
+            for (let j = i+1; j < particles.length; j++) {
+                const dx = particles[i].x-particles[j].x, dy = particles[i].y-particles[j].y, d = Math.sqrt(dx*dx+dy*dy);
+                if (d < CDIST) {
+                    const alpha = (1-d/CDIST)*0.35;
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    const g = ctx.createLinearGradient(particles[i].x, particles[i].y, particles[j].x, particles[j].y);
+                    g.addColorStop(0, `hsla(${particles[i].hue}, 80%, 65%, ${alpha})`);
+                    g.addColorStop(1, `hsla(${particles[j].hue}, 80%, 65%, ${alpha})`);
+                    ctx.strokeStyle = g;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
                 }
             }
         }
     }
 
-    // Mouse
     document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
-    document.addEventListener('mouseleave', () => { mouseX = -1000; mouseY = -1000; });
+    document.addEventListener('mouseleave', () => { mouseX = -999; mouseY = -999; });
 
-    // Touch gestures
-    let touchStartY = 0;
-    let touchStartX = 0;
-    let currentSection = 0;
+    // ============================================
+    // SCROLL OBSERVER
+    // ============================================
     const sections = document.querySelectorAll('section');
 
-    document.addEventListener('touchstart', e => {
-        touchStartY = e.touches[0].clientY;
-        touchStartX = e.touches[0].clientX;
-    }, { passive: true });
-
-    document.addEventListener('touchend', e => {
-        const deltaY = touchStartY - e.changedTouches[0].clientY;
-        const deltaX = touchStartX - e.changedTouches[0].clientX;
-        
-        // Only handle vertical swipes (ignore horizontal)
-        if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 50) {
-            if (deltaY > 0 && currentSection < sections.length - 1) {
-                currentSection++;
-                sections[currentSection].scrollIntoView({ behavior: 'smooth' });
-            } else if (deltaY < 0 && currentSection > 0) {
-                currentSection--;
-                sections[currentSection].scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-    }, { passive: true });
-
-    // Update currentSection on scroll
-    const sectionObserver = new IntersectionObserver((entries) => {
+    const sObs = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
+                entry.target.querySelectorAll('.anim').forEach((el, i) => {
+                    setTimeout(() => el.classList.add('vis'), i * 100);
+                });
                 const idx = Array.from(sections).indexOf(entry.target);
-                if (idx !== -1) currentSection = idx;
-                
-                const anims = entry.target.querySelectorAll('.anim');
-                anims.forEach((el, i) => {
-                    setTimeout(() => el.classList.add('visible'), i * 120);
-                });
-                
-                const scrollDots = document.querySelectorAll('.scroll-dot');
-                scrollDots.forEach((dot, i) => {
-                    dot.classList.toggle('active', i === idx);
-                });
+                document.querySelectorAll('.sdot').forEach((d, i) => d.classList.toggle('active', i === idx));
             }
         });
-    }, { threshold: 0.35 });
+    }, { threshold: 0.3 });
+    sections.forEach(s => sObs.observe(s));
 
-    sections.forEach(s => sectionObserver.observe(s));
-
-    // Scroll dots
-    document.querySelectorAll('.scroll-dot').forEach(dot => {
-        dot.addEventListener('click', () => {
-            const idx = parseInt(dot.dataset.section);
+    document.querySelectorAll('.sdot').forEach(d => {
+        d.addEventListener('click', () => {
+            const idx = parseInt(d.dataset.s);
             if (sections[idx]) sections[idx].scrollIntoView({ behavior: 'smooth' });
         });
     });
 
-    // Nav scroll
     window.addEventListener('scroll', () => {
-        document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 50);
+        document.getElementById('mainNav').classList.toggle('scrolled', scrollY > 50);
     });
 
-    // Smooth scroll links
+    const navLinks = document.querySelectorAll('.nav-links a:not(.btn-nav)');
+    window.addEventListener('scroll', () => {
+        let cur = '';
+        sections.forEach(s => { if (scrollY >= s.offsetTop - 200) cur = s.id; });
+        navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${cur}`));
+    });
+
+    function switchCode(btn, lang) {
+        document.querySelectorAll('.term-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('[id^="code-"]').forEach(b => b.style.display = 'none');
+        document.getElementById(`code-${lang}`).style.display = 'block';
+    }
+
+    function openMobile() { document.getElementById('mobileNav').classList.add('open'); }
+    function closeMobile() { document.getElementById('mobileNav').classList.remove('open'); }
+
+    let touchY = 0, curS = 0;
+    document.addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, { passive: true });
+    document.addEventListener('touchend', e => {
+        const dy = touchY - e.changedTouches[0].clientY;
+        if (Math.abs(dy) > 60) {
+            if (dy > 0 && curS < sections.length-1) { curS++; sections[curS].scrollIntoView({ behavior: 'smooth' }); }
+            else if (dy < 0 && curS > 0) { curS--; sections[curS].scrollIntoView({ behavior: 'smooth' }); }
+        }
+    }, { passive: true });
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+            e.preventDefault(); if (curS < sections.length-1) { curS++; sections[curS].scrollIntoView({ behavior: 'smooth' }); }
+        } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+            e.preventDefault(); if (curS > 0) { curS--; sections[curS].scrollIntoView({ behavior: 'smooth' }); }
+        }
+    });
+
     document.querySelectorAll('a[href^="#"]').forEach(a => {
         a.addEventListener('click', function(e) {
             e.preventDefault();
@@ -2549,85 +1632,27 @@ curl -X GET <span class="str">"https://api.aetheriusx.io/v1/crypto/price?token=E
         });
     });
 
-    // Active nav link
-    const navLinks = document.querySelectorAll('.nav-links a:not(.btn-nav)');
-    window.addEventListener('scroll', () => {
-        let current = '';
-        sections.forEach(s => {
-            if (window.scrollY >= s.offsetTop - 200) current = s.id;
-        });
-        navLinks.forEach(l => {
-            l.classList.toggle('active', l.getAttribute('href') === `#${current}`);
-        });
-    });
-
-    // Code tabs
-    function switchTab(btn, lang) {
-        document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('[id^="code-"]').forEach(b => b.style.display = 'none');
-        document.getElementById(`code-${lang}`).style.display = 'block';
-    }
-
-    // Mobile nav
-    function openMobileNav() { document.getElementById('mobileNav').classList.add('open'); }
-    function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); }
-
-    // Gesture hint hide after scroll
-    let hintHidden = false;
-    window.addEventListener('scroll', () => {
-        if (!hintHidden && window.scrollY > 100) {
-            document.getElementById('gestureHint').style.opacity = '0';
-            setTimeout(() => document.getElementById('gestureHint').style.display = 'none', 300);
-            hintHidden = true;
-        }
-    });
+    const sTrack = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) curS = Array.from(sections).indexOf(e.target); });
+    }, { threshold: 0.5 });
+    sections.forEach(s => sTrack.observe(s));
 
     // ============================================
     // ANIMATION LOOP
     // ============================================
-    let globalTime = 0;
-
     function animate() {
-        if (globalTime % 3 === 0) drawPlasma();
-        
-        ptCtx.clearRect(0, 0, ptWidth, ptHeight);
-        particles.forEach(p => { p.update(globalTime); p.draw(globalTime); });
+        ctx.fillStyle = 'rgba(6,6,14,0.15)';
+        ctx.fillRect(0, 0, W, H);
+        particles.forEach(p => { p.update(gTime); p.draw(gTime); });
         drawConnections();
-        
-        globalTime++;
+        gTime++;
         requestAnimationFrame(animate);
     }
 
-    // Init
-    resizePlasma();
-    ptWidth = particlesCanvas.width = window.innerWidth;
-    ptHeight = particlesCanvas.height = window.innerHeight;
-    for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+    resize();
+    for (let i = 0; i < PCOUNT; i++) particles.push(new P());
     animate();
-
-    window.addEventListener('resize', () => {
-        resizePlasma();
-        ptWidth = particlesCanvas.width = window.innerWidth;
-        ptHeight = particlesCanvas.height = window.innerHeight;
-    });
-
-    // Keyboard navigation
-    document.addEventListener('keydown', e => {
-        if (e.key === 'ArrowDown' || e.key === 'PageDown') {
-            e.preventDefault();
-            if (currentSection < sections.length - 1) {
-                currentSection++;
-                sections[currentSection].scrollIntoView({ behavior: 'smooth' });
-            }
-        } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-            e.preventDefault();
-            if (currentSection > 0) {
-                currentSection--;
-                sections[currentSection].scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-    });
+    window.addEventListener('resize', resize);
     </script>
 </body>
 </html>
