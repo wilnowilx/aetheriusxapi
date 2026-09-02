@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetheriusX API - Crypto-Native API Marketplace for AI Agents</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(147, 51, 234, 0.1) 0%, transparent 50%);
+        }
+
+        .hero-content { position: relative; z-index: 1; }
+
+        .logo {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #9333ea, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            color: #60a5fa;
+            margin-bottom: 2rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #3b82f6, #9333ea);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Features */
+        .features {
+            padding: 100px 0;
+            background: #0f0f1a;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 4rem;
+            font-size: 1.1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-desc { color: #94a3b8; }
+
+        /* Endpoints */
+        .endpoints {
+            padding: 100px 0;
+            background: #0a0a0f;
+        }
+
+        .endpoint-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .endpoint {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .endpoint:hover { border-color: rgba(59, 130, 246, 0.3); }
+
+        .endpoint-name {
+            font-family: 'Courier New', monospace;
+            color: #60a5fa;
+            font-size: 1rem;
+        }
+
+        .endpoint-price {
+            padding: 0.25rem 0.75rem;
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 9999px;
+            color: #4ade80;
+            font-size: 0.875rem;
+        }
+
+        /* How it works */
+        .how-it-works {
+            padding: 100px 0;
+            background: #0f0f1a;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .step {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6, #9333ea);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem;
+        }
+
+        .step-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-desc { color: #94a3b8; }
+
+        /* Tech Stack */
+        .tech-stack {
+            padding: 100px 0;
+            background: #0a0a0f;
+        }
+
+        .tech-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .tech-badge {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 0;
+            background: #0a0a0f;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover { color: #60a5fa; }
+
+        .copyright { color: #475569; font-size: 0.875rem; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content container">
+            <div class="badge">Powered by x402 Protocol on Base</div>
+            <h1 class="logo">AetheriusX API</h1>
+            <p class="tagline">The crypto-native API marketplace where AI agents pay per request in USDC</p>
+            <a href="#endpoints" class="cta-button">Explore Endpoints</a>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Why AetheriusX?</h2>
+            <p class="section-subtitle">Traditional APIs require credit cards, subscriptions, and trust. We use crypto.</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">Built for AI Agents</h3>
+                    <p class="feature-desc">AI agents can pay for API access directly from their wallets. No human intervention needed.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⛓️</div>
+                    <h3 class="feature-title">x402 Protocol</h3>
+                    <p class="feature-desc">HTTP 402 status code with crypto payments. The standard for machine-to-machine commerce.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💳</div>
+                    <h3 class="feature-title">USDC on Base</h3>
+                    <p class="feature-desc">Pay with stablecoins on Base L2. Low fees, fast settlement, real money.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔓</div>
+                    <h3 class="feature-title">No KYC Required</h3>
+                    <p class="feature-desc">Connect wallet, pay, use. No accounts, no subscriptions, no credit cards.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3 class="feature-title">Global Access</h3>
+                    <p class="feature-desc">Anyone with a crypto wallet can access our APIs. No geographic restrictions.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Instant Settlement</h3>
+                    <p class="feature-desc">Payments settle in seconds on Base. No waiting for bank transfers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Endpoints -->
+    <section class="endpoints" id="endpoints">
+        <div class="container">
+            <h2 class="section-title">API Endpoints</h2>
+            <p class="section-subtitle">Pay per request. No subscriptions. No minimums.</p>
+            
+            <div class="endpoint-list">
+                <div class="endpoint">
+                    <span class="endpoint-name">GET /api/v1/maps/search</span>
+                    <span class="endpoint-price">$0.01 / call</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-name">GET /api/v1/maps/reviews</span>
+                    <span class="endpoint-price">$0.02 / call</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-name">GET /api/v1/token/analyze</span>
+                    <span class="endpoint-price">$0.02 / call</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-name">GET /api/v1/web/scrape</span>
+                    <span class="endpoint-price">$0.01 / call</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-name">GET /api/v1/email/validate</span>
+                    <span class="endpoint-price">$0.005 / call</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">Three steps to start using AetheriusX API</p>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Connect Wallet</h3>
+                    <p class="step-desc">Connect your crypto wallet with USDC on Base network.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Make Request</h3>
+                    <p class="step-desc">Call any endpoint. x402 handles the payment automatically.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Get Data</h3>
+                    <p class="step-desc">Receive instant JSON response. Payment verified on-chain.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="tech-stack">
+        <div class="container">
+            <h2 class="section-title">Tech Stack</h2>
+            <p class="section-subtitle">Built with modern technologies</p>
+            
+            <div class="tech-grid">
+                <div class="tech-badge">FastAPI</div>
+                <div class="tech-badge">x402 Protocol</div>
+                <div class="tech-badge">Base L2</div>
+                <div class="tech-badge">USDC</div>
+                <div class="tech-badge">Python</div>
+                <div class="tech-badge">Coinbase CDP</div>
+                <div class="tech-badge">Uvicorn</div>
+                <div class="tech-badge">OpenStreetMap</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="https://x.com/aetheriusxAPI">Twitter</a>
+                <a href="https://github.com/aetheriusx">GitHub</a>
+                <a href="https://x402.org">x402 Protocol</a>
+                <a href="https://base.org">Base</a>
+            </div>
+            <p class="copyright">AetheriusX API - Crypto-Native API Marketplace for AI Agents</p>
+        </div>
+    </footer>
+</body>
+</html>
