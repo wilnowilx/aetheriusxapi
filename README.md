@@ -1,9 +1,13 @@
 <div align="center">
 
 ![AETHERIUS](https://img.shields.io/badge/AETHERIUS-aetheriusxAPI-8B5CF6?style=for-the-badge&labelColor=09090b)
-![Base](https://img.shields.io/badge/Base-Mainnet-0052FF?style=for-the-badge&labelColor=09090b)
+![Testnet](https://img.shields.io/badge/Base_Sepolia-Live-10B981?style=for-the-badge&labelColor=09090b)
 ![x402](https://img.shields.io/badge/x402-Protocol-10B981?style=for-the-badge&labelColor=09090b)
 ![USDC](https://img.shields.io/badge/USDC-Payments-2775CA?style=for-the-badge&labelColor=09090b)
+![Endpoints](https://img.shields.io/badge/Endpoints-11-d946ef?style=for-the-badge&labelColor=09090b)
+![Tests](https://img.shields.io/badge/Tests-29_passing-brightgreen?style=for-the-badge&labelColor=09090b)
+![Dashboard](https://img.shields.io/badge/Dashboard-Live-ec4899?style=for-the-badge&labelColor=09090b)
+![SDK](https://img.shields.io/badge/Python_SDK-ready-3776AB?style=for-the-badge&labelColor=09090b)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge&labelColor=09090b)
 
 # AETHERIUS — aetheriusxAPI
@@ -22,6 +26,9 @@
 ## Table of Contents
 
 - [The Problem](#the-problem)
+- [🗺️ System Overview](#system-overview)
+- [📡 Live Status](#live-status)
+- [🐍 SDKs](#sdks)
 - [The Vision](#the-vision)
 - [Concept Map](#concept-map)
 - [Mental Model: How x402 Changes Everything](#mental-model-how-x402-changes-everything)
@@ -37,6 +44,40 @@
 - [Contributing](#contributing)
 - [License](#license)
 - [Links](#links)
+
+---
+
+## 🗺️ System Overview
+
+```mermaid
+flowchart LR
+    A[🤖 AI Agent] -->|GET /v1/...| G[AETHERIUS Gateway<br/>FastAPI · x402]
+    G -->|402 + price| A
+    G -->|paid 200| A
+    G --> M[Maps · OSM]
+    G --> C[Crypto · CoinGecko/Coinbase/Llama]
+    G --> W[Web · direct fetch]
+    G --> D[Data · Open-Meteo/Nominatim]
+    G --> R[Drift · public RPCs]
+    G --> T[Telemetry<br/>SQLite + /v1/telemetry]
+    A -->|$ USDC settle| B[(Base L2)]
+    G -.->|verify proof| F[Facilitator]
+```
+
+```mermaid
+sequenceDiagram
+    participant Agent as 🤖 Agent
+    participant API as aetheriusxAPI
+    participant Fac as Facilitator
+    participant Base as Base L2
+    Agent->>API: GET /v1/email/validate
+    API-->>Agent: 402 + price $0.005 USDC
+    Agent->>Agent: sign USDC transfer
+    Agent->>API: retry + X-PAYMENT proof
+    API->>Fac: verify proof
+    Fac-->>API: valid → settle on Base
+    API-->>Agent: 200 + data
+```
 
 ---
 
@@ -272,6 +313,46 @@ curl -X GET \
   }
 }
 ```
+
+---
+
+## 🐍 SDKs
+
+### Python (`sdks/python/`)
+
+```bash
+pip install -e ./sdks/python
+```
+
+```python
+from aetheriusx import AetheriusXClient
+
+with AetheriusXClient() as client:  # default: http://127.0.0.1:4020
+    print(client.health()["version"])
+    route, price = client.discover_cheapest()  # cheapest paid endpoint
+    res = client.paid_get(route, {"email": "user@example.com"}, payment="anything")
+    print(res.status_code, res.json())
+```
+
+`payment` is caller-supplied: any string works in local simulated mode,
+live testnet needs a real x402 USDC proof. The client never touches private keys.
+Runnable flows: [`examples/`](examples/) · JS SDK in roadmap.
+
+---
+
+## 📡 Live Status
+
+| Signal | Value |
+|--------|-------|
+| Network | Base Sepolia `eip155:84532` (mainnet after funding) |
+| Mode | `real` — on-chain USDC verification via facilitator |
+| Health | `GET /health` (free) |
+| Telemetry | `GET /v1/telemetry` (free): uptime, per-endpoint stats, settled USDC volume |
+| Dashboard | [`/dashboard/`](https://wilnowilx.github.io/aetheriusxapi/dashboard/) + backend bar |
+| Live API | `http://34.156.149.38/aetherapi` · TLS `https://34-156-149-38.sslip.io/aetherapi` |
+| Version | v2.0.0 · 11 endpoints · 29/29 tests green |
+
+Snapshot 2026-09-03: E2E 6/6 paid endpoints → 200 with real settlement.
 
 ---
 
