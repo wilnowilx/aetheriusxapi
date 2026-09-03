@@ -769,6 +769,15 @@ async def email_validate(email: str = Query(..., description="Email address")):
                             or "mx record" in out)
     except Exception:
         result["has_mx"] = None
+    if not result["has_mx"]:
+        # Fallback: DNS-over-HTTPS (stub resolvers often fail MX lookups).
+        try:
+            dr = httpx.get("https://dns.google/resolve",
+                           params={"name": domain, "type": "MX"}, timeout=10)
+            if dr.status_code == 200 and (dr.json().get("Answer") or []):
+                result["has_mx"] = True
+        except Exception:
+            pass
     result["is_disposable"] = domain.lower() in DISPOSABLE
     score = 0
     if not result["has_mx"]:
