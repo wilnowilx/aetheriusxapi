@@ -84,7 +84,9 @@ provider onboarding + SDKs ($3,000) · security review ($1,500) · content/growt
 
 - Testnet: Base Sepolia (`eip155:84532`), wallet `0x677B…7f61`
 - E2E: 6/6 paid endpoints → 200 (receipts in repo history / demo video)
-- Suite: 20/20 tests green (`pytest -q`)
+- Suite: 23/23 tests green (`pytest -q`), incl. telemetry accounting tests
+- Public telemetry: `GET /v1/telemetry` (free) — uptime, per-endpoint stats,
+  settled USDC volume, latency feed. Powers the live dashboard.
 - Uptime: systemd + auto-restart, Nginx reverse proxy, 90s upstream budget
 - Cost: single GCP VM (Europe), full stack under $50/mo
 - Honesty policy: key-gated endpoints return 501 with setup instructions, never fake data

@@ -139,6 +139,47 @@ def test_dashboard_served():
     assert r.status_code == 200
 
 
+def test_telemetry_free_and_shape():
+    r = client.get("/v1/telemetry")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["service"] == "aetheriusxAPI"
+    assert body["uptime_s"] >= 0
+    for k in ("calls", "ok_200", "challenges_402", "errors",
+              "volume_usdc", "avg_latency_ms"):
+        assert k in body["totals"], k
+    assert "per_endpoint" in body
+    assert "recent_events" in body
+    assert "wallets_seen" in body
+
+
+def test_telemetry_records_paid_call_and_volume():
+    before = client.get("/v1/telemetry").json()
+    r = client.get("/v1/email/validate", params={"email": "not-an-email"},
+                   headers=PAID)
+    assert r.status_code == 200
+    after = client.get("/v1/telemetry").json()
+    # telemetry probe itself is never counted
+    assert after["totals"]["calls"] == before["totals"]["calls"] + 1
+    ep0 = before["per_endpoint"].get("/v1/email/validate", {"ok_200": 0})
+    assert after["per_endpoint"]["/v1/email/validate"]["ok_200"] == ep0["ok_200"] + 1
+    delta = round(after["totals"]["volume_usdc"] - before["totals"]["volume_usdc"], 4)
+    assert delta == 0.005  # email/validate price
+
+
+def test_telemetry_counts_402_and_wallets():
+    import uuid
+    w = "0x" + uuid.uuid4().hex[:40]
+    before = client.get("/v1/telemetry").json()
+    r = client.get("/v1/maps/search", params={"q": "cafe"})
+    assert r.status_code == 402
+    client.get("/v1/maps/search", params={"q": "cafe"},
+               headers={**PAID, "X-Wallet": w})
+    after = client.get("/v1/telemetry").json()
+    assert after["totals"]["challenges_402"] >= before["totals"]["challenges_402"] + 1
+    assert after["wallets_seen"] == before["wallets_seen"] + 1
+
+
 def test_live_email_valid_shape():
     r = client.get("/v1/email/validate", params={"email": "user@gmail.com"},
                    headers=PAID)

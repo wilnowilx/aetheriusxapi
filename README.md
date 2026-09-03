@@ -278,7 +278,7 @@ uvicorn main:app --reload --port 4020
 
 - **API Catalog** — all 10 endpoints with live prices from `/health`
 - **Explorer** — param forms, one-click paid calls, `Show 402` renders the payment challenge
-- **Live Metrics** — session calls, 200s, 402s, errors, latency bars
+- **Live Metrics** — REAL server telemetry (`/v1/telemetry`): uptime, totals, settled USDC volume, wallets seen, latency bars, event feed. Zero simulated numbers.
 - **Wallet** — memory-only demo connect (real x402 signing in production client)
 - **Storage Drift** — probes `/v1/storage/drift`, shows planned payload until Phase 2
 - **Activity** — client-side call log

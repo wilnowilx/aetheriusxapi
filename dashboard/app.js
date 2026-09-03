@@ -29,7 +29,7 @@ const FALLBACK_META = {
   "/v1/data/weather":"$0.008/call - Current weather",
 };
 
-const state = { health:null, selected:null, calls:0, ok:0, n402:0, err:0, lat:[] };
+const state = { health:null, selected:null };
 
 function splitMeta(s){ const i=s.indexOf(" - "); return i<0?[s,""]:[s.slice(0,i),s.slice(i+3)]; }
 
@@ -91,30 +91,44 @@ function params(){
   return q.toString();
 }
 
-function log(status, route, ms){
-  state.calls++;
-  if(status===200) state.ok++;
-  else if(status===402) state.n402++;
-  else state.err++;
-  state.lat.push(ms); if(state.lat.length>12) state.lat.shift();
-  $("#mCalls").textContent = state.calls;
-  $("#mOk").textContent = state.ok;
-  $("#m402").textContent = state.n402;
-  $("#mErr").textContent = state.err;
-  $("#mAvg").textContent = Math.round(state.lat.reduce((a,b)=>a+b,0)/state.lat.length)+" ms";
-  const bars = $("#latBars"); bars.innerHTML = "";
-  const mx = Math.max(...state.lat, 1);
-  state.lat.forEach(v=>{
-    const i = document.createElement("i");
-    i.style.height = Math.max(8, Math.round(v/mx*100))+"%"; i.title = Math.round(v)+" ms";
-    bars.appendChild(i);
-  });
-  const ul = $("#activity");
-  if(ul.querySelector(".muted")) ul.innerHTML = "";
-  const li = document.createElement("li");
-  li.innerHTML = `<b>${status}</b> GET ${route} · ${Math.round(ms)} ms`;
-  ul.prepend(li);
-  while(ul.children.length>20) ul.lastChild.remove();
+function fmtUptime(s){
+  s = Math.floor(s || 0);
+  const d = Math.floor(s/86400), h = Math.floor(s%86400/3600), m = Math.floor(s%3600/60);
+  return (d ? d+"d " : "") + (h ? h+"h " : "") + m + "m";
+}
+
+/* REAL server-side telemetry — no simulated numbers anywhere. */
+async function loadTelemetry(){
+  try{
+    const r = await fetch("../v1/telemetry");
+    if(!r.ok) return;
+    const t = await r.json();
+    const T = t.totals || {};
+    $("#mUp").textContent = fmtUptime(t.uptime_s);
+    $("#mCalls").textContent = T.calls ?? 0;
+    $("#mOk").textContent = T.ok_200 ?? 0;
+    $("#m402").textContent = T.challenges_402 ?? 0;
+    $("#mErr").textContent = T.errors ?? 0;
+    $("#mVol").textContent = "$" + (T.volume_usdc ?? 0) + " USDC";
+    $("#mWal").textContent = t.wallets_seen ?? 0;
+    $("#mAvg").textContent = T.avg_latency_ms != null ? T.avg_latency_ms + " ms" : "—";
+    const bars = $("#latBars"); bars.innerHTML = "";
+    const samples = t.recent_latency_ms || [];
+    const mx = Math.max(...samples, 1);
+    samples.forEach(v=>{
+      const i = document.createElement("i");
+      i.style.height = Math.max(8, Math.round(v/mx*100))+"%"; i.title = v+" ms";
+      bars.appendChild(i);
+    });
+    const ul = $("#activity"); ul.innerHTML = "";
+    const evs = t.recent_events || [];
+    if(!evs.length) ul.innerHTML = `<li class="muted">No API calls recorded yet — run the explorer.</li>`;
+    evs.slice(0,20).forEach(e=>{
+      const li = document.createElement("li");
+      li.innerHTML = `<b>${e.status}</b> ${e.t} · GET ${e.route} · ${e.latency_ms} ms`;
+      ul.appendChild(li);
+    });
+  }catch(e){ /* telemetry unreachable — explorer still works */ }
 }
 
 async function execute(paid){
@@ -129,13 +143,13 @@ async function execute(paid){
     const r = await fetch(url, {headers});
     const ms = performance.now()-t0;
     let body; try{ body = await r.json(); }catch(e){ body = await r.text(); }
-    log(r.status, route, ms);
+    loadTelemetry();
     const cls = r.status===200 ? "ok" : (r.status===402 ? "warn" : "bad");
     $("#resultMeta").innerHTML = `HTTP <b class="${cls}">${r.status}</b> · ${Math.round(ms)} ms` +
       (r.headers.get("X-PAYMENT-SETTLED") ? ` · settled: ${r.headers.get("X-PAYMENT-SETTLED")}` : "");
     $("#resultBox").textContent = typeof body === "string" ? body : JSON.stringify(body,null,2);
   }catch(e){
-    log(0, route, performance.now()-t0);
+    loadTelemetry();
     $("#resultMeta").innerHTML = `<b class="bad">network error</b>`;
     $("#resultBox").textContent = String(e);
   }
@@ -163,5 +177,6 @@ $("#btnWallet").onclick = ()=>{
 };
 
 loadHealth();
+loadTelemetry();
 probeDrift();
-setInterval(()=>{ if(state.health) $("#hEndpoints").textContent = Object.keys(state.health.endpoints).length; }, 30000);
+setInterval(loadTelemetry, 10000);

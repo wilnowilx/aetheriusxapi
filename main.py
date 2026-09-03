@@ -36,6 +36,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from x402_middleware import SimulatedX402Middleware
+from telemetry import Tracker, TelemetryMiddleware
 
 # === CONFIG (env-overridable, safe defaults) ===
 PAY_TO = os.getenv(
@@ -163,6 +164,8 @@ def _paid_routes_for_sdk(prefix: str) -> dict:
     return table
 
 
+tracker = Tracker(prices=PRICES)
+
 if X402_MODE == "real":
     try:
         from x402.http import FacilitatorConfig, HTTPFacilitatorClient
@@ -187,6 +190,11 @@ else:
                        pay_to=PAY_TO, network=NETWORK, currency=CURRENCY)
     print("[x402] SIMULATED mode: pass any X-PAYMENT header", flush=True)
 
+# Telemetry LAST: Starlette's add_middleware() inserts at position 0, so the
+# last-added middleware ends up outermost and observes the FINAL status
+# (paid 200 vs 402 challenge) after the x402 layer above.
+app.add_middleware(TelemetryMiddleware, tracker=tracker)
+
 
 # === FREE ROUTES ===
 
@@ -207,10 +215,19 @@ async def health():
     }
 
 
+@app.get("/v1/telemetry")
+@app.get("/api/v1/telemetry")
+async def telemetry():
+    """FREE public proof layer: uptime, totals, per-endpoint stats, volume."""
+    return tracker.snapshot(mode=X402_MODE, network=NETWORK,
+                            currency=CURRENCY, version=VERSION, wallet=PAY_TO)
+
+
 @app.get("/")
 async def root():
     return {"service": "aetheriusxAPI", "version": VERSION,
-            "docs": "/docs", "health": "/health", "dashboard": "/dashboard/"}
+            "docs": "/docs", "health": "/health", "dashboard": "/dashboard/",
+            "telemetry": "/v1/telemetry"}
 
 
 # Control-room dashboard (static, no build step). Mounted only if present
