@@ -58,16 +58,38 @@ OVERPASS_URLS = [
 ]
 
 
-async def _overpass_query(client: httpx.AsyncClient, query: str) -> dict | None:
+async def _overpass_query(client: httpx.AsyncClient, query: str,
+                          mirrors: list | None = None,
+                          timeout: float = 25) -> dict | None:
     """POST an Overpass QL query, failing over across public mirrors."""
-    for url in OVERPASS_URLS:
+    for url in (mirrors or OVERPASS_URLS):
         try:
-            r = await client.post(url, data={"data": query})
+            r = await client.post(url, data={"data": query}, timeout=timeout)
             if r.status_code == 200:
                 return r.json()
         except Exception:
             continue
     return None
+
+
+async def _nominatim_search(client: httpx.AsyncClient, q: str,
+                            location: str, limit: int = 20) -> dict:
+    """Fast fallback search: Nominatim only (no phones/websites)."""
+    resp = await client.get(
+        "https://nominatim.openstreetmap.org/search",
+        params={"q": f"{q}, {location}", "format": "json", "limit": limit},
+        headers=UA,
+    )
+    results = []
+    if resp.status_code == 200:
+        for p in resp.json():
+            results.append({
+                "name": p.get("display_name", "").split(",")[0],
+                "address": p.get("display_name", ""),
+                "phone": "", "website": "",
+                "lat": p.get("lat"), "lon": p.get("lon"),
+            })
+    return results
 
 # Canonical route -> price (USD). Served under /v1/* AND /api/v1/*.
 PRICES = {
@@ -212,27 +234,33 @@ async def maps_search(q: str = Query(..., description="Search query"),
     try:
         async with httpx.AsyncClient(timeout=30) as client:
             lat, lon = await _geocode(client, location)
-            query = (f'[out:json][timeout:25];(node["name"~"{q}",i]'
+            query = (f'[out:json][timeout:12];(node["name"~"{q}",i]'
                      f'(around:5000,{lat},{lon});way["name"~"{q}",i]'
                      f'(around:5000,{lat},{lon}););out center body;')
-            data = await _overpass_query(client, query)
-            if data is not None:
-                results = []
-                for elem in data.get("elements", [])[:20]:
-                    tags = elem.get("tags", {})
-                    center = elem.get("center", {})
-                    results.append({
-                        "name": tags.get("name", "Unknown"),
-                        "address": (tags.get("addr:street", "") + " "
-                                    + tags.get("addr:housenumber", "")).strip(),
-                        "phone": tags.get("phone", tags.get("contact:phone", "")),
-                        "website": tags.get("website", ""),
-                        "lat": elem.get("lat", center.get("lat")),
-                        "lon": elem.get("lon", center.get("lon")),
-                    })
+            # Regex queries are heavy: 2 fast mirrors, then Nominatim.
+            data = await _overpass_query(client, query,
+                                         mirrors=OVERPASS_URLS[:2], timeout=10)
+            if data is None:
+                results = await _nominatim_search(client, q, location)
                 return {"query": q, "location": location,
-                        "count": len(results), "results": results}
-            return _err(502, {"error": "Overpass API unavailable"})
+                        "count": len(results), "results": results,
+                        "data_source": "nominatim-fallback"}
+            results = []
+            for elem in data.get("elements", [])[:20]:
+                tags = elem.get("tags", {})
+                center = elem.get("center", {})
+                results.append({
+                    "name": tags.get("name", "Unknown"),
+                    "address": (tags.get("addr:street", "") + " "
+                                + tags.get("addr:housenumber", "")).strip(),
+                    "phone": tags.get("phone", tags.get("contact:phone", "")),
+                    "website": tags.get("website", ""),
+                    "lat": elem.get("lat", center.get("lat")),
+                    "lon": elem.get("lon", center.get("lon")),
+                })
+            return {"query": q, "location": location,
+                    "count": len(results), "results": results,
+                    "data_source": "overpass"}
     except Exception as e:
         return _err(500, {"error": str(e)})
 
@@ -413,7 +441,29 @@ async def token_price(address: str = Query(..., description="Token contract"),
                                 "fetched_at": _now()}
             except Exception:
                 pass
-            return _err(404, {"error": "Token not found (CoinGecko + DexScreener)",
+            # Last resort: GeckoTerminal (address-based, free, no key).
+            gt_network = {"ethereum": "eth", "base": "base",
+                          "polygon": "polygon_pos", "arbitrum": "arbitrum",
+                          "optimism": "optimism"}.get(chain.lower())
+            if gt_network:
+                try:
+                    r = await client.get(
+                        f"https://api.geckoterminal.com/api/v2/networks/"
+                        f"{gt_network}/tokens/{address}", headers=UA)
+                    if r.status_code == 200:
+                        attrs = (r.json().get("data") or {}).get("attributes") or {}
+                        if attrs.get("price_usd") is not None:
+                            chg = (attrs.get("price_change_percentage") or {}).get("h24")
+                            return {"address": address, "chain": chain,
+                                    "price_usd": float(attrs["price_usd"]),
+                                    "change_24h": float(chg) if chg is not None else None,
+                                    "vs_currency": "usd",
+                                    "data_source": "geckoterminal",
+                                    "fetched_at": _now()}
+                except Exception:
+                    pass
+            return _err(404, {"error": "Token not found "
+                                       "(CoinGecko + DexScreener + GeckoTerminal)",
                               "address": address, "chain": chain})
     except Exception as e:
         return _err(500, {"error": str(e)})
