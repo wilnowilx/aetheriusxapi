@@ -462,8 +462,29 @@ async def token_price(address: str = Query(..., description="Token contract"),
                                     "fetched_at": _now()}
                 except Exception:
                     pass
-            return _err(404, {"error": "Token not found "
-                                       "(CoinGecko + DexScreener + GeckoTerminal)",
+            # Final fallback: Llama.fi (server-grade, address-based).
+            llama_chain = {"ethereum": "ethereum", "base": "base",
+                           "polygon": "polygon", "arbitrum": "arbitrum",
+                           "optimism": "optimism"}.get(chain.lower())
+            if llama_chain:
+                try:
+                    r = await client.get(
+                        "https://coins.llama.fi/prices/current/"
+                        f"{llama_chain}:{address}")
+                    if r.status_code == 200:
+                        coin = (r.json().get("coins") or {}).get(
+                            f"{llama_chain}:{address}")
+                        if coin and coin.get("price") is not None:
+                            return {"address": address, "chain": chain,
+                                    "price_usd": float(coin["price"]),
+                                    "symbol": coin.get("symbol"),
+                                    "vs_currency": "usd",
+                                    "data_source": "llama",
+                                    "fetched_at": _now()}
+                except Exception:
+                    pass
+            return _err(404, {"error": "Token not found (CoinGecko + "
+                                       "DexScreener + GeckoTerminal + Llama)",
                               "address": address, "chain": chain})
     except Exception as e:
         return _err(500, {"error": str(e)})
