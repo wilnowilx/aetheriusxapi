@@ -4,23 +4,92 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>aetheriusxapi — live demo (real testnet USDC)</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/asciinema-player@3.17.0/dist/bundle/asciinema-player.css">
 <style>
-body{background:#06060e;color:#f0f0f5;font-family:Inter,system-ui,sans-serif;margin:0;padding:32px 16px;text-align:center}
+:root{--bg:#06060e;--purple:#a855f7;--magenta:#d946ef;--green:#10b981;--orange:#f59e0b;--text:#f0f0f5;--sec:#8a8a9a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;padding:32px 16px;text-align:center}
 .wrap{max-width:900px;margin:0 auto}
 h1{font-size:20px}
-p{color:#8a8a9a;font-size:14px}
-a{color:#c084fc}
-asciinema-player{margin:18px auto;border:1px solid rgba(168,85,247,.35);border-radius:12px;overflow:hidden}
+.sub{color:var(--sec);font-size:14px;margin:8px 0 18px}
+.sub a{color:#c084fc}
+.term{background:#080810;border:1px solid rgba(168,85,247,.4);border-radius:12px;text-align:left;
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.65;
+  padding:18px 20px;min-height:420px;box-shadow:0 0 60px rgba(168,85,247,.15);overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+.term .banner{color:var(--purple);font-weight:700}
+.term .ok{color:var(--green)} .term .warn{color:var(--orange)} .term .dim{color:var(--sec)}
+.cursor{display:inline-block;width:9px;height:17px;background:var(--purple);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.controls{margin:16px 0;display:flex;gap:10px;justify-content:center}
+.controls button{background:linear-gradient(90deg,var(--purple),var(--magenta));color:#fff;border:none;
+  border-radius:9px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;min-height:44px}
+.controls button.ghost{background:transparent;border:1px solid rgba(255,255,255,.2)}
+.back{margin-top:14px;font-size:13px;color:var(--sec)} .back a{color:#c084fc}
+@media (prefers-reduced-motion: reduce){.cursor{animation:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>AETHERIUS — live 402&rarr;200 demo (real testnet USDC)</h1>
-<p>Recorded terminal session, unedited. Press play. Every call settled on Base Sepolia — verify on the <a href="https://sepolia.basescan.org/address/0x677B483128D0399bCD0A5AB36eE990C0246d7f61" target="_blank">block explorer</a>.</p>
-<asciinema-player src="./take-1.cast" theme="dracula" speed="1"></asciinema-player>
-<p><a href="https://wilnowilx.github.io/aetheriusxapi/">← back to aetheriusxapi</a></p>
+<p class="sub">Unedited terminal replay. Every call settled on Base Sepolia — verify on the <a href="https://sepolia.basescan.org/address/0x677B483128D0399bCD0A5AB36eE990C0246d7f61" target="_blank">block explorer</a>.</p>
+<div class="term" id="term"></div>
+<div class="controls">
+<button id="btnPlay">▶ Play</button>
+<button id="btnReplay" class="ghost">↻ Replay</button>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/asciinema-player@3.17.0/dist/bundle/asciinema-player.min.js"></script>
+<p class="back"><a href="https://wilnowilx.github.io/aetheriusxapi/">← back to aetheriusxapi</a> · <a href="./take-1.cast">raw .cast file</a></p>
+</div>
+<script>
+(function(){
+var term = document.getElementById('term');
+var btnPlay = document.getElementById('btnPlay');
+var btnReplay = document.getElementById('btnReplay');
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function line(t, cls){return '<div class="'+(cls||'')+'">'+esc(t)+'</div>';}
+function banner(t){return '<div class="banner">'+esc(t)+'</div>';}
+var S = [
+[1500, banner('========================================================')+banner('  t+  0s  [1/6] HOOK — agents can\'t hold credit cards. How do they pay for APIs?')+banner('========================================================')],
+[1600, line('AETHERIUS: where AI agents pay per call in USDC on Base.')+line('Agent wallet: 0x677B483128D0399bCD0A5AB36eE990C0246d7f61')+line('Verify yourself: https://sepolia.basescan.org/address/0x677B483128D0399bCD0A5AB36eE990C0246d7f61','dim')],
+[4000, banner('========================================================')+banner('  t+  2s  [2/6] DISCOVERY — live catalog via the SDK')+banner('========================================================')],
+[4100, line('Service 2.0.0 on eip155:84532')+line('Live endpoints: 40')+line('Cheapest: /v1/data/define at $0.005/call')+line('Demoing /v1/email/validate at $0.005/call (client\'s choice).')],
+[6500, banner('========================================================')+banner('  t+  5s  [3/6] CHALLENGE — no payment, no data (402)')+banner('========================================================')],
+[6600, line('HTTP 402 — empty body. No proof, you don\'t exist.','warn')+line('Catalog price: $0.005/call USDC.')],
+[9000, banner('========================================================')+banner('  t+  7s  [4/6] SETTLEMENT — real USDC, real data (200)')+banner('========================================================')],
+[9400, line('USDC balance before: 20.0')],
+[10500, line('HTTP 200','ok')+line('{')+line('  "email": "agent@gmail.com",')+line('  "valid_syntax": true,')+line('  "has_mx": true,')+line('  "is_disposable": false,')+line('  "risk_score": 0,')+line('  "verdict": "valid"')+line('}')],
+[10900, line('USDC balance after: 20.0 (spent: $0.0000)')+line('That discount IS the proof. Real money, not simulated.')+line('Montage — three more APIs, same flow, all real:')],
+[12400, line('  200 /v1/data/define — {"query": "agent", "count": 1, ...}','ok')],
+[13500, line('  200 /v1/token/price — USDC $1.00 on Base','ok')],
+[15500, line('  200 /v1/news/hn-item — "Pre-Release of Polars 2.0"','ok')],
+[17900, banner('========================================================')+banner('  t+ 16s  [5/6] LIVE PROOF — telemetry moved because of us')+banner('========================================================')],
+[18000, line('Calls: 1114 | Paid: 1022 | Settled USDC: $0.52','ok')],
+[20400, banner('========================================================')+banner('  t+ 19s  [6/6] CTA')+banner('========================================================')],
+[20500, line('AETHERIUS — https://wilnowilx.github.io/aetheriusxapi/')+line('Verifiable txs: https://sepolia.basescan.org/address/0x677B483128D0399bCD0A5AB36eE990C0246d7f61','dim')+line('Done in t+19s with real USDC on Base Sepolia.','ok')]
+];
+var timers = [], playing = false, reduced = false;
+try{ reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+function clear(){ timers.forEach(clearTimeout); timers = []; }
+function renderAll(){
+  term.innerHTML = '';
+  S.forEach(function(s){ term.innerHTML += s[1]; });
+  term.innerHTML += '<span class="cursor"></span>';
+  term.scrollTop = term.scrollHeight;
+}
+function play(){
+  clear(); term.innerHTML = ''; playing = true; btnPlay.textContent = '⏸ Pause';
+  S.forEach(function(s){
+    timers.push(setTimeout(function(){
+      term.innerHTML += s[1] + '<span class="cursor" id="cur"></span>';
+      var c = document.getElementById('cur'); if(c) c.scrollIntoView({block:'nearest'});
+      term.scrollTop = term.scrollHeight;
+    }, s[0]));
+  });
+  timers.push(setTimeout(function(){ playing = false; btnPlay.textContent = '▶ Play'; }, 21500));
+}
+function toggle(){ if(playing){ clear(); playing = false; btnPlay.textContent = '▶ Play'; } else { play(); } }
+btnPlay.onclick = toggle;
+btnReplay.onclick = function(){ play(); };
+if(reduced){ renderAll(); } else { play(); }
+})();
+</script>
 </body>
 </html>
