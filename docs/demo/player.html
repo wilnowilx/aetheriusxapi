@@ -102,6 +102,9 @@ var reduced = false;
 try{ reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
 function scroll(){ term.scrollTop = term.scrollHeight; }
 function prog(){ pbar.style.width = Math.round(done / total * 100) + '%'; }
+var PCHAR = 8; /* input types slow; instant blocks stay instant */
+var cur = document.createElement('span');
+cur.className = 'cursor';
 function runStep(idx){
   if(!playing || idx >= S.length){
     playing = false; btnPlay.textContent = '▶ Play'; return;
@@ -109,31 +112,26 @@ function runStep(idx){
   var s = S[idx];
   function advance(){
     done = idx + 1; prog();
+    term.appendChild(cur); /* single cursor: move, never duplicate */
     timers.push(setTimeout(function(){ runStep(idx + 1); }, s.g || 850));
   }
   if(s.h){
-    term.innerHTML += s.h + '<span class="cursor" id="cur"></span>';
-    var c = document.getElementById('cur'); if(c) c.remove();
-    term.innerHTML += '<span class="cursor" id="cur"></span>';
+    term.insertAdjacentHTML('beforeend', s.h);
     scroll(); advance();
   } else {
     var d = document.createElement('div');
     if(s.c) d.className = s.c;
+    d.appendChild(cur);
     term.appendChild(d);
-    var cur = document.createElement('span');
-    cur.className = 'cursor'; cur.id = 'cur';
-    var old = document.getElementById('cur'); if(old) old.remove();
-    d.appendChild(cur);
-    var full = s.t;
-    d.textContent = '';
-    d.appendChild(cur);
-    (function type(i){
+    var full = s.t, i = 0;
+    (function type(){
       if(!playing) return;
       cur.before(document.createTextNode(full[i]));
       scroll();
-      if(i + 1 < full.length){ timers.push(setTimeout(function(){ type(i + 1); }, 4)); }
-      else { cur.remove(); term.innerHTML += '<span class="cursor" id="cur"></span>'; advance(); }
-    })(0);
+      i++;
+      if(i < full.length){ timers.push(setTimeout(type, PCHAR)); }
+      else { advance(); }
+    })();
   }
 }
 function clear(){ timers.forEach(clearTimeout); timers = []; }
