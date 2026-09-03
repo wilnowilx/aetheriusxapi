@@ -9,10 +9,9 @@
 ![Dashboard](https://img.shields.io/badge/Dashboard-Live-ec4899?style=for-the-badge&labelColor=09090b)
 ![SDK](https://img.shields.io/badge/Python_SDK-ready-3776AB?style=for-the-badge&labelColor=09090b)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge&labelColor=09090b)
-![Stars](https://img.shields.io/github/stars/wilnowilx/aetheriusxapi?style=social)
-![Forks](https://img.shields.io/github/forks/wilnowilx/aetheriusxapi?style=social)
-![Repo views](https://visitor-badge.laobi.icu/badge?page_id=wilnowilx.aetheriusxapi)
-![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fwilnowilx%2Faetheriusxapi&title=hits)
+![Stars](https://img.shields.io/github/stars/wilnowilx/aetheriusxapi?style=for-the-badge&labelColor=09090b&color=8B5CF6)
+![Forks](https://img.shields.io/github/forks/wilnowilx/aetheriusxapi?style=for-the-badge&labelColor=09090b&color=8B5CF6)
+![Repo views](https://visitor-badge.laobi.icu/badge?page_id=wilnowilx.aetheriusxapi&left_color=09090b&right_color=8B5CF6)
 
 # AETHERIUS — aetheriusxAPI
 
