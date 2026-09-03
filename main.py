@@ -1229,9 +1229,9 @@ async def token_gas(chain: str = Query("ethereum", description="ethereum only"))
                         "fast_gwei": r.get("FastGasPrice"),
                         "last_block": r.get("LastBlock"),
                         "data_source": "etherscan", "fetched_at": _now()}
-            # Fallback: eth_feeHistory from a public RPC (no key, never throttled).
-            for rpc in ("https://cloudflare-eth.com",
-                        "https://ethereum.llamarpc.com"):
+            # Fallback: eth_feeHistory from open RPCs (no key, VM-proven).
+            for rpc in ("https://rpc.flashbots.net",
+                        "https://eth.meowrpc.com"):
                 try:
                     r = await client.post(rpc, json={"jsonrpc": "2.0", "id": 1,
                         "method": "eth_feeHistory",
