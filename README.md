@@ -42,19 +42,27 @@
 
 ## The Problem
 
-The AI agent economy is emerging, but the API layer is stuck in 2015:
+### Problem statement
 
-| Pain Point | Traditional APIs | aetheriusxAPI |
-|------------|-----------------|---------------|
-| **Access** | Credit card + email signup | Wallet connection only |
-| **Pricing** | Monthly subscriptions | Pay per request |
-| **Identity** | API keys + secrets | Your wallet IS your identity |
-| **KYC/AML** | Required for most services | Permissionless |
-| **Settlement** | 3-5 business days | Instant on-chain |
-| **Global reach** | Restricted by banks/policy | Anyone with a crypto wallet |
-| **Agent autonomy** | Requires human in the loop | Full machine-to-machine |
+Most APIs are designed for a human-led workflow: a developer creates an account, provisions credentials, accepts a subscription or credit limit, and reconciles usage through a separate billing system. That model works for teams, but adds coordination and trust boundaries when the client is an autonomous agent.
 
-> **Core insight:** AI agents can't hold credit cards. They can hold crypto wallets. The API economy needs to meet them where they are.
+An agent needs to discover a service, authorize a bounded amount, call it, and receive a verifiable result without a human present for every transaction. API keys identify a client but do not provide per-request authorization; subscription billing separates consumption from settlement; and conventional payment rails are not optimized for low-value, high-frequency machine-to-machine calls.
+
+### Thesis
+
+If payment authorization and API access are expressed in the same HTTP interaction, an agent can consume external capabilities autonomously while the provider keeps a standard request/response interface. x402 provides that interaction: the provider returns `402 Payment Required` with machine-readable requirements, the client supplies a payment proof, and the request is verified and settled with USDC on Base.
+
+### Engineering requirements
+
+| Requirement | Design implication |
+|-------------|-------------------|
+| **Programmatic authorization** | Approve a specific request and amount without sharing a long-lived secret. |
+| **Usage-based economics** | Keep price, request, response, and settlement correlated at the API boundary. |
+| **Low-value viability** | Support micro-payments without monthly commitments. |
+| **Provider compatibility** | Keep services as ordinary HTTP APIs protected by middleware. |
+| **Operational verifiability** | Measure health, latency, payment events, and failures independently. |
+
+**AetheriusX hypothesis:** a marketplace of capability APIs with x402-native settlement can reduce the operational friction of agent commerce while preserving familiar HTTP semantics. The hypothesis is testable through payment conversion, latency, repeat usage, request success rate, and settled volume.
 
 ---
 

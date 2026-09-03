@@ -411,6 +411,19 @@
         .hero-console-grid strong { color: var(--text); font: 600 1.05rem 'JetBrains Mono', monospace; }
         .hero-console-grid span { color: var(--text-muted); font-size: 0.68rem; }
 
+        .telemetry-section { background: linear-gradient(180deg, rgba(168,85,247,0.04), transparent 55%); }
+        .telemetry-section .sdesc { margin: 0 auto; text-align: center; }
+        .telemetry-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 18px; align-items: stretch; max-width: 980px; margin: 64px auto 28px; }
+        .telemetry-node { padding: 26px; text-align: left; background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 16px; transition: transform 0.35s, border-color 0.35s, background 0.35s; }
+        .telemetry-node:hover { transform: translateY(-6px); border-color: rgba(168,85,247,0.5); background: rgba(168,85,247,0.07); }
+        .telemetry-index { display: block; color: var(--purple-light); font: 0.7rem 'JetBrains Mono', monospace; margin-bottom: 24px; }
+        .telemetry-node strong { display: block; font-size: 1.15rem; margin-bottom: 8px; }
+        .telemetry-node small { color: var(--text-sec); font-size: 0.82rem; }
+        .telemetry-arrow { color: var(--magenta-light); font: 1.7rem 'JetBrains Mono', monospace; display: flex; align-items: center; }
+        .telemetry-note { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--text-sec); font-size: 0.8rem; }
+        .telemetry-note a { color: var(--purple-light); margin-left: 12px; text-decoration: none; }
+        .telemetry-note a:hover { color: white; }
+
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
         /* ===== STATS ===== */
@@ -1218,6 +1231,9 @@
             .hero-console { margin-top: 40px; padding: 16px; }
             .hero-console-grid { grid-template-columns: repeat(2, 1fr); gap: 18px 12px; }
             .hero-console-top { align-items: flex-start; flex-direction: column; gap: 10px; }
+            .telemetry-flow { grid-template-columns: 1fr; gap: 12px; margin-top: 40px; }
+            .telemetry-arrow { justify-content: center; transform: rotate(90deg); }
+            .telemetry-note { flex-wrap: wrap; text-align: center; }
             .trusted-logos { gap: 32px; }
             .hero-badges { flex-direction: column; align-items: center; }
             .hb-stats { grid-template-columns: 1fr; }
@@ -1260,6 +1276,7 @@
         <a href="#features" onclick="closeMobile()">Features</a>
         <a href="#code" onclick="closeMobile()">Code</a>
         <a href="#heartbeat" onclick="closeMobile()">Status</a>
+        <a href="#telemetry" onclick="closeMobile()">Telemetry</a>
         <a href="#limits" onclick="closeMobile()">Rate Limits</a>
         <a href="#cta" onclick="closeMobile()">Get Started</a>
     </div>
@@ -1276,6 +1293,7 @@
                 <a href="#features">Features</a>
                 <a href="#code">Code</a>
                 <a href="#heartbeat">Status</a>
+                <a href="#telemetry">Telemetry</a>
                 <a href="#limits">Limits</a>
                 <a href="dashboard/">Dashboard</a>
                 <a href="#cta" class="btn-nav">Get Started</a>
@@ -1319,7 +1337,7 @@
                 <div class="hero-console-grid">
                     <div><strong>9</strong><span>VM services</span></div>
                     <div><strong>USDC</strong><span>per-request rail</span></div>
-                    <div><strong>NATS</strong><span>telemetry fabric</span></div>
+                    <div><strong>LIVE</strong><span>control surface</span></div>
                     <div><strong>402</strong><span>payment handshake</span></div>
                 </div>
             </div>
@@ -1500,6 +1518,23 @@
         </div>
     </section>
 
+    <!-- TELEMETRY -->
+    <section id="telemetry" class="telemetry-section">
+        <div class="inner">
+            <div class="stag anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 12h4l2-8 4 16 2-8h6"/></svg>Distributed Telemetry</div>
+            <h2 class="stitle anim">See the system between requests.</h2>
+            <p class="sdesc anim">NATS carries internal events across the runtime. Aetherius exposes the useful proof: health, latency, volume, and cross-layer drift.</p>
+            <div class="telemetry-flow anim">
+                <div class="telemetry-node"><span class="telemetry-index">01</span><strong>Request</strong><small>Agent calls an API</small></div>
+                <div class="telemetry-arrow">→</div>
+                <div class="telemetry-node"><span class="telemetry-index">02</span><strong>NATS fabric</strong><small>Events move between layers</small></div>
+                <div class="telemetry-arrow">→</div>
+                <div class="telemetry-node"><span class="telemetry-index">03</span><strong>Proof surface</strong><small>Dashboard reads outcomes</small></div>
+            </div>
+            <div class="telemetry-note anim"><span class="hero-console-dot"></span><span>NATS stays private. Observability becomes a product.</span><a href="dashboard/">Inspect control room ↗</a></div>
+        </div>
+    </section>
+
     <!-- DOCS -->
     <section id="docs" class="docs-section">
         <div class="inner">
@@ -1531,20 +1566,6 @@
         </div>
     </section>
 
-    <!-- TRUSTED BY -->
-    <section id="trusted" class="trusted-section" style="min-height: auto;">
-        <div class="inner" style="padding: 0 40px;">
-            <h3>Trusted by builders on</h3>
-            <div class="trusted-logos">
-                <div class="trusted-logo">Base</div>
-                <div class="trusted-logo">Ethereum</div>
-                <div class="trusted-logo">x402</div>
-                <div class="trusted-logo">Coinbase</div>
-                <div class="trusted-logo">USDC</div>
-            </div>
-        </div>
-    </section>
-
     <!-- CTA -->
     <section id="cta" class="cta-section">
         <div class="inner">
@@ -1556,6 +1577,20 @@
                     <a href="https://x.com/aetheriusxAPI" class="btn btn-primary">Follow on X<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
                     <a href="https://github.com/wilnowilx/aetheriusxapi" class="btn btn-secondary">View GitHub<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRUSTED BY -->
+    <section id="trusted" class="trusted-section" style="min-height: auto;">
+        <div class="inner" style="padding: 0 40px;">
+            <h3>Built in the open for builders on</h3>
+            <div class="trusted-logos">
+                <div class="trusted-logo">Base</div>
+                <div class="trusted-logo">Ethereum</div>
+                <div class="trusted-logo">x402</div>
+                <div class="trusted-logo">Coinbase</div>
+                <div class="trusted-logo">USDC</div>
             </div>
         </div>
     </section>
