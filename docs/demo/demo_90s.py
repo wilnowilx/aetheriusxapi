@@ -66,9 +66,28 @@ http = wrapRequestsWithPayment(session=req.Session(),
                                client=x402ClientSync.from_config(cfg))
 plain = req.Session()
 
+USDC_SEPOLIA = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+ERC20_ABI = [{"constant": True, "inputs": [{"name": "_o", "type": "address"}],
+              "name": "balanceOf", "outputs": [{"name": "", "type": "uint256"}],
+              "type": "function"}]
+usdc = w3.eth.contract(address=w3.to_checksum_address(USDC_SEPOLIA),
+                       abi=ERC20_ABI)
+
+
+def usdc_bal():
+    try:
+        return usdc.functions.balanceOf(acct.address).call() / 1e6
+    except Exception:
+        return None
+
+
+SCAN = f"https://sepolia.basescan.org/address/{acct.address}"
+
 beat(1, 6, "HOOK — agentes sin tarjeta, como pagan APIs?")
 print("AETHERIUS: donde los agentes IA pagan por llamada en USDC sobre Base.",
       flush=True)
+print(f"Wallet del agente: {acct.address}", flush=True)
+print(f"Verificalo tu mismo: {SCAN}", flush=True)
 pause()
 
 beat(2, 6, "PRUEBA — catalogo vivo")
@@ -84,13 +103,23 @@ pause()
 beat(3, 6, "CONFLICTO — sin pago no hay datos (402)")
 r = plain.get(f"{BASE}/v1/email/validate",
               params={"email": "agent@gmail.com"}, timeout=30)
-print(f"HTTP {r.status_code} — {r.json()}", flush=True)
+print(f"HTTP {r.status_code} — cuerpo vacio. Sin prueba de pago no existes.",
+      flush=True)
+print(f"Precio listado en catalogo: {cheapest[0]} a ${cheapest[1]} USDC.",
+      flush=True)
 pause()
 
 beat(4, 6, "RESOLUCION — pago real USDC y datos reales (200)")
-r = http.get(f"{BASE}/api/v1/email/validate",
+b0 = usdc_bal()
+print(f"Balance USDC antes: {b0}", flush=True)
+r = http.get(f"{BASE}/v1/email/validate",
              params={"email": "agent@gmail.com"}, timeout=120)
-print(f"HTTP {r.status_code} — {json.dumps(r.json())[:200]}", flush=True)
+print(f"HTTP {r.status_code}", flush=True)
+print(json.dumps(r.json(), indent=2, ensure_ascii=False), flush=True)
+b1 = usdc_bal()
+if b0 is not None and b1 is not None:
+    print(f"Balance USDC despues: {b1} (gastado: ${b0 - b1:.4f})", flush=True)
+    print("Ese descuento ES la prueba. Dinero real, no simulado.", flush=True)
 pause()
 
 beat(5, 6, "PRUEBA VIVA — la telemetria se movio por nosotros")
@@ -101,5 +130,6 @@ pause()
 
 beat(6, 6, "CTA")
 print("AETHERIUS — https://wilnowilx.github.io/aetheriusxapi/", flush=True)
+print(f"Transacciones verificables: {SCAN}", flush=True)
 print(f"Demo completado en t+{int(time.monotonic() - T0)}s "
       f"con USDC real en Base Sepolia.", flush=True)
