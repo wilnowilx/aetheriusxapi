@@ -106,6 +106,27 @@ def assert_live_or_upstream_error(resp, required_keys):
         assert "error" in resp.json()
 
 
+def test_error_branches_return_json():
+    # Regression: error paths must build valid JSON bodies (Starlette
+    # JSONResponse takes content first; status_code is keyword-only).
+    r = client.get("/v1/token/price",
+                   params={"address": "0xabc", "chain": "solana"},
+                   headers=PAID)
+    assert r.status_code == 400
+    assert "Unsupported chain" in r.json()["error"]
+
+    r = client.get("/v1/token/holders",
+                   params={"address": "0xabc"}, headers=PAID)
+    assert r.status_code in (200, 501, 502)
+    assert "error" in r.json() or "holders" in r.json()
+
+    r = client.get("/v1/web/scrape",
+                   params={"url": "http://invalid.invalid"},
+                   headers=PAID)
+    assert r.status_code in (200, 500, 502)
+    assert "error" in r.json() or "title" in r.json()
+
+
 def test_live_email_valid_shape():
     r = client.get("/v1/email/validate", params={"email": "user@gmail.com"},
                    headers=PAID)

@@ -98,6 +98,11 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _err(status_code: int, payload: dict) -> JSONResponse:
+    """Build an error response. (status_code is keyword-only in Starlette.)"""
+    return JSONResponse(content=payload, status_code=status_code)
+
+
 def _paid_routes_for_sdk(prefix: str) -> dict:
     """Build official-SDK route table lazily (imported only in real mode)."""
     from x402.http.types import RouteConfig
@@ -208,9 +213,9 @@ async def maps_search(q: str = Query(..., description="Search query"),
                     })
                 return {"query": q, "location": location,
                         "count": len(results), "results": results}
-            return JSONResponse(502, {"error": "Overpass API unavailable"})
+            return _err(502, {"error": "Overpass API unavailable"})
     except Exception as e:
-        return JSONResponse(500, {"error": str(e)})
+        return _err(500, {"error": str(e)})
 
 
 @app.get("/v1/maps/reviews")
@@ -232,9 +237,9 @@ async def maps_reviews(place_name: str = Query(..., description="Place name")):
                            for p in resp.json()]
                 return {"query": place_name, "count": len(results),
                         "results": results}
-            return JSONResponse(502, {"error": "Nominatim unavailable"})
+            return _err(502, {"error": "Nominatim unavailable"})
     except Exception as e:
-        return JSONResponse(500, {"error": str(e)})
+        return _err(500, {"error": str(e)})
 
 
 @app.get("/v1/maps/nearby")
@@ -271,9 +276,9 @@ async def maps_nearby(lat: float = Query(..., description="Latitude"),
                 return {"lat": lat, "lon": lon, "radius": radius,
                         "category": category or "all",
                         "count": len(results), "results": results}
-            return JSONResponse(502, {"error": "Overpass API unavailable"})
+            return _err(502, {"error": "Overpass API unavailable"})
     except Exception as e:
-        return JSONResponse(500, {"error": str(e)})
+        return _err(500, {"error": str(e)})
 
 
 # === CRYPTO ===
@@ -313,7 +318,7 @@ async def token_analyze(address: str = Query(..., description="Token contract"),
                                 else "medium" if risk < 60 else "high")
         return result
     except Exception as e:
-        return JSONResponse(500, {"error": str(e), "address": address})
+        return _err(500, {"error": str(e), "address": address})
 
 
 @app.get("/v1/token/holders")
@@ -322,7 +327,7 @@ async def token_holders(address: str = Query(..., description="Token contract"),
                         chain: str = Query("ethereum", description="Blockchain")):
     """Holder distribution. Requires ETHERSCAN_API_KEY env var."""
     if not ETHERSCAN_API_KEY:
-        return JSONResponse(501, {
+        return _err(501, {
             "error": "token/holders requires an Etherscan API key",
             "how": "Set ETHERSCAN_API_KEY env var (free at etherscan.io/apis).",
             "address": address, "chain": chain})
@@ -340,9 +345,9 @@ async def token_holders(address: str = Query(..., description="Token contract"),
                 return {"address": address, "chain": chain,
                         "count": len(data["result"]),
                         "holders": data["result"], "fetched_at": _now()}
-            return JSONResponse(502, {"error": data.get("message", "Etherscan error")})
+            return _err(502, {"error": data.get("message", "Etherscan error")})
     except Exception as e:
-        return JSONResponse(500, {"error": str(e)})
+        return _err(500, {"error": str(e)})
 
 
 @app.get("/v1/token/price")
@@ -352,8 +357,8 @@ async def token_price(address: str = Query(..., description="Token contract"),
     """Real-time USD price via CoinGecko free API (no key)."""
     platform = COINGECKO_PLATFORM.get(chain.lower())
     if not platform:
-        return JSONResponse(400, {"error": f"Unsupported chain: {chain}. "
-                                           f"Use: {sorted(COINGECKO_PLATFORM)}"})
+        return _err(400, {"error": f"Unsupported chain: {chain}. "
+                                   f"Use: {sorted(COINGECKO_PLATFORM)}"})
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             r = await client.get(
@@ -362,15 +367,15 @@ async def token_price(address: str = Query(..., description="Token contract"),
                         "include_24hr_change": "true"})
             info = r.json().get(address.lower()) if r.status_code == 200 else None
             if not info:
-                return JSONResponse(404, {"error": "Token not found on "
-                                                   f"{chain} (CoinGecko)"})
+                return _err(404, {"error": "Token not found on "
+                                           f"{chain} (CoinGecko)"})
             return {"address": address, "chain": chain,
                     "price_usd": info.get("usd"),
                     "change_24h": info.get("usd_24h_change"),
                     "vs_currency": "usd",
                     "data_source": "coingecko", "fetched_at": _now()}
     except Exception as e:
-        return JSONResponse(500, {"error": str(e)})
+        return _err(500, {"error": str(e)})
 
 
 # === WEB ===
@@ -383,9 +388,9 @@ async def web_scrape(url: str = Query(..., description="URL to scrape")):
         async with httpx.AsyncClient(timeout=20, follow_redirects=True) as client:
             resp = await client.get(url, headers=UA)
             if resp.status_code != 200:
-                return JSONResponse(resp.status_code,
-                                    {"error": f"HTTP {resp.status_code}",
-                                     "url": url})
+                return _err(resp.status_code,
+                            {"error": f"HTTP {resp.status_code}",
+                             "url": url})
             content = resp.text[:50000]
             m = re.search(r"<title[^>]*>(.*?)</title>", content,
                           re.IGNORECASE | re.DOTALL)
@@ -401,7 +406,7 @@ async def web_scrape(url: str = Query(..., description="URL to scrape")):
                     "text_preview": text[:2000], "links_count": len(links),
                     "links": links[:20], "content_length": len(content)}
     except Exception as e:
-        return JSONResponse(500, {"error": str(e), "url": url})
+        return _err(500, {"error": str(e), "url": url})
 
 
 @app.get("/v1/web/screenshot")
@@ -474,14 +479,14 @@ async def weather(lat: float = Query(..., description="Latitude"),
                                    "wind_speed_10m",
                         "timezone": "auto"})
             if r.status_code != 200:
-                return JSONResponse(502, {"error": "Open-Meteo unavailable"})
+                return _err(502, {"error": "Open-Meteo unavailable"})
             d = r.json()
             return {"lat": lat, "lon": lon,
                     "timezone": d.get("timezone"),
                     "current": d.get("current", {}),
                     "data_source": "open-meteo", "fetched_at": _now()}
     except Exception as e:
-        return JSONResponse(500, {"error": str(e)})
+        return _err(500, {"error": str(e)})
 
 
 if __name__ == "__main__":
