@@ -49,6 +49,26 @@ VERSION = "2.0.0"
 
 UA = {"User-Agent": "aetheriusxAPI/2.0 (AI Agent)"}
 
+# Overpass instances tried in order (public mirrors; datacenter IPs are
+# often throttled on the primary, so fail over automatically).
+OVERPASS_URLS = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.nchc.org.tw/api/interpreter",
+]
+
+
+async def _overpass_query(client: httpx.AsyncClient, query: str) -> dict | None:
+    """POST an Overpass QL query, failing over across public mirrors."""
+    for url in OVERPASS_URLS:
+        try:
+            r = await client.post(url, data={"data": query})
+            if r.status_code == 200:
+                return r.json()
+        except Exception:
+            continue
+    return None
+
 # Canonical route -> price (USD). Served under /v1/* AND /api/v1/*.
 PRICES = {
     "/v1/maps/search": "$0.01",
@@ -195,11 +215,10 @@ async def maps_search(q: str = Query(..., description="Search query"),
             query = (f'[out:json][timeout:25];(node["name"~"{q}",i]'
                      f'(around:5000,{lat},{lon});way["name"~"{q}",i]'
                      f'(around:5000,{lat},{lon}););out center body;')
-            overpass = await client.post(
-                "https://overpass-api.de/api/interpreter", data={"data": query})
-            if overpass.status_code == 200:
+            data = await _overpass_query(client, query)
+            if data is not None:
                 results = []
-                for elem in overpass.json().get("elements", [])[:20]:
+                for elem in data.get("elements", [])[:20]:
                     tags = elem.get("tags", {})
                     center = elem.get("center", {})
                     results.append({
@@ -260,11 +279,10 @@ async def maps_nearby(lat: float = Query(..., description="Latitude"),
                         f'way["name"](around:{radius},{lat},{lon});')
         query = f"[out:json][timeout:25];({selector});out center body;"
         async with httpx.AsyncClient(timeout=30) as client:
-            overpass = await client.post(
-                "https://overpass-api.de/api/interpreter", data={"data": query})
-            if overpass.status_code == 200:
+            data = await _overpass_query(client, query)
+            if data is not None:
                 results = []
-                for elem in overpass.json().get("elements", [])[:20]:
+                for elem in data.get("elements", [])[:20]:
                     tags = elem.get("tags", {})
                     center = elem.get("center", {})
                     results.append({
@@ -354,26 +372,49 @@ async def token_holders(address: str = Query(..., description="Token contract"),
 @app.get("/api/v1/token/price")
 async def token_price(address: str = Query(..., description="Token contract"),
                       chain: str = Query("ethereum", description="Blockchain")):
-    """Real-time USD price via CoinGecko free API (no key)."""
-    platform = COINGECKO_PLATFORM.get(chain.lower())
-    if not platform:
-        return _err(400, {"error": f"Unsupported chain: {chain}. "
-                                   f"Use: {sorted(COINGECKO_PLATFORM)}"})
+    """Real-time USD price: CoinGecko primary, DexScreener fallback (no keys)."""
     try:
         async with httpx.AsyncClient(timeout=15) as client:
-            r = await client.get(
-                f"https://api.coingecko.com/api/v3/simple/token_price/{platform}",
-                params={"contract_addresses": address, "vs_currencies": "usd",
-                        "include_24hr_change": "true"})
-            info = r.json().get(address.lower()) if r.status_code == 200 else None
-            if not info:
-                return _err(404, {"error": "Token not found on "
-                                           f"{chain} (CoinGecko)"})
-            return {"address": address, "chain": chain,
-                    "price_usd": info.get("usd"),
-                    "change_24h": info.get("usd_24h_change"),
-                    "vs_currency": "usd",
-                    "data_source": "coingecko", "fetched_at": _now()}
+            # Primary: CoinGecko (chain-specific).
+            platform = COINGECKO_PLATFORM.get(chain.lower())
+            if platform:
+                try:
+                    r = await client.get(
+                        f"https://api.coingecko.com/api/v3/simple/token_price/{platform}",
+                        params={"contract_addresses": address,
+                                "vs_currencies": "usd",
+                                "include_24hr_change": "true"})
+                    info = (r.json().get(address.lower())
+                            if r.status_code == 200 else None)
+                    if info and info.get("usd") is not None:
+                        return {"address": address, "chain": chain,
+                                "price_usd": info.get("usd"),
+                                "change_24h": info.get("usd_24h_change"),
+                                "vs_currency": "usd",
+                                "data_source": "coingecko",
+                                "fetched_at": _now()}
+                except Exception:
+                    pass
+            # Fallback: DexScreener (chain-agnostic, datacenter-friendly).
+            try:
+                r = await client.get(
+                    f"https://api.dexscreener.com/latest/dex/tokens/{address}",
+                    headers=UA)
+                if r.status_code == 200:
+                    pairs = r.json().get("pairs") or []
+                    if pairs:
+                        p0 = pairs[0]
+                        return {"address": address, "chain": chain,
+                                "price_usd": float(p0.get("priceUsd", 0)),
+                                "change_24h": (p0.get("priceChange") or {}).get("h24"),
+                                "dex": p0.get("dexId"),
+                                "vs_currency": "usd",
+                                "data_source": "dexscreener",
+                                "fetched_at": _now()}
+            except Exception:
+                pass
+            return _err(404, {"error": "Token not found (CoinGecko + DexScreener)",
+                              "address": address, "chain": chain})
     except Exception as e:
         return _err(500, {"error": str(e)})
 
