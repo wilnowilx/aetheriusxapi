@@ -28,7 +28,7 @@ def test_health_free():
     body = r.json()
     assert body["status"] == "alive"
     assert body["service"] == "aetheriusxAPI"
-    assert len(body["endpoints"]) == 11
+    assert len(body["endpoints"]) == 17
 
 
 @pytest.mark.parametrize("route", sorted(PRICES))
@@ -46,6 +46,12 @@ def test_paid_endpoints_require_payment(route):
         "/v1/email/validate": {"email": "user@example.com"},
         "/v1/data/weather": {"lat": 19.43, "lon": -99.13},
         "/v1/storage/drift": {"chain": "base", "layers": 1},
+        "/v1/defi/yields": {"limit": 2},
+        "/v1/defi/stablecoins": {"limit": 2},
+        "/v1/defi/fees": {"limit": 2},
+        "/v1/defi/bridges": {"limit": 2},
+        "/v1/forex/rates": {"base": "USD"},
+        "/v1/news/hackernews": {"kind": "top", "limit": 2},
     }
     r = client.get(route, params=params[route])
     assert r.status_code == 402

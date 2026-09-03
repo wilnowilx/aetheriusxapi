@@ -16,6 +16,12 @@ const SPECS = {
   "/v1/email/validate":[{n:"email",r:1,d:"user@example.com"}],
   "/v1/data/weather":  [{n:"lat",r:1,t:"n",d:"19.43"},{n:"lon",r:1,t:"n",d:"-99.13"}],
   "/v1/storage/drift": [{n:"chain",r:0,d:"base"},{n:"layers",r:0,t:"n",d:"2"}],
+  "/v1/defi/yields": [{n:"chain",r:0},{n:"project",r:0},{n:"limit",r:0,t:"n",d:"20"}],
+  "/v1/defi/stablecoins": [{n:"limit",r:0,t:"n",d:"30"}],
+  "/v1/defi/fees": [{n:"limit",r:0,t:"n",d:"20"}],
+  "/v1/defi/bridges": [{n:"limit",r:0,t:"n",d:"20"}],
+  "/v1/forex/rates": [{n:"base",r:0,d:"USD"},{n:"symbols",r:0,d:"EUR,MXN"}],
+  "/v1/news/hackernews": [{n:"kind",r:0,d:"top"},{n:"limit",r:0,t:"n",d:"10"}],
 };
 const FALLBACK_META = {
   "/v1/maps/search":"$0.01/call - Business search via OpenStreetMap",
@@ -29,6 +35,12 @@ const FALLBACK_META = {
   "/v1/email/validate":"$0.005/call - Email validation",
   "/v1/data/weather":"$0.008/call - Current weather",
   "/v1/storage/drift":"$0.02/call - Cross-RPC slot drift",
+  "/v1/defi/yields":"$0.02/call - Top yield pools",
+  "/v1/defi/stablecoins":"$0.01/call - Stablecoin list",
+  "/v1/defi/fees":"$0.015/call - Protocol fees",
+  "/v1/defi/bridges":"$0.01/call - Bridge volumes",
+  "/v1/forex/rates":"$0.008/call - Fiat FX rates",
+  "/v1/news/hackernews":"$0.01/call - HN stories",
 };
 
 const state = { health:null, selected:null };

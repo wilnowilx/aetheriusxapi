@@ -225,6 +225,27 @@ Capture a screenshot of a website.
 
 ---
 
+### DeFi (Llama, no keys)
+
+| Endpoint | Params | Price |
+|----------|--------|-------|
+| `GET /v1/defi/yields` | `chain`, `project`, `limit` (def. 20) | $0.02 |
+| `GET /v1/defi/stablecoins` | `limit` (def. 30) | $0.01 |
+| `GET /v1/defi/fees` | `limit` (def. 20) | $0.015 |
+| `GET /v1/defi/bridges` | `limit` (def. 20) | $0.01 |
+
+Top yield pools by TVL, stablecoin prices/circulation, protocol fee leaders,
+bridge volumes. Upstream failures return honest `502`, never mock data.
+
+### Forex & News (no keys)
+
+| Endpoint | Params | Price |
+|----------|--------|-------|
+| `GET /v1/forex/rates` | `base` (def. USD), `symbols` CSV | $0.008 |
+| `GET /v1/news/hackernews` | `kind` top/new/best, `limit` (def. 10) | $0.01 |
+
+ECB fiat rates via Frankfurter; HN stories with title/url/score via Firebase API.
+
 ### Data
 
 #### GET /v1/email/validate

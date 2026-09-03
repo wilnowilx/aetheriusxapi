@@ -109,6 +109,12 @@ PRICES = {
     "/v1/email/validate": "$0.005",
     "/v1/data/weather": "$0.008",
     "/v1/storage/drift": "$0.02",
+    "/v1/defi/yields": "$0.02",
+    "/v1/defi/stablecoins": "$0.01",
+    "/v1/defi/fees": "$0.015",
+    "/v1/defi/bridges": "$0.01",
+    "/v1/forex/rates": "$0.008",
+    "/v1/news/hackernews": "$0.01",
 }
 
 DESCRIPTIONS = {
@@ -123,6 +129,12 @@ DESCRIPTIONS = {
     "/v1/email/validate": "Email validation - syntax, MX, disposable, risk score",
     "/v1/data/weather": "Current weather by coordinates via Open-Meteo",
     "/v1/storage/drift": "Cross-RPC slot drift - which block number each layer sees",
+    "/v1/defi/yields": "Top DeFi yield pools by TVL via Llama",
+    "/v1/defi/stablecoins": "Stablecoin list with prices via Llama",
+    "/v1/defi/fees": "Protocol fees and revenue via Llama",
+    "/v1/defi/bridges": "Bridge volumes via Llama",
+    "/v1/forex/rates": "Fiat exchange rates via Frankfurter",
+    "/v1/news/hackernews": "Hacker News top stories with metadata",
 }
 
 # Public JSON-RPC endpoints used as independent observation layers.
@@ -158,6 +170,35 @@ async def validation_handler(request: Request, exc: RequestValidationError):
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+async def fetch_json(client: httpx.AsyncClient, url: str,
+                     params: dict | None = None,
+                     timeout: float = 15):
+    """GET JSON from an upstream. Returns (ok, payload). Never raises."""
+    try:
+        r = await client.get(url, params=params or {}, headers=UA,
+                             timeout=timeout)
+        if r.status_code == 200:
+            try:
+                return True, r.json()
+            except Exception:
+                return False, {"error": "Upstream returned non-JSON",
+                               "url": url}
+        return False, {"error": f"Upstream HTTP {r.status_code}", "url": url}
+    except Exception as e:
+        return False, {"error": str(e)[:200], "url": url}
+
+
+def pick(obj: dict, keep: tuple = ("name",),
+         contains: tuple = ("fee", "vol", "tvl", "revenue")) -> dict:
+    """Defensive row trimmer: keep listed keys + any key mentioning targets."""
+    row = {k: obj.get(k) for k in keep}
+    for k, v in obj.items():
+        kl = k.lower()
+        if any(t in kl for t in contains) and k not in row:
+            row[k] = v
+    return row
 
 
 def _err(status_code: int, payload: dict) -> JSONResponse:
@@ -767,6 +808,159 @@ async def storage_drift(chain: str = Query("base", description="Chain"),
                               "failed_layers": failed},
                     "data_source": "public-rpc",
                     "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+# === SPEC-DRIVEN PACK: DeFi + Forex + News (free upstreams, no keys) ===
+
+@app.get("/v1/defi/yields")
+@app.get("/api/v1/defi/yields")
+async def defi_yields(chain: str = Query("", description="Filter by chain"),
+                      project: str = Query("", description="Filter by project"),
+                      limit: int = Query(20, description="Max pools 1-100")):
+    """Top DeFi yield pools by TVL. Llama Yields, no key."""
+    limit = max(1, min(limit, 100))
+    try:
+        async with httpx.AsyncClient(timeout=25) as client:
+            ok, data = await fetch_json(client, "https://yields.llama.fi/pools")
+            if not ok:
+                return _err(502, data)
+            pools = data.get("data", []) if isinstance(data, dict) else []
+            if chain:
+                pools = [p for p in pools
+                         if str(p.get("chain", "")).lower() == chain.lower()]
+            if project:
+                pools = [p for p in pools
+                         if str(p.get("project", "")).lower() == project.lower()]
+            pools = sorted(pools, key=lambda p: float(p.get("tvlUsd") or 0),
+                           reverse=True)[:limit]
+            out = [{"pool": p.get("pool"), "chain": p.get("chain"),
+                    "project": p.get("project"), "symbol": p.get("symbol"),
+                    "apy": p.get("apy"), "tvlUsd": p.get("tvlUsd")}
+                   for p in pools]
+            return {"count": len(out), "chain": chain or "all",
+                    "project": project or "all", "pools": out,
+                    "data_source": "llama-yields", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/defi/stablecoins")
+@app.get("/api/v1/defi/stablecoins")
+async def defi_stablecoins(limit: int = Query(30, description="Max stables 1-100")):
+    """Stablecoins with prices and circulation. Llama, no key."""
+    limit = max(1, min(limit, 100))
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
+            ok, data = await fetch_json(
+                client, "https://stablecoins.llama.fi/stablecoins",
+                params={"includePrices": "true"})
+            if not ok:
+                return _err(502, data)
+            assets = data.get("peggedAssets", []) if isinstance(data, dict) else []
+            assets = sorted(assets,
+                            key=lambda a: float(a.get("circulating", {}).get("peggedUSD") or 0) if isinstance(a.get("circulating"), dict) else float(a.get("circulating") or 0),
+                            reverse=True)[:limit]
+            out = [{"name": a.get("name"), "symbol": a.get("symbol"),
+                    "price": (a.get("price") or {}).get("peggedUSD") if isinstance(a.get("price"), dict) else a.get("price"),
+                    "circulating_usd": (a.get("circulating") or {}).get("peggedUSD") if isinstance(a.get("circulating"), dict) else a.get("circulating"),
+                    "chains": a.get("chains", [])} for a in assets]
+            return {"count": len(out), "stables": out,
+                    "data_source": "llama-stablecoins", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/defi/fees")
+@app.get("/api/v1/defi/fees")
+async def defi_fees(limit: int = Query(20, description="Max protocols 1-100")):
+    """Protocol fees and revenue leaders. Llama, no key."""
+    limit = max(1, min(limit, 100))
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
+            ok, data = await fetch_json(
+                client, "https://api.llama.fi/overview/fees",
+                params={"excludeTotalDataChart": "true",
+                        "excludeTotalDataChartBreakdown": "true"})
+            if not ok:
+                return _err(502, data)
+            protos = data.get("protocols", []) if isinstance(data, dict) else []
+            return {"count": min(len(protos), limit),
+                    "protocols": [pick(p) for p in protos[:limit]],
+                    "data_source": "llama-fees", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/defi/bridges")
+@app.get("/api/v1/defi/bridges")
+async def defi_bridges(limit: int = Query(20, description="Max bridges 1-100")):
+    """Bridge volumes. Llama Bridges, no key."""
+    limit = max(1, min(limit, 100))
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
+            ok, data = await fetch_json(
+                client, "https://bridges.llama.fi/bridges",
+                params={"includeChains": "true"})
+            if not ok:
+                return _err(502, data)
+            bridges = data.get("bridges", []) if isinstance(data, dict) else []
+            return {"count": min(len(bridges), limit),
+                    "bridges": [pick(b) for b in bridges[:limit]],
+                    "data_source": "llama-bridges", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/forex/rates")
+@app.get("/api/v1/forex/rates")
+async def forex_rates(base: str = Query("USD", description="Base currency"),
+                      symbols: str = Query("", description="CSV targets, e.g. EUR,MXN")):
+    """Fiat exchange rates. Frankfurter (ECB data), no key."""
+    try:
+        params = {"base": base.upper()}
+        if symbols:
+            params["symbols"] = symbols.upper()
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(
+                client, "https://api.frankfurter.app/v1/latest", params=params)
+            if not ok:
+                return _err(502, data)
+            data["data_source"] = "frankfurter"
+            data["fetched_at"] = _now()
+            return data
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/news/hackernews")
+@app.get("/api/v1/news/hackernews")
+async def news_hackernews(kind: str = Query("top", description="top|new|best"),
+                          limit: int = Query(10, description="Max stories 1-25")):
+    """Hacker News stories with metadata. Firebase API, no key."""
+    if kind not in ("top", "new", "best"):
+        return _err(400, {"error": f"Invalid kind: {kind}. Use top|new|best"})
+    limit = max(1, min(limit, 25))
+    try:
+        async with httpx.AsyncClient(timeout=25) as client:
+            ok, ids = await fetch_json(
+                client, f"https://hacker-news.firebaseio.com/v0/{kind}stories.json")
+            if not ok or not isinstance(ids, list):
+                return _err(502, {"error": "HN API unavailable"})
+            async def one(iid: int):
+                ok2, item = await fetch_json(
+                    client, f"https://hacker-news.firebaseio.com/v0/item/{iid}.json")
+                if not ok2 or not isinstance(item, dict):
+                    return None
+                return {"id": item.get("id"), "title": item.get("title"),
+                        "url": item.get("url"), "score": item.get("score"),
+                        "by": item.get("by"), "time": item.get("time"),
+                        "descendants": item.get("descendants")}
+            items = [x for x in await asyncio.gather(
+                * [one(i) for i in ids[:limit]]) if x]
+            return {"kind": kind, "count": len(items), "stories": items,
+                    "data_source": "hacker-news", "fetched_at": _now()}
     except Exception as e:
         return _err(500, {"error": str(e)})
 
