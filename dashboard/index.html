@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>aetheriusxAPI — Control Room</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">AETHERIUS<span>X</span> <em>control room</em></div>
+  <div class="net" id="netBadge"><span class="dot"></span>connecting…</div>
+</header>
+
+<section class="statusbar" id="healthPanel">
+  <div><label>service</label><b id="hService">—</b></div>
+  <div><label>version</label><b id="hVersion">—</b></div>
+  <div><label>mode</label><b id="hMode">—</b></div>
+  <div><label>network</label><b id="hNetwork">—</b></div>
+  <div><label>wallet</label><b id="hWallet" title="">—</b></div>
+  <div><label>endpoints</label><b id="hEndpoints">—</b></div>
+</section>
+
+<main class="grid">
+  <section class="card catalog">
+    <h2>API Catalog</h2>
+    <div id="catalog" class="catalog-list"><p class="muted">Loading…</p></div>
+  </section>
+
+  <section class="card explorer">
+    <h2>Explorer <span class="muted" id="expRoute">select an endpoint</span></h2>
+    <form id="expForm" class="form"></form>
+    <div class="btnrow">
+      <button type="button" id="btnPay" class="btn primary" disabled>Execute (pay)</button>
+      <button type="button" id="btnFree" class="btn ghost" disabled>Show 402</button>
+    </div>
+    <div class="result-meta" id="resultMeta"></div>
+    <pre class="result" id="resultBox">{"hint": "Pick an endpoint from the catalog, fill params, hit Execute. Requests carry an X-PAYMENT header (simulated locally, real USDC on the live server)."}</pre>
+  </section>
+
+  <section class="card metrics">
+    <h2>Live Metrics</h2>
+    <div class="mrow"><span>calls this session</span><b id="mCalls">0</b></div>
+    <div class="mrow"><span>paid 200</span><b id="mOk">0</b></div>
+    <div class="mrow"><span>402 challenges</span><b id="m402">0</b></div>
+    <div class="mrow"><span>errors</span><b id="mErr">0</b></div>
+    <div class="mrow"><span>avg latency</span><b id="mAvg">—</b></div>
+    <div class="bars" id="latBars" title="last 12 call latencies"></div>
+  </section>
+
+  <section class="card wallet">
+    <h2>Wallet <span class="tag">demo</span></h2>
+    <p class="muted">Memory-only. Real x402 signing lands with the production client — keys never leave your machine.</p>
+    <div class="wrow">
+      <input id="walletInput" placeholder="0xYourWalletAddress" spellcheck="false">
+      <button type="button" id="btnWallet" class="btn primary">Connect</button>
+    </div>
+    <div class="mrow"><span>status</span><b id="wStatus">disconnected</b></div>
+    <div class="mrow"><span>address</span><b id="wAddr">—</b></div>
+  </section>
+
+  <section class="card drift">
+    <h2>Storage Drift <span class="tag">phase 2</span></h2>
+    <div id="driftBody"><p class="muted">Probing /v1/storage/drift…</p></div>
+    <pre class="result small">{"layers":[{"name":"ingress","slot":1842},{"name":"storage","slot":1845}],"drift":{"slot_delta":3,"status":"detected"}}</pre>
+  </section>
+
+  <section class="card activity">
+    <h2>Activity</h2>
+    <ul id="activity" class="activity"><li class="muted">No calls yet.</li></ul>
+  </section>
+</main>
+
+<footer> aetheriusxAPI control room · wallet is identity · USDC on Base · x402 </footer>
+<script src="app.js"></script>
+</body>
+</html>

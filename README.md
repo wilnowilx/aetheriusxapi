@@ -27,6 +27,7 @@
 - [Mental Model: How x402 Changes Everything](#mental-model-how-x402-changes-everything)
 - [Architecture](#architecture)
 - [Quick Start](#quick-start)
+- [Dashboard](#dashboard)
 - [Endpoints](#endpoints)
 - [Categories](#categories)
 - [Rate Limits](#rate-limits)
@@ -266,6 +267,26 @@ curl -X GET \
 
 ---
 
+## Dashboard
+
+Interactive control room (no build step, vanilla JS) served by the backend itself:
+
+```bash
+uvicorn main:app --reload --port 4020
+# open http://127.0.0.1:4020/dashboard/
+```
+
+- **API Catalog** — all 10 endpoints with live prices from `/health`
+- **Explorer** — param forms, one-click paid calls, `Show 402` renders the payment challenge
+- **Live Metrics** — session calls, 200s, 402s, errors, latency bars
+- **Wallet** — memory-only demo connect (real x402 signing in production client)
+- **Storage Drift** — probes `/v1/storage/drift`, shows planned payload until Phase 2
+- **Activity** — client-side call log
+
+Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
+
+---
+
 ## Endpoints
 
 | Endpoint | Description | Price | Latency |
@@ -349,14 +370,15 @@ curl -X GET \
 ## Roadmap
 
 ### Phase 1: Foundation (Current)
-- [x] Core API server with x402 middleware
-- [x] 10 production endpoints
-- [x] E2E payment flow tested on testnet
-- [x] Self-hosted facilitator code
+- [x] Core API server with x402 middleware (simulated + real modes)
+- [x] 10 endpoints, 8 with live upstream logic (no mocked data)
+- [x] E2E payment flow proven on testnet (6/6 → 200, real USDC settled)
+- [x] Upstream resilience (Overpass mirrors, 5-source price chain, Nominatim fallbacks)
+- [x] Interactive dashboard (`/dashboard/`) with API explorer
 - [x] Coinbase CDP API credentials
 - [x] Professional landing page
 - [ ] **Mainnet deployment** (pending ETH funding)
-- [ ] Base Builder Grant application
+- [ ] Base grant applications (Creator + Ecosystem Fund)
 
 ### Phase 2: Scale (Post-Grant)
 - [ ] Expand to 120+ endpoints

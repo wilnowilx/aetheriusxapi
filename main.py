@@ -33,6 +33,7 @@ import httpx
 from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from x402_middleware import SimulatedX402Middleware
 
@@ -209,7 +210,16 @@ async def health():
 @app.get("/")
 async def root():
     return {"service": "aetheriusxAPI", "version": VERSION,
-            "docs": "/docs", "health": "/health"}
+            "docs": "/docs", "health": "/health", "dashboard": "/dashboard/"}
+
+
+# Control-room dashboard (static, no build step). Mounted only if present
+# so unit/test checkouts without the folder still boot.
+if os.path.isdir(os.path.join(os.path.dirname(__file__), "dashboard")):
+    app.mount("/dashboard",
+              StaticFiles(directory=os.path.join(os.path.dirname(__file__),
+                                                 "dashboard"), html=True),
+              name="dashboard")
 
 
 # === MAPS (OpenStreetMap: Nominatim + Overpass, no key) ===

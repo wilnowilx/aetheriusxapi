@@ -127,6 +127,18 @@ def test_error_branches_return_json():
     assert "error" in r.json() or "title" in r.json()
 
 
+def test_dashboard_served():
+    import os
+    if not os.path.isdir(os.path.join(os.path.dirname(__file__), "..", "dashboard")):
+        pytest.skip("dashboard folder not present")
+    r = client.get("/dashboard/")
+    assert r.status_code == 200
+    assert "text/html" in r.headers["content-type"]
+    assert "control room" in r.text.lower()
+    r = client.get("/dashboard/app.js")
+    assert r.status_code == 200
+
+
 def test_live_email_valid_shape():
     r = client.get("/v1/email/validate", params={"email": "user@gmail.com"},
                    headers=PAID)

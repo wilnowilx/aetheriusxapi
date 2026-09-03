@@ -6,6 +6,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY main.py x402_middleware.py ./
+COPY dashboard ./dashboard
 
 ENV X402_MODE=simulated \
     PORT=4020 \
