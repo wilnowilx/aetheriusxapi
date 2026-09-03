@@ -1,0 +1,497 @@
+"""aetheriusxAPI — unified backend.
+
+Crypto-native API marketplace: AI agents pay per request in USDC on Base
+via the x402 protocol. No accounts, no API keys — the wallet is the identity.
+
+MODES (env X402_MODE, default "simulated"):
+  - simulated : any non-empty X-PAYMENT header passes (local dev / tests).
+  - real       : official x402 SDK middleware verifies USDC on-chain via a
+                 facilitator (production on sentinel-v4).
+
+Routes are served under BOTH /v1/* (canonical, per docs/API.md) and
+/api/v1/* (legacy prefix already live behind nginx) so existing clients
+keep working.
+
+Endpoints with live upstream logic (no API key needed):
+  maps/search, maps/reviews, maps/nearby  (OpenStreetMap Nominatim+Overpass)
+  token/analyze                            (Etherscan contract verification)
+  token/price                              (CoinGecko free API)
+  web/scrape                               (direct fetch + parse)
+  web/screenshot                           (WordPress mShots proxy, no browser)
+  email/validate                           (syntax + MX + disposable check)
+  data/weather                             (Open-Meteo free API)
+Key-gated:
+  token/holders                            (needs ETHERSCAN_API_KEY, else 501)
+"""
+
+import os
+import re
+import subprocess
+from datetime import datetime, timezone
+
+import httpx
+from fastapi import FastAPI, Query, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+
+from x402_middleware import SimulatedX402Middleware
+
+# === CONFIG (env-overridable, safe defaults) ===
+PAY_TO = os.getenv(
+    "AETHERIUS_WALLET", "0x677B483128D0399bCD0A5AB36eE990C0246d7f61"
+)
+NETWORK = os.getenv("AETHERIUS_NETWORK", "eip155:84532")  # Base Sepolia testnet
+CURRENCY = "USDC"
+X402_MODE = os.getenv("X402_MODE", "simulated").lower()
+FACILITATOR_URL = os.getenv("FACILITATOR_URL", "https://x402.org/facilitator")
+ETHERSCAN_API_KEY = os.getenv("ETHERSCAN_API_KEY", "")
+VERSION = "2.0.0"
+
+UA = {"User-Agent": "aetheriusxAPI/2.0 (AI Agent)"}
+
+# Canonical route -> price (USD). Served under /v1/* AND /api/v1/*.
+PRICES = {
+    "/v1/maps/search": "$0.01",
+    "/v1/maps/reviews": "$0.02",
+    "/v1/maps/nearby": "$0.015",
+    "/v1/token/analyze": "$0.02",
+    "/v1/token/holders": "$0.03",
+    "/v1/token/price": "$0.005",
+    "/v1/web/scrape": "$0.01",
+    "/v1/web/screenshot": "$0.025",
+    "/v1/email/validate": "$0.005",
+    "/v1/data/weather": "$0.008",
+}
+
+DESCRIPTIONS = {
+    "/v1/maps/search": "Business search via OpenStreetMap - names, addresses, phones, coords",
+    "/v1/maps/reviews": "Place lookup via OpenStreetMap - coords, type, importance",
+    "/v1/maps/nearby": "Nearby places by coordinates via OpenStreetMap",
+    "/v1/token/analyze": "Token contract analysis - verification, ABI, risk score",
+    "/v1/token/holders": "Token holder distribution (requires ETHERSCAN_API_KEY)",
+    "/v1/token/price": "Real-time token price via CoinGecko",
+    "/v1/web/scrape": "Web scraper - structured content as JSON",
+    "/v1/web/screenshot": "Website screenshot URL (mShots proxy, no browser needed)",
+    "/v1/email/validate": "Email validation - syntax, MX, disposable, risk score",
+    "/v1/data/weather": "Current weather by coordinates via Open-Meteo",
+}
+
+# === APP ===
+app = FastAPI(
+    title="aetheriusxAPI",
+    description="Crypto-native API marketplace. AI agents pay per request in USDC on Base via x402.",
+    version=VERSION,
+)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_handler(request: Request, exc: RequestValidationError):
+    """Return docs-compliant 400 instead of FastAPI's default 422."""
+    missing = [".".join(map(str, e["loc"][1:])) or e["loc"][0]
+               for e in exc.errors() if e["type"] == "missing"]
+    detail = (f"Missing required parameter: {', '.join(missing)}"
+              if missing else "Invalid request parameters")
+    return JSONResponse(status_code=400, content={"error": detail})
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _paid_routes_for_sdk(prefix: str) -> dict:
+    """Build official-SDK route table lazily (imported only in real mode)."""
+    from x402.http.types import RouteConfig
+    from x402.http import PaymentOption
+
+    table = {}
+    for canonical, price in PRICES.items():
+        route = prefix + canonical[len("/v1"):]  # /v1/x -> {prefix}/x
+        table[f"GET {route}"] = RouteConfig(
+            accepts=[PaymentOption(scheme="exact", pay_to=PAY_TO,
+                                   price=price, network=NETWORK)],
+            description=DESCRIPTIONS[canonical],
+            mime_type="application/json",
+        )
+    return table
+
+
+if X402_MODE == "real":
+    try:
+        from x402.http import FacilitatorConfig, HTTPFacilitatorClient
+        from x402.http.middleware.fastapi import PaymentMiddlewareASGI
+        from x402.mechanisms.evm.exact import ExactEvmServerScheme
+        from x402.server import x402ResourceServer
+
+        _facilitator = HTTPFacilitatorClient(FacilitatorConfig(url=FACILITATOR_URL))
+        _server = x402ResourceServer(_facilitator)
+        _server.register(NETWORK, ExactEvmServerScheme())
+        _routes = {}
+        _routes.update(_paid_routes_for_sdk("/v1"))
+        _routes.update(_paid_routes_for_sdk("/api/v1"))
+        app.add_middleware(PaymentMiddlewareASGI, routes=_routes, server=_server)
+        print(f"[x402] REAL mode: {len(_routes)} paid routes on {NETWORK}", flush=True)
+    except ImportError as e:
+        print(f"[x402] SDK missing ({e}); falling back to SIMULATED mode", flush=True)
+        app.add_middleware(SimulatedX402Middleware, prices=PRICES,
+                           pay_to=PAY_TO, network=NETWORK, currency=CURRENCY)
+else:
+    app.add_middleware(SimulatedX402Middleware, prices=PRICES,
+                       pay_to=PAY_TO, network=NETWORK, currency=CURRENCY)
+    print("[x402] SIMULATED mode: pass any X-PAYMENT header", flush=True)
+
+
+# === FREE ROUTES ===
+
+@app.get("/health")
+@app.get("/api/v1/health")
+async def health():
+    return {
+        "status": "alive",
+        "service": "aetheriusxAPI",
+        "version": VERSION,
+        "mode": X402_MODE,
+        "network": NETWORK,
+        "currency": CURRENCY,
+        "wallet": PAY_TO,
+        "timestamp": _now(),
+        "endpoints": {k: f"{v}/call - {DESCRIPTIONS[k]}"
+                      for k, v in PRICES.items()},
+    }
+
+
+@app.get("/")
+async def root():
+    return {"service": "aetheriusxAPI", "version": VERSION,
+            "docs": "/docs", "health": "/health"}
+
+
+# === MAPS (OpenStreetMap: Nominatim + Overpass, no key) ===
+
+async def _geocode(client: httpx.AsyncClient, location: str):
+    resp = await client.get(
+        "https://nominatim.openstreetmap.org/search",
+        params={"q": location, "format": "json", "limit": 1},
+        headers=UA,
+    )
+    if resp.status_code == 200 and resp.json():
+        g = resp.json()[0]
+        return g["lat"], g["lon"]
+    return "19.4326", "-99.1332"  # Mexico City fallback
+
+
+@app.get("/v1/maps/search")
+@app.get("/api/v1/maps/search")
+async def maps_search(q: str = Query(..., description="Search query"),
+                      location: str = Query("Mexico", description="Location")):
+    """Business search. Names, addresses, phones, websites, coordinates."""
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            lat, lon = await _geocode(client, location)
+            query = (f'[out:json][timeout:25];(node["name"~"{q}",i]'
+                     f'(around:5000,{lat},{lon});way["name"~"{q}",i]'
+                     f'(around:5000,{lat},{lon}););out center body;')
+            overpass = await client.post(
+                "https://overpass-api.de/api/interpreter", data={"data": query})
+            if overpass.status_code == 200:
+                results = []
+                for elem in overpass.json().get("elements", [])[:20]:
+                    tags = elem.get("tags", {})
+                    center = elem.get("center", {})
+                    results.append({
+                        "name": tags.get("name", "Unknown"),
+                        "address": (tags.get("addr:street", "") + " "
+                                    + tags.get("addr:housenumber", "")).strip(),
+                        "phone": tags.get("phone", tags.get("contact:phone", "")),
+                        "website": tags.get("website", ""),
+                        "lat": elem.get("lat", center.get("lat")),
+                        "lon": elem.get("lon", center.get("lon")),
+                    })
+                return {"query": q, "location": location,
+                        "count": len(results), "results": results}
+            return JSONResponse(502, {"error": "Overpass API unavailable"})
+    except Exception as e:
+        return JSONResponse(500, {"error": str(e)})
+
+
+@app.get("/v1/maps/reviews")
+@app.get("/api/v1/maps/reviews")
+async def maps_reviews(place_name: str = Query(..., description="Place name")):
+    """Place info lookup. Display name, coordinates, type, importance."""
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
+            resp = await client.get(
+                "https://nominatim.openstreetmap.org/search",
+                params={"q": place_name, "format": "json", "limit": 5},
+                headers=UA,
+            )
+            if resp.status_code == 200:
+                results = [{"name": p.get("display_name", ""),
+                            "lat": p.get("lat"), "lon": p.get("lon"),
+                            "type": p.get("type"),
+                            "importance": p.get("importance")}
+                           for p in resp.json()]
+                return {"query": place_name, "count": len(results),
+                        "results": results}
+            return JSONResponse(502, {"error": "Nominatim unavailable"})
+    except Exception as e:
+        return JSONResponse(500, {"error": str(e)})
+
+
+@app.get("/v1/maps/nearby")
+@app.get("/api/v1/maps/nearby")
+async def maps_nearby(lat: float = Query(..., description="Latitude"),
+                      lon: float = Query(..., description="Longitude"),
+                      radius: int = Query(1000, description="Radius in meters"),
+                      category: str = Query("", description="amenity/shop filter")):
+    """Nearby named places around coordinates, optional category filter."""
+    try:
+        radius = max(50, min(radius, 10000))
+        if category:
+            selector = (f'node["amenity"~"{category}",i](around:{radius},{lat},{lon});'
+                        f'way["amenity"~"{category}",i](around:{radius},{lat},{lon});'
+                        f'node["shop"~"{category}",i](around:{radius},{lat},{lon});')
+        else:
+            selector = (f'node["name"](around:{radius},{lat},{lon});'
+                        f'way["name"](around:{radius},{lat},{lon});')
+        query = f"[out:json][timeout:25];({selector});out center body;"
+        async with httpx.AsyncClient(timeout=30) as client:
+            overpass = await client.post(
+                "https://overpass-api.de/api/interpreter", data={"data": query})
+            if overpass.status_code == 200:
+                results = []
+                for elem in overpass.json().get("elements", [])[:20]:
+                    tags = elem.get("tags", {})
+                    center = elem.get("center", {})
+                    results.append({
+                        "name": tags.get("name", "Unknown"),
+                        "category": tags.get("amenity", tags.get("shop", "")),
+                        "lat": elem.get("lat", center.get("lat")),
+                        "lon": elem.get("lon", center.get("lon")),
+                    })
+                return {"lat": lat, "lon": lon, "radius": radius,
+                        "category": category or "all",
+                        "count": len(results), "results": results}
+            return JSONResponse(502, {"error": "Overpass API unavailable"})
+    except Exception as e:
+        return JSONResponse(500, {"error": str(e)})
+
+
+# === CRYPTO ===
+
+CHAINIDS = {"ethereum": 1, "base": 8453, "optimism": 10,
+            "arbitrum": 42161, "polygon": 137}
+COINGECKO_PLATFORM = {"ethereum": "ethereum", "base": "base",
+                      "optimism": "optimistic-ethereum",
+                      "arbitrum": "arbitrum-one", "polygon": "polygon-pos"}
+
+
+@app.get("/v1/token/analyze")
+@app.get("/api/v1/token/analyze")
+async def token_analyze(address: str = Query(..., description="Token contract"),
+                        chain: str = Query("ethereum", description="Blockchain")):
+    """Contract analysis: Etherscan verification + heuristic risk score."""
+    try:
+        result = {"address": address, "chain": chain,
+                  "analyzed_at": _now(), "checks": {}}
+        if chain.lower() in ("ethereum", "base", "optimism", "arbitrum"):
+            async with httpx.AsyncClient(timeout=15) as client:
+                vr = await client.get(
+                    "https://api.etherscan.io/api",
+                    params={"module": "contract", "action": "getabi",
+                            "address": address, "tag": "latest"})
+                if vr.status_code == 200:
+                    data = vr.json()
+                    result["checks"]["verified"] = data.get("status") == "1"
+                    result["checks"]["has_abi"] = data.get("status") == "1"
+        risk = 50
+        if result["checks"].get("verified"):
+            risk -= 20
+        if not result["checks"].get("has_abi"):
+            risk += 30
+        result["risk_score"] = max(0, min(100, risk))
+        result["risk_level"] = ("low" if risk < 30
+                                else "medium" if risk < 60 else "high")
+        return result
+    except Exception as e:
+        return JSONResponse(500, {"error": str(e), "address": address})
+
+
+@app.get("/v1/token/holders")
+@app.get("/api/v1/token/holders")
+async def token_holders(address: str = Query(..., description="Token contract"),
+                        chain: str = Query("ethereum", description="Blockchain")):
+    """Holder distribution. Requires ETHERSCAN_API_KEY env var."""
+    if not ETHERSCAN_API_KEY:
+        return JSONResponse(501, {
+            "error": "token/holders requires an Etherscan API key",
+            "how": "Set ETHERSCAN_API_KEY env var (free at etherscan.io/apis).",
+            "address": address, "chain": chain})
+    try:
+        chainid = CHAINIDS.get(chain.lower(), 1)
+        async with httpx.AsyncClient(timeout=20) as client:
+            r = await client.get(
+                "https://api.etherscan.io/v2/api",
+                params={"chainid": chainid, "module": "token",
+                        "action": "tokenholderlist",
+                        "contractaddress": address, "page": 1, "offset": 20,
+                        "apikey": ETHERSCAN_API_KEY})
+            data = r.json()
+            if data.get("status") == "1":
+                return {"address": address, "chain": chain,
+                        "count": len(data["result"]),
+                        "holders": data["result"], "fetched_at": _now()}
+            return JSONResponse(502, {"error": data.get("message", "Etherscan error")})
+    except Exception as e:
+        return JSONResponse(500, {"error": str(e)})
+
+
+@app.get("/v1/token/price")
+@app.get("/api/v1/token/price")
+async def token_price(address: str = Query(..., description="Token contract"),
+                      chain: str = Query("ethereum", description="Blockchain")):
+    """Real-time USD price via CoinGecko free API (no key)."""
+    platform = COINGECKO_PLATFORM.get(chain.lower())
+    if not platform:
+        return JSONResponse(400, {"error": f"Unsupported chain: {chain}. "
+                                           f"Use: {sorted(COINGECKO_PLATFORM)}"})
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            r = await client.get(
+                f"https://api.coingecko.com/api/v3/simple/token_price/{platform}",
+                params={"contract_addresses": address, "vs_currencies": "usd",
+                        "include_24hr_change": "true"})
+            info = r.json().get(address.lower()) if r.status_code == 200 else None
+            if not info:
+                return JSONResponse(404, {"error": "Token not found on "
+                                                   f"{chain} (CoinGecko)"})
+            return {"address": address, "chain": chain,
+                    "price_usd": info.get("usd"),
+                    "change_24h": info.get("usd_24h_change"),
+                    "vs_currency": "usd",
+                    "data_source": "coingecko", "fetched_at": _now()}
+    except Exception as e:
+        return JSONResponse(500, {"error": str(e)})
+
+
+# === WEB ===
+
+@app.get("/v1/web/scrape")
+@app.get("/api/v1/web/scrape")
+async def web_scrape(url: str = Query(..., description="URL to scrape")):
+    """Fetch a page, return title, text preview, links, content length."""
+    try:
+        async with httpx.AsyncClient(timeout=20, follow_redirects=True) as client:
+            resp = await client.get(url, headers=UA)
+            if resp.status_code != 200:
+                return JSONResponse(resp.status_code,
+                                    {"error": f"HTTP {resp.status_code}",
+                                     "url": url})
+            content = resp.text[:50000]
+            m = re.search(r"<title[^>]*>(.*?)</title>", content,
+                          re.IGNORECASE | re.DOTALL)
+            title = m.group(1).strip() if m else ""
+            text = re.sub(r"<script[^>]*>.*?</script>", "", content,
+                          flags=re.DOTALL | re.IGNORECASE)
+            text = re.sub(r"<style[^>]*>.*?</style>", "", text,
+                          flags=re.DOTALL | re.IGNORECASE)
+            text = re.sub(r"<[^>]+>", " ", text)
+            text = re.sub(r"\s+", " ", text).strip()[:10000]
+            links = re.findall(r'href=["\']([^"\' ]+)["\']', content)[:50]
+            return {"url": url, "status": resp.status_code, "title": title,
+                    "text_preview": text[:2000], "links_count": len(links),
+                    "links": links[:20], "content_length": len(content)}
+    except Exception as e:
+        return JSONResponse(500, {"error": str(e), "url": url})
+
+
+@app.get("/v1/web/screenshot")
+@app.get("/api/v1/web/screenshot")
+async def web_screenshot(url: str = Query(..., description="URL to capture"),
+                         width: int = Query(1280, description="Viewport width"),
+                         height: int = Query(720, description="Viewport height")):
+    """Screenshot via WordPress mShots proxy (no headless browser needed)."""
+    width = max(320, min(width, 1920))
+    height = max(240, min(height, 1080))
+    shot = f"https://s0.wp.com/mshots/v1/{httpx.QueryParams({'u': url})['u']}?w={width}"
+    return {"url": url, "width": width, "height": height,
+            "screenshot_url": shot,
+            "note": "Rendered on demand by WordPress mShots; allow a few "
+                    "seconds on first load.",
+            "data_source": "mshots"}
+
+
+# === DATA ===
+
+DISPOSABLE = {"tempmail.com", "guerrillamail.com", "mailinator.com",
+              "yopmail.com", "throwaway.email", "temp-mail.org",
+              "10minutemail.com", "sharklasers.com", "dispostable.com",
+              "trashmail.com", "fakeinbox.com"}
+
+
+@app.get("/v1/email/validate")
+@app.get("/api/v1/email/validate")
+async def email_validate(email: str = Query(..., description="Email address")):
+    """Syntax + MX record + disposable-domain check with risk score."""
+    result = {"email": email, "valid_syntax": False, "has_mx": False,
+              "is_disposable": False, "risk_score": 0}
+    if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email):
+        result.update(risk_score=100, verdict="invalid_syntax")
+        return result
+    result["valid_syntax"] = True
+    domain = email.split("@")[1]
+    try:
+        mx = subprocess.run(["nslookup", "-type=mx", domain],
+                            capture_output=True, text=True, timeout=8)
+        out = mx.stdout.lower()
+        result["has_mx"] = ("mail exchanger" in out or "mx preference" in out
+                            or "mx record" in out)
+    except Exception:
+        result["has_mx"] = None
+    result["is_disposable"] = domain.lower() in DISPOSABLE
+    score = 0
+    if not result["has_mx"]:
+        score += 40
+    if result["is_disposable"]:
+        score += 50
+    result["risk_score"] = min(100, score)
+    result["verdict"] = ("valid" if score < 20
+                         else "risky" if score < 50 else "invalid")
+    return result
+
+
+@app.get("/v1/data/weather")
+@app.get("/api/v1/data/weather")
+async def weather(lat: float = Query(..., description="Latitude"),
+                  lon: float = Query(..., description="Longitude")):
+    """Current weather via Open-Meteo free API (no key)."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            r = await client.get(
+                "https://api.open-meteo.com/v1/forecast",
+                params={"latitude": lat, "longitude": lon,
+                        "current": "temperature_2m,relative_humidity_2m,"
+                                   "apparent_temperature,weather_code,"
+                                   "wind_speed_10m",
+                        "timezone": "auto"})
+            if r.status_code != 200:
+                return JSONResponse(502, {"error": "Open-Meteo unavailable"})
+            d = r.json()
+            return {"lat": lat, "lon": lon,
+                    "timezone": d.get("timezone"),
+                    "current": d.get("current", {}),
+                    "data_source": "open-meteo", "fetched_at": _now()}
+    except Exception as e:
+        return JSONResponse(500, {"error": str(e)})
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    port = int(os.getenv("PORT", "4020"))
+    print("=== aetheriusxAPI Starting ===")
+    print(f"Version: {VERSION} | Mode: {X402_MODE} | Network: {NETWORK}")
+    print(f"Wallet: {PAY_TO} | Port: {port}")
+    for route, price in PRICES.items():
+        print(f"GET {route:<24} {price}/call  (+ legacy /api{route})")
+    print("==============================")
+    uvicorn.run(app, host="0.0.0.0", port=port)

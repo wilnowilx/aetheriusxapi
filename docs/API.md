@@ -314,4 +314,4 @@ All errors follow the x402 standard:
 ## Support
 
 - Twitter: [@aetheriusxAPI](https://x.com/aetheriusxAPI)
-- GitHub: [wilnowilx/aetheriusx-api-site](https://github.com/wilnowilx/aetheriusx-api-site)
+- GitHub: [wilnowilx/aetheriusxapi](https://github.com/wilnowilx/aetheriusxapi)
