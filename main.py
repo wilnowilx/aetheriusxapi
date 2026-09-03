@@ -523,18 +523,23 @@ async def token_analyze(address: str = Query(..., description="Token contract"),
     try:
         result = {"address": address, "chain": chain,
                   "analyzed_at": _now(), "checks": {}}
-        if chain.lower() in ("ethereum", "base", "optimism", "arbitrum"):
+        chainid = CHAINIDS.get(chain.lower())
+        if chainid:
             async with httpx.AsyncClient(timeout=15) as client:
-                _params = {"module": "contract", "action": "getabi",
-                           "address": address, "tag": "latest"}
+                _params = {"chainid": chainid, "module": "contract",
+                           "action": "getabi", "address": address,
+                           "tag": "latest"}
                 if ETHERSCAN_API_KEY:
                     _params["apikey"] = ETHERSCAN_API_KEY
-                vr = await client.get("https://api.etherscan.io/api",
-                                      params=_params)
-                if vr.status_code == 200:
-                    data = vr.json()
-                    result["checks"]["verified"] = data.get("status") == "1"
-                    result["checks"]["has_abi"] = data.get("status") == "1"
+                try:
+                    vr = await client.get("https://api.etherscan.io/v2/api",
+                                          params=_params)
+                    if vr.status_code == 200:
+                        data = vr.json()
+                        result["checks"]["verified"] = data.get("status") == "1"
+                        result["checks"]["has_abi"] = data.get("status") == "1"
+                except Exception:
+                    pass
         risk = 50
         if result["checks"].get("verified"):
             risk -= 20
@@ -1248,11 +1253,12 @@ async def token_gas(chain: str = Query("ethereum", description="ethereum only"))
         return _err(400, {"error": "Gas oracle supports ethereum only"})
     try:
         async with httpx.AsyncClient(timeout=15) as client:
-            _gparams = {"module": "gastracker", "action": "gasoracle"}
+            _gparams = {"chainid": 1, "module": "gastracker",
+                        "action": "gasoracle"}
             if ETHERSCAN_API_KEY:
                 _gparams["apikey"] = ETHERSCAN_API_KEY
-            ok, data = await fetch_json(client, "https://api.etherscan.io/api",
-                                        params=_gparams)
+            ok, data = await fetch_json(client,
+                "https://api.etherscan.io/v2/api", params=_gparams)
             if ok and data.get("status") == "1":
                 r = data.get("result", {})
                 return {"chain": "ethereum",
@@ -1440,13 +1446,18 @@ async def data_words(word: str = Query(..., description="Seed word"),
 @app.get("/v1/maps/geocode")
 @app.get("/api/v1/maps/geocode")
 async def maps_geocode(q: str = Query(..., description="Place to geocode"),
-                       limit: int = Query(5, description="Max 1-10")):
-    """Forward geocode via Photon (Komoot/OSM), no key."""
+                       limit: int = Query(5, description="Max 1-10"),
+                       lat: float | None = Query(None, description="Bias lat"),
+                       lon: float | None = Query(None, description="Bias lon")):
+    """Forward geocode via Photon (Komoot/OSM), no key. Pass lat/lon to bias."""
     limit = max(1, min(limit, 10))
     try:
+        params = {"q": q, "limit": limit}
+        if lat is not None and lon is not None:
+            params.update({"lat": lat, "lon": lon})
         async with httpx.AsyncClient(timeout=15) as client:
             ok, data = await fetch_json(client, "https://photon.komoot.io/api/",
-                                        params={"q": q, "limit": limit})
+                                        params=params)
             if not ok:
                 return _err(502, data)
             out = []
@@ -1470,36 +1481,57 @@ async def token_global():
         async with httpx.AsyncClient(timeout=15) as client:
             ok, data = await fetch_json(client,
                 "https://api.coingecko.com/api/v3/global")
-            if not ok:
-                return _err(502, data)
-            d = data.get("data", {}) if isinstance(data, dict) else {}
-            return {"total_market_cap_usd": (d.get("total_market_cap") or {}).get("usd"),
-                    "btc_dominance": (d.get("market_cap_percentage") or {}).get("btc"),
-                    "eth_dominance": (d.get("market_cap_percentage") or {}).get("eth"),
-                    "active_cryptos": d.get("active_cryptocurrencies"),
-                    "data_source": "coingecko", "fetched_at": _now()}
+            if ok:
+                d = data.get("data", {}) if isinstance(data, dict) else {}
+                return {"total_market_cap_usd": (d.get("total_market_cap") or {}).get("usd"),
+                        "btc_dominance": (d.get("market_cap_percentage") or {}).get("btc"),
+                        "eth_dominance": (d.get("market_cap_percentage") or {}).get("eth"),
+                        "active_cryptos": d.get("active_cryptocurrencies"),
+                        "data_source": "coingecko", "fetched_at": _now()}
+            ok2, cp = await fetch_json(client,
+                "https://api.coinpaprika.com/v1/global")
+            if ok2 and isinstance(cp, dict):
+                return {"total_market_cap_usd": cp.get("market_cap_usd"),
+                        "volume_24h_usd": cp.get("volume_24h_usd"),
+                        "btc_dominance": (cp.get("bitcoin_dominance_percentage") or 0) / 100 if cp.get("bitcoin_dominance_percentage") else None,
+                        "active_cryptos": cp.get("cryptocurrencies_number"),
+                        "data_source": "coinpaprika", "fetched_at": _now()}
+            return _err(502, {"error": "Global stats unavailable (CG + Paprika)"})
     except Exception as e:
         return _err(500, {"error": str(e)})
 
 
 @app.get("/v1/token/balance")
 @app.get("/api/v1/token/balance")
-async def token_balance(address: str = Query(..., description="Wallet address")):
-    """ETH balance of any wallet. Etherscan (+key quota), no signup."""
+async def token_balance(address: str = Query(..., description="Wallet address"),
+                        chain: str = Query("ethereum", description="Chain")):
+    """Native balance of any wallet. Etherscan V2 (+key) then Blockscout."""
     try:
-        params = {"module": "account", "action": "balance",
+        chainid = CHAINIDS.get(chain.lower(), 1)
+        params = {"chainid": chainid, "module": "account", "action": "balance",
                   "address": address, "tag": "latest"}
         if ETHERSCAN_API_KEY:
             params["apikey"] = ETHERSCAN_API_KEY
         async with httpx.AsyncClient(timeout=15) as client:
-            ok, data = await fetch_json(client, "https://api.etherscan.io/api",
-                                        params=params)
-            if not ok or data.get("status") != "1":
-                return _err(502, {"error": "Etherscan balance unavailable"})
-            wei = int(data.get("result", "0"))
-            return {"address": address, "balance_wei": str(wei),
-                    "balance_eth": wei / 1e18,
-                    "data_source": "etherscan", "fetched_at": _now()}
+            ok, data = await fetch_json(client,
+                "https://api.etherscan.io/v2/api", params=params)
+            if ok and data.get("status") == "1":
+                wei = int(data.get("result", "0"))
+                return {"address": address, "chain": chain.lower(),
+                        "balance_wei": str(wei), "balance_eth": wei / 1e18,
+                        "data_source": "etherscan-v2", "fetched_at": _now()}
+            bs = BLOCKSCOUT.get(chain.lower())
+            if bs:
+                ok2, b = await fetch_json(client,
+                    f"{bs}/api/v2/addresses/{address}")
+                if ok2 and b.get("coin_balance") is not None:
+                    wei = int(b["coin_balance"])
+                    return {"address": address, "chain": chain.lower(),
+                            "balance_wei": str(wei),
+                            "balance_eth": wei / 1e18,
+                            "ens": b.get("ens_domain_name"),
+                            "data_source": "blockscout", "fetched_at": _now()}
+            return _err(502, {"error": "Balance sources unavailable"})
     except Exception as e:
         return _err(500, {"error": str(e)})
 
@@ -1507,18 +1539,20 @@ async def token_balance(address: str = Query(..., description="Wallet address"))
 @app.get("/v1/token/transactions")
 @app.get("/api/v1/token/transactions")
 async def token_transactions(address: str = Query(..., description="Wallet"),
-                             limit: int = Query(10, description="Max 1-25")):
-    """Recent normal transactions of a wallet. Etherscan (+key quota)."""
+                             limit: int = Query(10, description="Max 1-25"),
+                             chain: str = Query("ethereum", description="Chain")):
+    """Recent transactions of a wallet. Etherscan V2 (+key), multi-chain."""
     limit = max(1, min(limit, 25))
     try:
-        params = {"module": "account", "action": "txlist", "address": address,
+        params = {"chainid": CHAINIDS.get(chain.lower(), 1),
+                  "module": "account", "action": "txlist", "address": address,
                   "startblock": 0, "endblock": 99999999, "page": 1,
                   "offset": limit, "sort": "desc"}
         if ETHERSCAN_API_KEY:
             params["apikey"] = ETHERSCAN_API_KEY
         async with httpx.AsyncClient(timeout=20) as client:
-            ok, data = await fetch_json(client, "https://api.etherscan.io/api",
-                                        params=params)
+            ok, data = await fetch_json(client,
+                "https://api.etherscan.io/v2/api", params=params)
             if not ok or data.get("status") != "1":
                 return _err(502, {"error": "Etherscan txlist unavailable"})
             out = [{"hash": t.get("hash"), "from": t.get("from"),
@@ -1563,10 +1597,11 @@ async def forex_convert(from_: str = Query("USD", alias="from",
                         amount: float = Query(1.0, description="Amount")):
     """Currency conversion. Frankfurter, no key."""
     try:
-        async with httpx.AsyncClient(timeout=15) as client:
+        async with httpx.AsyncClient(timeout=25) as client:
             ok, data = await fetch_json(client,
                 "https://api.frankfurter.dev/v1/latest",
-                params={"amount": amount, "from": from_.upper(), "to": to.upper()})
+                params={"amount": amount, "from": from_.upper(), "to": to.upper()},
+                timeout=25)
             if not ok:
                 return _err(502, data)
             rates = data.get("rates", {}) if isinstance(data, dict) else {}
