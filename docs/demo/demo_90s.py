@@ -36,6 +36,10 @@ if len(KEY) < 32:
 
 T0 = time.monotonic()
 
+# Modo escena: DEMO_STEP=1 detiene el guion entre bloques esperando ENTER.
+# Ideal para grabar (repites escenas, marcas tu propio ritmo, nada se escapa).
+STEP = os.getenv("DEMO_STEP", "") not in ("", "0", "false")
+
 
 def beat(n, total, title):
     print(f"\n{'=' * 56}"
@@ -44,7 +48,13 @@ def beat(n, total, title):
 
 
 def pause(s=2.5):
-    time.sleep(s)
+    if STEP:
+        try:
+            input("  ▶ ENTER para la siguiente escena…")
+        except EOFError:
+            pass
+    else:
+        time.sleep(s)
 
 
 w3 = Web3(Web3.HTTPProvider("https://sepolia.base.org"))
