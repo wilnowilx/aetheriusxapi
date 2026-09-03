@@ -1145,16 +1145,24 @@ async def defi_stablecoinchains(limit: int = Query(20, description="Max 1-100"))
                 return _err(502, data if isinstance(data, dict)
                             else {"error": "Llama stablecoin chains unavailable"})
 
-            def _num(r):
-                return max([float(v) for v in r.values()
-                            if isinstance(v, (int, float))], default=0)
+            def _circ(c):
+                for k in ("totalCirculatingUSD", "totalCirculating"):
+                    v = c.get(k)
+                    if isinstance(v, dict):
+                        v = v.get("peggedUSD")
+                    try:
+                        if v is not None:
+                            return float(v)
+                    except (TypeError, ValueError):
+                        pass
+                return 0.0
 
             rows = []
             for c in data:
                 if isinstance(c, dict):
-                    rows.append({k: v for k, v in c.items()
-                                 if isinstance(v, (int, float, str))})
-            rows.sort(key=_num, reverse=True)
+                    rows.append({"chain": c.get("name"),
+                                 "circulating_usd": _circ(c)})
+            rows.sort(key=lambda r: r["circulating_usd"], reverse=True)
             return {"count": min(len(rows), limit), "chains": rows[:limit],
                     "data_source": "llama-stablecoinchains", "fetched_at": _now()}
     except Exception as e:
@@ -1177,13 +1185,28 @@ async def token_prices(addresses: str = Query(..., description="CSV, max 10"),
             if not ok:
                 return _err(502, data)
             coins = (data.get("coins") or {}) if isinstance(data, dict) else {}
-            out = {}
+            out, need = {}, {}
             for a in addrs:
                 c = coins.get(f"{chain.lower()}:{a}") or coins.get(f"{chain.lower()}:{a.lower()}")
-                out[a] = ({"price_usd": c.get("price"),
-                           "symbol": c.get("symbol")} if c else None)
-            return {"chain": chain, "prices": out,
-                    "data_source": "llama", "fetched_at": _now()}
+                if c and c.get("price") is not None:
+                    out[a] = {"price_usd": c.get("price"),
+                              "symbol": c.get("symbol"),
+                              "data_source": "llama"}
+                elif a.lower() in KNOWN_TOKENS:
+                    need[a] = KNOWN_TOKENS[a.lower()]
+                else:
+                    out[a] = None
+            for a, sym in need.items():  # stables via Coinbase spot
+                try:
+                    r = await client.get(
+                        f"https://api.coinbase.com/v2/prices/{sym}-USD/spot")
+                    amt = ((r.json().get("data") or {}).get("amount")
+                           if r.status_code == 200 else None)
+                    out[a] = ({"price_usd": float(amt), "symbol": sym,
+                               "data_source": "coinbase"} if amt else None)
+                except Exception:
+                    out[a] = None
+            return {"chain": chain, "prices": out, "fetched_at": _now()}
     except Exception as e:
         return _err(500, {"error": str(e)})
 
@@ -1198,15 +1221,40 @@ async def token_gas(chain: str = Query("ethereum", description="ethereum only"))
         async with httpx.AsyncClient(timeout=15) as client:
             ok, data = await fetch_json(client, "https://api.etherscan.io/api",
                 params={"module": "gastracker", "action": "gasoracle"})
-            if not ok or data.get("status") != "1":
-                return _err(502, {"error": "Etherscan gas oracle unavailable"})
-            r = data.get("result", {})
-            return {"chain": "ethereum",
-                    "safe_gwei": r.get("SafeGasPrice"),
-                    "propose_gwei": r.get("ProposeGasPrice"),
-                    "fast_gwei": r.get("FastGasPrice"),
-                    "last_block": r.get("LastBlock"),
-                    "data_source": "etherscan", "fetched_at": _now()}
+            if ok and data.get("status") == "1":
+                r = data.get("result", {})
+                return {"chain": "ethereum",
+                        "safe_gwei": r.get("SafeGasPrice"),
+                        "propose_gwei": r.get("ProposeGasPrice"),
+                        "fast_gwei": r.get("FastGasPrice"),
+                        "last_block": r.get("LastBlock"),
+                        "data_source": "etherscan", "fetched_at": _now()}
+            # Fallback: eth_feeHistory from a public RPC (no key, never throttled).
+            for rpc in ("https://cloudflare-eth.com",
+                        "https://ethereum.llamarpc.com"):
+                try:
+                    r = await client.post(rpc, json={"jsonrpc": "2.0", "id": 1,
+                        "method": "eth_feeHistory",
+                        "params": ["0x4", "latest", [25, 50, 75]]}, timeout=12)
+                    if r.status_code == 200:
+                        res = r.json().get("result") or {}
+                        base = res.get("baseFeePerGas") or []
+                        last = int(base[-1], 16) / 1e9 if base else None
+                        rewards = res.get("reward") or []
+                        pals = rewards[-1] if rewards else []
+                        prio = (int(pals[1], 16) / 1e9) if len(pals) > 1 else None
+                        if last is not None:
+                            tot = last + (prio or 0)
+                            return {"chain": "ethereum",
+                                    "base_fee_gwei": round(last, 2),
+                                    "priority_gwei": round(prio, 2) if prio else None,
+                                    "est_total_gwei": round(tot, 2),
+                                    "last_block": res.get("oldestBlock"),
+                                    "data_source": "public-rpc-feeHistory",
+                                    "fetched_at": _now()}
+                except Exception:
+                    continue
+            return _err(502, {"error": "Gas oracles unavailable (Etherscan + RPC)"})
     except Exception as e:
         return _err(500, {"error": str(e)})
 
