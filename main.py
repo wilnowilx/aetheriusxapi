@@ -129,7 +129,9 @@ DESCRIPTIONS = {
 # No keys. Distinct operators genuinely disagree by 0-3 blocks — that
 # disagreement IS the product (distributed-state divergence, measured).
 DRIFT_RPCS = {
-    "base": ["https://mainnet.base.org", "https://base.llamarpc.com"],
+    "base": ["https://mainnet.base.org",
+             "https://base-mainnet.public.blastapi.io",
+             "https://base.llamarpc.com"],
     "ethereum": ["https://cloudflare-eth.com", "https://ethereum.llamarpc.com"],
     "optimism": ["https://mainnet.optimism.io", "https://optimism.llamarpc.com"],
     "arbitrum": ["https://arb1.arbitrum.io/rpc", "https://arbitrum.llamarpc.com"],
