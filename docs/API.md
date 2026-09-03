@@ -305,6 +305,20 @@ Powers the dashboard and grant reporting.
 
 ---
 
+## HTTPS Access (GitHub Pages → VM)
+
+Browsers block HTTPS pages calling HTTP APIs (mixed content). Use the TLS endpoint:
+
+```
+https://34-156-149-38.sslip.io/aetherapi
+```
+
+Valid Let's Encrypt cert, Nginx 443 → FastAPI, CORS allows
+`https://wilnowilx.github.io`. Requires GCP firewall ingress `tcp:443`
+(rule `allow-https-aetherapi`) + OS iptables ACCEPT 443 — both active.
+
+---
+
 ## Error Responses
 
 All errors follow the x402 standard:

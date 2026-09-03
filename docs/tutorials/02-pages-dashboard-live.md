@@ -64,4 +64,4 @@ curl -i -X OPTIONS \
   "https://34-156-149-38.sslip.io/aetherapi/health"
 ```
 
-Expected state after deployment: the first two should return `200`, and the preflight should include an `Access-Control-Allow-Origin` value matching the Pages origin. Observed on 2026-09-03: Pages returned `200`, while the HTTPS backend health check and CORS preflight timed out (`curl` status `000`). The dashboard cannot display live data until the reverse proxy, certificate, network access, and CORS policy are active.
+Expected state after deployment: the first two should return `200`, and the preflight should include an `Access-Control-Allow-Origin` value matching the Pages origin. **Status 2026-09-03: LIVE** — HTTPS health `200`, preflight `200` with matching origin, dashboard `200`, telemetry streaming. The earlier timeout was a closed firewall (GCP ingress + OS iptables for `tcp:443`, both opened since). If you ever see `000` again, check those two layers first.
