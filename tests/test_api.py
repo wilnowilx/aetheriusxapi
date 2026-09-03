@@ -58,7 +58,7 @@ def test_paid_endpoints_require_payment(route):
         "/v1/defi/protocols": {"limit": 2},
         "/v1/defi/dexs": {"limit": 2},
         "/v1/defi/stablecoinchains": {"limit": 2},
-        "/v1/token/prices": {"addresses": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA4b4eE"},
+        "/v1/token/prices": {"addresses": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"},
         "/v1/token/gas": {},
         "/v1/maps/reverse": {"lat": 19.43, "lon": -99.13},
         "/v1/forex/history": {"start": "2026-01-01", "end": "2026-01-02"},
