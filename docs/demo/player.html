@@ -7,14 +7,14 @@
 <style>
 :root{--bg:#06060e;--purple:#a855f7;--magenta:#d946ef;--green:#10b981;--orange:#f59e0b;--text:#f0f0f5;--sec:#8a8a9a}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;padding:32px 16px;text-align:center}
-.wrap{max-width:900px;margin:0 auto}
-h1{font-size:20px}
+body{background:radial-gradient(1000px 500px at 50% -10%,rgba(168,85,247,.18),transparent 60%),var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;text-align:center}
+.wrap{width:100%;max-width:1060px}
+h1{font-size:clamp(18px,3vw,26px)}
 .sub{color:var(--sec);font-size:14px;margin:8px 0 18px}
 .sub a{color:#c084fc}
-.term{background:#080810;border:1px solid rgba(168,85,247,.4);border-radius:12px;text-align:left;
-  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.65;
-  padding:18px 20px;min-height:420px;box-shadow:0 0 60px rgba(168,85,247,.15);overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+.term{background:rgba(4,4,10,.92);border:1px solid rgba(168,85,247,.4);border-radius:0 0 12px 12px;text-align:left;
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;line-height:1.65;
+  padding:18px 20px;min-height:56vh;box-shadow:0 0 60px rgba(168,85,247,.15);overflow-x:auto;white-space:pre-wrap;word-break:break-word}
 .term .banner{color:var(--purple);font-weight:700}
 .term .ok{color:var(--green)} .term .warn{color:var(--orange)} .term .dim{color:var(--sec)}
 .cursor{display:inline-block;width:9px;height:17px;background:var(--purple);vertical-align:-3px;animation:blink 1s steps(1) infinite}
@@ -24,6 +24,11 @@ h1{font-size:20px}
   border-radius:9px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;min-height:44px}
 .controls button.ghost{background:transparent;border:1px solid rgba(255,255,255,.2)}
 .back{margin-top:14px;font-size:13px;color:var(--sec)} .back a{color:#c084fc}
+.stats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.stat{border:1px solid rgba(168,85,247,.35);background:rgba(168,85,247,.07);border-radius:20px;padding:5px 14px;font-size:12px;letter-spacing:.06em;color:#e9d5ff;font-family:ui-monospace,monospace}
+.termchrome{display:flex;align-items:center;gap:8px;background:#101018;border:1px solid rgba(168,85,247,.4);border-bottom:none;border-radius:12px 12px 0 0;padding:9px 14px;font-family:ui-monospace,monospace;font-size:12px;color:var(--sec);text-align:left}
+.dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}.r{background:#ff5f57}.y{background:#febc2e}.g{background:#28c840}
+.termchrome .title{margin:0 auto;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (prefers-reduced-motion: reduce){.cursor{animation:none}}
 </style>
 </head>
@@ -31,6 +36,8 @@ h1{font-size:20px}
 <div class="wrap">
 <h1>AETHERIUS — live 402&rarr;200 demo (real testnet USDC)</h1>
 <p class="sub">Unedited terminal replay. Every call settled on Base Sepolia — verify on the <a href="https://sepolia.basescan.org/address/0x677B483128D0399bCD0A5AB36eE990C0246d7f61" target="_blank">block explorer</a>.</p>
+<div class="stats"><span class="stat">40 ENDPOINTS LIVE</span><span class="stat">x402 + USDC</span><span class="stat">BASE SEPOLIA</span><span class="stat">~19S RUNTIME</span></div>
+<div class="termchrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="title">aetheriusxapi — live-demo.cast</span></div>
 <div class="term" id="term"></div>
 <div class="controls">
 <button id="btnPlay">▶ Play</button>
