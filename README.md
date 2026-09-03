@@ -30,7 +30,6 @@
 - [📡 Live Status](#live-status)
 - [🐍 SDKs](#sdks)
 - [The Vision](#the-vision)
-- [Concept Map](#concept-map)
 - [Mental Model: How x402 Changes Everything](#mental-model-how-x402-changes-everything)
 - [Architecture](#architecture)
 - [Quick Start](#quick-start)
@@ -81,7 +80,7 @@ sequenceDiagram
 
 ---
 
-## The Problem
+## 🔥 The Problem
 
 ### Problem statement
 
@@ -107,34 +106,14 @@ If payment authorization and API access are expressed in the same HTTP interacti
 
 ---
 
-## The Vision
+## 🔭 The Vision
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     AETHERIUS ECOSYSTEM                         │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   ┌──────────┐    x402 Protocol    ┌──────────┐                 │
-│   │   AI     │ ◄──── Payment ────► │   API    │                 │
-│   │  Agent   │     USDC on Base    │ Provider │                 │
-│   │ (Buyer)  │                     │ (Seller) │                 │
-│   └──────────┘                     └──────────┘                 │
-│        │                                │                       │
-│        │    ┌──────────────────────┐    │                       │
-│        └───►│   AETHERIUS Hub      │◄───┘                       │
-│             │  ┌────────────────┐  │                            │
-│             │  │  120+ APIs     │  │                            │
-│             │  │  12 Categories │  │                            │
-│             │  │  Auto-pay      │  │                            │
-│             │  └────────────────┘  │                            │
-│             └──────────────────────┘                            │
-│                                                                 │
-│   ┌──────────────────────────────────────────────────────┐      │
-│   │                  Infrastructure                      │      │
-│   │  FastAPI · x402 Middleware · Base L2 · Coinbase CDP  │      │
-│   └──────────────────────────────────────────────────────┘      │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    AG[🤖 AI Agent<br/>Buyer] <-->|x402 · USDC on Base| AP[🧩 API Provider<br/>Seller]
+    AG --> HUB[AETHERIUS Hub<br/>11 APIs · auto-pay · growing]
+    AP --> HUB
+    HUB --> INF[Infrastructure<br/>FastAPI · x402 · Base L2 · Coinbase CDP]
 ```
 
 **Mission:** Become the default API layer for autonomous agents — the Stripe of the agent economy.
@@ -147,29 +126,20 @@ If payment authorization and API access are expressed in the same HTTP interacti
 
 ---
 
-## Mental Model: How x402 Changes Everything
+## 🧠 Mental Model: How x402 Changes Everything
 
 ### The Old World (API Key Era)
 
-```
-Developer → signs up → gets API key → manages billing → hopes it works
-    │                                                    │
-    │    ┌─────────────┐    ┌─────────────┐              │
-    └───►│  Credit Card │───►│  Dashboard  │───► API Access
-         └─────────────┘    └─────────────┘
-              Human friction at every step
+```mermaid
+flowchart LR
+    D[👨‍💻 Developer] --> S[Sign up] --> K[API key] --> B[💳 Credit card + billing] --> H[🤞 Hope it works]
 ```
 
 ### The New World (x402 Protocol)
 
-```
-AI Agent → connects wallet → makes request → pays automatically → gets data
-    │                                                         │
-    │    ┌─────────────┐    ┌─────────────┐                   │
-    └───►│  Crypto     │───►│  x402      │───► Response       │
-         │  Wallet     │    │  Protocol  │                    │
-         └─────────────┘    └─────────────┘
-              Zero friction. Machine-native.
+```mermaid
+flowchart LR
+    A[🤖 AI Agent] --> W[👛 Wallet] --> R[📡 Request] --> P[⚡ Auto-pay USDC] --> D[📦 Data]
 ```
 
 ### Key Concepts
@@ -184,69 +154,29 @@ AI Agent → connects wallet → makes request → pays automatically → gets d
 
 ---
 
-## Architecture
+## 🏗️ Architecture
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    CLIENT LAYER                         │
-│                                                         │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌──────────┐    │
-│  │ Python  │  │   JS    │  │   Go    │  │   Rust   │    │
-│  │   SDK   │  │   SDK   │  │   SDK   │  │   SDK    │    │
-│  └────┬────┘  └────┬────┘  └────┬────┘  └────┬─────┘    │
-│       └─────────────┴────────────┴────────────┘         │
-└─────────────────────────┬───────────────────────────────┘
-                          │
-┌─────────────────────────▼───────────────────────────────┐
-│                   GATEWAY LAYER                         │
-│                                                         │
-│  ┌─────────────────────────────────────────────────┐    │
-│  │              Nginx Reverse Proxy                │    │
-│  │          Rate Limiting · SSL · Routing          │    │
-│  └──────────────────────┬──────────────────────────┘    │
-│                          │                              │
-│  ┌──────────────────────▼──────────────────────────┐    │
-│  │            AetherAPI Server (FastAPI)           │    │
-│  │                                                 │    │
-│  │  ┌────────────┐  ┌────────────┐  ┌───────────┐  │    │
-│  │  │   Auth     │  │   x402     │  │  Router   │  │    │
-│  │  │  (Wallet)  │  │ Middleware │  │           │  │    │
-│  │  └────────────┘  └────────────┘  └───────────┘  │    │
-│  └──────────────────────┬──────────────────────────┘    │
-│                          │                              │
-│  ┌──────────────────────▼──────────────────────────┐    │
-│  │              API Providers (Upstream)           │    │
-│  │                                                 │    │
-│  │  Google Maps · CoinGecko · OpenWeather · ...    │    │
-│  └─────────────────────────────────────────────────┘    │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-                          │
-┌─────────────────────────▼───────────────────────────────┐
-│                   SETTLEMENT LAYER                      │
-│                                                         │
-│  ┌─────────────────────────────────────────────────┐    │
-│  │         x402 Facilitator (Coinbase CDP)         │    │
-│  │                                                 │    │
-│  │  • Verifies payment proofs on-chain             │    │
-│  │  • Settles USDC on Base                         │    │
-│  │  • Instant finality                             │    │
-│  └─────────────────────────────────────────────────┘    │
-│                          │                              │
-│  ┌──────────────────────▼──────────────────────────┐    │
-│  │              Base (Ethereum L2)                 │    │
-│  │                                                 │    │
-│  │  • Low gas fees (~$0.001 per tx)                │    │
-│  │  • High throughput (2000+ TPS)                  │    │
-│  │  • Coinbase ecosystem integration               │    │
-│  └─────────────────────────────────────────────────┘    │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph CLIENT["💻 Client layer"]
+        direction LR
+        PY[Python SDK] & JS[JS SDK] & GO[Go SDK] & RS[Rust SDK]
+    end
+    subgraph GW["🌐 Gateway layer"]
+        direction TB
+        NX[Nginx · rate limit · SSL · routing] --> FW[FastAPI · wallet auth · x402 · router]
+        FW --> UP[Upstream providers<br/>OSM · CoinGecko · Open-Meteo · RPCs]
+    end
+    subgraph STL["💵 Settlement layer"]
+        direction TB
+        FAC[Facilitator · Coinbase CDP<br/>verify proofs · settle USDC · instant finality] --> BASE[(Base L2<br/>~$0.001 · 2000+ TPS)]
+    end
+    CLIENT --> GW --> STL
 ```
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
 ### For AI Agents (Buyers)
 
@@ -356,7 +286,7 @@ Snapshot 2026-09-03: E2E 6/6 paid endpoints → 200 with real settlement.
 
 ---
 
-## Dashboard
+## 🎛️ Dashboard
 
 Interactive control room (no build step, vanilla JS) served by the backend itself:
 
@@ -376,7 +306,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ---
 
-## Endpoints
+## ⚡ Endpoints
 
 | Endpoint | Description | Price | Latency |
 |----------|-------------|-------|---------|
@@ -395,7 +325,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ---
 
-## Categories
+## 🗂️ Categories
 
 | Category | APIs | Examples |
 |----------|------|----------|
@@ -414,7 +344,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ---
 
-## Rate Limits
+## 🚦 Rate Limits
 
 | Tier | Requests/min | Requests/day | Burst | Price |
 |------|-------------|-------------|-------|-------|
@@ -426,22 +356,13 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ---
 
-## Tech Stack
+## 🧱 Tech Stack
 
-```
-┌─────────────────────────────────────────────────┐
-│                 APPLICATION                      │
-│  FastAPI · Python 3.11+ · Pydantic              │
-├─────────────────────────────────────────────────┤
-│                 PROTOCOL                         │
-│  x402 · HTTP 402 · USDC · Base L2               │
-├─────────────────────────────────────────────────┤
-│                 INFRASTRUCTURE                   │
-│  Nginx · Systemd · GCP Compute Engine           │
-├─────────────────────────────────────────────────┤
-│                 PAYMENTS                         │
-│  Coinbase CDP · USDC · Ethereum L2               │
-└─────────────────────────────────────────────────┘
+```mermaid
+graph LR
+    APP[🧱 FastAPI · Python · Pydantic] --> PRO[🔌 x402 · HTTP 402 · USDC · Base]
+    PRO --> INF[☁️ Nginx · Systemd · GCP]
+    INF --> PAY[💵 Coinbase CDP · USDC · L2]
 ```
 
 | Component | Technology | Purpose |
@@ -456,7 +377,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ---
 
-## Roadmap
+## 🛣️ Roadmap
 
 ### Phase 1: Foundation (Current)
 - [x] Core API server with x402 middleware (simulated + real modes)
@@ -486,7 +407,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ---
 
-## Grant Application
+## 💰 Grant Application
 
 We are applying for the **Base Builder Grants** program:
 
@@ -499,7 +420,7 @@ We are applying for the **Base Builder Grants** program:
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
@@ -521,13 +442,13 @@ uvicorn main:app --reload --port 4020
 
 ---
 
-## License
+## 📄 License
 
 MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-## Links
+## 🔗 Links
 
 | Resource | URL |
 |----------|-----|

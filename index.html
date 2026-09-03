@@ -60,10 +60,11 @@
 
         .plasma-blob {
             position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
+            border-radius: 42% 58% 63% 37% / 45% 42% 58% 55%;
+            filter: blur(90px);
             mix-blend-mode: screen;
-            animation: plasmaFloat 14s ease-in-out infinite alternate;
+            animation: plasmaFloat 14s ease-in-out infinite alternate,
+                       auroraMorph 19s ease-in-out infinite alternate;
         }
         .plasma-blob:nth-child(1) {
             width: 700px; height: 700px;
@@ -106,6 +107,13 @@
             50% { transform: translate(-50px, 80px) scale(0.92) rotate(8deg); }
             75% { transform: translate(65px, 30px) scale(1.08); }
             100% { transform: translate(-35px, -50px) scale(1.02) rotate(-6deg); }
+        }
+
+        /* Aurora morph: blobs breathe between organic ribbon shapes — plasma, not circles */
+        @keyframes auroraMorph {
+            0%, 100% { border-radius: 42% 58% 63% 37% / 45% 42% 58% 55%; }
+            33% { border-radius: 63% 37% 42% 58% / 55% 58% 42% 45%; }
+            66% { border-radius: 37% 63% 55% 45% / 42% 55% 45% 58%; }
         }
 
         /* Noise overlay for texture */
