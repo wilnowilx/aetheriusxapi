@@ -1,15 +1,16 @@
-"""AETHERIUS 90-second live demo — co-created: automaton runs, human records.
+"""AETHERIUS 90-second live demo — the EXACT path a client integrates.
 
-One command, real testnet USDC. Screen-record while it runs, then stitch
-your hook/CTA cards around it in any free editor (OBS + CapCut/VN/DaVinci,
-all without watermark).
+Same calls as docs/API.md, executed through sdks/python (the client SDK).
+Co-created: automaton runs, human records.
 
-Run:
-    AETHERIUS_DEMO_KEY=<testnet-wallet-key> python docs/demo/demo_90s.py
+Run (CMD):
+    set AETHERIUS_DEMO_KEY=<testnet key>
+    set DEMO_STEP=1
+    python docs\\demo\\demo_90s.py
 
-Needs: pip install httpx requests web3 x402. Key NEVER hardcoded, env only.
-Beats follow docs/tutorials/03-agent-first-paid-call.md (discover, challenge,
-pay, verify on telemetry).
+Modes: DEMO_STEP=1 pauses per scene ([ENTER] next, [Q] quit). Unset = auto.
+No keys in repo, ever. Local X-PAYMENT:anything is simulated; live networks
+settle real USDC (watch the balance drop).
 """
 
 import json
@@ -17,16 +18,13 @@ import os
 import sys
 import time
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "..", "..", "sdks", "python"))
+
 import requests as req
 from web3 import Web3
-from x402.mechanisms.evm.exact import ExactEvmClientScheme
-from x402.mechanisms.evm.exact.client import _wrap_if_local_account
-from x402.client import (
-    x402ClientConfig,
-    x402ClientSync,
-    SchemeRegistration,
-)
-from x402.http.clients.requests import wrapRequestsWithPayment
+
+from aetheriusx import AetheriusXClient
 
 BASE = "http://34.156.149.38/aetherapi"
 NETWORK = "eip155:84532"
@@ -36,8 +34,7 @@ if len(KEY) < 32:
 
 T0 = time.monotonic()
 
-# Modo escena: DEMO_STEP=1 detiene el guion entre bloques esperando ENTER.
-# Ideal para grabar (repites escenas, marcas tu propio ritmo, nada se escapa).
+# Scene mode: DEMO_STEP=1 waits per scene. [ENTER] = next, [Q] = quit.
 STEP = os.getenv("DEMO_STEP", "") not in ("", "0", "false")
 
 
@@ -50,20 +47,19 @@ def beat(n, total, title):
 def pause(s=2.5):
     if STEP:
         try:
-            input("  ▶ ENTER para la siguiente escena…")
+            ans = input("  -- [ENTER] next scene · [Q]uit -- ").strip().lower()
+            if ans in ("q", "quit", "exit"):
+                print("Demo stopped. See you next take!")
+                raise SystemExit(0)
         except EOFError:
             pass
     else:
         time.sleep(s)
 
 
+sdk = AetheriusXClient(base_url=BASE)
 w3 = Web3(Web3.HTTPProvider("https://sepolia.base.org"))
 acct = w3.eth.account.from_key(KEY)
-evm = ExactEvmClientScheme(signer=_wrap_if_local_account(acct))
-cfg = x402ClientConfig(
-    schemes=[SchemeRegistration(network=NETWORK, client=evm)])
-http = wrapRequestsWithPayment(session=req.Session(),
-                               client=x402ClientSync.from_config(cfg))
 plain = req.Session()
 
 USDC_SEPOLIA = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
@@ -82,54 +78,53 @@ def usdc_bal():
 
 
 SCAN = f"https://sepolia.basescan.org/address/{acct.address}"
+ROUTE = "/v1/email/validate"
+PARAMS = {"email": "agent@gmail.com"}
 
-beat(1, 6, "HOOK — agentes sin tarjeta, como pagan APIs?")
-print("AETHERIUS: donde los agentes IA pagan por llamada en USDC sobre Base.",
-      flush=True)
-print(f"Wallet del agente: {acct.address}", flush=True)
-print(f"Verificalo tu mismo: {SCAN}", flush=True)
+beat(1, 6, "HOOK — agents can't hold credit cards. How do they pay for APIs?")
+print("AETHERIUS: where AI agents pay per call in USDC on Base.", flush=True)
+print(f"Agent wallet: {acct.address}", flush=True)
+print(f"Verify yourself: {SCAN}", flush=True)
 pause()
 
-beat(2, 6, "PRUEBA — catalogo vivo")
-h = plain.get(f"{BASE}/api/v1/health", timeout=30).json()
+beat(2, 6, "DISCOVERY — live catalog via the SDK")
+h = sdk.health()
 eps = h["endpoints"]
-print(f"Servicio {h['service']} v{h['version']} en {h['network']}", flush=True)
-print(f"Endpoints en vivo: {len(eps)}", flush=True)
-cheapest = min(eps.items(),
-               key=lambda kv: float(kv[1].split("$")[1].split("/")[0]))
-print(f"Mas barato: {cheapest[0]} a {cheapest[1].split(' - ')[0]}", flush=True)
-pause()
-
-beat(3, 6, "CONFLICTO — sin pago no hay datos (402)")
-r = plain.get(f"{BASE}/v1/email/validate",
-              params={"email": "agent@gmail.com"}, timeout=30)
-print(f"HTTP {r.status_code} — cuerpo vacio. Sin prueba de pago no existes.",
-      flush=True)
-print(f"Precio listado en catalogo: {cheapest[0]} a ${cheapest[1]} USDC.",
+print(f"Service {h['version']} on {h['network']}", flush=True)
+print(f"Live endpoints: {len(eps)}", flush=True)
+route, price = sdk.discover_cheapest()
+print(f"Cheapest: {route} at ${price}/call", flush=True)
+print(f"Demoing {ROUTE} at {eps[ROUTE].split(' - ')[0]} (client's choice).",
       flush=True)
 pause()
 
-beat(4, 6, "RESOLUCION — pago real USDC y datos reales (200)")
+beat(3, 6, "CHALLENGE — no payment, no data (402)")
+r = plain.get(f"{BASE}{ROUTE}", params=PARAMS, timeout=30)
+print(f"HTTP {r.status_code} — empty body. No proof, you don't exist.",
+      flush=True)
+print(f"Catalog price: {eps[ROUTE].split(' - ')[0]} USDC.", flush=True)
+pause()
+
+beat(4, 6, "SETTLEMENT — real USDC, real data (200)")
 b0 = usdc_bal()
-print(f"Balance USDC antes: {b0}", flush=True)
-r = http.get(f"{BASE}/v1/email/validate",
-             params={"email": "agent@gmail.com"}, timeout=120)
+print(f"USDC balance before: {b0}", flush=True)
+r = sdk.paid_get_x402(ROUTE, PARAMS, signer=acct)
 print(f"HTTP {r.status_code}", flush=True)
 print(json.dumps(r.json(), indent=2, ensure_ascii=False), flush=True)
 b1 = usdc_bal()
 if b0 is not None and b1 is not None:
-    print(f"Balance USDC despues: {b1} (gastado: ${b0 - b1:.4f})", flush=True)
-    print("Ese descuento ES la prueba. Dinero real, no simulado.", flush=True)
+    print(f"USDC balance after: {b1} (spent: ${b0 - b1:.4f})", flush=True)
+    print("That discount IS the proof. Real money, not simulated.", flush=True)
 pause()
 
-beat(5, 6, "PRUEBA VIVA — la telemetria se movio por nosotros")
+beat(5, 6, "LIVE PROOF — telemetry moved because of us")
 t = plain.get(f"{BASE}/v1/telemetry", timeout=30).json()["totals"]
-print(f"Llamadas: {t['calls']} | Pagadas: {t['ok_200']} | "
-      f"USDC liquidado: ${t['volume_usdc']}", flush=True)
+print(f"Calls: {t['calls']} | Paid: {t['ok_200']} | "
+      f"Settled USDC: ${t['volume_usdc']}", flush=True)
 pause()
 
 beat(6, 6, "CTA")
 print("AETHERIUS — https://wilnowilx.github.io/aetheriusxapi/", flush=True)
-print(f"Transacciones verificables: {SCAN}", flush=True)
-print(f"Demo completado en t+{int(time.monotonic() - T0)}s "
-      f"con USDC real en Base Sepolia.", flush=True)
+print(f"Verifiable txs: {SCAN}", flush=True)
+print(f"Done in t+{int(time.monotonic() - T0)}s with real USDC on Base Sepolia.",
+      flush=True)

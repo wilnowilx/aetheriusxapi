@@ -74,3 +74,40 @@ class AetheriusXClient:
         if not payment:
             raise ValueError("payment is required after the 402 challenge")
         return self._client.get(url, params=params, headers={"X-PAYMENT": payment})
+
+    def paid_get_x402(self, route, params=None, signer=None,
+                      network="eip155:84532",
+                      rpc_url="https://sepolia.base.org"):
+        """Real x402 USDC payment flow (same path as docs/API.md).
+
+        signer: an eth-account LocalAccount — signs LOCALLY, keys never leave
+        your machine. Requires ``web3`` + ``x402`` packages.
+        Local ``X-PAYMENT:anything`` is simulated; live networks need a real
+        signature settling on-chain.
+        """
+        if not route.startswith("/"):
+            raise ValueError("route must start with '/'")
+        if signer is None:
+            raise ValueError("signer is required for real x402 payment")
+        try:
+            from web3 import Web3
+            from x402.mechanisms.evm.exact import ExactEvmClientScheme
+            from x402.mechanisms.evm.exact.client import _wrap_if_local_account
+            from x402.client import (
+                x402ClientConfig,
+                x402ClientSync,
+                SchemeRegistration,
+            )
+            from x402.http.clients.requests import wrapRequestsWithPayment
+        except ImportError as e:
+            raise RuntimeError("x402 extras missing: pip install web3 x402") from e
+        import requests as req
+
+        _w3 = Web3(Web3.HTTPProvider(rpc_url))  # noqa: F841 (ensures RPC live)
+        scheme = ExactEvmClientScheme(signer=_wrap_if_local_account(signer))
+        cfg = x402ClientConfig(
+            schemes=[SchemeRegistration(network=network, client=scheme)])
+        session = wrapRequestsWithPayment(
+            session=req.Session(), client=x402ClientSync.from_config(cfg))
+        return session.get(f"{self.base_url}{route}",
+                           params=params or {}, timeout=self.timeout)
