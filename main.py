@@ -546,7 +546,7 @@ async def token_holders(address: str = Query(..., description="Token contract"),
         async with httpx.AsyncClient(timeout=20) as client:
             ok, data = await fetch_json(client,
                 f"{base}/api/v2/tokens/{address}/holders",
-                params={"page": 1, "offset": 20})
+                params={"page": 1})
             if not ok or not isinstance(data, dict) or "items" not in data:
                 return _err(502, {"error": "Blockscout holders unavailable",
                                   "address": address, "chain": chain})
