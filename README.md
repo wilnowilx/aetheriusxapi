@@ -14,7 +14,7 @@
 
 ### The Operating System for AI Agent Commerce
 
-**120+ APIs where autonomous AI agents pay per request in USDC on Base.**
+**40 live APIs (120+ on the roadmap) where autonomous AI agents pay per request in USDC on Base.**
 **No accounts. No subscriptions. No human friction. Just code.**
 
 [Website](https://wilnowilx.github.io/aetheriusxapi/) · [Documentation](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) · [Twitter](https://x.com/aetheriusxAPI) · [x402 Protocol](https://x402.org)
@@ -82,14 +82,14 @@ If payment authorization and API access are expressed in the same HTTP interacti
 
 ## 🔭 The Vision
 
-![Ecosystem](https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKZmxvd2NoYXJ0IFRCCiAgICBBR1vwn6SWIEFJIEFnZW50IC0gQnV5ZXJdIC0tPnx4NDAyIFVTREMgb24gQmFzZXwgQVBb8J-nqSBBUEkgUHJvdmlkZXIgLSBTZWxsZXJdCiAgICBBUCAtLT58ZGF0YSBhbmQgc2VydmljZXwgQUcKICAgIEFHIC0tPiBIVUJbQUVUSEVSSVVTIEh1YiAtIDExIEFQSXMsIGF1dG8tcGF5XQogICAgQVAgLS0-IEhVQgogICAgSFVCIC0tPiBJTkZbRmFzdEFQSSwgeDQwMiwgQmFzZSBMMiwgQ29pbmJhc2UgQ0RQXQ==)
+<img src="https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKZmxvd2NoYXJ0IFRCCiAgICBBR1vwn6SWIEFJIEFnZW50IC0gQnV5ZXJdIC0tPnx4NDAyIFVTREMgb24gQmFzZXwgQVBb8J-nqSBBUEkgUHJvdmlkZXIgLSBTZWxsZXJdCiAgICBBUCAtLT58ZGF0YSBhbmQgc2VydmljZXwgQUcKICAgIEFHIC0tPiBIVUJbQUVUSEVSSVVTIEh1YiAtIDExIEFQSXMsIGF1dG8tcGF5XQogICAgQVAgLS0-IEhVQgogICAgSFVCIC0tPiBJTkZbRmFzdEFQSSwgeDQwMiwgQmFzZSBMMiwgQ29pbmJhc2UgQ0RQXQ==" alt="Ecosystem" width="560">
 
 **Mission:** Become the default API layer for autonomous agents — the Stripe of the agent economy.
 
 **Strategy:**
-1. **Launch** with 10 curated API categories (120+ endpoints)
-2. **Prove** the x402 payment flow works end-to-end on Base mainnet
-3. **Scale** to 500+ endpoints after Base Builder Grant funding
+1. **Live now:** 8 categories, 40 endpoints verified with real USDC on Base Sepolia
+2. **Next:** mainnet (1 env var + funding) + 10-per-category depth
+3. **Scale** to 120+ with grant funding, then 500+
 4. **Become** the infrastructure that AI agents depend on
 
 ---
@@ -304,7 +304,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ## 🧱 Tech Stack
 
-![Tech stack](https://mermaid.ink/svg/Z3JhcGggTFIKICAgIEFQUFvwn6exIEZhc3RBUEkgwrcgUHl0aG9uIMK3IFB5ZGFudGljXSAtLT4gUFJPW_CflIwgeDQwMiDCtyBIVFRQIDQwMiDCtyBVU0RDIMK3IEJhc2VdCiAgICBQUk8gLS0-IElORlvimIHvuI8gTmdpbnggwrcgU3lzdGVtZCDCtyBHQ1BdCiAgICBJTkYgLS0-IFBBWVvwn5K1IENvaW5iYXNlIENEUCDCtyBVU0RDIMK3IEwyXQ==)
+<img src="https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKZmxvd2NoYXJ0IExSCiAgICBBUFBb8J-nsSBGYXN0QVBJPGJyLz5QeXRob24gwrcgUHlkYW50aWNdIC0tPiBQUk9b8J-UjCB4NDAyPGJyLz5IVFRQIDQwMiDCtyBVU0RDIMK3IEJhc2VdCiAgICBQUk8gLS0-IElORlvimIHvuI8gTmdpbng8YnIvPlN5c3RlbWQgwrcgR0NQXQogICAgSU5GIC0tPiBQQVlb8J-StSBDb2luYmFzZSBDRFA8YnIvPlVTREMgwrcgTDJd" alt="Tech stack" width="700">
 
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
@@ -322,7 +322,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ### Phase 1: Foundation (Current)
 - [x] Core API server with x402 middleware (simulated + real modes)
-- [x] 40 endpoints, 39 wired to live upstreams (honest errors on outage, no mocked data)
+- [x] 40 endpoints, 40 verified live with real USDC payments (no mocked data)
 - [x] E2E payment flow proven on testnet (6/6 → 200, real USDC settled)
 - [x] Upstream resilience (Overpass mirrors, 5-source price chain, Nominatim fallbacks)
 - [x] Interactive dashboard (`/dashboard/`) with API explorer
