@@ -9,7 +9,10 @@
 <body>
 <header class="topbar">
   <div class="brand">AETHERIUS <em>control room</em></div>
-  <div class="net" id="netBadge"><span class="dot"></span>connecting…</div>
+  <div class="topright">
+    <button id="backendGear" class="gear" title="Backend settings">⚙</button>
+    <div class="net" id="netBadge"><span class="dot"></span>connecting…</div>
+  </div>
 </header>
 
 <section class="statusbar" id="healthPanel">
@@ -21,7 +24,7 @@
   <div><label>endpoints</label><b id="hEndpoints">—</b></div>
 </section>
 
-<div class="backendbar">
+<div class="backendbar collapsed" id="backendBar">
   <span class="muted">Backend</span>
   <input id="backendUrl" placeholder="same origin — e.g. https://34-156-149-38.sslip.io/aetherapi" spellcheck="false">
   <button type="button" id="btnBaseUse" class="btn primary">Use</button>
@@ -72,7 +75,7 @@
 
   <section class="card drift">
     <h2>Storage Drift <span class="tag">phase 2</span></h2>
-    <div id="driftBody"><p class="muted">Probing /v1/storage/drift…</p></div>
+    <div id="driftBody"><p class="muted">Probing live endpoint…</p></div>
     <pre class="result small">{"layers":[{"name":"ingress","slot":1842},{"name":"storage","slot":1845}],"drift":{"slot_delta":3,"status":"detected"}}</pre>
   </section>
 
@@ -83,6 +86,8 @@
 </main>
 
 <footer> AETHERIUS control room · wallet is identity · USDC on Base · x402 </footer>
+<script>window.AEX_FX = { n: 36, speed: 0.6 };</script>
+<script src="fx.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

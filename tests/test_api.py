@@ -223,9 +223,14 @@ def test_dashboard_backend_setting_present():
     r = client.get("/dashboard/")
     assert r.status_code == 200
     assert 'id="backendUrl"' in r.text
+    assert 'id="backendGear"' in r.text
+    assert "fx.js" in r.text
     js = client.get("/dashboard/app.js")
     assert js.status_code == 200
     assert "aex_base" in js.text and "api(" in js.text
+    fx = client.get("/dashboard/fx.js")
+    assert fx.status_code == 200
+    assert "aex-fx" in fx.text
 
 
 def test_live_email_valid_shape():

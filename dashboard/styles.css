@@ -80,3 +80,16 @@ body{background:radial-gradient(circle at 8% 0%,rgba(168,85,247,.15),transparent
 .ep{position:relative;overflow:hidden}.ep:after{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(var(--purple),var(--magenta));transform:scaleY(0);transition:transform .2s}.ep:hover:after,.ep.sel:after{transform:scaleY(1)}
 .metrics .mrow b{color:#f0e6ff}.bars{border-bottom:1px solid rgba(168,85,247,.2);padding-bottom:2px}
 .drift{background:linear-gradient(145deg,rgba(245,158,11,.06),rgba(255,255,255,.02) 45%),var(--card)}
+/* AETHER palette v1 — Void #06060e · Violet #a855f7 · Magenta #d946ef · Pink #ec4899 · Mint #10b981 · Amber #f59e0b */
+.topright{display:flex;align-items:center;gap:10px}
+.gear{background:var(--card);border:1px solid var(--border);color:var(--sec);border-radius:9px;
+  width:34px;height:34px;font-size:16px;cursor:pointer;line-height:1}
+.gear:hover{color:var(--text);border-color:var(--purple)}
+.backendbar.collapsed{display:none}
+body{font-size:15px}
+.ep{padding:12px 14px}
+.ep code{font-size:13.5px}
+.btn{min-height:44px}
+.form input{min-height:44px;font-size:14px}
+.wrow input{min-height:44px;font-size:14px}
+.result{font-size:12.5px}

@@ -191,6 +191,7 @@ $("#btnWallet").onclick = ()=>{
   else { $("#wStatus").textContent = "disconnected"; $("#wAddr").textContent = "—"; }
 };
 
+$("#backendGear").onclick = ()=>{ $("#backendBar").classList.toggle("collapsed"); };
 $("#btnBaseUse").onclick = ()=>{
   localStorage.setItem("aex_base", $("#backendUrl").value.trim().replace(/\/+$/, ""));
   refreshBaseState(); loadHealth(); loadTelemetry();

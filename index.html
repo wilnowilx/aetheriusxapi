@@ -182,7 +182,7 @@
             pointer-events: all;
         }
 
-        .nav-links { display: flex; gap: 6px; align-items: center; }
+        .nav-links { display: flex; gap: 4px; align-items: center; flex-shrink: 1; min-width: 0; }
 
         .nav-links a {
             color: var(--text-sec);
@@ -202,6 +202,9 @@
             color: white !important;
             font-weight: 600 !important;
             margin-left: 8px;
+            white-space: nowrap !important;
+            flex-shrink: 0;
+            line-height: 1.2 !important;
         }
         .btn-nav:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(168,85,247,0.4); }
 
@@ -1286,15 +1289,10 @@
         <div class="nav-wrap">
             <a href="#hero" class="brand">AETHERIUS</a>
             <div class="nav-links">
-                <a href="#hero" class="active">Home</a>
-                <a href="#stats">Stats</a>
                 <a href="#categories">APIs</a>
                 <a href="#how">How It Works</a>
-                <a href="#features">Features</a>
-                <a href="#code">Code</a>
                 <a href="#heartbeat">Status</a>
                 <a href="#telemetry">Telemetry</a>
-                <a href="#limits">Limits</a>
                 <a href="dashboard/">Dashboard</a>
                 <a href="#cta" class="btn-nav">Get Started</a>
             </div>
@@ -1329,18 +1327,6 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
                 </a>
             </div>
-            <div class="hero-console anim">
-                <div class="hero-console-top">
-                    <span><span class="hero-console-dot"></span> AETHERIUSX CONTROL ROOM</span>
-                    <a href="dashboard/">Open dashboard <span>↗</span></a>
-                </div>
-                <div class="hero-console-grid">
-                    <div><strong>9</strong><span>VM services</span></div>
-                    <div><strong>USDC</strong><span>per-request rail</span></div>
-                    <div><strong>LIVE</strong><span>control surface</span></div>
-                    <div><strong>402</strong><span>payment handshake</span></div>
-                </div>
-            </div>
         </div>
     </section>
 
@@ -1357,22 +1343,22 @@
             <div class="stats-grid">
                 <div class="stat-card anim ad1">
                     <div class="stat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg></div>
-                    <div class="stat-val">120+</div>
-                    <div class="stat-label">Live APIs</div>
+                    <div class="stat-val" id="lvEndpoints">…</div>
+                    <div class="stat-label">Live Endpoints</div>
                 </div>
                 <div class="stat-card anim ad2">
                     <div class="stat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
-                    <div class="stat-val">12</div>
-                    <div class="stat-label">Categories</div>
+                    <div class="stat-val" id="lvVolume">…</div>
+                    <div class="stat-label">USDC Settled</div>
                 </div>
                 <div class="stat-card anim ad3">
                     <div class="stat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-                    <div class="stat-val">$0.001</div>
+                    <div class="stat-val" id="lvPrice">…</div>
                     <div class="stat-label">Starting Price</div>
                 </div>
                 <div class="stat-card anim ad4">
                     <div class="stat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-                    <div class="stat-val">&lt;50ms</div>
+                    <div class="stat-val" id="lvLatency">…</div>
                     <div class="stat-label">Avg Latency</div>
                 </div>
             </div>
@@ -1525,11 +1511,11 @@
             <h2 class="stitle anim">See the system between requests.</h2>
             <p class="sdesc anim">NATS carries internal events across the runtime. Aetherius exposes the useful proof: health, latency, volume, and cross-layer drift.</p>
             <div class="telemetry-flow anim">
-                <div class="telemetry-node"><span class="telemetry-index">01</span><strong>Request</strong><small>Agent calls an API</small></div>
+                <div class="telemetry-node"><span class="telemetry-index">01</span><strong>Your agent calls</strong><small>Any endpoint. No signup, no keys.</small></div>
                 <div class="telemetry-arrow">→</div>
-                <div class="telemetry-node"><span class="telemetry-index">02</span><strong>NATS fabric</strong><small>Events move between layers</small></div>
+                <div class="telemetry-node"><span class="telemetry-index">02</span><strong>Payment settles</strong><small>x402 + USDC on Base. NATS moves internal events.</small></div>
                 <div class="telemetry-arrow">→</div>
-                <div class="telemetry-node"><span class="telemetry-index">03</span><strong>Proof surface</strong><small>Dashboard reads outcomes</small></div>
+                <div class="telemetry-node"><span class="telemetry-index">03</span><strong>You see the proof</strong><small>Health, latency and volume — live.</small></div>
             </div>
             <div class="telemetry-note anim"><span class="hero-console-dot"></span><span>NATS stays private. Observability becomes a product.</span><a href="dashboard/">Inspect control room ↗</a></div>
         </div>
@@ -1792,6 +1778,38 @@
     setInterval(updateHeartbeat, 200);
     setTimeout(initHeartbeat, 100);
     window.addEventListener('resize', initHeartbeat);
+
+    // LIVE platform metrics: same-origin first, VM fallback. Honest numbers only.
+    const AEX_BASES = ['', 'https://34-156-149-38.sslip.io/aetherapi'];
+    async function aexGet(path) {
+        for (const b of AEX_BASES) {
+            try {
+                const r = await fetch(b ? b + path : path.replace(/^\//, ''));
+                if (r.ok) return await r.json();
+            } catch (e) { /* try next base */ }
+        }
+        return null;
+    }
+    async function refreshLiveStats() {
+        try {
+            const h = await aexGet('/api/v1/health');
+            if (h && h.endpoints) {
+                const eps = Object.values(h.endpoints);
+                document.getElementById('lvEndpoints').textContent = Object.keys(h.endpoints).length;
+                let min = Infinity;
+                eps.forEach(d => { const m = /\$(\d+(?:\.\d+)?)\/call/.exec(d); if (m) min = Math.min(min, parseFloat(m[1])); });
+                if (min < Infinity) document.getElementById('lvPrice').textContent = '$' + min;
+            }
+            const t = await aexGet('/v1/telemetry');
+            if (t && t.totals) {
+                if (t.totals.avg_latency_ms) document.getElementById('lvLatency').textContent = Math.round(t.totals.avg_latency_ms) + 'ms';
+                document.getElementById('lvVolume').textContent = '$' + (t.totals.volume_usdc || 0);
+            }
+        } catch (e) { /* keep placeholders when offline */ }
+    }
+    refreshLiveStats();
+    setInterval(refreshLiveStats, 60000);
     </script>
+    <script src="fx.js"></script>
 </body>
 </html>
