@@ -476,6 +476,11 @@ async def maps_nearby(lat: float = Query(..., description="Latitude"),
 
 CHAINIDS = {"ethereum": 1, "base": 8453, "optimism": 10,
             "arbitrum": 42161, "polygon": 137}
+BLOCKSCOUT = {"ethereum": "https://eth.blockscout.com",
+              "base": "https://base.blockscout.com",
+              "optimism": "https://optimism.blockscout.com",
+              "arbitrum": "https://arbitrum.blockscout.com",
+              "polygon": "https://polygon.blockscout.com"}
 
 # Major stablecoins: served instantly via Coinbase spot (fiat-grade source,
 # immune to DEX-indexer gaps and datacenter throttling).
@@ -500,10 +505,12 @@ async def token_analyze(address: str = Query(..., description="Token contract"),
                   "analyzed_at": _now(), "checks": {}}
         if chain.lower() in ("ethereum", "base", "optimism", "arbitrum"):
             async with httpx.AsyncClient(timeout=15) as client:
-                vr = await client.get(
-                    "https://api.etherscan.io/api",
-                    params={"module": "contract", "action": "getabi",
-                            "address": address, "tag": "latest"})
+                _params = {"module": "contract", "action": "getabi",
+                           "address": address, "tag": "latest"}
+                if ETHERSCAN_API_KEY:
+                    _params["apikey"] = ETHERSCAN_API_KEY
+                vr = await client.get("https://api.etherscan.io/api",
+                                      params=_params)
                 if vr.status_code == 200:
                     data = vr.json()
                     result["checks"]["verified"] = data.get("status") == "1"
@@ -525,27 +532,30 @@ async def token_analyze(address: str = Query(..., description="Token contract"),
 @app.get("/api/v1/token/holders")
 async def token_holders(address: str = Query(..., description="Token contract"),
                         chain: str = Query("ethereum", description="Blockchain")):
-    """Holder distribution. Requires ETHERSCAN_API_KEY env var."""
-    if not ETHERSCAN_API_KEY:
-        return _err(501, {
-            "error": "token/holders requires an Etherscan API key",
-            "how": "Set ETHERSCAN_API_KEY env var (free at etherscan.io/apis).",
-            "address": address, "chain": chain})
+    """Holder distribution via Blockscout public API (no key).
+
+    NOTE: Etherscan's tokenholderlist is a PRO endpoint (free keys get
+    "upgrade to API Pro"), so holders intentionally bypass Etherscan.
+    The ETHERSCAN_API_KEY (when set) still boosts analyze + gas quotas.
+    """
+    base = BLOCKSCOUT.get(chain.lower())
+    if not base:
+        return _err(400, {"error": f"Unsupported chain: {chain}. "
+                                   f"Use: {sorted(BLOCKSCOUT)}"})
     try:
-        chainid = CHAINIDS.get(chain.lower(), 1)
         async with httpx.AsyncClient(timeout=20) as client:
-            r = await client.get(
-                "https://api.etherscan.io/v2/api",
-                params={"chainid": chainid, "module": "token",
-                        "action": "tokenholderlist",
-                        "contractaddress": address, "page": 1, "offset": 20,
-                        "apikey": ETHERSCAN_API_KEY})
-            data = r.json()
-            if data.get("status") == "1":
-                return {"address": address, "chain": chain,
-                        "count": len(data["result"]),
-                        "holders": data["result"], "fetched_at": _now()}
-            return _err(502, {"error": data.get("message", "Etherscan error")})
+            ok, data = await fetch_json(client,
+                f"{base}/api/v2/tokens/{address}/holders",
+                params={"page": 1, "offset": 20})
+            if not ok or not isinstance(data, dict) or "items" not in data:
+                return _err(502, {"error": "Blockscout holders unavailable",
+                                  "address": address, "chain": chain})
+            out = [{"address": (h.get("address") or {}).get("hash"),
+                    "balance": h.get("value")}
+                   for h in (data.get("items") or [])[:20]]
+            return {"address": address, "chain": chain,
+                    "count": len(out), "holders": out,
+                    "data_source": "blockscout", "fetched_at": _now()}
     except Exception as e:
         return _err(500, {"error": str(e)})
 
@@ -1219,8 +1229,11 @@ async def token_gas(chain: str = Query("ethereum", description="ethereum only"))
         return _err(400, {"error": "Gas oracle supports ethereum only"})
     try:
         async with httpx.AsyncClient(timeout=15) as client:
+            _gparams = {"module": "gastracker", "action": "gasoracle"}
+            if ETHERSCAN_API_KEY:
+                _gparams["apikey"] = ETHERSCAN_API_KEY
             ok, data = await fetch_json(client, "https://api.etherscan.io/api",
-                params={"module": "gastracker", "action": "gasoracle"})
+                                        params=_gparams)
             if ok and data.get("status") == "1":
                 r = data.get("result", {})
                 return {"chain": "ethereum",
