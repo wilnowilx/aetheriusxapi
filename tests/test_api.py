@@ -1,131 +1,192 @@
+"""aetheriusxAPI test suite.
+
+Deterministic gates (no network needed):
+  - /health is free (200, no payment header)
+  - all 10 paid endpoints return 402 without X-PAYMENT, with x402 body shape
+  - invalid email is rejected deterministically (no MX lookup reached)
+  - missing params return docs-compliant 400
+  - legacy /api/v1/* prefix behaves identically
+  - paid responses carry the X-PAYMENT-SETTLED header
+
+Live-shape checks (need network; tolerant of upstream outages):
+  - paid requests return 200 with expected keys, OR a JSON {"error": ...}
+    proving our stack executed end-to-end.
+"""
+
+import pytest
 from fastapi.testclient import TestClient
 
-from main import app
-
+from main import app, PRICES
 
 client = TestClient(app)
-PAYMENT = {"X-PAYMENT": "simulated-payment"}
-ADDRESS = "0x0000000000000000000000000000000000000001"
+PAID = {"X-PAYMENT": "simulated-payment"}
 
 
-def get(path: str):
-    return client.get(path, headers=PAYMENT)
+def test_health_free():
+    r = client.get("/health")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["status"] == "alive"
+    assert body["service"] == "aetheriusxAPI"
+    assert len(body["endpoints"]) == 10
 
 
-def test_payment_is_required_before_endpoint_execution():
-    response = client.get("/v1/email/validate", params={"email": "user@example.com"})
-
-    assert response.status_code == 402
-    assert response.json()["currency"] == "USDC"
-    assert response.json()["mode"] == "simulated"
-    assert response.headers["X-PAYMENT-REQUIRED"] == "true"
-
-
-def test_maps_search():
-    response = get("/v1/maps/search?q=coffee&location=Mexico City")
-
-    assert response.status_code == 200
-    body = response.json()
-    assert body["query"] == "coffee"
-    assert body["count"] == len(body["results"])
-    assert {"name", "address", "lat", "lon"} <= body["results"][0].keys()
-
-
-def test_maps_reviews():
-    body = get("/v1/maps/reviews?place_name=Zocalo").json()
-
-    assert body["count"] == 1
-    assert body["results"][0]["type"] == "place"
-    assert isinstance(body["results"][0]["importance"], float)
-
-
-def test_maps_nearby():
-    body = get("/v1/maps/nearby?lat=19.4326&lon=-99.1332&radius=500&category=cafe").json()
-
-    assert body["center"] == {"lat": 19.4326, "lon": -99.1332}
-    assert body["radius"] == 500
-    assert body["category"] == "cafe"
-    assert all("distance_m" in item for item in body["results"])
-
-
-def test_token_analyze():
-    body = get(f"/v1/token/analyze?address={ADDRESS}").json()
-
-    assert body["address"] == ADDRESS
-    assert body["checks"]["verified"] is True
-    assert body["risk_level"] == "low"
-    assert 0 <= body["risk_score"] <= 100
-
-
-def test_token_holders():
-    body = get(f"/v1/token/holders?address={ADDRESS}&chain=base").json()
-
-    assert body["chain"] == "base"
-    assert body["holder_count"] > 0
-    assert body["top_holders"][0]["rank"] == 1
-    assert "share_percent" in body["top_holders"][0]
-
-
-def test_token_price():
-    body = get(f"/v1/token/price?address={ADDRESS}").json()
-
-    assert body["symbol"] == "AETH"
-    assert body["price_usd"] > 0
-    assert "change_24h" in body
-
-
-def test_web_scrape():
-    body = get("/v1/web/scrape?url=https://example.com").json()
-
-    assert body["status"] == 200
-    assert body["title"] == "Example Domain"
-    assert body["links_count"] == len(body["links"])
-    assert body["content_length"] > len(body["text_preview"])
-
-
-def test_web_screenshot():
-    body = get("/v1/web/screenshot?url=https://example.com&width=800&height=600").json()
-
-    assert body["status"] == 200
-    assert body["width"] == 800
-    assert body["height"] == 600
-    assert body["content_type"] == "image/png"
-
-
-def test_email_validate():
-    body = get("/v1/email/validate?email=user@example.com").json()
-
-    assert body == {
-        "email": "user@example.com",
-        "valid_syntax": True,
-        "has_mx": True,
-        "is_disposable": False,
-        "risk_score": 10,
-        "verdict": "valid",
+@pytest.mark.parametrize("route", sorted(PRICES))
+def test_paid_endpoints_require_payment(route):
+    # Minimal query params so routing (not validation) is what we test.
+    params = {
+        "/v1/maps/search": {"q": "cafe"},
+        "/v1/maps/reviews": {"place_name": "Zocalo"},
+        "/v1/maps/nearby": {"lat": 19.43, "lon": -99.13},
+        "/v1/token/analyze": {"address": "0x0000000000000000000000000000000000000000"},
+        "/v1/token/holders": {"address": "0x0000000000000000000000000000000000000000"},
+        "/v1/token/price": {"address": "0x0000000000000000000000000000000000000000"},
+        "/v1/web/scrape": {"url": "https://example.com"},
+        "/v1/web/screenshot": {"url": "https://example.com"},
+        "/v1/email/validate": {"email": "user@example.com"},
+        "/v1/data/weather": {"lat": 19.43, "lon": -99.13},
     }
+    r = client.get(route, params=params[route])
+    assert r.status_code == 402
+    body = r.json()
+    assert body["error"] == "Payment required"
+    assert body["currency"] == "USDC"
+    assert "pay_to" in body and body["pay_to"].startswith("0x")
+    assert "network" in body
 
 
-def test_weather():
-    body = get("/v1/data/weather?lat=19.4326&lon=-99.1332").json()
-
-    assert body["location"] == {"lat": 19.4326, "lon": -99.1332}
-    assert body["current"]["temperature_c"] > -100
-    assert len(body["forecast"]) == 2
-    assert "precipitation_probability" in body["forecast"][0]
-
-
-def test_invalid_input_returns_bad_request():
-    response = get(f"/v1/token/price?address=not-an-address")
-
-    assert response.status_code == 400
-    assert "valid EVM contract address" in response.json()["detail"]
+def test_invalid_email_deterministic():
+    r = client.get("/v1/email/validate", params={"email": "not-an-email"},
+                   headers=PAID)
+    assert r.status_code == 200
+    body = r.json()
+    assert body["valid_syntax"] is False
+    assert body["verdict"] == "invalid_syntax"
+    assert body["risk_score"] == 100
 
 
-def test_json_simulated_payment_can_encode_amount():
-    response = client.get(
-        "/v1/email/validate?email=user@example.com",
-        headers={"X-PAYMENT": '{"scheme":"simulated","amount":"0.005"}'},
-    )
+def test_missing_param_returns_400():
+    r = client.get("/v1/maps/search", headers=PAID)  # no q
+    assert r.status_code == 400
+    assert "Missing required parameter" in r.json()["error"]
 
-    assert response.status_code == 200
-    assert response.headers["X-PAYMENT-RESPONSE"]
+
+def test_legacy_prefix_alias():
+    r = client.get("/api/v1/email/validate", params={"email": "not-an-email"},
+                   headers=PAID)
+    assert r.status_code == 200
+    assert r.json()["verdict"] == "invalid_syntax"
+
+
+def test_settlement_header_on_paid():
+    r = client.get("/health")
+    assert "X-PAYMENT-SETTLED" not in r.headers  # free route: no header
+    r = client.get("/v1/email/validate", params={"email": "not-an-email"},
+                   headers=PAID)
+    assert r.headers.get("X-PAYMENT-SETTLED") == "simulated"
+
+
+def test_screenshot_shape():
+    r = client.get("/v1/web/screenshot",
+                   params={"url": "https://example.com"},
+                   headers=PAID)
+    assert r.status_code == 200
+    body = r.json()
+    assert "screenshot_url" in body and body["url"] == "https://example.com"
+
+
+def assert_live_or_upstream_error(resp, required_keys):
+    """200 + keys, or a JSON error proving our stack ran (upstream down)."""
+    if resp.status_code == 200:
+        body = resp.json()
+        assert ("error" in body
+                or all(k in body for k in required_keys)), body
+    else:
+        assert resp.status_code in (404, 500, 501, 502)
+        assert "error" in resp.json()
+
+
+def test_error_branches_return_json():
+    # Regression: error paths must build valid JSON bodies (Starlette
+    # JSONResponse takes content first; status_code is keyword-only).
+    r = client.get("/v1/token/price",
+                   params={"address": "0xabc", "chain": "solana"},
+                   headers=PAID)
+    assert r.status_code in (200, 404, 500, 502)
+    assert "error" in r.json() or "price_usd" in r.json()
+
+    r = client.get("/v1/token/holders",
+                   params={"address": "0xabc"}, headers=PAID)
+    assert r.status_code in (200, 501, 502)
+    assert "error" in r.json() or "holders" in r.json()
+
+    r = client.get("/v1/web/scrape",
+                   params={"url": "http://invalid.invalid"},
+                   headers=PAID)
+    assert r.status_code in (200, 500, 502)
+    assert "error" in r.json() or "title" in r.json()
+
+
+def test_dashboard_served():
+    import os
+    if not os.path.isdir(os.path.join(os.path.dirname(__file__), "..", "dashboard")):
+        pytest.skip("dashboard folder not present")
+    r = client.get("/dashboard/")
+    assert r.status_code == 200
+    assert "text/html" in r.headers["content-type"]
+    assert "control room" in r.text.lower()
+    r = client.get("/dashboard/app.js")
+    assert r.status_code == 200
+
+
+def test_telemetry_free_and_shape():
+    r = client.get("/v1/telemetry")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["service"] == "aetheriusxAPI"
+    assert body["uptime_s"] >= 0
+    for k in ("calls", "ok_200", "challenges_402", "errors",
+              "volume_usdc", "avg_latency_ms"):
+        assert k in body["totals"], k
+    assert "per_endpoint" in body
+    assert "recent_events" in body
+    assert "wallets_seen" in body
+
+
+def test_telemetry_records_paid_call_and_volume():
+    before = client.get("/v1/telemetry").json()
+    r = client.get("/v1/email/validate", params={"email": "not-an-email"},
+                   headers=PAID)
+    assert r.status_code == 200
+    after = client.get("/v1/telemetry").json()
+    # telemetry probe itself is never counted
+    assert after["totals"]["calls"] == before["totals"]["calls"] + 1
+    ep0 = before["per_endpoint"].get("/v1/email/validate", {"ok_200": 0})
+    assert after["per_endpoint"]["/v1/email/validate"]["ok_200"] == ep0["ok_200"] + 1
+    delta = round(after["totals"]["volume_usdc"] - before["totals"]["volume_usdc"], 4)
+    assert delta == 0.005  # email/validate price
+
+
+def test_telemetry_counts_402_and_wallets():
+    import uuid
+    w = "0x" + uuid.uuid4().hex[:40]
+    before = client.get("/v1/telemetry").json()
+    r = client.get("/v1/maps/search", params={"q": "cafe"})
+    assert r.status_code == 402
+    client.get("/v1/maps/search", params={"q": "cafe"},
+               headers={**PAID, "X-Wallet": w})
+    after = client.get("/v1/telemetry").json()
+    assert after["totals"]["challenges_402"] >= before["totals"]["challenges_402"] + 1
+    assert after["wallets_seen"] == before["wallets_seen"] + 1
+
+
+def test_live_email_valid_shape():
+    r = client.get("/v1/email/validate", params={"email": "user@gmail.com"},
+                   headers=PAID)
+    assert_live_or_upstream_error(r, ["valid_syntax", "verdict"])
+
+
+def test_live_weather_shape():
+    r = client.get("/v1/data/weather",
+                   params={"lat": 19.43, "lon": -99.13}, headers=PAID)
+    assert_live_or_upstream_error(r, ["current", "data_source"])

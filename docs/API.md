@@ -269,6 +269,42 @@ Get weather forecast by location.
 
 ---
 
+### Telemetry
+
+#### GET /v1/telemetry
+
+Public proof layer — **free, no payment required.** Uptime, totals, per-endpoint
+stats, settled USDC volume, wallets seen, recent latencies and events.
+Powers the dashboard and grant reporting.
+
+**Response:**
+
+```json
+{
+  "service": "aetheriusxAPI",
+  "uptime_s": 12345.6,
+  "totals": {
+    "calls": 1000,
+    "ok_200": 800,
+    "challenges_402": 190,
+    "errors": 10,
+    "avg_latency_ms": 120.5,
+    "volume_usdc": 12.345
+  },
+  "wallets_seen": 42,
+  "per_endpoint": {
+    "/v1/email/validate": {
+      "calls": 100, "ok_200": 90, "n402": 9, "errors": 1,
+      "avg_latency_ms": 15.2, "volume_usdc": 0.45
+    }
+  }
+}
+```
+
+**Price:** Free
+
+---
+
 ## Error Responses
 
 All errors follow the x402 standard:
@@ -314,4 +350,4 @@ All errors follow the x402 standard:
 ## Support
 
 - Twitter: [@aetheriusxAPI](https://x.com/aetheriusxAPI)
-- GitHub: [wilnowilx/aetheriusx-api-site](https://github.com/wilnowilx/aetheriusx-api-site)
+- GitHub: [wilnowilx/aetheriusxapi](https://github.com/wilnowilx/aetheriusxapi)

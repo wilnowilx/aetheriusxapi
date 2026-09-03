@@ -1,48 +1,92 @@
-# Base Ecosystem Fund Application - AetheriusX API
+# Base Grant Applications — AETHERIUS / aetheriusxAPI
+
+> Single source of truth for both tracks. Creator Grant = content funding ($4K).
+> Ecosystem Fund = product investment (pre-seed/seed). Different asks, shared evidence.
 
 ## Company Name
-AetheriusX API
+
+AETHERIUS (product: aetheriusxAPI)
 
 ## What are you building?
-AetheriusX API is a crypto-native API marketplace where AI agents pay per request in USDC on Base. We use the x402 protocol (HTTP 402 with crypto payments) to enable machine-to-machine commerce without human intervention, subscriptions, or credit cards.
 
-Our platform offers 5 core endpoints:
-- Google Maps business search ($0.01/call)
-- Google Maps reviews ($0.02/call)
-- Crypto token analyzer ($0.02/call)
-- Web scraper ($0.01/call)
-- Email validator ($0.005/call)
+Crypto-native API marketplace where **AI agents pay per request in USDC on Base via x402**.
+No accounts, no API keys, no credit cards — the wallet is the identity.
 
-All payments settle instantly in USDC on Base L2. AI agents connect their wallets and pay directly - no KYC, no accounts, no friction.
+**Live on Base Sepolia testnet (not a deck — running code):**
+- 10 endpoints: maps search/reviews/nearby, token analyze/holders/price,
+  web scrape/screenshot, email validate, weather
+- 8 served by live upstream logic (OpenStreetMap, CoinGecko/Coinbase, Open-Meteo, …)
+- E2E proven: 6/6 endpoints return 200 with real USDC settlement
+- Interactive dashboard with API explorer: `/dashboard/`
+- Landing: https://wilnowilx.github.io/aetheriusxapi/
+- Live API: http://34.156.149.38/aetherapi/ (`/docs`, `/health`)
+- Repo: https://github.com/wilnowilx/aetheriusxapi
 
 ## Website URL
-https://aetheriusx.github.io/aetheriusx-api/
+
+https://wilnowilx.github.io/aetheriusxapi/
 
 ## X URL
+
 https://x.com/aetheriusxAPI
 
 ## Team
-Solo developer with 13+ years in crypto (since 2013). Full-stack skills: Python, Kubernetes, FastAPI, Solidity, deep x402 protocol knowledge. Currently in Google for Startups program with GCP infrastructure.
+
+Solo builder, 13+ years in crypto (since 2013). Python, FastAPI, GCP/Kubernetes,
+telemetry/NATS, x402 protocol. Google for Startups member with GCP infrastructure
+(Europe region, systemd + Nginx, monitored 24/7).
 
 ## Why Base?
-Base is the ideal L2 for our use case:
-1. Low transaction fees make micro-payments viable ($0.01-$0.02 per API call)
-2. Coinbase ecosystem provides trust and liquidity
-3. x402 protocol support is native to Base
-4. Growing AI agent economy needs payment infrastructure
 
-## What will the funding be used for?
-1. Mainnet deployment and testing ($500)
-2. Infrastructure costs - GCP VM hosting ($200/month for 6 months)
-3. Additional API endpoints development ($1,000)
-4. Marketing and community building ($500)
-5. Legal and administrative ($300)
+1. Sub-cent fees make $0.005–$0.03 per-call micropayments viable — impossible on L1.
+2. USDC on Base is the natural settlement asset for agents (stable, liquid, instant).
+3. x402 is Base-native; facilitator + Base Sepolia give a complete test loop.
+4. Base explicitly funds **payments** and **AI agents** (Ecosystem Fund categories).
+5. Every paid call is onchain activity: wallets, transactions, volume attributable to Base.
 
-Total requested: $5,000
+## TRACK A — Creator Grant ($4,000): builders documenting the agent economy
 
-## Metrics
-- Testnet deployment: Active on Base Sepolia
-- 5 functional endpoints with x402 payment integration
-- E2E tested payment flow with USDC
-- Self-hosted facilitator ready for mainnet
-- Codebase: Production-ready FastAPI application
+**Angle:** we are technical builders producing education from real infrastructure,
+in English + Spanish (underserved audience).
+
+**Content series (8 pieces, 6 weeks):**
+1. An agent pays for its first API call (video + code, EN/ES)
+2. Inside an x402 round-trip: 402 → sign → settle (deep-dive)
+3. Operating 10 paid endpoints on $X/month GCP (cost transparency)
+4. When upstreams throttle datacenters: building a 5-source price chain (postmortem)
+5. Distributed telemetry with NATS: what each layer sees (video)
+6. Storage-layout drift: detecting divergent state between layers (demo + API preview)
+7. Agents + prediction markets: Polymarket bots that pay for data (case study)
+8. Deploy your own paid API on Base in 30 minutes (tutorial + template repo)
+
+**Deliverables:** videos + written tutorials + reproducible code. Budget: $4,000
+(infra $1,200 · production/editing $1,600 · ES translation $600 · distribution $600).
+
+## TRACK B — Ecosystem Fund: infrastructure for agent commerce
+
+**Thesis:** agents need to pay for data; data providers need to get paid.
+aetheriusxAPI is that rail on Base: discovery (catalog) → payment (x402/USDC) →
+delivery (APIs) → observability (telemetry, drift detection).
+
+**Three product lines:**
+- **Data APIs** (live): crypto, maps, weather, web, email.
+- **Agent APIs** (next): Polymarket markets/signals, protocol discovery (80+ mapped).
+- **Infrastructure APIs** (Phase 2): telemetry health, storage-layout drift,
+  latency proofs — observability other builders can consume per-call.
+
+**Use of funds:** mainnet deployment + audit ($800) · 12-month infra ($2,400) ·
+provider onboarding + SDKs ($3,000) · security review ($1,500) · content/growth ($2,300).
+
+**90-day targets post-funding:** mainnet live · 25+ endpoints · Python/JS SDKs ·
+100 paying agent-wallets · public status page with uptime/latency/volume.
+
+## Metrics (verifiable today)
+
+- Testnet: Base Sepolia (`eip155:84532`), wallet `0x677B…7f61`
+- E2E: 6/6 paid endpoints → 200 (receipts in repo history / demo video)
+- Suite: 23/23 tests green (`pytest -q`), incl. telemetry accounting tests
+- Public telemetry: `GET /v1/telemetry` (free) — uptime, per-endpoint stats,
+  settled USDC volume, latency feed. Powers the live dashboard.
+- Uptime: systemd + auto-restart, Nginx reverse proxy, 90s upstream budget
+- Cost: single GCP VM (Europe), full stack under $50/mo
+- Honesty policy: key-gated endpoints return 501 with setup instructions, never fake data

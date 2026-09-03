@@ -1,68 +1,65 @@
-"""Simulated x402 middleware for local development."""
+"""Simulated x402 payment middleware for local development and testing.
 
-from collections.abc import Iterable
-from decimal import Decimal, InvalidOperation
-import json
-from typing import Any
+In SIMULATED mode any request carrying an ``X-PAYMENT`` header is treated as
+paid and passes through (a ``X-PAYMENT-SETTLED: simulated`` header is added
+to the response). Requests without the header receive a standards-compliant
+``402 Payment Required`` JSON body describing price, currency, network and
+pay-to address — the same shape the real x402 facilitator flow returns.
+
+Set X402_MODE=real (and install the official ``x402`` SDK) to enforce
+on-chain USDC verification instead. See main.py.
+"""
 
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
-from starlette.responses import JSONResponse, Response
+from starlette.responses import JSONResponse
+
+PAYMENT_HEADER = "X-PAYMENT"
+SETTLED_HEADER = "X-PAYMENT-SETTLED"
 
 
 class SimulatedX402Middleware(BaseHTTPMiddleware):
-    """Require a local payment proof and expose x402-shaped 402 responses."""
+    """Gate paid routes behind an ``X-PAYMENT`` header (simulated settlement)."""
 
-    def __init__(self, app: Any, routes: dict[str, str]) -> None:
+    def __init__(self, app, prices: dict, pay_to: str, network: str,
+                 currency: str = "USDC"):
         super().__init__(app)
-        self.routes = {key.upper(): value for key, value in routes.items()}
+        self.prices = prices          # canonical "/v1/..." path -> "$0.01"
+        self.pay_to = pay_to
+        self.network = network
+        self.currency = currency
 
-    async def dispatch(self, request: Request, call_next: Any) -> Response:
-        route_key = f"{request.method} {request.url.path}".upper()
-        price = self.routes.get(route_key)
-        if price is None:
+    def _canonical(self, path: str) -> str | None:
+        """Map /v1/... and legacy /api/v1/... to the canonical /v1/... key."""
+        for prefix in ("/api/v1/", "/v1/"):
+            if path.startswith(prefix):
+                return "/v1/" + path[len(prefix):]
+        return None
+
+    async def dispatch(self, request, call_next):
+        path = request.url.path
+        canonical = self._canonical(path)
+
+        # Free route (health, docs, root, or anything not in the price table).
+        if canonical is None or canonical not in self.prices:
             return await call_next(request)
 
-        payment = request.headers.get("X-PAYMENT", "").strip()
+        payment = request.headers.get(PAYMENT_HEADER)
         if not payment:
+            price = self.prices[canonical]
             return JSONResponse(
                 status_code=402,
                 content={
                     "error": "Payment required",
-                    "amount": price,
-                    "currency": "USDC",
-                    "network": "eip155:8453",
-                    "pay_to": "0x0000000000000000000000000000000000000001",
-                    "mode": "simulated",
-                    "payment_header": "X-PAYMENT",
+                    "amount": price.replace("$", ""),
+                    "currency": self.currency,
+                    "network": self.network,
+                    "pay_to": self.pay_to,
+                    "route": canonical,
+                    "hint": f"Retry with header '{PAYMENT_HEADER}: <payment-proof>'. "
+                            f"Local simulated mode accepts any non-empty value.",
                 },
-                headers={"X-PAYMENT-REQUIRED": "true"},
-            )
-
-        if not _is_valid_simulated_payment(payment, price):
-            return JSONResponse(
-                status_code=402,
-                content={"error": "Invalid simulated payment", "mode": "simulated"},
             )
 
         response = await call_next(request)
-        response.headers["X-PAYMENT-RESPONSE"] = json.dumps(
-            {"status": "settled", "mode": "simulated", "amount": price}
-        )
+        response.headers[SETTLED_HEADER] = "simulated"
         return response
-
-
-def _is_valid_simulated_payment(payment: str, price: str) -> bool:
-    """Accept an explicit local proof, optionally encoded as JSON."""
-    if payment in {"simulated", "simulated-payment", "test-payment"}:
-        return True
-    try:
-        payload = json.loads(payment)
-    except json.JSONDecodeError:
-        return False
-    if not isinstance(payload, dict) or payload.get("scheme") != "simulated":
-        return False
-    try:
-        return Decimal(str(payload.get("amount"))) >= Decimal(price)
-    except (InvalidOperation, TypeError):
-        return False
