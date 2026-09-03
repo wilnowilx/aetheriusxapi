@@ -25,58 +25,32 @@
 
 ## Table of Contents
 
-- [The Problem](#the-problem)
+- [🔥 The Problem](#the-problem)
 - [🗺️ System Overview](#system-overview)
 - [📡 Live Status](#live-status)
 - [🐍 SDKs](#sdks)
-- [The Vision](#the-vision)
-- [Mental Model: How x402 Changes Everything](#mental-model-how-x402-changes-everything)
-- [Architecture](#architecture)
-- [Quick Start](#quick-start)
-- [Dashboard](#dashboard)
-- [Endpoints](#endpoints)
-- [Categories](#categories)
-- [Rate Limits](#rate-limits)
-- [Tech Stack](#tech-stack)
-- [Roadmap](#roadmap)
-- [Grant Application](#grant-application)
-- [Contributing](#contributing)
-- [License](#license)
-- [Links](#links)
+- [🔭 The Vision](#the-vision)
+- [🧠 Mental Model: How x402 Changes Everything](#mental-model-how-x402-changes-everything)
+- [🏗️ Architecture](#architecture)
+- [🚀 Quick Start](#quick-start)
+- [🎛️ Dashboard](#dashboard)
+- [⚡ Endpoints](#endpoints)
+- [🗂️ Categories](#categories)
+- [🚦 Rate Limits](#rate-limits)
+- [🧱 Tech Stack](#tech-stack)
+- [🛣️ Roadmap](#roadmap)
+- [💰 Grant Application](#grant-application)
+- [🤝 Contributing](#contributing)
+- [📄 License](#license)
+- [🔗 Links](#links)
 
 ---
 
 ## 🗺️ System Overview
 
-```mermaid
-flowchart LR
-    A[🤖 AI Agent] -->|GET /v1/...| G[AETHERIUS Gateway<br/>FastAPI · x402]
-    G -->|402 + price| A
-    G -->|paid 200| A
-    G --> M[Maps · OSM]
-    G --> C[Crypto · CoinGecko/Coinbase/Llama]
-    G --> W[Web · direct fetch]
-    G --> D[Data · Open-Meteo/Nominatim]
-    G --> R[Drift · public RPCs]
-    G --> T[Telemetry<br/>SQLite + /v1/telemetry]
-    A -->|$ USDC settle| B[(Base L2)]
-    G -.->|verify proof| F[Facilitator]
-```
+![System flow](https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKZmxvd2NoYXJ0IExSCiAgICBBW_CfpJYgQUkgQWdlbnRdIC0tPnxHRVQgL3YxLy4uLnwgR1tBRVRIRVJJVVMgR2F0ZXdheTxici8-RmFzdEFQSSDCtyB4NDAyXQogICAgRyAtLT58NDAyICsgcHJpY2V8IEEKICAgIEcgLS0-fHBhaWQgMjAwfCBBCiAgICBHIC0tPiBNW01hcHMgwrcgT1NNXQogICAgRyAtLT4gQ1tDcnlwdG8gwrcgQ29pbkdlY2tvL0NvaW5iYXNlL0xsYW1hXQogICAgRyAtLT4gV1tXZWIgwrcgZGlyZWN0IGZldGNoXQogICAgRyAtLT4gRFtEYXRhIMK3IE9wZW4tTWV0ZW8vTm9taW5hdGltXQogICAgRyAtLT4gUltEcmlmdCDCtyBwdWJsaWMgUlBDc10KICAgIEcgLS0-IFRbVGVsZW1ldHJ5PGJyLz5TUUxpdGUgKyAvdjEvdGVsZW1ldHJ5XQogICAgQSAtLT58JCBVU0RDIHNldHRsZXwgQlsoQmFzZSBMMildCiAgICBHIC0uLT58dmVyaWZ5IHByb29mfCBGW0ZhY2lsaXRhdG9yXQ==)
 
-```mermaid
-sequenceDiagram
-    participant Agent as 🤖 Agent
-    participant API as aetheriusxAPI
-    participant Fac as Facilitator
-    participant Base as Base L2
-    Agent->>API: GET /v1/email/validate
-    API-->>Agent: 402 + price $0.005 USDC
-    Agent->>Agent: sign USDC transfer
-    Agent->>API: retry + X-PAYMENT proof
-    API->>Fac: verify proof
-    Fac-->>API: valid → settle on Base
-    API-->>Agent: 200 + data
-```
+![x402 payment sequence](https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKc2VxdWVuY2VEaWFncmFtCiAgICBwYXJ0aWNpcGFudCBBZ2VudCBhcyDwn6SWIEFnZW50CiAgICBwYXJ0aWNpcGFudCBBUEkgYXMgYWV0aGVyaXVzeEFQSQogICAgcGFydGljaXBhbnQgRmFjIGFzIEZhY2lsaXRhdG9yCiAgICBwYXJ0aWNpcGFudCBCYXNlIGFzIEJhc2UgTDIKICAgIEFnZW50LT4-QVBJOiBHRVQgL3YxL2VtYWlsL3ZhbGlkYXRlCiAgICBBUEktLT4-QWdlbnQ6IDQwMiArIHByaWNlICQwLjAwNSBVU0RDCiAgICBBZ2VudC0-PkFnZW50OiBzaWduIFVTREMgdHJhbnNmZXIKICAgIEFnZW50LT4-QVBJOiByZXRyeSArIFgtUEFZTUVOVCBwcm9vZgogICAgQVBJLT4-RmFjOiB2ZXJpZnkgcHJvb2YKICAgIEZhYy0tPj5BUEk6IHZhbGlkIOKGkiBzZXR0bGUgb24gQmFzZQogICAgQVBJLS0-PkFnZW50OiAyMDAgKyBkYXRh)
 
 ---
 
@@ -108,13 +82,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 
 ## 🔭 The Vision
 
-```mermaid
-flowchart TB
-    AG[🤖 AI Agent<br/>Buyer] <-->|x402 · USDC on Base| AP[🧩 API Provider<br/>Seller]
-    AG --> HUB[AETHERIUS Hub<br/>11 APIs · auto-pay · growing]
-    AP --> HUB
-    HUB --> INF[Infrastructure<br/>FastAPI · x402 · Base L2 · Coinbase CDP]
-```
+![Ecosystem](https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKZmxvd2NoYXJ0IFRCCiAgICBBR1vwn6SWIEFJIEFnZW50PGJyLz5CdXllcl0gPC0tPnx4NDAyIMK3IFVTREMgb24gQmFzZXwgQVBb8J-nqSBBUEkgUHJvdmlkZXI8YnIvPlNlbGxlcl0KICAgIEFHIC0tPiBIVUJbQUVUSEVSSVVTIEh1Yjxici8-MTEgQVBJcyDCtyBhdXRvLXBheSDCtyBncm93aW5nXQogICAgQVAgLS0-IEhVQgogICAgSFVCIC0tPiBJTkZbSW5mcmFzdHJ1Y3R1cmU8YnIvPkZhc3RBUEkgwrcgeDQwMiDCtyBCYXNlIEwyIMK3IENvaW5iYXNlIENEUF0=)
 
 **Mission:** Become the default API layer for autonomous agents — the Stripe of the agent economy.
 
@@ -130,17 +98,11 @@ flowchart TB
 
 ### The Old World (API Key Era)
 
-```mermaid
-flowchart LR
-    D[👨‍💻 Developer] --> S[Sign up] --> K[API key] --> B[💳 Credit card + billing] --> H[🤞 Hope it works]
-```
+![Old world](https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKZmxvd2NoYXJ0IExSCiAgICBEW_CfkajigI3wn5K7IERldmVsb3Blcl0gLS0-IFNbU2lnbiB1cF0gLS0-IEtbQVBJIGtleV0gLS0-IEJb8J-SsyBDcmVkaXQgY2FyZCArIGJpbGxpbmddIC0tPiBIW_CfpJ4gSG9wZSBpdCB3b3Jrc10=)
 
 ### The New World (x402 Protocol)
 
-```mermaid
-flowchart LR
-    A[🤖 AI Agent] --> W[👛 Wallet] --> R[📡 Request] --> P[⚡ Auto-pay USDC] --> D[📦 Data]
-```
+![New world](https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKZmxvd2NoYXJ0IExSCiAgICBBW_CfpJYgQUkgQWdlbnRdIC0tPiBXW_CfkZsgV2FsbGV0XSAtLT4gUlvwn5OhIFJlcXVlc3RdIC0tPiBQW-KaoSBBdXRvLXBheSBVU0RDXSAtLT4gRFvwn5OmIERhdGFd)
 
 ### Key Concepts
 
@@ -156,23 +118,7 @@ flowchart LR
 
 ## 🏗️ Architecture
 
-```mermaid
-flowchart TB
-    subgraph CLIENT["💻 Client layer"]
-        direction LR
-        PY[Python SDK] & JS[JS SDK] & GO[Go SDK] & RS[Rust SDK]
-    end
-    subgraph GW["🌐 Gateway layer"]
-        direction TB
-        NX[Nginx · rate limit · SSL · routing] --> FW[FastAPI · wallet auth · x402 · router]
-        FW --> UP[Upstream providers<br/>OSM · CoinGecko · Open-Meteo · RPCs]
-    end
-    subgraph STL["💵 Settlement layer"]
-        direction TB
-        FAC[Facilitator · Coinbase CDP<br/>verify proofs · settle USDC · instant finality] --> BASE[(Base L2<br/>~$0.001 · 2000+ TPS)]
-    end
-    CLIENT --> GW --> STL
-```
+![Architecture](https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKZmxvd2NoYXJ0IFRCCiAgICBzdWJncmFwaCBDTElFTlRbIvCfkrsgQ2xpZW50IGxheWVyIl0KICAgICAgICBkaXJlY3Rpb24gTFIKICAgICAgICBQWVtQeXRob24gU0RLXSAmIEpTW0pTIFNES10gJiBHT1tHbyBTREtdICYgUlNbUnVzdCBTREtdCiAgICBlbmQKICAgIHN1YmdyYXBoIEdXWyLwn4yQIEdhdGV3YXkgbGF5ZXIiXQogICAgICAgIGRpcmVjdGlvbiBUQgogICAgICAgIE5YW05naW54IMK3IHJhdGUgbGltaXQgwrcgU1NMIMK3IHJvdXRpbmddIC0tPiBGV1tGYXN0QVBJIMK3IHdhbGxldCBhdXRoIMK3IHg0MDIgwrcgcm91dGVyXQogICAgICAgIEZXIC0tPiBVUFtVcHN0cmVhbSBwcm92aWRlcnM8YnIvPk9TTSDCtyBDb2luR2Vja28gwrcgT3Blbi1NZXRlbyDCtyBSUENzXQogICAgZW5kCiAgICBzdWJncmFwaCBTVExbIvCfkrUgU2V0dGxlbWVudCBsYXllciJdCiAgICAgICAgZGlyZWN0aW9uIFRCCiAgICAgICAgRkFDW0ZhY2lsaXRhdG9yIMK3IENvaW5iYXNlIENEU Dxici8-dmVyaWZ5IHByb29mcyDCtyBzZXR0bGUgVVNEQyDCtyBpbnN0YW50IGZpbmFsaXR5XSAtLT4gQkFTRVsoQmFzZSBMMjxici8-fiQwLjAwMSDCtyAyMDAwKyBUUFMpXQogICAgZW5kCiAgICBDTElFTlQgLS0-IEdXIC0tPiBTVEw=)
 
 ---
 
@@ -358,12 +304,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ## 🧱 Tech Stack
 
-```mermaid
-graph LR
-    APP[🧱 FastAPI · Python · Pydantic] --> PRO[🔌 x402 · HTTP 402 · USDC · Base]
-    PRO --> INF[☁️ Nginx · Systemd · GCP]
-    INF --> PAY[💵 Coinbase CDP · USDC · L2]
-```
+![Tech stack](https://mermaid.ink/svg/Z3JhcGggTFIKICAgIEFQUFvwn6exIEZhc3RBUEkgwrcgUHl0aG9uIMK3IFB5ZGFudGljXSAtLT4gUFJPW_CflIwgeDQwMiDCtyBIVFRQIDQwMiDCtyBVU0RDIMK3IEJhc2VdCiAgICBQUk8gLS0-IElORlvimIHvuI8gTmdpbnggwrcgU3lzdGVtZCDCtyBHQ1BdCiAgICBJTkYgLS0-IFBBWVvwn5K1IENvaW5iYXNlIENEUCDCtyBVU0RDIMK3IEwyXQ==)
 
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
@@ -470,5 +411,7 @@ AETHERIUS — The infrastructure that lets AI agents pay for themselves.
 
 [![Twitter](https://img.shields.io/badge/Follow-%40aetheriusxAPI-1DA1F2?style=for-the-badge&logo=twitter&labelColor=09090b)](https://x.com/aetheriusxAPI)
 [![GitHub](https://img.shields.io/badge/Star-wilnowilx-fff?style=for-the-badge&logo=github&labelColor=09090b)](https://github.com/wilnowilx/aetheriusxapi)
+
+**Built for AETHERIUS** 💜
 
 </div>
