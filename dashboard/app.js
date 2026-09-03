@@ -19,7 +19,7 @@ const SPECS = {
   "/v1/defi/yields": [{n:"chain",r:0},{n:"project",r:0},{n:"limit",r:0,t:"n",d:"20"}],
   "/v1/defi/stablecoins": [{n:"limit",r:0,t:"n",d:"30"}],
   "/v1/defi/fees": [{n:"limit",r:0,t:"n",d:"20"}],
-  "/v1/defi/bridges": [{n:"limit",r:0,t:"n",d:"20"}],
+  "/v1/defi/tvl": [{n:"chain",r:0},{n:"limit",r:0,t:"n",d:"20"}],
   "/v1/forex/rates": [{n:"base",r:0,d:"USD"},{n:"symbols",r:0,d:"EUR,MXN"}],
   "/v1/news/hackernews": [{n:"kind",r:0,d:"top"},{n:"limit",r:0,t:"n",d:"10"}],
 };
@@ -38,7 +38,7 @@ const FALLBACK_META = {
   "/v1/defi/yields":"$0.02/call - Top yield pools",
   "/v1/defi/stablecoins":"$0.01/call - Stablecoin list",
   "/v1/defi/fees":"$0.015/call - Protocol fees",
-  "/v1/defi/bridges":"$0.01/call - Bridge volumes",
+  "/v1/defi/tvl":"$0.01/call - Chain TVLs",
   "/v1/forex/rates":"$0.008/call - Fiat FX rates",
   "/v1/news/hackernews":"$0.01/call - HN stories",
 };

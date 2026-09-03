@@ -112,7 +112,7 @@ PRICES = {
     "/v1/defi/yields": "$0.02",
     "/v1/defi/stablecoins": "$0.01",
     "/v1/defi/fees": "$0.015",
-    "/v1/defi/bridges": "$0.01",
+    "/v1/defi/tvl": "$0.01",
     "/v1/forex/rates": "$0.008",
     "/v1/news/hackernews": "$0.01",
 }
@@ -132,7 +132,7 @@ DESCRIPTIONS = {
     "/v1/defi/yields": "Top DeFi yield pools by TVL via Llama",
     "/v1/defi/stablecoins": "Stablecoin list with prices via Llama",
     "/v1/defi/fees": "Protocol fees and revenue via Llama",
-    "/v1/defi/bridges": "Bridge volumes via Llama",
+    "/v1/defi/tvl": "Chain TVLs via Llama",
     "/v1/forex/rates": "Fiat exchange rates via Frankfurter",
     "/v1/news/hackernews": "Hacker News top stories with metadata",
 }
@@ -886,29 +886,44 @@ async def defi_fees(limit: int = Query(20, description="Max protocols 1-100")):
             if not ok:
                 return _err(502, data)
             protos = data.get("protocols", []) if isinstance(data, dict) else []
-            return {"count": min(len(protos), limit),
-                    "protocols": [pick(p) for p in protos[:limit]],
+            protos = sorted(protos, key=lambda p: float(p.get("total24h") or 0),
+                            reverse=True)[:limit]
+            out = [{"name": p.get("displayName") or p.get("name"),
+                    "category": p.get("category"),
+                    "fees_24h_usd": p.get("total24h"),
+                    "fees_7d_usd": p.get("total7d"),
+                    "fees_all_time_usd": p.get("totalAllTime")} for p in protos]
+            return {"count": len(out), "protocols": out,
+                    "total_24h_usd": data.get("total24h") if isinstance(data, dict) else None,
                     "data_source": "llama-fees", "fetched_at": _now()}
     except Exception as e:
         return _err(500, {"error": str(e)})
 
 
-@app.get("/v1/defi/bridges")
-@app.get("/api/v1/defi/bridges")
-async def defi_bridges(limit: int = Query(20, description="Max bridges 1-100")):
-    """Bridge volumes. Llama Bridges, no key."""
+@app.get("/v1/defi/tvl")
+@app.get("/api/v1/defi/tvl")
+async def defi_tvl(limit: int = Query(20, description="Max chains 1-100"),
+                   chain: str = Query("", description="Filter by chain name")):
+    """Chain TVLs. Llama v2 API, no key. (Replaces /v1/defi/bridges — Llama
+    put Bridges behind paywall; their monetization validates our model.)"""
     limit = max(1, min(limit, 100))
     try:
         async with httpx.AsyncClient(timeout=20) as client:
-            ok, data = await fetch_json(
-                client, "https://bridges.llama.fi/bridges",
-                params={"includeChains": "true"})
-            if not ok:
-                return _err(502, data)
-            bridges = data.get("bridges", []) if isinstance(data, dict) else []
-            return {"count": min(len(bridges), limit),
-                    "bridges": [pick(b) for b in bridges[:limit]],
-                    "data_source": "llama-bridges", "fetched_at": _now()}
+            ok, data = await fetch_json(client, "https://api.llama.fi/v2/chains")
+            if not ok or not isinstance(data, list):
+                return _err(502, data if isinstance(data, dict)
+                            else {"error": "Llama TVL unavailable"})
+            chains = data
+            if chain:
+                chains = [c for c in chains
+                          if str(c.get("name", "")).lower() == chain.lower()]
+            chains = sorted(chains, key=lambda c: float(c.get("tvl") or 0),
+                            reverse=True)[:limit]
+            out = [{"chain": c.get("name"), "tvl": c.get("tvl"),
+                    "tokenSymbol": c.get("tokenSymbol"),
+                    "chainId": c.get("chainId")} for c in chains]
+            return {"count": len(out), "chains": out,
+                    "data_source": "llama-tvl", "fetched_at": _now()}
     except Exception as e:
         return _err(500, {"error": str(e)})
 
@@ -924,7 +939,7 @@ async def forex_rates(base: str = Query("USD", description="Base currency"),
             params["symbols"] = symbols.upper()
         async with httpx.AsyncClient(timeout=15) as client:
             ok, data = await fetch_json(
-                client, "https://api.frankfurter.app/v1/latest", params=params)
+                client, "https://api.frankfurter.dev/v1/latest", params=params)
             if not ok:
                 return _err(502, data)
             data["data_source"] = "frankfurter"

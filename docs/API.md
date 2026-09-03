@@ -232,10 +232,10 @@ Capture a screenshot of a website.
 | `GET /v1/defi/yields` | `chain`, `project`, `limit` (def. 20) | $0.02 |
 | `GET /v1/defi/stablecoins` | `limit` (def. 30) | $0.01 |
 | `GET /v1/defi/fees` | `limit` (def. 20) | $0.015 |
-| `GET /v1/defi/bridges` | `limit` (def. 20) | $0.01 |
+| `GET /v1/defi/tvl` | `chain`, `limit` (def. 20) | $0.01 |
 
 Top yield pools by TVL, stablecoin prices/circulation, protocol fee leaders,
-bridge volumes. Upstream failures return honest `502`, never mock data.
+chain TVLs. Upstream failures return honest `502`, never mock data.
 
 ### Forex & News (no keys)
 

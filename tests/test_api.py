@@ -49,7 +49,7 @@ def test_paid_endpoints_require_payment(route):
         "/v1/defi/yields": {"limit": 2},
         "/v1/defi/stablecoins": {"limit": 2},
         "/v1/defi/fees": {"limit": 2},
-        "/v1/defi/bridges": {"limit": 2},
+        "/v1/defi/tvl": {"limit": 2},
         "/v1/forex/rates": {"base": "USD"},
         "/v1/news/hackernews": {"kind": "top", "limit": 2},
     }
