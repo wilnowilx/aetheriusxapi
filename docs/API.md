@@ -269,6 +269,44 @@ Get weather forecast by location.
 
 ---
 
+### Storage Drift
+
+#### GET /v1/storage/drift
+
+Cross-layer slot observation: queries N independent public RPC endpoints and
+reports which block number (`slot`) each layer sees, with per-layer latency.
+Operators genuinely disagree by 0–3 blocks — that divergence is the measured
+phenomenon (distributed-state drift).
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| chain | string | No | base, ethereum, optimism, arbitrum, polygon (default: base) |
+| layers | int | No | RPC layers to compare (default: 2) |
+
+**Response:**
+
+```json
+{
+  "chain": "base",
+  "layers": [
+    {"name": "mainnet.base.org", "slot": 18420001,
+     "observed_at": "...", "latency_ms": 120.5, "error": null}
+  ],
+  "drift": {
+    "slot_delta": 2, "min_slot": 18420001, "max_slot": 18420003,
+    "status": "diverged", "reporting_layers": 2, "failed_layers": []
+  }
+}
+```
+
+Status: `converged` (delta ≤ 1) · `diverged` (delta ≥ 2) · `degraded` (a layer failed).
+
+**Price:** $0.02
+
+---
+
 ### Telemetry
 
 #### GET /v1/telemetry

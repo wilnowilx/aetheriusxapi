@@ -13,9 +13,10 @@ Crypto-native API marketplace where **AI agents pay per request in USDC on Base 
 No accounts, no API keys, no credit cards — the wallet is the identity.
 
 **Live on Base Sepolia testnet (not a deck — running code):**
-- 10 endpoints: maps search/reviews/nearby, token analyze/holders/price,
-  web scrape/screenshot, email validate, weather
-- 8 served by live upstream logic (OpenStreetMap, CoinGecko/Coinbase, Open-Meteo, …)
+- 11 endpoints: maps search/reviews/nearby, token analyze/holders/price,
+  web scrape/screenshot, email validate, weather, storage drift
+- 9 served by live upstream logic (OpenStreetMap, CoinGecko/Coinbase, Open-Meteo,
+  public RPCs, …)
 - E2E proven: 6/6 endpoints return 200 with real USDC settlement
 - Interactive dashboard with API explorer: `/dashboard/`
 - Landing: https://wilnowilx.github.io/aetheriusxapi/
@@ -52,7 +53,7 @@ in English + Spanish (underserved audience).
 **Content series (8 pieces, 6 weeks):**
 1. An agent pays for its first API call (video + code, EN/ES)
 2. Inside an x402 round-trip: 402 → sign → settle (deep-dive)
-3. Operating 10 paid endpoints on $X/month GCP (cost transparency)
+3. Operating 11 paid endpoints on $X/month GCP (cost transparency)
 4. When upstreams throttle datacenters: building a 5-source price chain (postmortem)
 5. Distributed telemetry with NATS: what each layer sees (video)
 6. Storage-layout drift: detecting divergent state between layers (demo + API preview)

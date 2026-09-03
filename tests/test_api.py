@@ -2,7 +2,7 @@
 
 Deterministic gates (no network needed):
   - /health is free (200, no payment header)
-  - all 10 paid endpoints return 402 without X-PAYMENT, with x402 body shape
+  - all 11 paid endpoints return 402 without X-PAYMENT, with x402 body shape
   - invalid email is rejected deterministically (no MX lookup reached)
   - missing params return docs-compliant 400
   - legacy /api/v1/* prefix behaves identically
@@ -28,7 +28,7 @@ def test_health_free():
     body = r.json()
     assert body["status"] == "alive"
     assert body["service"] == "aetheriusxAPI"
-    assert len(body["endpoints"]) == 10
+    assert len(body["endpoints"]) == 11
 
 
 @pytest.mark.parametrize("route", sorted(PRICES))
@@ -45,6 +45,7 @@ def test_paid_endpoints_require_payment(route):
         "/v1/web/screenshot": {"url": "https://example.com"},
         "/v1/email/validate": {"email": "user@example.com"},
         "/v1/data/weather": {"lat": 19.43, "lon": -99.13},
+        "/v1/storage/drift": {"chain": "base", "layers": 1},
     }
     r = client.get(route, params=params[route])
     assert r.status_code == 402
@@ -125,6 +126,19 @@ def test_error_branches_return_json():
                    headers=PAID)
     assert r.status_code in (200, 500, 502)
     assert "error" in r.json() or "title" in r.json()
+
+
+def test_drift_rejects_unknown_chain():
+    r = client.get("/v1/storage/drift", params={"chain": "solana"},
+                   headers=PAID)
+    assert r.status_code == 400
+    assert "Unsupported chain" in r.json()["error"]
+
+
+def test_drift_live_shape():
+    r = client.get("/v1/storage/drift",
+                   params={"chain": "base", "layers": 2}, headers=PAID)
+    assert_live_or_upstream_error(r, ["layers", "drift"])
 
 
 def test_dashboard_served():

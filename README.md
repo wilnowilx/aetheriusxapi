@@ -276,7 +276,7 @@ uvicorn main:app --reload --port 4020
 # open http://127.0.0.1:4020/dashboard/
 ```
 
-- **API Catalog** — all 10 endpoints with live prices from `/health`
+- **API Catalog** — all 11 endpoints with live prices from `/health`
 - **Explorer** — param forms, one-click paid calls, `Show 402` renders the payment challenge
 - **Live Metrics** — REAL server telemetry (`/v1/telemetry`): uptime, totals, settled USDC volume, wallets seen, latency bars, event feed. Zero simulated numbers.
 - **Wallet** — memory-only demo connect (real x402 signing in production client)
@@ -302,7 +302,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 | `GET /v1/email/validate` | Email verification service | $0.005 | ~40ms |
 | `GET /v1/weather/current` | Weather forecast by location | $0.008 | ~50ms |
 
-> **Note:** These are the initial 10 endpoints. With Base Builder Grant funding, we'll expand to **120+ endpoints across 12 categories.**
+> **Note:** These are the initial 11 endpoints. With Base Builder Grant funding, we'll expand to **120+ endpoints across 12 categories.**
 
 ---
 
@@ -371,7 +371,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ### Phase 1: Foundation (Current)
 - [x] Core API server with x402 middleware (simulated + real modes)
-- [x] 10 endpoints, 8 with live upstream logic (no mocked data)
+- [x] 11 endpoints, 9 with live upstream logic (no mocked data)
 - [x] E2E payment flow proven on testnet (6/6 → 200, real USDC settled)
 - [x] Upstream resilience (Overpass mirrors, 5-source price chain, Nominatim fallbacks)
 - [x] Interactive dashboard (`/dashboard/`) with API explorer

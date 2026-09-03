@@ -15,6 +15,7 @@ const SPECS = {
   "/v1/web/screenshot":[{n:"url",r:1,d:"https://example.com"},{n:"width",r:0,t:"n",d:"1280"},{n:"height",r:0,t:"n",d:"720"}],
   "/v1/email/validate":[{n:"email",r:1,d:"user@example.com"}],
   "/v1/data/weather":  [{n:"lat",r:1,t:"n",d:"19.43"},{n:"lon",r:1,t:"n",d:"-99.13"}],
+  "/v1/storage/drift": [{n:"chain",r:0,d:"base"},{n:"layers",r:0,t:"n",d:"2"}],
 };
 const FALLBACK_META = {
   "/v1/maps/search":"$0.01/call - Business search via OpenStreetMap",
@@ -27,6 +28,7 @@ const FALLBACK_META = {
   "/v1/web/screenshot":"$0.025/call - Screenshot URL",
   "/v1/email/validate":"$0.005/call - Email validation",
   "/v1/data/weather":"$0.008/call - Current weather",
+  "/v1/storage/drift":"$0.02/call - Cross-RPC slot drift",
 };
 
 const state = { health:null, selected:null };

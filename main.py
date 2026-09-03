@@ -24,9 +24,11 @@ Key-gated:
   token/holders                            (needs ETHERSCAN_API_KEY, else 501)
 """
 
+import asyncio
 import os
 import re
 import subprocess
+import time
 from datetime import datetime, timezone
 
 import httpx
@@ -106,6 +108,7 @@ PRICES = {
     "/v1/web/screenshot": "$0.025",
     "/v1/email/validate": "$0.005",
     "/v1/data/weather": "$0.008",
+    "/v1/storage/drift": "$0.02",
 }
 
 DESCRIPTIONS = {
@@ -119,6 +122,18 @@ DESCRIPTIONS = {
     "/v1/web/screenshot": "Website screenshot URL (mShots proxy, no browser needed)",
     "/v1/email/validate": "Email validation - syntax, MX, disposable, risk score",
     "/v1/data/weather": "Current weather by coordinates via Open-Meteo",
+    "/v1/storage/drift": "Cross-RPC slot drift - which block number each layer sees",
+}
+
+# Public JSON-RPC endpoints used as independent observation layers.
+# No keys. Distinct operators genuinely disagree by 0-3 blocks — that
+# disagreement IS the product (distributed-state divergence, measured).
+DRIFT_RPCS = {
+    "base": ["https://mainnet.base.org", "https://base.llamarpc.com"],
+    "ethereum": ["https://cloudflare-eth.com", "https://ethereum.llamarpc.com"],
+    "optimism": ["https://mainnet.optimism.io", "https://optimism.llamarpc.com"],
+    "arbitrum": ["https://arb1.arbitrum.io/rpc", "https://arbitrum.llamarpc.com"],
+    "polygon": ["https://polygon-rpc.com", "https://polygon.llamarpc.com"],
 }
 
 # === APP ===
@@ -683,6 +698,72 @@ async def weather(lat: float = Query(..., description="Latitude"),
                     "timezone": d.get("timezone"),
                     "current": d.get("current", {}),
                     "data_source": "open-meteo", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+async def _rpc_slot(client: httpx.AsyncClient, url: str) -> dict:
+    """Ask one RPC layer which slot (block number) it sees right now."""
+    t0 = time.perf_counter()
+    layer = {"name": url.split("://", 1)[1].split("/")[0],
+             "slot": None, "observed_at": _now(),
+             "latency_ms": None, "error": None}
+    try:
+        r = await client.post(url, json={"jsonrpc": "2.0", "id": 1,
+                                         "method": "eth_blockNumber",
+                                         "params": []})
+        layer["latency_ms"] = round((time.perf_counter() - t0) * 1000, 1)
+        if r.status_code == 200:
+            result = (r.json().get("result") or "")
+            if result.startswith("0x"):
+                layer["slot"] = int(result, 16)
+                return layer
+        layer["error"] = f"HTTP {r.status_code}"
+    except Exception as e:
+        layer["latency_ms"] = round((time.perf_counter() - t0) * 1000, 1)
+        layer["error"] = str(e)[:120]
+    return layer
+
+
+@app.get("/v1/storage/drift")
+@app.get("/api/v1/storage/drift")
+async def storage_drift(chain: str = Query("base", description="Chain"),
+                        layers: int = Query(2, description="RPC layers to compare")):
+    """Cross-layer slot drift: query N independent RPCs, report which block
+    each one sees. Disagreement of 0-3 slots between operators is normal and
+    IS the measured phenomenon (distributed-state divergence)."""
+    rpcs = DRIFT_RPCS.get(chain.lower())
+    if not rpcs:
+        return _err(400, {"error": f"Unsupported chain: {chain}. "
+                                   f"Use: {sorted(DRIFT_RPCS)}"})
+    layers = max(1, min(layers, len(rpcs)))
+    try:
+        async with httpx.AsyncClient(timeout=12) as client:
+            results = await asyncio.gather(
+                *[_rpc_slot(client, url) for url in rpcs[:layers]])
+            ok = [x for x in results if x["slot"] is not None]
+            if not ok:
+                return _err(502, {"error": "All RPC layers unreachable",
+                                  "chain": chain, "layers": results})
+            slots = [x["slot"] for x in ok]
+            delta = max(slots) - min(slots)
+            failed = [x["name"] for x in results if x["slot"] is None]
+            if failed:
+                status = "degraded"
+            elif delta <= 1:
+                status = "converged"
+            else:
+                status = "diverged"
+            return {"chain": chain.lower(),
+                    "layers": results,
+                    "drift": {"slot_delta": delta,
+                              "min_slot": min(slots),
+                              "max_slot": max(slots),
+                              "status": status,
+                              "reporting_layers": len(ok),
+                              "failed_layers": failed},
+                    "data_source": "public-rpc",
+                    "fetched_at": _now()}
     except Exception as e:
         return _err(500, {"error": str(e)})
 
