@@ -107,6 +107,15 @@
             -webkit-text-fill-color: transparent;
             text-decoration: none;
             letter-spacing: -0.03em;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        nav.scrolled .brand {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
         }
 
         .nav-links { display: flex; gap: 6px; align-items: center; }
@@ -215,6 +224,16 @@
         /* ===== HERO ===== */
         .hero { text-align: center; }
 
+        .hero-badges {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 48px;
+            opacity: 0; transform: translateY(30px);
+            animation: fadeUp 0.8s 0.2s forwards;
+            flex-wrap: wrap;
+        }
+
         .hero-badge {
             display: inline-flex;
             align-items: center;
@@ -225,18 +244,16 @@
             border-radius: 9999px;
             font-size: 0.85rem;
             color: var(--purple-light);
-            margin-bottom: 48px;
-            opacity: 0; transform: translateY(30px);
-            animation: fadeUp 0.8s 0.2s forwards;
         }
 
         .hero-dot {
             width: 10px; height: 10px;
-            background: var(--green);
             border-radius: 50%;
-            box-shadow: 0 0 12px var(--green);
+            box-shadow: 0 0 12px currentColor;
             animation: pulse 2s infinite;
         }
+        .dot-green { background: var(--green); color: var(--green); }
+        .dot-orange { background: var(--orange); color: var(--orange); }
 
         @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.5; transform:scale(1.4); } }
 
@@ -280,48 +297,6 @@
         }
 
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-
-        /* ===== TRUSTED BY ===== */
-        .trusted-section {
-            padding: 60px 0;
-            text-align: center;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            background: rgba(255,255,255,0.01);
-        }
-
-        .trusted-section h3 {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--text-muted);
-            margin-bottom: 40px;
-            font-weight: 600;
-        }
-
-        .trusted-logos {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 64px;
-            flex-wrap: wrap;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .trusted-logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-muted);
-            opacity: 0.35;
-            transition: all 0.3s;
-            letter-spacing: -0.02em;
-        }
-
-        .trusted-logo:hover {
-            opacity: 0.7;
-            color: var(--purple-light);
-        }
 
         /* ===== STATS ===== */
         .stats-section { text-align: center; }
@@ -428,58 +403,73 @@
         .cat-title { font-size: 1rem; font-weight: 700; margin-bottom: 8px; position: relative; z-index: 1; }
         .cat-count { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--magenta-light); position: relative; z-index: 1; }
 
-        /* ===== HOW IT WORKS ===== */
+        /* ===== HOW IT WORKS — FLAT CARDS ===== */
         .how-section { text-align: center; }
 
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
+        .steps-flow {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 0;
             margin-top: 72px;
             position: relative;
         }
-        .steps-grid::before {
-            content: '';
-            position: absolute;
-            top: 50px; left: 12%; right: 12%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--purple), var(--magenta), var(--pink), transparent);
+
+        .step-card {
+            flex: 1;
+            max-width: 260px;
+            position: relative;
+            text-align: center;
+            padding: 0 16px;
         }
 
-        .step-card { position: relative; z-index: 1; text-align: center; }
-
-        .step-icon {
-            width: 100px; height: 100px;
+        .step-icon-wrap {
+            width: 80px; height: 80px;
             margin: 0 auto 24px;
-            background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(217,70,239,0.12));
-            border: 2px solid var(--purple);
-            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(217,70,239,0.08));
+            border: 1px solid rgba(168,85,247,0.3);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--purple-light);
             position: relative;
-            box-shadow: 0 0 30px rgba(168,85,247,0.2);
+            transition: all 0.4s;
         }
-        .step-icon svg { width: 40px; height: 40px; }
+        .step-card:hover .step-icon-wrap {
+            border-color: var(--purple);
+            box-shadow: 0 0 30px rgba(168,85,247,0.3);
+            transform: translateY(-4px);
+        }
+        .step-icon-wrap svg { width: 36px; height: 36px; }
 
         .step-num {
             position: absolute;
-            top: -8px; right: -8px;
-            width: 32px; height: 32px;
-            background: var(--magenta);
-            border-radius: 50%;
+            top: -6px; right: -6px;
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, var(--purple), var(--magenta));
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: 800;
             color: white;
-            box-shadow: 0 4px 12px rgba(217,70,239,0.4);
+            box-shadow: 0 4px 12px rgba(168,85,247,0.5);
         }
 
-        .step-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
-        .step-desc { color: var(--text-sec); font-size: 0.9rem; max-width: 220px; margin: 0 auto; }
+        .step-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
+        .step-desc { color: var(--text-sec); font-size: 0.88rem; max-width: 200px; margin: 0 auto; line-height: 1.5; }
+
+        .step-arrow {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            padding-top: 36px;
+            color: var(--purple);
+            opacity: 0.4;
+        }
+        .step-arrow svg { width: 32px; height: 32px; }
 
         /* ===== FEATURES ===== */
         .features-section { text-align: center; }
@@ -586,6 +576,7 @@
             font-size: 0.82rem;
             line-height: 1.9;
             min-height: 300px;
+            position: relative;
         }
 
         .term-body .prompt { color: var(--green); }
@@ -597,6 +588,24 @@
         .term-body .fn { color: var(--pink); }
         .term-body .num { color: var(--orange); }
         .term-body .out { color: var(--text-sec); }
+
+        /* Typewriter cursor */
+        .typewriter-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1.1em;
+            background: var(--purple-light);
+            margin-left: 2px;
+            vertical-align: text-bottom;
+            animation: blink 0.8s step-end infinite;
+        }
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Pulse glow on colored chars during typing */
+        .tw-char-active {
+            text-shadow: 0 0 8px currentColor, 0 0 16px currentColor;
+            transition: text-shadow 0.4s;
+        }
 
         .code-info { text-align: left; }
         .code-info h3 { font-size: 1.8rem; font-weight: 800; margin-bottom: 20px; }
@@ -612,6 +621,139 @@
             color: var(--text-sec);
         }
         .code-list li svg { width: 22px; height: 22px; color: var(--green); flex-shrink: 0; }
+
+        /* ===== HEARTBEAT / STATUS ===== */
+        .heartbeat-section { text-align: center; }
+
+        .heartbeat-container {
+            margin-top: 72px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .heartbeat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 36px;
+            text-align: left;
+        }
+
+        .hb-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+
+        .hb-title {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hb-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .hb-status-live { background: rgba(16,185,129,0.12); color: var(--green); }
+        .hb-status-idle { background: rgba(245,158,11,0.12); color: var(--orange); }
+
+        .hb-status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        .hb-graph {
+            width: 100%;
+            height: 120px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .hb-graph canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .hb-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .hb-stat {
+            text-align: center;
+        }
+
+        .hb-stat-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hb-stat-val.green { color: var(--green); }
+        .hb-stat-val.purple { color: var(--purple-light); }
+        .hb-stat-val.orange { color: var(--orange); }
+
+        .hb-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .hb-api-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .hb-api-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: border-color 0.3s;
+        }
+        .hb-api-item:hover { border-color: var(--border-hover); }
+
+        .hb-api-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.88rem;
+            font-weight: 500;
+        }
+
+        .hb-api-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+        }
+        .hb-api-dot.up { background: var(--green); box-shadow: 0 0 6px var(--green); }
+        .hb-api-dot.deploying { background: var(--orange); box-shadow: 0 0 6px var(--orange); animation: pulse 1.5s infinite; }
+        .hb-api-dot.offline { background: var(--text-muted); }
+
+        .hb-api-latency {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: var(--text-sec);
+        }
 
         /* ===== DOCS ===== */
         .docs-section { text-align: center; }
@@ -712,6 +854,44 @@
         .tier-free { background: rgba(255,255,255,0.08); color: var(--text-sec); }
         .tier-pro { background: rgba(168,85,247,0.15); color: var(--purple-light); }
         .tier-ent { background: rgba(217,70,239,0.15); color: var(--magenta-light); }
+
+        /* ===== TRUSTED BY ===== */
+        .trusted-section {
+            padding: 60px 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.01);
+        }
+
+        .trusted-section h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            font-weight: 600;
+        }
+
+        .trusted-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 64px;
+            flex-wrap: wrap;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .trusted-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            opacity: 0.35;
+            transition: all 0.3s;
+            letter-spacing: -0.02em;
+        }
+        .trusted-logo:hover { opacity: 0.7; color: var(--purple-light); }
 
         /* ===== CTA ===== */
         .cta-section { text-align: center; }
@@ -916,6 +1096,7 @@
             .code-wrap { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr 1fr; }
             .docs-grid { grid-template-columns: 1fr 1fr; }
+            .heartbeat-container { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 768px) {
@@ -923,8 +1104,9 @@
             .nav-links { display: none; }
             .mobile-toggle { display: flex; }
             .stats-grid, .cats-grid { grid-template-columns: 1fr 1fr; }
-            .steps-grid { grid-template-columns: 1fr 1fr; }
-            .steps-grid::before { display: none; }
+            .steps-flow { flex-direction: column; align-items: center; gap: 24px; }
+            .step-arrow { transform: rotate(90deg); padding-top: 0; }
+            .step-card { max-width: 100%; }
             .features-grid { grid-template-columns: 1fr; }
             .scroll-dots { display: none; }
             .footer-grid { grid-template-columns: 1fr; }
@@ -937,6 +1119,8 @@
             .docs-grid { grid-template-columns: 1fr; }
             .limits-table { margin: 64px 10px 0; }
             .trusted-logos { gap: 32px; }
+            .hero-badges { flex-direction: column; align-items: center; }
+            .hb-stats { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -953,6 +1137,8 @@
         <div class="sdot" data-s="5"></div>
         <div class="sdot" data-s="6"></div>
         <div class="sdot" data-s="7"></div>
+        <div class="sdot" data-s="8"></div>
+        <div class="sdot" data-s="9"></div>
     </div>
 
     <!-- Mobile Nav -->
@@ -966,11 +1152,12 @@
         <a href="#how" onclick="closeMobile()">How It Works</a>
         <a href="#features" onclick="closeMobile()">Features</a>
         <a href="#code" onclick="closeMobile()">Code</a>
+        <a href="#heartbeat" onclick="closeMobile()">Status</a>
         <a href="#limits" onclick="closeMobile()">Rate Limits</a>
         <a href="#cta" onclick="closeMobile()">Get Started</a>
     </div>
 
-    <!-- Nav -->
+    <!-- Nav — brand hidden on hero, appears after scroll -->
     <nav id="mainNav">
         <div class="nav-wrap">
             <a href="#hero" class="brand">AETHERIUS</a>
@@ -981,6 +1168,7 @@
                 <a href="#how">How It Works</a>
                 <a href="#features">Features</a>
                 <a href="#code">Code</a>
+                <a href="#heartbeat">Status</a>
                 <a href="#limits">Limits</a>
                 <a href="#cta" class="btn-nav">Get Started</a>
             </div>
@@ -993,9 +1181,15 @@
     <!-- HERO -->
     <section id="hero" class="hero">
         <div class="inner">
-            <div class="hero-badge">
-                <div class="hero-dot"></div>
-                Live on Base Mainnet
+            <div class="hero-badges">
+                <div class="hero-badge">
+                    <div class="hero-dot dot-orange"></div>
+                    Live on Testnet
+                </div>
+                <div class="hero-badge">
+                    <div class="hero-dot dot-green"></div>
+                    Live on Base Mainnet
+                </div>
             </div>
             <h1>The Infrastructure for<br><span class="grad">Autonomous AI Agents</span></h1>
             <p class="hero-sub">120+ APIs your agents can pay for in USDC on Base. No accounts, no subscriptions, no human friction. Just code.</p>
@@ -1008,20 +1202,6 @@
                     View Docs
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
                 </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- TRUSTED BY -->
-    <section id="trusted" class="trusted-section" style="min-height: auto; padding: 60px 0;">
-        <div class="inner" style="padding: 0 40px;">
-            <h3>Trusted by builders on</h3>
-            <div class="trusted-logos">
-                <div class="trusted-logo">Base</div>
-                <div class="trusted-logo">Ethereum</div>
-                <div class="trusted-logo">x402</div>
-                <div class="trusted-logo">Coinbase</div>
-                <div class="trusted-logo">USDC</div>
             </div>
         </div>
     </section>
@@ -1144,7 +1324,7 @@
         </div>
     </section>
 
-    <!-- HOW IT WORKS -->
+    <!-- HOW IT WORKS — FLAT CARDS -->
     <section id="how" class="how-section">
         <div class="inner">
             <div class="stag anim">
@@ -1154,33 +1334,36 @@
             <h2 class="stitle anim">Four Steps to Autonomous Access</h2>
             <p class="sdesc anim" style="margin: 0 auto;">From zero to API access in under a minute.</p>
             
-            <div class="steps-grid">
+            <div class="steps-flow">
                 <div class="step-card anim ad1">
-                    <div class="step-icon">
+                    <div class="step-icon-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         <span class="step-num">1</span>
                     </div>
                     <h3 class="step-title">Connect Wallet</h3>
                     <p class="step-desc">Your crypto wallet is your identity. No signup, no KYC.</p>
                 </div>
+                <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
                 <div class="step-card anim ad2">
-                    <div class="step-icon">
+                    <div class="step-icon-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                         <span class="step-num">2</span>
                     </div>
                     <h3 class="step-title">Choose API</h3>
                     <p class="step-desc">Browse 120+ endpoints. Pick what your agent needs.</p>
                 </div>
+                <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
                 <div class="step-card anim ad3">
-                    <div class="step-icon">
+                    <div class="step-icon-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                         <span class="step-num">3</span>
                     </div>
                     <h3 class="step-title">Pay Per Request</h3>
                     <p class="step-desc">x402 handles payment. USDC on Base. Sub-cent fees.</p>
                 </div>
+                <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
                 <div class="step-card anim ad4">
-                    <div class="step-icon">
+                    <div class="step-icon-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                         <span class="step-num">4</span>
                     </div>
@@ -1260,56 +1443,9 @@
                             <button class="term-tab" onclick="switchCode(this, 'js')">JavaScript</button>
                             <button class="term-tab" onclick="switchCode(this, 'curl')">cURL</button>
                         </div>
-                        <div class="term-body" id="code-py">
-<span class="cmt"># Install the SDK</span>
-<span class="prompt">$</span> <span class="cmd">pip install aetheriusx</span>
-
-<span class="cmt"># Initialize with your wallet</span>
-<span class="prompt">$</span> <span class="cmd">python</span>
-<span class="kw">>>> from</span> aetheriusx <span class="kw">import</span> <span class="fn">Client</span>
-<span class="kw">>>> client</span> = <span class="fn">Client</span>(<span class="str">"0xYourWallet"</span>)
-
-<span class="cmt"># Call any API — payment is automatic</span>
-<span class="kw">>>> resp</span> = client.<span class="fn">get</span>(<span class="str">"/v1/crypto/price"</span>,
-        params={<span class="str">"token"</span>: <span class="str">"ETH"</span>})
-
-<span class="kw">>>> print</span>(resp.data)
-<span class="out">{</span><span class="str">"price"</span>: <span class="num">2384.50</span>, <span class="str">"change"</span>: <span class="num">2.3</span><span class="out">}</span>
-<span class="prompt">$</span> <span class="cmt"># That's it. Payment handled.</span>
-                        </div>
-                        <div class="term-body" id="code-js" style="display:none">
-<span class="cmt">// Install the SDK</span>
-<span class="prompt">$</span> <span class="cmd">npm install aetheriusx</span>
-
-<span class="cmt">// Initialize with your wallet</span>
-<span class="kw">import</span> { <span class="fn">Client</span> } <span class="kw">from</span> <span class="str">'aetheriusx'</span>;
-
-<span class="kw">const</span> client = <span class="kw">new</span> <span class="fn">Client</span>(<span class="str">'0xYourWallet'</span>);
-
-<span class="cmt">// Call any API — payment is automatic</span>
-<span class="kw">const</span> resp = <span class="kw">await</span> client.<span class="fn">get</span>(
-  <span class="str">'/v1/crypto/price'</span>,
-  { params: { token: <span class="str">'ETH'</span> } }
-);
-
-console.<span class="fn">log</span>(resp.data);
-<span class="out">// { price: 2384.50, change: 2.3 }</span>
-                        </div>
-                        <div class="term-body" id="code-curl" style="display:none">
-<span class="cmt"># Make a request with x402 payment</span>
-<span class="prompt">$</span> <span class="cmd">curl</span> <span class="flag">-X GET</span> \
-  <span class="str">"https://api.aetheriusx.io/v1/crypto/price?token=ETH"</span> \
-  <span class="flag">-H</span> <span class="str">"X-PAYMENT: 0x...proof"</span> \
-  <span class="flag">-H</span> <span class="str">"Content-Type: application/json"</span>
-
-<span class="cmt"># Response</span>
-<span class="out">{</span>
-  <span class="str">"data"</span>: <span class="out">{</span>
-    <span class="str">"price"</span>: <span class="num">2384.50</span>,
-    <span class="str">"change_24h"</span>: <span class="num">2.3</span>
-  <span class="out">}</span>
-<span class="out">}</span>
-                        </div>
+                        <div class="term-body" id="code-py"></div>
+                        <div class="term-body" id="code-js" style="display:none"></div>
+                        <div class="term-body" id="code-curl" style="display:none"></div>
                     </div>
                 </div>
                 
@@ -1323,6 +1459,103 @@ console.<span class="fn">log</span>(resp.data);
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Built-in retry and error handling</li>
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Zero configuration needed</li>
                     </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HEARTBEAT / STATUS -->
+    <section id="heartbeat" class="heartbeat-section">
+        <div class="inner">
+            <div class="stag anim">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                System Status
+            </div>
+            <h2 class="stitle anim">Live Infrastructure</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">Real-time health of every API endpoint.</p>
+
+            <div class="heartbeat-container anim">
+                <div class="heartbeat-card">
+                    <div class="hb-header">
+                        <div class="hb-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            Request Volume
+                        </div>
+                        <div class="hb-status hb-status-idle">
+                            <div class="hb-status-dot"></div>
+                            Warming Up
+                        </div>
+                    </div>
+                    <div class="hb-graph">
+                        <canvas id="heartbeatCanvas"></canvas>
+                    </div>
+                    <div class="hb-stats">
+                        <div class="hb-stat">
+                            <div class="hb-stat-val green">99.9%</div>
+                            <div class="hb-stat-label">Uptime</div>
+                        </div>
+                        <div class="hb-stat">
+                            <div class="hb-stat-val purple">32ms</div>
+                            <div class="hb-stat-label">Avg Latency</div>
+                        </div>
+                        <div class="hb-stat">
+                            <div class="hb-stat-val orange">0</div>
+                            <div class="hb-stat-label">Errors (24h)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="heartbeat-card">
+                    <div class="hb-header">
+                        <div class="hb-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple-light)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            Endpoint Health
+                        </div>
+                    </div>
+                    <div class="hb-api-list">
+                        <div class="hb-api-item">
+                            <div class="hb-api-name">
+                                <div class="hb-api-dot deploying"></div>
+                                /v1/crypto/price
+                            </div>
+                            <div class="hb-api-latency">Deploying</div>
+                        </div>
+                        <div class="hb-api-item">
+                            <div class="hb-api-name">
+                                <div class="hb-api-dot deploying"></div>
+                                /v1/maps/geocode
+                            </div>
+                            <div class="hb-api-latency">Deploying</div>
+                        </div>
+                        <div class="hb-api-item">
+                            <div class="hb-api-name">
+                                <div class="hb-api-dot deploying"></div>
+                                /v1/weather/current
+                            </div>
+                            <div class="hb-api-latency">Deploying</div>
+                        </div>
+                        <div class="hb-api-item">
+                            <div class="hb-api-name">
+                                <div class="hb-api-dot offline"></div>
+                                /v1/news/headlines
+                            </div>
+                            <div class="hb-api-latency">Planned</div>
+                        </div>
+                        <div class="hb-api-item">
+                            <div class="hb-api-name">
+                                <div class="hb-api-dot offline"></div>
+                                /v1/ai/generate
+                            </div>
+                            <div class="hb-api-latency">Planned</div>
+                        </div>
+                        <div class="hb-api-item">
+                            <div class="hb-api-name">
+                                <div class="hb-api-dot offline"></div>
+                                + 115 more endpoints
+                            </div>
+                            <div class="hb-api-latency">Post-Grant</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1406,6 +1639,20 @@ console.<span class="fn">log</span>(resp.data);
         </div>
     </section>
 
+    <!-- TRUSTED BY — after rate limits -->
+    <section id="trusted" class="trusted-section" style="min-height: auto; padding: 60px 0;">
+        <div class="inner" style="padding: 0 40px;">
+            <h3>Trusted by builders on</h3>
+            <div class="trusted-logos">
+                <div class="trusted-logo">Base</div>
+                <div class="trusted-logo">Ethereum</div>
+                <div class="trusted-logo">x402</div>
+                <div class="trusted-logo">Coinbase</div>
+                <div class="trusted-logo">USDC</div>
+            </div>
+        </div>
+    </section>
+
     <!-- CTA -->
     <section id="cta" class="cta-section">
         <div class="inner">
@@ -1435,7 +1682,7 @@ console.<span class="fn">log</span>(resp.data);
         <div class="footer-wrap">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <a href="#hero" class="brand">AETHERIUS</a>
+                    <a href="#hero" class="brand" style="opacity:1;transform:none;pointer-events:all;">AETHERIUS</a>
                     <p>The operating system for AI agent commerce. Infrastructure for machines that pay for themselves.</p>
                 </div>
                 <div class="footer-col">
@@ -1444,7 +1691,7 @@ console.<span class="fn">log</span>(resp.data);
                         <li><a href="#categories">APIs</a></li>
                         <li><a href="https://github.com/wilnowilx/aetheriusx-api-site/blob/main/docs/API.md" target="_blank">Documentation</a></li>
                         <li><a href="#limits">Rate Limits</a></li>
-                        <li><a href="#">Status</a></li>
+                        <li><a href="#heartbeat">Status</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -1481,76 +1728,142 @@ console.<span class="fn">log</span>(resp.data);
 
     <script>
     // ============================================
-    // BACKGROUND CANVAS
+    // AURORA / NEURAL NETWORK BACKGROUND
     // ============================================
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     let W, H, mouseX = -999, mouseY = -999;
-    const particles = [];
-    const PCOUNT = 90;
-    const CDIST = 130;
     let gTime = 0;
 
-    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    // Neural network nodes
+    const nodes = [];
+    const NODE_COUNT = 40;
+    const CONNECT_DIST = 200;
 
-    class P {
+    // Aurora bands
+    const auroraBands = [];
+    const BAND_COUNT = 5;
+
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+
+    class NeuralNode {
         constructor() {
             this.x = Math.random() * W;
             this.y = Math.random() * H;
-            this.vx = (Math.random() - 0.5) * 0.5;
-            this.vy = (Math.random() - 0.5) * 0.5;
-            this.r = Math.random() * 2 + 0.8;
-            this.hue = 260 + Math.random() * 60;
-            this.a = Math.random() * 0.5 + 0.2;
-            this.ps = Math.random() * 0.015 + 0.006;
-            this.po = Math.random() * Math.PI * 2;
+            this.vx = (Math.random() - 0.5) * 0.3;
+            this.vy = (Math.random() - 0.5) * 0.3;
+            this.r = Math.random() * 2 + 1;
+            this.hue = 260 + Math.random() * 80;
             this.pulsePhase = Math.random() * Math.PI * 2;
-            this.pulseSpeed = Math.random() * 0.008 + 0.003;
+            this.pulseSpeed = Math.random() * 0.01 + 0.005;
         }
 
         update(t) {
-            this.x += this.vx + Math.sin(t * this.ps + this.po) * 0.3;
-            this.y += this.vy + Math.cos(t * this.ps * 0.7 + this.po) * 0.2;
+            this.x += this.vx + Math.sin(t * 0.003 + this.pulsePhase) * 0.2;
+            this.y += this.vy + Math.cos(t * 0.002 + this.pulsePhase) * 0.15;
+            
+            // Mouse repulsion
             const dx = mouseX - this.x, dy = mouseY - this.y, d = Math.sqrt(dx*dx+dy*dy);
-            if (d < 150) { const f = (150-d)/150; this.x -= dx*f*0.02; this.y -= dy*f*0.02; }
-            if (this.x < -20) this.x = W+20; if (this.x > W+20) this.x = -20;
-            if (this.y < -20) this.y = H+20; if (this.y > H+20) this.y = -20;
+            if (d < 180) { const f = (180-d)/180; this.x -= dx*f*0.015; this.y -= dy*f*0.015; }
+            
+            // Wrap
+            if (this.x < -30) this.x = W+30; if (this.x > W+30) this.x = -30;
+            if (this.y < -30) this.y = H+30; if (this.y > H+30) this.y = -30;
         }
 
         draw(t) {
             const pulse = Math.sin(t * this.pulseSpeed + this.pulsePhase);
-            const size = this.r * (1 + pulse * 0.4);
-            const alpha = this.a * (0.7 + pulse * 0.3);
-
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, size * 4, 0, Math.PI * 2);
-            const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, size * 4);
-            g.addColorStop(0, `hsla(${this.hue}, 80%, 65%, ${0.12 * alpha})`);
+            const size = this.r * (1 + pulse * 0.3);
+            
+            // Glow
+            const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, size * 6);
+            g.addColorStop(0, `hsla(${this.hue}, 70%, 60%, 0.08)`);
             g.addColorStop(1, 'transparent');
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, size * 6, 0, Math.PI * 2);
             ctx.fillStyle = g;
             ctx.fill();
-
+            
+            // Core
             ctx.beginPath();
             ctx.arc(this.x, this.y, size, 0, Math.PI * 2);
-            ctx.fillStyle = `hsla(${this.hue}, 80%, 65%, ${alpha})`;
+            ctx.fillStyle = `hsla(${this.hue}, 70%, 65%, ${0.5 + pulse * 0.2})`;
             ctx.fill();
         }
     }
 
-    function drawConnections() {
-        for (let i = 0; i < particles.length; i++) {
-            for (let j = i+1; j < particles.length; j++) {
-                const dx = particles[i].x-particles[j].x, dy = particles[i].y-particles[j].y, d = Math.sqrt(dx*dx+dy*dy);
-                if (d < CDIST) {
-                    const alpha = (1-d/CDIST)*0.35;
+    class AuroraBand {
+        constructor(i) {
+            this.yBase = H * (0.15 + i * 0.15);
+            this.amplitude = 30 + Math.random() * 40;
+            this.freq = 0.002 + Math.random() * 0.001;
+            this.speed = 0.0005 + Math.random() * 0.0003;
+            this.hue = 260 + i * 15 + Math.random() * 10;
+            this.alpha = 0.03 + Math.random() * 0.02;
+            this.width = 60 + Math.random() * 80;
+            this.phase = Math.random() * Math.PI * 2;
+        }
+
+        draw(t) {
+            ctx.beginPath();
+            ctx.moveTo(0, this.yBase);
+            
+            for (let x = 0; x <= W; x += 8) {
+                const y = this.yBase + 
+                    Math.sin(x * this.freq + t * this.speed + this.phase) * this.amplitude +
+                    Math.sin(x * this.freq * 1.5 + t * this.speed * 0.7) * this.amplitude * 0.3;
+                ctx.lineTo(x, y);
+            }
+            
+            ctx.lineTo(W, this.yBase + this.width);
+            for (let x = W; x >= 0; x -= 8) {
+                const y = this.yBase + this.width +
+                    Math.sin(x * this.freq + t * this.speed + this.phase + 1) * this.amplitude * 0.5;
+                ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            
+            const g = ctx.createLinearGradient(0, this.yBase - this.amplitude, 0, this.yBase + this.width + this.amplitude);
+            g.addColorStop(0, 'transparent');
+            g.addColorStop(0.3, `hsla(${this.hue}, 80%, 60%, ${this.alpha})`);
+            g.addColorStop(0.6, `hsla(${this.hue + 30}, 70%, 55%, ${this.alpha * 1.5})`);
+            g.addColorStop(1, 'transparent');
+            ctx.fillStyle = g;
+            ctx.fill();
+        }
+    }
+
+    function drawNeuralConnections() {
+        for (let i = 0; i < nodes.length; i++) {
+            for (let j = i+1; j < nodes.length; j++) {
+                const dx = nodes[i].x - nodes[j].x;
+                const dy = nodes[i].y - nodes[j].y;
+                const d = Math.sqrt(dx*dx + dy*dy);
+                
+                if (d < CONNECT_DIST) {
+                    const alpha = (1 - d/CONNECT_DIST) * 0.2;
+                    
+                    // Electric arc effect — slightly jittered line
                     ctx.beginPath();
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
-                    const g = ctx.createLinearGradient(particles[i].x, particles[i].y, particles[j].x, particles[j].y);
-                    g.addColorStop(0, `hsla(${particles[i].hue}, 80%, 65%, ${alpha})`);
-                    g.addColorStop(1, `hsla(${particles[j].hue}, 80%, 65%, ${alpha})`);
+                    ctx.moveTo(nodes[i].x, nodes[i].y);
+                    
+                    const segments = 5;
+                    for (let s = 1; s < segments; s++) {
+                        const t = s / segments;
+                        const mx = nodes[i].x + dx * t + (Math.random() - 0.5) * 4;
+                        const my = nodes[i].y + dy * t + (Math.random() - 0.5) * 4;
+                        ctx.lineTo(mx, my);
+                    }
+                    ctx.lineTo(nodes[j].x, nodes[j].y);
+                    
+                    const g = ctx.createLinearGradient(nodes[i].x, nodes[i].y, nodes[j].x, nodes[j].y);
+                    g.addColorStop(0, `hsla(${nodes[i].hue}, 70%, 60%, ${alpha})`);
+                    g.addColorStop(1, `hsla(${nodes[j].hue}, 70%, 60%, ${alpha})`);
                     ctx.strokeStyle = g;
-                    ctx.lineWidth = 1;
+                    ctx.lineWidth = 0.8;
                     ctx.stroke();
                 }
             }
@@ -1559,6 +1872,210 @@ console.<span class="fn">log</span>(resp.data);
 
     document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
     document.addEventListener('mouseleave', () => { mouseX = -999; mouseY = -999; });
+
+    // ============================================
+    // HEARTBEAT GRAPH
+    // ============================================
+    const hbCanvas = document.getElementById('heartbeatCanvas');
+    const hbCtx = hbCanvas ? hbCanvas.getContext('2d') : null;
+    let hbData = [];
+    const HB_POINTS = 60;
+
+    function initHeartbeat() {
+        if (!hbCanvas) return;
+        const rect = hbCanvas.parentElement.getBoundingClientRect();
+        hbCanvas.width = rect.width * 2;
+        hbCanvas.height = rect.height * 2;
+        hbCanvas.style.width = rect.width + 'px';
+        hbCanvas.style.height = rect.height + 'px';
+        hbCtx.scale(2, 2);
+        
+        // Initialize with low "warming up" data
+        for (let i = 0; i < HB_POINTS; i++) {
+            hbData.push(Math.random() * 8 + 2);
+        }
+    }
+
+    function drawHeartbeat() {
+        if (!hbCtx) return;
+        const w = hbCanvas.width / 2;
+        const h = hbCanvas.height / 2;
+        
+        hbCtx.clearRect(0, 0, w, h);
+        
+        // Grid lines
+        hbCtx.strokeStyle = 'rgba(255,255,255,0.04)';
+        hbCtx.lineWidth = 1;
+        for (let y = 0; y < h; y += h/4) {
+            hbCtx.beginPath();
+            hbCtx.moveTo(0, y);
+            hbCtx.lineTo(w, y);
+            hbCtx.stroke();
+        }
+        
+        // Data line
+        if (hbData.length < 2) return;
+        
+        const step = w / (HB_POINTS - 1);
+        const maxVal = 50;
+        
+        // Glow fill
+        hbCtx.beginPath();
+        hbCtx.moveTo(0, h);
+        for (let i = 0; i < hbData.length; i++) {
+            const x = i * step;
+            const y = h - (hbData[i] / maxVal) * h * 0.85;
+            if (i === 0) hbCtx.lineTo(x, y);
+            else {
+                const px = (i-1) * step;
+                const py = h - (hbData[i-1] / maxVal) * h * 0.85;
+                const cx = (px + x) / 2;
+                hbCtx.bezierCurveTo(cx, py, cx, y, x, y);
+            }
+        }
+        hbCtx.lineTo(w, h);
+        hbCtx.closePath();
+        
+        const fillG = hbCtx.createLinearGradient(0, 0, 0, h);
+        fillG.addColorStop(0, 'rgba(168,85,247,0.15)');
+        fillG.addColorStop(1, 'transparent');
+        hbCtx.fillStyle = fillG;
+        hbCtx.fill();
+        
+        // Line
+        hbCtx.beginPath();
+        for (let i = 0; i < hbData.length; i++) {
+            const x = i * step;
+            const y = h - (hbData[i] / maxVal) * h * 0.85;
+            if (i === 0) hbCtx.moveTo(x, y);
+            else {
+                const px = (i-1) * step;
+                const py = h - (hbData[i-1] / maxVal) * h * 0.85;
+                const cx = (px + x) / 2;
+                hbCtx.bezierCurveTo(cx, py, cx, y, x, y);
+            }
+        }
+        const lineG = hbCtx.createLinearGradient(0, 0, w, 0);
+        lineG.addColorStop(0, 'rgba(168,85,247,0.3)');
+        lineG.addColorStop(0.5, 'rgba(168,85,247,0.9)');
+        lineG.addColorStop(1, 'rgba(217,70,239,0.9)');
+        hbCtx.strokeStyle = lineG;
+        hbCtx.lineWidth = 2;
+        hbCtx.stroke();
+        
+        // Latest point glow
+        const lastX = (hbData.length - 1) * step;
+        const lastY = h - (hbData[hbData.length-1] / maxVal) * h * 0.85;
+        
+        hbCtx.beginPath();
+        hbCtx.arc(lastX, lastY, 6, 0, Math.PI * 2);
+        hbCtx.fillStyle = 'rgba(168,85,247,0.3)';
+        hbCtx.fill();
+        hbCtx.beginPath();
+        hbCtx.arc(lastX, lastY, 3, 0, Math.PI * 2);
+        hbCtx.fillStyle = '#a855f7';
+        hbCtx.fill();
+    }
+
+    let hbTick = 0;
+    function updateHeartbeat() {
+        hbTick++;
+        // Simulate warming up — slowly increasing activity with occasional spikes
+        const base = 5 + Math.sin(hbTick * 0.05) * 3;
+        const spike = Math.random() > 0.9 ? Math.random() * 15 : 0;
+        const noise = Math.random() * 3;
+        hbData.push(base + spike + noise);
+        if (hbData.length > HB_POINTS) hbData.shift();
+        drawHeartbeat();
+    }
+
+    // ============================================
+    // TYPEWRITER CODE ANIMATION
+    // ============================================
+    const codeSnippets = {
+        py: `<span class="cmt"># Install the SDK</span>\n<span class="prompt">$</span> <span class="cmd">pip install aetheriusx</span>\n\n<span class="cmt"># Initialize with your wallet</span>\n<span class="prompt">$</span> <span class="cmd">python</span>\n<span class="kw">>>> from</span> aetheriusx <span class="kw">import</span> <span class="fn">Client</span>\n<span class="kw">>>> client</span> = <span class="fn">Client</span>(<span class="str">"0xYourWallet"</span>)\n\n<span class="cmt"># Call any API — payment is automatic</span>\n<span class="kw">>>> resp</span> = client.<span class="fn">get</span>(<span class="str">"/v1/crypto/price"</span>,\n        params={<span class="str">"token"</span>: <span class="str">"ETH"</span>})\n\n<span class="kw">>>> print</span>(resp.data)\n<span class="out">{</span><span class="str">"price"</span>: <span class="num">2384.50</span>, <span class="str">"change"</span>: <span class="num">2.3</span><span class="out">}</span>\n<span class="prompt">$</span> <span class="cmt"># That's it. Payment handled.</span>`,
+        js: `<span class="cmt">// Install the SDK</span>\n<span class="prompt">$</span> <span class="cmd">npm install aetheriusx</span>\n\n<span class="cmt">// Initialize with your wallet</span>\n<span class="kw">import</span> { <span class="fn">Client</span> } <span class="kw">from</span> <span class="str">'aetheriusx'</span>;\n\n<span class="kw">const</span> client = <span class="kw">new</span> <span class="fn">Client</span>(<span class="str">'0xYourWallet'</span>);\n\n<span class="cmt">// Call any API — payment is automatic</span>\n<span class="kw">const</span> resp = <span class="kw">await</span> client.<span class="fn">get</span>(\n  <span class="str">'/v1/crypto/price'</span>,\n  { params: { token: <span class="str">'ETH'</span> } }\n);\n\nconsole.<span class="fn">log</span>(resp.data);\n<span class="out">// { price: 2384.50, change: 2.3 }</span>`,
+        curl: `<span class="cmt"># Make a request with x402 payment</span>\n<span class="prompt">$</span> <span class="cmd">curl</span> <span class="flag">-X GET</span> \\\n  <span class="str">"https://api.aetheriusx.io/v1/crypto/price?token=ETH"</span> \\\n  <span class="flag">-H</span> <span class="str">"X-PAYMENT: 0x...proof"</span> \\\n  <span class="flag">-H</span> <span class="str">"Content-Type: application/json"</span>\n\n<span class="cmt"># Response</span>\n<span class="out">{</span>\n  <span class="str">"data"</span>: <span class="out">{</span>\n    <span class="str">"price"</span>: <span class="num">2384.50</span>,\n    <span class="str">"change_24h"</span>: <span class="num">2.3</span>\n  <span class="out">}</span>\n<span class="out">}</span>`
+    };
+
+    let typewriterState = { active: false, el: null, html: '', pos: 0, timer: null, lang: 'py' };
+
+    function startTypewriter(lang) {
+        // Clear any existing
+        if (typewriterState.timer) clearInterval(typewriterState.timer);
+        
+        const el = document.getElementById('code-' + lang);
+        if (!el) return;
+        
+        typewriterState = {
+            active: true,
+            el: el,
+            html: codeSnippets[lang],
+            pos: 0,
+            timer: null,
+            lang: lang
+        };
+        
+        el.innerHTML = '<span class="typewriter-cursor"></span>';
+        
+        typewriterState.timer = setInterval(() => {
+            if (!typewriterState.active) return;
+            
+            const { el, html, pos } = typewriterState;
+            
+            if (pos >= html.length) {
+                clearInterval(typewriterState.timer);
+                // Remove cursor after typing complete
+                setTimeout(() => {
+                    const cursor = el.querySelector('.typewriter-cursor');
+                    if (cursor) cursor.remove();
+                }, 2000);
+                return;
+            }
+            
+            // Parse ahead to find the next HTML tag boundary
+            let nextPos = pos + 1;
+            let rawChar = html[pos];
+            
+            if (rawChar === '<') {
+                // Find end of tag
+                const tagEnd = html.indexOf('>', pos);
+                if (tagEnd !== -1) nextPos = tagEnd + 1;
+            }
+            
+            typewriterState.pos = nextPos;
+            
+            // Render what we have so far
+            const rendered = html.substring(0, nextPos);
+            el.innerHTML = rendered + '<span class="typewriter-cursor"></span>';
+            
+            // Add pulse glow to the most recently typed colored char
+            const lastTag = rendered.lastIndexOf('<span class="');
+            if (lastTag !== -1) {
+                const tagContent = rendered.substring(lastTag);
+                if (tagContent.startsWith('<span class="kw"') || 
+                    tagContent.startsWith('<span class="str"') || 
+                    tagContent.startsWith('<span class="fn"') ||
+                    tagContent.startsWith('<span class="num"')) {
+                    // Find the span that was just opened and add glow to its content
+                    const spans = el.querySelectorAll('.kw, .str, .fn, .num');
+                    if (spans.length > 0) {
+                        const last = spans[spans.length - 1];
+                        last.classList.add('tw-char-active');
+                        setTimeout(() => last.classList.remove('tw-char-active'), 400);
+                    }
+                }
+            }
+        }, 18); // Speed of typing
+    }
+
+    function switchCode(btn, lang) {
+        document.querySelectorAll('.term-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('[id^="code-"]').forEach(b => b.style.display = 'none');
+        document.getElementById('code-' + lang).style.display = 'block';
+        startTypewriter(lang);
+    }
 
     // ============================================
     // SCROLL OBSERVER
@@ -1585,8 +2102,10 @@ console.<span class="fn">log</span>(resp.data);
         });
     });
 
+    // Nav scrolled state + brand reveal
     window.addEventListener('scroll', () => {
-        document.getElementById('mainNav').classList.toggle('scrolled', scrollY > 50);
+        const nav = document.getElementById('mainNav');
+        nav.classList.toggle('scrolled', scrollY > 50);
     });
 
     const navLinks = document.querySelectorAll('.nav-links a:not(.btn-nav)');
@@ -1595,13 +2114,6 @@ console.<span class="fn">log</span>(resp.data);
         sections.forEach(s => { if (scrollY >= s.offsetTop - 200) cur = s.id; });
         navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${cur}`));
     });
-
-    function switchCode(btn, lang) {
-        document.querySelectorAll('.term-tab').forEach(t => t.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('[id^="code-"]').forEach(b => b.style.display = 'none');
-        document.getElementById(`code-${lang}`).style.display = 'block';
-    }
 
     function openMobile() { document.getElementById('mobileNav').classList.add('open'); }
     function closeMobile() { document.getElementById('mobileNav').classList.remove('open'); }
@@ -1637,22 +2149,47 @@ console.<span class="fn">log</span>(resp.data);
     }, { threshold: 0.5 });
     sections.forEach(s => sTrack.observe(s));
 
+    // Start typewriter when code section is visible
+    const codeObs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting && !typewriterState.active) {
+                startTypewriter('py');
+            }
+        });
+    }, { threshold: 0.3 });
+    const codeSection = document.getElementById('code');
+    if (codeSection) codeObs.observe(codeSection);
+
     // ============================================
     // ANIMATION LOOP
     // ============================================
     function animate() {
-        ctx.fillStyle = 'rgba(6,6,14,0.15)';
+        ctx.fillStyle = 'rgba(6,6,14,0.12)';
         ctx.fillRect(0, 0, W, H);
-        particles.forEach(p => { p.update(gTime); p.draw(gTime); });
-        drawConnections();
+        
+        // Draw aurora bands
+        auroraBands.forEach(b => b.draw(gTime));
+        
+        // Update & draw neural nodes
+        nodes.forEach(n => { n.update(gTime); n.draw(gTime); });
+        drawNeuralConnections();
+        
         gTime++;
         requestAnimationFrame(animate);
     }
 
+    // Heartbeat update loop
+    setInterval(updateHeartbeat, 200);
+
+    // Init
     resize();
-    for (let i = 0; i < PCOUNT; i++) particles.push(new P());
+    for (let i = 0; i < NODE_COUNT; i++) nodes.push(new NeuralNode());
+    for (let i = 0; i < BAND_COUNT; i++) auroraBands.push(new AuroraBand(i));
     animate();
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', () => { resize(); initHeartbeat(); });
+    
+    // Init heartbeat after a tick
+    setTimeout(initHeartbeat, 100);
     </script>
 </body>
 </html>
