@@ -6,8 +6,10 @@
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   } catch (e) { /* keep motion */ }
   var st = document.createElement('style');
-  st.textContent = 'canvas#aex-fx{position:fixed;inset:0;z-index:0;pointer-events:none}'
-    + 'body>*:not(canvas#aex-fx){position:relative;z-index:1}';
+  /* z-index:-1 ONLY: paints above the page background, below everything else.
+     NEVER add sibling rules here — position:relative on body>* killed fixed
+     nav/overlays and buried the plasma blobs under section stacking. */
+  st.textContent = 'canvas#aex-fx{position:fixed;inset:0;z-index:-1;pointer-events:none}';
   document.head.appendChild(st);
   var cv = document.createElement('canvas');
   cv.id = 'aex-fx';
@@ -25,12 +27,13 @@
   window.addEventListener('resize', size);
   var hues = [268, 285, 300, 320];
   function spawn(anywhere) {
+    var hot = Math.random() < 0.12; /* ~1 in 8 particles burns intense */
     return {
       x: Math.random() * W, y: anywhere ? Math.random() * H : H + 6,
-      r: 0.6 + Math.random() * cfg.maxR,
+      r: (0.6 + Math.random() * cfg.maxR) * (hot ? 2.2 : 1),
       vy: -((0.08 + Math.random() * 0.3) * cfg.speed * 3),
       vx: (Math.random() - 0.5) * 0.15,
-      a: 0.15 + Math.random() * 0.5,
+      a: (0.15 + Math.random() * 0.5) * (hot ? 1.7 : 1),
       h: hues[(Math.random() * hues.length) | 0],
       tw: Math.random() * 6.28
     };
