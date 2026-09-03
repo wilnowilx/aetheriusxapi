@@ -153,6 +153,20 @@ def test_dashboard_served():
     assert r.status_code == 200
 
 
+def test_telemetry_persists_sqlite(tmp_path):
+    from telemetry import Tracker
+    db = str(tmp_path / "t.db")
+    t1 = Tracker(prices={"/v1/email/validate": "$0.005"}, db_path=db)
+    t1.record("/v1/email/validate", 200, 10.0, wallet="0xabc")
+    t1.record("/v1/email/validate", 402, 5.0)
+    t2 = Tracker(prices={"/v1/email/validate": "$0.005"}, db_path=db)
+    snap = t2.snapshot()
+    assert snap["totals"]["calls"] == 2
+    assert snap["totals"]["volume_usdc"] == 0.005
+    assert snap["wallets_seen"] == 1
+    assert snap["per_endpoint"]["/v1/email/validate"]["n402"] == 1
+
+
 def test_telemetry_free_and_shape():
     r = client.get("/v1/telemetry")
     assert r.status_code == 200

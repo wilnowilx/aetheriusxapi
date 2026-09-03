@@ -16,6 +16,7 @@ Design notes:
     The set is capped to bound memory.
 """
 
+import sqlite3
 import time
 from collections import deque
 from datetime import datetime, timezone
@@ -36,9 +37,11 @@ def canonical_route(path: str) -> str | None:
 
 
 class Tracker:
-    def __init__(self, prices: dict):
+    def __init__(self, prices: dict, db_path: str | None = None):
         self.started_at = time.time()
         self.prices = prices  # canonical route -> "$0.01"
+        self._db = None
+        self._db_path = db_path
         self.total = 0
         self.ok = 0
         self.n402 = 0
@@ -49,6 +52,68 @@ class Tracker:
         self.lat = deque(maxlen=MAX_LAT_SAMPLES)
         self.events = deque(maxlen=MAX_EVENTS)
         self.wallets = set()
+        if self._db_path:
+            self._db_open(self._db_path)
+            self._db_load()
+
+    # ---- SQLite persistence: counters survive restarts/deploys ----
+    def _db_open(self, path: str) -> None:
+        self._db = sqlite3.connect(path, check_same_thread=False)
+        self._db.execute("PRAGMA journal_mode=WAL")
+        self._db.executescript("""
+          CREATE TABLE IF NOT EXISTS totals(k TEXT PRIMARY KEY, v REAL);
+          CREATE TABLE IF NOT EXISTS per_endpoint(route TEXT PRIMARY KEY, calls REAL, ok REAL, n402 REAL, err REAL, lat REAL, volume REAL);
+          CREATE TABLE IF NOT EXISTS wallets(address TEXT PRIMARY KEY);
+          CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY, v TEXT);
+        """)
+
+    def _db_load(self) -> None:
+        cur = self._db.cursor()
+        t = dict(cur.execute("SELECT k, v FROM totals"))
+        self.total = int(t.get("calls", 0))
+        self.ok = int(t.get("ok", 0))
+        self.n402 = int(t.get("n402", 0))
+        self.err = int(t.get("err", 0))
+        self.lat_sum = float(t.get("lat_sum", 0.0))
+        self.volume = float(t.get("volume", 0.0))
+        for route, calls, ok, n402, err, lat, vol in cur.execute(
+                "SELECT route, calls, ok, n402, err, lat, volume FROM per_endpoint"):
+            self.per[route] = {"calls": int(calls), "ok_200": int(ok),
+                               "n402": int(n402), "errors": int(err),
+                               "lat_ms": float(lat), "volume_usdc": float(vol)}
+        for (a,) in cur.execute("SELECT address FROM wallets"):
+            self.wallets.add(a)
+        row = cur.execute("SELECT v FROM meta WHERE k='started_at'").fetchone()
+        if row:
+            self.started_at = float(row[0])
+        else:
+            cur.execute("INSERT INTO meta(k,v) VALUES('started_at', ?)",
+                        (str(self.started_at),))
+            self._db.commit()
+
+    def _db_save(self, wallet: str | None) -> None:
+        try:
+            db = self._db
+            db.executemany(
+                "INSERT INTO totals(k,v) VALUES(?,?) "
+                "ON CONFLICT(k) DO UPDATE SET v=excluded.v",
+                [("calls", self.total), ("ok", self.ok), ("n402", self.n402),
+                 ("err", self.err), ("lat_sum", self.lat_sum),
+                 ("volume", self.volume)])
+            for route, e in self.per.items():
+                db.execute(
+                    "INSERT INTO per_endpoint(route,calls,ok,n402,err,lat,volume)"
+                    " VALUES(?,?,?,?,?,?,?) ON CONFLICT(route) DO UPDATE SET "
+                    "calls=excluded.calls, ok=excluded.ok, n402=excluded.n402,"
+                    " err=excluded.err, lat=excluded.lat, volume=excluded.volume",
+                    (route, e["calls"], e["ok_200"], e["n402"], e["errors"],
+                     e["lat_ms"], e["volume_usdc"]))
+            if wallet:
+                db.execute("INSERT OR IGNORE INTO wallets(address) VALUES(?)",
+                           (wallet,))
+            db.commit()
+        except Exception:
+            pass  # telemetry must never break serving
 
     def price_of(self, canonical: str) -> float:
         try:
@@ -105,6 +170,8 @@ class Tracker:
             "status": status,
             "latency_ms": round(latency_ms, 1),
         })
+        if self._db:
+            self._db_save(wallet)
 
     def snapshot(self, **meta) -> dict:
         per = {}

@@ -182,7 +182,8 @@ def _paid_routes_for_sdk(prefix: str) -> dict:
     return table
 
 
-tracker = Tracker(prices=PRICES)
+tracker = Tracker(prices=PRICES,
+                    db_path=os.getenv("AETHERIUS_DB_PATH") or None)
 
 if X402_MODE == "real":
     try:
