@@ -16,6 +16,19 @@ Everything observable is already public HTTP — no credentials needed:
 | Dashboard | `http://34.156.149.38/aetherapi/dashboard/` |
 | Landing | https://wilnowilx.github.io/aetheriusxapi/ |
 
+## HTTPS (for GitHub Pages → VM live calls)
+
+Browsers block HTTPS pages calling HTTP APIs (mixed content). The VM has a
+valid Let's Encrypt cert for `34-156-149-38.sslip.io` (nginx `aetherapi-ssl.conf`):
+
+- `https://34-156-149-38.sslip.io/aetherapi/api/v1/health`
+- `https://34-156-149-38.sslip.io/aetherapi/dashboard/` ← set this as the
+  dashboard Backend URL when served from GitHub Pages.
+
+**Requires GCP firewall ingress tcp:443** (VPC → Firewall → allow `0.0.0.0/0`).
+Without it, external HTTPS times out (TLS itself is verified working via loopback).
+CORS already allows `https://wilnowilx.github.io` (see `CORS_ORIGINS` in `main.py`).
+
 Contract source of truth: `docs/API.md` + `main.py` + `telemetry.py` in this repo.
 
 ## SSH access (maintainers only, via Codespaces secret)
