@@ -233,6 +233,9 @@ Capture a screenshot of a website.
 | `GET /v1/defi/stablecoins` | `limit` (def. 30) | $0.01 |
 | `GET /v1/defi/fees` | `limit` (def. 20) | $0.015 |
 | `GET /v1/defi/tvl` | `chain`, `limit` (def. 20) | $0.01 |
+| `GET /v1/defi/protocols` | `chain`, `limit` (def. 20) | $0.01 |
+| `GET /v1/defi/dexs` | `limit` (def. 20) | $0.015 |
+| `GET /v1/defi/stablecoinchains` | `limit` (def. 20) | $0.01 |
 
 Top yield pools by TVL, stablecoin prices/circulation, protocol fee leaders,
 chain TVLs. Upstream failures return honest `502`, never mock data.
@@ -242,7 +245,22 @@ chain TVLs. Upstream failures return honest `502`, never mock data.
 | Endpoint | Params | Price |
 |----------|--------|-------|
 | `GET /v1/forex/rates` | `base` (def. USD), `symbols` CSV | $0.008 |
+| `GET /v1/forex/history` | `start`, `end` YYYY-MM-DD, `base`, `symbols` | $0.01 |
 | `GET /v1/news/hackernews` | `kind` top/new/best, `limit` (def. 10) | $0.01 |
+| `GET /v1/news/hn-item` | `id` | $0.005 |
+| `GET /v1/news/hn-user` | `username` | $0.005 |
+
+### More utilities (no keys)
+
+| Endpoint | Params | Price |
+|----------|--------|-------|
+| `GET /v1/data/forecast` | `lat`, `lon`, `days` 1-16 | $0.008 |
+| `GET /v1/data/airquality` | `lat`, `lon` | $0.008 |
+| `GET /v1/data/define` | `word`, `lang` (def. en) | $0.005 |
+| `GET /v1/token/prices` | `addresses` CSV max 10, `chain` | $0.01 |
+| `GET /v1/token/gas` | `chain` (ethereum) | $0.01 |
+| `GET /v1/maps/reverse` | `lat`, `lon` | $0.01 |
+| `GET /v1/web/geoip` | `ip` | $0.008 |
 
 ECB fiat rates via Frankfurter; HN stories with title/url/score via Firebase API.
 

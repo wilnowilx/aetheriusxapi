@@ -4,7 +4,7 @@
 ![Testnet](https://img.shields.io/badge/Base_Sepolia-Live-10B981?style=for-the-badge&labelColor=09090b)
 ![x402](https://img.shields.io/badge/x402-Protocol-10B981?style=for-the-badge&labelColor=09090b)
 ![USDC](https://img.shields.io/badge/USDC-Payments-2775CA?style=for-the-badge&labelColor=09090b)
-![Endpoints](https://img.shields.io/badge/Endpoints-17-d946ef?style=for-the-badge&labelColor=09090b)
+![Endpoints](https://img.shields.io/badge/Endpoints-30-d946ef?style=for-the-badge&labelColor=09090b)
 ![Tests](https://img.shields.io/badge/Tests-29_passing-brightgreen?style=for-the-badge&labelColor=09090b)
 ![Dashboard](https://img.shields.io/badge/Dashboard-Live-ec4899?style=for-the-badge&labelColor=09090b)
 ![SDK](https://img.shields.io/badge/Python_SDK-ready-3776AB?style=for-the-badge&labelColor=09090b)
@@ -322,7 +322,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ### Phase 1: Foundation (Current)
 - [x] Core API server with x402 middleware (simulated + real modes)
-- [x] 17 endpoints, 16 wired to live upstreams (honest errors on outage, no mocked data)
+- [x] 30 endpoints, 29 wired to live upstreams (honest errors on outage, no mocked data)
 - [x] E2E payment flow proven on testnet (6/6 → 200, real USDC settled)
 - [x] Upstream resilience (Overpass mirrors, 5-source price chain, Nominatim fallbacks)
 - [x] Interactive dashboard (`/dashboard/`) with API explorer

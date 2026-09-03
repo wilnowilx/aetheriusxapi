@@ -115,6 +115,19 @@ PRICES = {
     "/v1/defi/tvl": "$0.01",
     "/v1/forex/rates": "$0.008",
     "/v1/news/hackernews": "$0.01",
+    "/v1/data/forecast": "$0.008",
+    "/v1/data/airquality": "$0.008",
+    "/v1/data/define": "$0.005",
+    "/v1/defi/protocols": "$0.01",
+    "/v1/defi/dexs": "$0.015",
+    "/v1/defi/stablecoinchains": "$0.01",
+    "/v1/token/prices": "$0.01",
+    "/v1/token/gas": "$0.01",
+    "/v1/maps/reverse": "$0.01",
+    "/v1/news/hn-item": "$0.005",
+    "/v1/news/hn-user": "$0.005",
+    "/v1/forex/history": "$0.01",
+    "/v1/web/geoip": "$0.008",
 }
 
 DESCRIPTIONS = {
@@ -135,6 +148,19 @@ DESCRIPTIONS = {
     "/v1/defi/tvl": "Chain TVLs via Llama",
     "/v1/forex/rates": "Fiat exchange rates via Frankfurter",
     "/v1/news/hackernews": "Hacker News top stories with metadata",
+    "/v1/data/forecast": "7-day forecast via Open-Meteo",
+    "/v1/data/airquality": "Air quality via Open-Meteo",
+    "/v1/data/define": "Dictionary definitions, no key",
+    "/v1/defi/protocols": "DeFi protocols by TVL via Llama",
+    "/v1/defi/dexs": "DEX volume leaders via Llama",
+    "/v1/defi/stablecoinchains": "Stable distribution by chain via Llama",
+    "/v1/token/prices": "Batch token prices in one call",
+    "/v1/token/gas": "Ethereum gas oracle via Etherscan",
+    "/v1/maps/reverse": "Coords to address via Nominatim",
+    "/v1/news/hn-item": "Single HN item by id",
+    "/v1/news/hn-user": "HN user profile and karma",
+    "/v1/forex/history": "Historical FX ranges via Frankfurter",
+    "/v1/web/geoip": "IP geolocation and ISP",
 }
 
 # Public JSON-RPC endpoints used as independent observation layers.
@@ -976,6 +1002,315 @@ async def news_hackernews(kind: str = Query("top", description="top|new|best"),
                 * [one(i) for i in ids[:limit]]) if x]
             return {"kind": kind, "count": len(items), "stories": items,
                     "data_source": "hacker-news", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+# === SCALE PACK 2: toward 10 per category (all free, no keys) ===
+
+@app.get("/v1/data/forecast")
+@app.get("/api/v1/data/forecast")
+async def data_forecast(lat: float = Query(...), lon: float = Query(...),
+                        days: int = Query(7, description="Days 1-16")):
+    """7-day forecast. Open-Meteo, no key."""
+    days = max(1, min(days, 16))
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                "https://api.open-meteo.com/v1/forecast",
+                params={"latitude": lat, "longitude": lon,
+                        "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode",
+                        "timezone": "auto", "forecast_days": days})
+            if not ok:
+                return _err(502, data)
+            return {"lat": lat, "lon": lon, "days": days,
+                    "daily": data.get("daily", {}),
+                    "data_source": "open-meteo", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/data/airquality")
+@app.get("/api/v1/data/airquality")
+async def data_airquality(lat: float = Query(...), lon: float = Query(...)):
+    """Current air quality. Open-Meteo AQ API, no key."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                "https://air-quality-api.open-meteo.com/v1/air-quality",
+                params={"latitude": lat, "longitude": lon,
+                        "current": "us_aqi,pm2_5,pm10,nitrogen_dioxide,ozone"})
+            if not ok:
+                return _err(502, data)
+            return {"lat": lat, "lon": lon, "current": data.get("current", {}),
+                    "data_source": "open-meteo-aq", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/data/define")
+@app.get("/api/v1/data/define")
+async def data_define(word: str = Query(..., description="Word to define"),
+                      lang: str = Query("en", description="Language code")):
+    """Dictionary definitions. Free Dictionary API, no key."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                f"https://api.dictionaryapi.dev/api/v2/entries/{lang}/{word}")
+            if not ok:
+                return _err(404, {"error": f"No definition found: {word}"})
+            out = []
+            for entry in (data if isinstance(data, list) else [])[:3]:
+                meanings = []
+                for m in (entry.get("meanings") or [])[:3]:
+                    defs = [{"definition": d.get("definition"),
+                             "example": d.get("example")}
+                            for d in (m.get("definitions") or [])[:3]]
+                    meanings.append({"partOfSpeech": m.get("partOfSpeech"),
+                                     "definitions": defs})
+                out.append({"word": entry.get("word"),
+                            "phonetic": entry.get("phonetic"),
+                            "meanings": meanings})
+            return {"query": word, "count": len(out), "entries": out,
+                    "data_source": "dictionaryapi", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/defi/protocols")
+@app.get("/api/v1/defi/protocols")
+async def defi_protocols(chain: str = Query("", description="Filter by chain"),
+                         limit: int = Query(20, description="Max 1-100")):
+    """DeFi protocols by TVL. Llama, no key."""
+    limit = max(1, min(limit, 100))
+    try:
+        async with httpx.AsyncClient(timeout=25) as client:
+            ok, data = await fetch_json(client, "https://api.llama.fi/protocols")
+            if not ok or not isinstance(data, list):
+                return _err(502, data if isinstance(data, dict)
+                            else {"error": "Llama protocols unavailable"})
+            protos = data
+            if chain:
+                chains_l = chain.lower()
+                protos = [p for p in protos
+                          if chains_l in [str(c).lower() for c in (p.get("chains") or [])]]
+            protos = sorted(protos, key=lambda p: float(p.get("tvl") or 0),
+                            reverse=True)[:limit]
+            out = [{"name": p.get("name"), "symbol": p.get("symbol"),
+                    "category": p.get("category"), "tvl": p.get("tvl"),
+                    "chains": (p.get("chains") or [])[:8]} for p in protos]
+            return {"count": len(out), "chain": chain or "all",
+                    "protocols": out, "data_source": "llama-protocols",
+                    "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/defi/dexs")
+@app.get("/api/v1/defi/dexs")
+async def defi_dexs(limit: int = Query(20, description="Max 1-100")):
+    """DEX volume leaders. Llama, no key."""
+    limit = max(1, min(limit, 100))
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
+            ok, data = await fetch_json(client,
+                "https://api.llama.fi/overview/dexs",
+                params={"excludeTotalDataChart": "true",
+                        "excludeTotalDataChartBreakdown": "true"})
+            if not ok:
+                return _err(502, data)
+            protos = data.get("protocols", []) if isinstance(data, dict) else []
+            protos = sorted(protos,
+                            key=lambda p: float(p.get("total24h") or p.get("total7d") or 0),
+                            reverse=True)[:limit]
+            out = [{"name": p.get("displayName") or p.get("name"),
+                    "volume_24h_usd": p.get("total24h"),
+                    "volume_7d_usd": p.get("total7d")} for p in protos]
+            return {"count": len(out), "dexs": out,
+                    "data_source": "llama-dexs", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/defi/stablecoinchains")
+@app.get("/api/v1/defi/stablecoinchains")
+async def defi_stablecoinchains(limit: int = Query(20, description="Max 1-100")):
+    """Stablecoin distribution by chain. Llama, no key. Schema-agnostic."""
+    limit = max(1, min(limit, 100))
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
+            ok, data = await fetch_json(client,
+                "https://stablecoins.llama.fi/stablecoinchains")
+            if not ok or not isinstance(data, list):
+                return _err(502, data if isinstance(data, dict)
+                            else {"error": "Llama stablecoin chains unavailable"})
+
+            def _num(r):
+                return max([float(v) for v in r.values()
+                            if isinstance(v, (int, float))], default=0)
+
+            rows = []
+            for c in data:
+                if isinstance(c, dict):
+                    rows.append({k: v for k, v in c.items()
+                                 if isinstance(v, (int, float, str))})
+            rows.sort(key=_num, reverse=True)
+            return {"count": min(len(rows), limit), "chains": rows[:limit],
+                    "data_source": "llama-stablecoinchains", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/token/prices")
+@app.get("/api/v1/token/prices")
+async def token_prices(addresses: str = Query(..., description="CSV, max 10"),
+                       chain: str = Query("ethereum", description="Chain")):
+    """Batch token prices in ONE call. Llama Coins, no key."""
+    addrs = [a.strip() for a in addresses.split(",") if a.strip()][:10]
+    if not addrs:
+        return _err(400, {"error": "Provide at least one address"})
+    try:
+        irs = ",".join(f"{chain.lower()}:{a}" for a in addrs)
+        async with httpx.AsyncClient(timeout=20) as client:
+            ok, data = await fetch_json(client,
+                f"https://coins.llama.fi/prices/current/{irs}")
+            if not ok:
+                return _err(502, data)
+            coins = (data.get("coins") or {}) if isinstance(data, dict) else {}
+            out = {}
+            for a in addrs:
+                c = coins.get(f"{chain.lower()}:{a}") or coins.get(f"{chain.lower()}:{a.lower()}")
+                out[a] = ({"price_usd": c.get("price"),
+                           "symbol": c.get("symbol")} if c else None)
+            return {"chain": chain, "prices": out,
+                    "data_source": "llama", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/token/gas")
+@app.get("/api/v1/token/gas")
+async def token_gas(chain: str = Query("ethereum", description="ethereum only")):
+    """Live gas oracle. Etherscan (mainnet), no key."""
+    if chain.lower() != "ethereum":
+        return _err(400, {"error": "Gas oracle supports ethereum only"})
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client, "https://api.etherscan.io/api",
+                params={"module": "gastracker", "action": "gasoracle"})
+            if not ok or data.get("status") != "1":
+                return _err(502, {"error": "Etherscan gas oracle unavailable"})
+            r = data.get("result", {})
+            return {"chain": "ethereum",
+                    "safe_gwei": r.get("SafeGasPrice"),
+                    "propose_gwei": r.get("ProposeGasPrice"),
+                    "fast_gwei": r.get("FastGasPrice"),
+                    "last_block": r.get("LastBlock"),
+                    "data_source": "etherscan", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/maps/reverse")
+@app.get("/api/v1/maps/reverse")
+async def maps_reverse(lat: float = Query(...), lon: float = Query(...)):
+    """Coords → address. Nominatim reverse, no key."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                "https://nominatim.openstreetmap.org/reverse",
+                params={"lat": lat, "lon": lon, "format": "json"})
+            if not ok or not data.get("display_name"):
+                return _err(502, {"error": "Nominatim reverse unavailable"})
+            return {"lat": lat, "lon": lon,
+                    "address": data.get("display_name"),
+                    "details": data.get("address", {}),
+                    "type": data.get("type"),
+                    "data_source": "nominatim", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/news/hn-item")
+@app.get("/api/v1/news/hn-item")
+async def news_hn_item(id: int = Query(..., description="HN item id")):
+    """Single HN item. Firebase API, no key."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, item = await fetch_json(client,
+                f"https://hacker-news.firebaseio.com/v0/item/{id}.json")
+            if not ok or not isinstance(item, dict) or not item.get("id"):
+                return _err(404, {"error": f"HN item not found: {id}"})
+            if isinstance(item.get("text"), str):
+                item["text"] = item["text"][:500]
+            return {**{k: item.get(k) for k in
+                       ("id", "title", "url", "score", "by", "time",
+                        "descendants", "text")},
+                    "data_source": "hacker-news", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/news/hn-user")
+@app.get("/api/v1/news/hn-user")
+async def news_hn_user(username: str = Query(..., description="HN username")):
+    """HN user profile + karma. Firebase API, no key."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, u = await fetch_json(client,
+                f"https://hacker-news.firebaseio.com/v0/user/{username}.json")
+            if not ok or not isinstance(u, dict) or not u.get("id"):
+                return _err(404, {"error": f"HN user not found: {username}"})
+            return {"id": u.get("id"), "karma": u.get("karma"),
+                    "created": u.get("created"),
+                    "about": str(u.get("about", ""))[:500],
+                    "submitted_count": len(u.get("submitted") or []),
+                    "data_source": "hacker-news", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/forex/history")
+@app.get("/api/v1/forex/history")
+async def forex_history(start: str = Query(..., description="YYYY-MM-DD"),
+                        end: str = Query(..., description="YYYY-MM-DD"),
+                        base: str = Query("USD", description="Base currency"),
+                        symbols: str = Query("", description="CSV targets")):
+    """Historical FX range. Frankfurter, no key."""
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", start) or not re.match(r"^\d{4}-\d{2}-\d{2}$", end):
+        return _err(400, {"error": "Dates must be YYYY-MM-DD"})
+    try:
+        params = {"base": base.upper()}
+        if symbols:
+            params["symbols"] = symbols.upper()
+        async with httpx.AsyncClient(timeout=20) as client:
+            ok, data = await fetch_json(client,
+                f"https://api.frankfurter.dev/v1/{start}..{end}", params=params)
+            if not ok:
+                return _err(502, data)
+            data["data_source"] = "frankfurter"
+            data["fetched_at"] = _now()
+            return data
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/web/geoip")
+@app.get("/api/v1/web/geoip")
+async def web_geoip(ip: str = Query(..., description="IPv4 address")):
+    """IP → geo + ISP. ip-api free tier, no key."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                f"http://ip-api.com/json/{ip}",
+                params={"fields": "status,message,country,city,lat,lon,isp,org,query"})
+            if not ok or data.get("status") != "success":
+                return _err(404 if data.get("message") else 502,
+                            {"error": data.get("message") or "GeoIP unavailable",
+                             "ip": ip})
+            data["data_source"] = "ip-api"
+            data["fetched_at"] = _now()
+            return data
     except Exception as e:
         return _err(500, {"error": str(e)})
 

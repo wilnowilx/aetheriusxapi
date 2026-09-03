@@ -28,7 +28,7 @@ def test_health_free():
     body = r.json()
     assert body["status"] == "alive"
     assert body["service"] == "aetheriusxAPI"
-    assert len(body["endpoints"]) == 17
+    assert len(body["endpoints"]) == 30
 
 
 @pytest.mark.parametrize("route", sorted(PRICES))
@@ -52,6 +52,19 @@ def test_paid_endpoints_require_payment(route):
         "/v1/defi/tvl": {"limit": 2},
         "/v1/forex/rates": {"base": "USD"},
         "/v1/news/hackernews": {"kind": "top", "limit": 2},
+        "/v1/data/forecast": {"lat": 19.43, "lon": -99.13},
+        "/v1/data/airquality": {"lat": 19.43, "lon": -99.13},
+        "/v1/data/define": {"word": "test"},
+        "/v1/defi/protocols": {"limit": 2},
+        "/v1/defi/dexs": {"limit": 2},
+        "/v1/defi/stablecoinchains": {"limit": 2},
+        "/v1/token/prices": {"addresses": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA4b4eE"},
+        "/v1/token/gas": {},
+        "/v1/maps/reverse": {"lat": 19.43, "lon": -99.13},
+        "/v1/forex/history": {"start": "2026-01-01", "end": "2026-01-02"},
+        "/v1/news/hn-item": {"id": 1},
+        "/v1/news/hn-user": {"username": "pg"},
+        "/v1/web/geoip": {"ip": "8.8.8.8"},
     }
     r = client.get(route, params=params[route])
     assert r.status_code == 402
