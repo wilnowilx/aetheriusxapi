@@ -115,6 +115,20 @@ b1 = usdc_bal()
 if b0 is not None and b1 is not None:
     print(f"USDC balance after: {b1} (spent: ${b0 - b1:.4f})", flush=True)
     print("That discount IS the proof. Real money, not simulated.", flush=True)
+print("Montage — three more APIs, same flow, all real:", flush=True)
+for m_route, m_params in [
+    ("/v1/data/define", {"word": "agent"}),
+    ("/v1/token/price",
+     {"address": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "chain": "base"}),
+    ("/v1/news/hn-item", {"id": 49546753}),
+]:
+    try:
+        mr = sdk.paid_get_x402(m_route, m_params, signer=acct)
+        print(f"  {mr.status_code} {m_route} — "
+              f"{json.dumps(mr.json())[:140]}", flush=True)
+    except Exception as e:
+        print(f"  FAIL {m_route}: {str(e)[:100]}", flush=True)
 pause()
 
 beat(5, 6, "LIVE PROOF — telemetry moved because of us")

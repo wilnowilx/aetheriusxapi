@@ -110,4 +110,4 @@ class AetheriusXClient:
         session = wrapRequestsWithPayment(
             session=req.Session(), client=x402ClientSync.from_config(cfg))
         return session.get(f"{self.base_url}{route}",
-                           params=params or {}, timeout=self.timeout)
+                           params=params or {}, timeout=30)
