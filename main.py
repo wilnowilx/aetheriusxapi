@@ -128,6 +128,16 @@ PRICES = {
     "/v1/news/hn-user": "$0.005",
     "/v1/forex/history": "$0.01",
     "/v1/web/geoip": "$0.008",
+    "/v1/data/elevation": "$0.005",
+    "/v1/data/words": "$0.005",
+    "/v1/maps/geocode": "$0.01",
+    "/v1/token/global": "$0.01",
+    "/v1/token/balance": "$0.01",
+    "/v1/token/transactions": "$0.02",
+    "/v1/defi/stablecoin-history": "$0.01",
+    "/v1/forex/convert": "$0.008",
+    "/v1/news/hn-feed": "$0.01",
+    "/v1/web/dns": "$0.005",
 }
 
 DESCRIPTIONS = {
@@ -161,6 +171,16 @@ DESCRIPTIONS = {
     "/v1/news/hn-user": "HN user profile and karma",
     "/v1/forex/history": "Historical FX ranges via Frankfurter",
     "/v1/web/geoip": "IP geolocation and ISP",
+    "/v1/data/elevation": "Ground elevation via Open-Meteo",
+    "/v1/data/words": "Synonyms/antonyms/rhymes via Datamuse",
+    "/v1/maps/geocode": "Forward geocode via Photon",
+    "/v1/token/global": "Global crypto stats via CoinGecko",
+    "/v1/token/balance": "ETH balance via Etherscan",
+    "/v1/token/transactions": "Wallet tx history via Etherscan",
+    "/v1/defi/stablecoin-history": "Stable circulation history via Llama",
+    "/v1/forex/convert": "Currency conversion via Frankfurter",
+    "/v1/news/hn-feed": "HN Ask/Show/Jobs feeds",
+    "/v1/web/dns": "DNS over HTTPS via Google",
 }
 
 # Public JSON-RPC endpoints used as independent observation layers.
@@ -1371,6 +1391,241 @@ async def web_geoip(ip: str = Query(..., description="IPv4 address")):
             data["data_source"] = "ip-api"
             data["fetched_at"] = _now()
             return data
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+# === SCALE PACK 3: toward 10 per category (proven hosts only) ===
+
+@app.get("/v1/data/elevation")
+@app.get("/api/v1/data/elevation")
+async def data_elevation(lat: float = Query(...), lon: float = Query(...)):
+    """Ground elevation in meters. Open-Meteo, no key."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                "https://api.open-meteo.com/v1/elevation",
+                params={"latitude": lat, "longitude": lon})
+            if not ok:
+                return _err(502, data)
+            el = (data.get("elevation") or [None])[0]
+            return {"lat": lat, "lon": lon, "elevation_m": el,
+                    "data_source": "open-meteo", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/data/words")
+@app.get("/api/v1/data/words")
+async def data_words(word: str = Query(..., description="Seed word"),
+                     rel: str = Query("syn", description="syn|ant|rhy")):
+    """Synonyms, antonyms, rhymes. Datamuse, no key."""
+    if rel not in ("syn", "ant", "rhy"):
+        return _err(400, {"error": "rel must be syn|ant|rhy"})
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client, "https://api.datamuse.com/words",
+                                        params={f"rel_{rel}": word, "max": 20})
+            if not ok or not isinstance(data, list):
+                return _err(502, {"error": "Datamuse unavailable"})
+            out = [{"word": w.get("word"), "score": w.get("score")}
+                   for w in data[:20]]
+            return {"word": word, "rel": rel, "count": len(out),
+                    "results": out, "data_source": "datamuse",
+                    "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/maps/geocode")
+@app.get("/api/v1/maps/geocode")
+async def maps_geocode(q: str = Query(..., description="Place to geocode"),
+                       limit: int = Query(5, description="Max 1-10")):
+    """Forward geocode via Photon (Komoot/OSM), no key."""
+    limit = max(1, min(limit, 10))
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client, "https://photon.komoot.io/api/",
+                                        params={"q": q, "limit": limit})
+            if not ok:
+                return _err(502, data)
+            out = []
+            for f in (data.get("features") or [])[:limit]:
+                props, geom = f.get("properties") or {}, f.get("geometry") or {}
+                coords = geom.get("coordinates") or [None, None]
+                out.append({"name": props.get("name"),
+                            "city": props.get("city"), "country": props.get("country"),
+                            "lat": coords[1], "lon": coords[0]})
+            return {"query": q, "count": len(out), "results": out,
+                    "data_source": "photon", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/token/global")
+@app.get("/api/v1/token/global")
+async def token_global():
+    """Global crypto stats: market cap, BTC dominance. CoinGecko, no key."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                "https://api.coingecko.com/api/v3/global")
+            if not ok:
+                return _err(502, data)
+            d = data.get("data", {}) if isinstance(data, dict) else {}
+            return {"total_market_cap_usd": (d.get("total_market_cap") or {}).get("usd"),
+                    "btc_dominance": (d.get("market_cap_percentage") or {}).get("btc"),
+                    "eth_dominance": (d.get("market_cap_percentage") or {}).get("eth"),
+                    "active_cryptos": d.get("active_cryptocurrencies"),
+                    "data_source": "coingecko", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/token/balance")
+@app.get("/api/v1/token/balance")
+async def token_balance(address: str = Query(..., description="Wallet address")):
+    """ETH balance of any wallet. Etherscan (+key quota), no signup."""
+    try:
+        params = {"module": "account", "action": "balance",
+                  "address": address, "tag": "latest"}
+        if ETHERSCAN_API_KEY:
+            params["apikey"] = ETHERSCAN_API_KEY
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client, "https://api.etherscan.io/api",
+                                        params=params)
+            if not ok or data.get("status") != "1":
+                return _err(502, {"error": "Etherscan balance unavailable"})
+            wei = int(data.get("result", "0"))
+            return {"address": address, "balance_wei": str(wei),
+                    "balance_eth": wei / 1e18,
+                    "data_source": "etherscan", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/token/transactions")
+@app.get("/api/v1/token/transactions")
+async def token_transactions(address: str = Query(..., description="Wallet"),
+                             limit: int = Query(10, description="Max 1-25")):
+    """Recent normal transactions of a wallet. Etherscan (+key quota)."""
+    limit = max(1, min(limit, 25))
+    try:
+        params = {"module": "account", "action": "txlist", "address": address,
+                  "startblock": 0, "endblock": 99999999, "page": 1,
+                  "offset": limit, "sort": "desc"}
+        if ETHERSCAN_API_KEY:
+            params["apikey"] = ETHERSCAN_API_KEY
+        async with httpx.AsyncClient(timeout=20) as client:
+            ok, data = await fetch_json(client, "https://api.etherscan.io/api",
+                                        params=params)
+            if not ok or data.get("status") != "1":
+                return _err(502, {"error": "Etherscan txlist unavailable"})
+            out = [{"hash": t.get("hash"), "from": t.get("from"),
+                    "to": t.get("to"), "value_eth": int(t.get("value", "0")) / 1e18,
+                    "block": t.get("blockNumber"), "time": t.get("timeStamp")}
+                   for t in (data.get("result") or [])[:limit]]
+            return {"address": address, "count": len(out),
+                    "transactions": out, "data_source": "etherscan",
+                    "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/defi/stablecoin-history")
+@app.get("/api/v1/defi/stablecoin-history")
+async def defi_stablecoin_history(chain: str = Query("ethereum"),
+                                  limit: int = Query(30, description="Max 1-200")):
+    """Stablecoin circulation history per chain. Llama, no key."""
+    limit = max(1, min(limit, 200))
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
+            ok, data = await fetch_json(client,
+                f"https://stablecoins.llama.fi/stablecoincharts/{chain.lower()}")
+            if not ok or not isinstance(data, list):
+                return _err(502, {"error": "Llama stablecoin history unavailable"})
+            out = []
+            for p in data[-limit:]:
+                circ = p.get("totalCirculatingUSD") or p.get("totalCirculating") or {}
+                out.append({"date": p.get("date"),
+                            "circulating_usd": (circ.get("peggedUSD") if isinstance(circ, dict) else circ)})
+            return {"chain": chain.lower(), "count": len(out), "points": out,
+                    "data_source": "llama-stablecoins", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/forex/convert")
+@app.get("/api/v1/forex/convert")
+async def forex_convert(from_: str = Query("USD", alias="from",
+                                           description="Source currency"),
+                        to: str = Query("MXN", description="Target currency"),
+                        amount: float = Query(1.0, description="Amount")):
+    """Currency conversion. Frankfurter, no key."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                "https://api.frankfurter.dev/v1/latest",
+                params={"amount": amount, "from": from_.upper(), "to": to.upper()})
+            if not ok:
+                return _err(502, data)
+            rates = data.get("rates", {}) if isinstance(data, dict) else {}
+            return {"from": from_.upper(), "to": to.upper(), "amount": amount,
+                    "result": rates.get(to.upper()), "rates": rates,
+                    "data_source": "frankfurter", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/news/hn-feed")
+@app.get("/api/v1/news/hn-feed")
+async def news_hn_feed(kind: str = Query("ask", description="ask|show|job"),
+                       limit: int = Query(10, description="Max 1-25")):
+    """HN Ask/Show/Jobs feeds with metadata. Firebase, no key."""
+    if kind not in ("ask", "show", "job"):
+        return _err(400, {"error": "kind must be ask|show|job"})
+    limit = max(1, min(limit, 25))
+    try:
+        async with httpx.AsyncClient(timeout=25) as client:
+            ok, ids = await fetch_json(client,
+                f"https://hacker-news.firebaseio.com/v0/{kind}stories.json")
+            if not ok or not isinstance(ids, list):
+                return _err(502, {"error": "HN API unavailable"})
+
+            async def one(iid: int):
+                ok2, item = await fetch_json(client,
+                    f"https://hacker-news.firebaseio.com/v0/item/{iid}.json")
+                if not ok2 or not isinstance(item, dict):
+                    return None
+                return {"id": item.get("id"), "title": item.get("title"),
+                        "url": item.get("url"), "score": item.get("score"),
+                        "by": item.get("by"), "time": item.get("time")}
+
+            items = [x for x in await asyncio.gather(
+                *[one(i) for i in ids[:limit]]) if x]
+            return {"kind": kind, "count": len(items), "stories": items,
+                    "data_source": "hacker-news", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/web/dns")
+@app.get("/api/v1/web/dns")
+async def web_dns(name: str = Query(..., description="Domain to resolve"),
+                  type: str = Query("A", description="Record type")):
+    """DNS over HTTPS. Google DoH, no key."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client, "https://dns.google/resolve",
+                                        params={"name": name, "type": type.upper()})
+            if not ok:
+                return _err(502, data)
+            answers = [{"data": a.get("data"), "ttl": a.get("TTL")}
+                       for a in (data.get("Answer") or [])]
+            return {"name": name, "type": type.upper(),
+                    "status": data.get("Status"),
+                    "answers": answers, "data_source": "google-doh",
+                    "fetched_at": _now()}
     except Exception as e:
         return _err(500, {"error": str(e)})
 

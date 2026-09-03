@@ -13,10 +13,11 @@ Crypto-native API marketplace where **AI agents pay per request in USDC on Base 
 No accounts, no API keys, no credit cards — the wallet is the identity.
 
 **Live on Base Sepolia testnet (not a deck — running code):**
-- 30 endpoints: maps ×4, token ×5, web ×3, data ×5, drift, DeFi ×7,
-  forex ×2, news ×3
-- 29 wired to live upstreams (OSM, Llama suite, Open-Meteo, Frankfurter,
-  Firebase, Etherscan, dictionary, ip-api, public RPCs, …) with honest errors
+- 40 endpoints: maps ×5, token ×8, web ×4, data ×7, drift, DeFi ×8,
+  forex ×3, news ×4
+- 39 wired to live upstreams (OSM/Photon, Llama suite, Open-Meteo, Frankfurter,
+  Firebase, Etherscan, dictionary/Datamuse, ip-api, Google DoH, public RPCs,
+  CoinGecko…) with honest errors
 - E2E proven: 6/6 endpoints return 200 with real USDC settlement
 - Interactive dashboard with API explorer: `/dashboard/`
 - Landing: https://wilnowilx.github.io/aetheriusxapi/

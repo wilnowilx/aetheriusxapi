@@ -35,6 +35,16 @@ const SPECS = {
   "/v1/news/hn-item": [{n:"id",r:1,t:"n",d:"49546753"}],
   "/v1/news/hn-user": [{n:"username",r:1,d:"pg"}],
   "/v1/web/geoip": [{n:"ip",r:1,d:"8.8.8.8"}],
+  "/v1/data/elevation": [{n:"lat",r:1,t:"n",d:"19.43"},{n:"lon",r:1,t:"n",d:"-99.13"}],
+  "/v1/data/words": [{n:"word",r:1,d:"happy"},{n:"rel",r:0,d:"syn"}],
+  "/v1/maps/geocode": [{n:"q",r:1,d:"Eiffel Tower"},{n:"limit",r:0,t:"n",d:"3"}],
+  "/v1/token/global": [],
+  "/v1/token/balance": [{n:"address",r:1,d:"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"}],
+  "/v1/token/transactions": [{n:"address",r:1,d:"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"},{n:"limit",r:0,t:"n",d:"5"}],
+  "/v1/defi/stablecoin-history": [{n:"chain",r:0,d:"ethereum"},{n:"limit",r:0,t:"n",d:"5"}],
+  "/v1/forex/convert": [{n:"from",r:0,d:"USD"},{n:"to",r:0,d:"MXN"},{n:"amount",r:0,t:"n",d:"100"}],
+  "/v1/news/hn-feed": [{n:"kind",r:0,d:"ask"},{n:"limit",r:0,t:"n",d:"5"}],
+  "/v1/web/dns": [{n:"name",r:1,d:"example.com"},{n:"type",r:0,d:"A"}],
 };
 const FALLBACK_META = {
   "/v1/maps/search":"$0.01/call - Business search via OpenStreetMap",
@@ -67,6 +77,16 @@ const FALLBACK_META = {
   "/v1/news/hn-item":"$0.005/call - HN item",
   "/v1/news/hn-user":"$0.005/call - HN user",
   "/v1/web/geoip":"$0.008/call - IP geolocation",
+  "/v1/data/elevation":"$0.005/call - Elevation",
+  "/v1/data/words":"$0.005/call - Word relations",
+  "/v1/maps/geocode":"$0.01/call - Forward geocode",
+  "/v1/token/global":"$0.01/call - Global stats",
+  "/v1/token/balance":"$0.01/call - ETH balance",
+  "/v1/token/transactions":"$0.02/call - Wallet txs",
+  "/v1/defi/stablecoin-history":"$0.01/call - Stable history",
+  "/v1/forex/convert":"$0.008/call - Convert",
+  "/v1/news/hn-feed":"$0.01/call - Ask/Show/Jobs",
+  "/v1/web/dns":"$0.005/call - DNS lookup",
 };
 
 const state = { health:null, selected:null };
