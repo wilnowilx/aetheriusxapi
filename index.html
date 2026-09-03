@@ -296,6 +296,63 @@
             animation: fadeUp 1s 0.8s forwards;
         }
 
+        .hero-console {
+            max-width: 780px;
+            margin: 54px auto 0;
+            padding: 18px 22px 20px;
+            text-align: left;
+            background: rgba(10, 10, 20, 0.72);
+            border: 1px solid rgba(168, 85, 247, 0.28);
+            border-radius: 16px;
+            box-shadow: 0 20px 80px rgba(124, 58, 237, 0.16), inset 0 1px rgba(255,255,255,0.05);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s 1s forwards;
+        }
+
+        .hero-console-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-sec);
+            font: 0.68rem 'JetBrains Mono', monospace;
+            letter-spacing: 0.08em;
+        }
+
+        .hero-console-top a {
+            color: var(--purple-light);
+            letter-spacing: 0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .hero-console-top a:hover { color: white; }
+        .hero-console-top a span { margin-left: 4px; }
+
+        .hero-console-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            margin-right: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green);
+        }
+
+        .hero-console-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            padding-top: 20px;
+        }
+
+        .hero-console-grid div { display: flex; flex-direction: column; gap: 6px; }
+        .hero-console-grid strong { color: var(--text); font: 600 1.05rem 'JetBrains Mono', monospace; }
+        .hero-console-grid span { color: var(--text-muted); font-size: 0.68rem; }
+
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
         /* ===== STATS ===== */
@@ -1118,6 +1175,9 @@
             .limits-header { display: none; }
             .docs-grid { grid-template-columns: 1fr; }
             .limits-table { margin: 64px 10px 0; }
+            .hero-console { margin-top: 40px; padding: 16px; }
+            .hero-console-grid { grid-template-columns: repeat(2, 1fr); gap: 18px 12px; }
+            .hero-console-top { align-items: flex-start; flex-direction: column; gap: 10px; }
             .trusted-logos { gap: 32px; }
             .hero-badges { flex-direction: column; align-items: center; }
             .hb-stats { grid-template-columns: 1fr; }
@@ -1170,6 +1230,7 @@
                 <a href="#code">Code</a>
                 <a href="#heartbeat">Status</a>
                 <a href="#limits">Limits</a>
+                <a href="/dashboard/">Dashboard</a>
                 <a href="#cta" class="btn-nav">Get Started</a>
             </div>
             <button class="mobile-toggle" onclick="openMobile()">
@@ -1202,6 +1263,18 @@
                     View Docs
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
                 </a>
+            </div>
+            <div class="hero-console anim">
+                <div class="hero-console-top">
+                    <span><span class="hero-console-dot"></span> AETHERIUSX CONTROL ROOM</span>
+                    <a href="/dashboard/">Open dashboard <span>↗</span></a>
+                </div>
+                <div class="hero-console-grid">
+                    <div><strong>9</strong><span>VM services</span></div>
+                    <div><strong>USDC</strong><span>per-request rail</span></div>
+                    <div><strong>NATS</strong><span>telemetry fabric</span></div>
+                    <div><strong>402</strong><span>payment handshake</span></div>
+                </div>
             </div>
         </div>
     </section>

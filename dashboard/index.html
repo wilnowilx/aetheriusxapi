@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101317">
+  <title>AetheriusX Control Room</title>
+  <link rel="stylesheet" href="/dashboard/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-mark"><span class="brand-dot"></span><span>AETHERIUS<span class="brand-sub">X</span></span></div>
+      <div class="workspace-label">CONTROL ROOM <span class="live-pill">LIVE</span></div>
+      <nav class="side-nav" aria-label="Dashboard sections">
+        <a class="nav-item active" href="#overview"><span class="nav-icon">+</span>Overview</a>
+        <a class="nav-item" href="#apis"><span class="nav-icon">[]</span>API catalog</a>
+        <a class="nav-item" href="#telemetry"><span class="nav-icon">~</span>Telemetry</a>
+        <a class="nav-item" href="#drift"><span class="nav-icon"><> </span>Storage drift</a>
+        <a class="nav-item" href="#activity"><span class="nav-icon">*</span>Activity</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="network-card"><div class="eyebrow">NETWORK</div><div class="network-name"><span class="status-dot"></span>Base Sepolia</div><div class="network-meta">Simulated settlement mode</div></div>
+        <a class="side-link" href="/docs" target="_blank" rel="noreferrer">API docs <span>↗</span></a>
+        <a class="side-link" href="/landing">Back to site <span>↗</span></a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="menu-button" id="menuButton" aria-label="Open navigation">=</button>
+        <div><div class="eyebrow">AETHERIUSX / OPERATIONS</div><h1>Control room <span class="live-pulse"></span></h1></div>
+        <div class="top-actions"><div class="sync-state"><span class="status-dot"></span><span id="syncLabel">Syncing</span></div><button class="wallet-button" id="walletButton">Connect wallet</button></div>
+      </header>
+
+      <section class="hero-strip" id="overview">
+        <div><div class="eyebrow blue">SYSTEM SNAPSHOT · <span id="snapshotTime">--:--:--</span></div><h2>Infrastructure for autonomous commerce.</h2><p>One view for your APIs, payments and distributed runtime.</p></div>
+        <div class="hero-metric"><span>Request volume</span><strong id="requestVolume">18,420</strong><small>+12.8% vs last period</small></div>
+      </section>
+
+      <section class="metric-grid" aria-label="Key metrics">
+        <article class="metric-card"><div class="metric-head"><span>API health</span><span class="metric-icon green">OK</span></div><strong>99.98%</strong><div class="micro-chart green-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small>All public routes responding</small></article>
+        <article class="metric-card"><div class="metric-head"><span>USDC settled</span><span class="metric-icon blue">$</span></div><strong>$284.16</strong><div class="metric-change up">+18.4% <span>this week</span></div><small>Simulated in local mode</small></article>
+        <article class="metric-card"><div class="metric-head"><span>Avg. latency</span><span class="metric-icon orange">ms</span></div><strong>84<span class="unit">ms</span></strong><div class="latency-line"><span style="width:36%"></span></div><small>p95 · 142ms</small></article>
+        <article class="metric-card"><div class="metric-head"><span>Active wallets</span><span class="metric-icon coral">W</span></div><strong>126</strong><div class="avatar-row"><span>AK</span><span>JM</span><span>NS</span><span>+123</span></div><small>Across 4 integrated services</small></article>
+      </section>
+
+      <section class="content-grid" id="apis">
+        <article class="panel api-panel"><div class="panel-heading"><div><div class="eyebrow">PRODUCT SURFACE</div><h3>API catalog</h3></div><button class="text-button" id="refreshButton">Refresh ↻</button></div><div class="api-list" id="apiList"></div></article>
+        <article class="panel volume-panel" id="telemetry"><div class="panel-heading"><div><div class="eyebrow">RUNTIME TELEMETRY</div><h3>Request volume</h3></div><span class="select-like">Last 24h⌄</span></div><div class="volume-total"><strong>18.4k</strong><span class="metric-change up">+12.8%</span></div><div class="bar-chart" aria-label="Request volume chart"><i style="height:34%"></i><i style="height:48%"></i><i style="height:42%"></i><i style="height:62%"></i><i style="height:55%"></i><i style="height:74%"></i><i style="height:68%"></i><i style="height:88%"></i><i style="height:71%"></i><i style="height:96%"></i><i style="height:82%"></i><i style="height:100%"></i></div><div class="chart-labels"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span></div></article>
+      </section>
+
+      <section class="content-grid lower-grid">
+        <article class="panel drift-panel" id="drift"><div class="panel-heading"><div><div class="eyebrow">DISTRIBUTED STATE</div><h3>Storage drift</h3></div><span class="state-tag watch"><span class="status-dot"></span>Watching</span></div><p class="panel-copy">Compare observed slots across runtime layers and detect convergence gaps.</p><div class="layer-stack"><div class="layer-row"><span class="layer-name"><b class="layer-index">01</b>Ingress</span><strong>18,842</strong><span class="layer-time">42ms ago</span><span class="state-tag stable">Stable</span></div><div class="layer-row"><span class="layer-name"><b class="layer-index">02</b>Storage</span><strong>18,839</strong><span class="layer-time">47ms ago</span><span class="state-tag drift">+3 slots</span></div><div class="layer-row"><span class="layer-name"><b class="layer-index">03</b>Settlement</span><strong>18,839</strong><span class="layer-time">51ms ago</span><span class="state-tag stable">Stable</span></div></div><button class="outline-button" id="driftButton">Open drift inspector <span>→</span></button></article>
+        <article class="panel activity-panel" id="activity"><div class="panel-heading"><div><div class="eyebrow">RECENT EVENTS</div><h3>Activity</h3></div><button class="text-button">View all →</button></div><div class="activity-list"><div class="activity-row"><span class="activity-marker blue-marker"></span><div><strong>Payment settled</strong><small>/v1/token/price · 0.005 USDC</small></div><time>12s</time></div><div class="activity-row"><span class="activity-marker green-marker"></span><div><strong>API request completed</strong><small>/v1/maps/search · 91ms</small></div><time>38s</time></div><div class="activity-row"><span class="activity-marker orange-marker"></span><div><strong>Drift detected</strong><small>storage layer · 3 slots</small></div><time>2m</time></div><div class="activity-row"><span class="activity-marker gray-marker"></span><div><strong>Wallet connected</strong><small>0x71...9c2a · Base Sepolia</small></div><time>4m</time></div></div></article>
+      </section>
+      <footer class="footer-note"><span>Control room v0.1</span><span>Data marked as simulated is for local development.</span></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <div class="inspector-backdrop" id="inspectorBackdrop">
+    <aside class="inspector" role="dialog" aria-modal="true" aria-labelledby="inspectorTitle">
+      <button class="inspector-close" id="inspectorClose" aria-label="Close endpoint inspector">×</button>
+      <div class="eyebrow blue">ENDPOINT INSPECTOR</div>
+      <h2 id="inspectorTitle">API endpoint</h2>
+      <div class="inspector-route" id="inspectorRoute">GET /v1/endpoint</div>
+      <div class="inspector-status"><span class="status-dot"></span> Ready for a signed request</div>
+      <div class="inspector-block"><span>PRICE</span><strong id="inspectorPrice">$0.010 USDC</strong></div>
+      <div class="inspector-block"><span>PAYMENT RAIL</span><strong>x402 · Base Sepolia</strong></div>
+      <button class="run-button" id="runButton">Run simulated request <span>→</span></button>
+    </aside>
+  </div>
+  <script src="/dashboard/app.js"></script>
+</body>
+</html>
