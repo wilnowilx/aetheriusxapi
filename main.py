@@ -308,21 +308,39 @@ async def maps_nearby(lat: float = Query(..., description="Latitude"),
         query = f"[out:json][timeout:25];({selector});out center body;"
         async with httpx.AsyncClient(timeout=30) as client:
             data = await _overpass_query(client, query)
-            if data is not None:
-                results = []
-                for elem in data.get("elements", [])[:20]:
-                    tags = elem.get("tags", {})
-                    center = elem.get("center", {})
-                    results.append({
-                        "name": tags.get("name", "Unknown"),
-                        "category": tags.get("amenity", tags.get("shop", "")),
-                        "lat": elem.get("lat", center.get("lat")),
-                        "lon": elem.get("lon", center.get("lon")),
-                    })
+            if data is None:
+                # Fallback: reverse-geocode single best guess for the coords.
+                try:
+                    r = await client.get(
+                        "https://nominatim.openstreetmap.org/reverse",
+                        params={"lat": lat, "lon": lon, "format": "json"},
+                        headers=UA)
+                    results = []
+                    if r.status_code == 200 and r.json().get("display_name"):
+                        p = r.json()
+                        results = [{"name": p.get("display_name", "").split(",")[0],
+                                    "category": p.get("type", ""),
+                                    "lat": lat, "lon": lon}]
+                except Exception:
+                    results = []
                 return {"lat": lat, "lon": lon, "radius": radius,
                         "category": category or "all",
-                        "count": len(results), "results": results}
-            return _err(502, {"error": "Overpass API unavailable"})
+                        "count": len(results), "results": results,
+                        "data_source": "nominatim-reverse"}
+            results = []
+            for elem in data.get("elements", [])[:20]:
+                tags = elem.get("tags", {})
+                center = elem.get("center", {})
+                results.append({
+                    "name": tags.get("name", "Unknown"),
+                    "category": tags.get("amenity", tags.get("shop", "")),
+                    "lat": elem.get("lat", center.get("lat")),
+                    "lon": elem.get("lon", center.get("lon")),
+                })
+            return {"lat": lat, "lon": lon, "radius": radius,
+                    "category": category or "all",
+                    "count": len(results), "results": results,
+                    "data_source": "overpass"}
     except Exception as e:
         return _err(500, {"error": str(e)})
 
@@ -331,6 +349,15 @@ async def maps_nearby(lat: float = Query(..., description="Latitude"),
 
 CHAINIDS = {"ethereum": 1, "base": 8453, "optimism": 10,
             "arbitrum": 42161, "polygon": 137}
+
+# Major stablecoins: served instantly via Coinbase spot (fiat-grade source,
+# immune to DEX-indexer gaps and datacenter throttling).
+KNOWN_TOKENS = {
+    "0x833589fcd6edb6e08f4c7c32d4f71b54bda4b4ee": "USDC",  # Base
+    "0xa0b86991c6218b36c1d19d4a2e9eb0ce69c744": "USDC",    # Ethereum
+    "0xdac17f958d2ee523a2206206994597c13d831ec7": "USDT",  # Ethereum
+    "0x6b175474e89094c44da98b954eedeac495271d0f": "DAI",   # Ethereum
+}
 COINGECKO_PLATFORM = {"ethereum": "ethereum", "base": "base",
                       "optimism": "optimistic-ethereum",
                       "arbitrum": "arbitrum-one", "polygon": "polygon-pos"}
@@ -400,9 +427,26 @@ async def token_holders(address: str = Query(..., description="Token contract"),
 @app.get("/api/v1/token/price")
 async def token_price(address: str = Query(..., description="Token contract"),
                       chain: str = Query("ethereum", description="Blockchain")):
-    """Real-time USD price: CoinGecko primary, DexScreener fallback (no keys)."""
+    """Real-time USD price: known stables via Coinbase, else 4-source chain."""
     try:
         async with httpx.AsyncClient(timeout=15) as client:
+            # Instant path: major stablecoins via Coinbase spot.
+            symbol = KNOWN_TOKENS.get(address.lower())
+            if symbol:
+                try:
+                    r = await client.get(
+                        f"https://api.coinbase.com/v2/prices/{symbol}-USD/spot")
+                    if r.status_code == 200:
+                        amt = (r.json().get("data") or {}).get("amount")
+                        if amt is not None:
+                            return {"address": address, "chain": chain,
+                                    "price_usd": float(amt),
+                                    "symbol": symbol,
+                                    "vs_currency": "usd",
+                                    "data_source": "coinbase",
+                                    "fetched_at": _now()}
+                except Exception:
+                    pass
             # Primary: CoinGecko (chain-specific).
             platform = COINGECKO_PLATFORM.get(chain.lower())
             if platform:
