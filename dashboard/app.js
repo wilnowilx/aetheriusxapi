@@ -31,11 +31,24 @@ const FALLBACK_META = {
 
 const state = { health:null, selected:null };
 
+/* Backend base URL: same-origin by default (local uvicorn / VM proxy).
+   Override via the Backend bar (stored in localStorage) when the page is
+   served elsewhere (e.g. GitHub Pages) — requires CORS on the backend. */
+function api(path){
+  const base = (localStorage.getItem("aex_base") || "").replace(/\/+$/, "");
+  return base ? base + path : ".." + path;
+}
+function refreshBaseState(){
+  const b = localStorage.getItem("aex_base") || "";
+  $("#backendState").textContent = b ? "→ " + b : "→ same origin";
+  $("#backendUrl").value = b;
+}
+
 function splitMeta(s){ const i=s.indexOf(" - "); return i<0?[s,""]:[s.slice(0,i),s.slice(i+3)]; }
 
 async function loadHealth(){
   try{
-    const r = await fetch("../health");
+    const r = await fetch(api("/health"));
     if(!r.ok) throw 0;
     const h = await r.json();
     state.health = h;
@@ -100,7 +113,7 @@ function fmtUptime(s){
 /* REAL server-side telemetry — no simulated numbers anywhere. */
 async function loadTelemetry(){
   try{
-    const r = await fetch("../v1/telemetry");
+    const r = await fetch(api("/v1/telemetry"));
     if(!r.ok) return;
     const t = await r.json();
     const T = t.totals || {};
@@ -134,7 +147,7 @@ async function loadTelemetry(){
 async function execute(paid){
   if(!state.selected) return;
   const route = state.selected;
-  const url = ".." + route + "?" + params();
+  const url = api(route) + "?" + params();
   $("#resultMeta").textContent = (paid?"paying → ":"no payment → ") + url;
   $("#resultBox").textContent = "…";
   const t0 = performance.now();
@@ -158,7 +171,7 @@ async function execute(paid){
 async function probeDrift(){
   const box = $("#driftBody");
   try{
-    const r = await fetch("../v1/storage/drift?layers=3", {headers:{"X-PAYMENT":"dashboard-demo"}});
+    const r = await fetch(api("/v1/storage/drift?layers=3"), {headers:{"X-PAYMENT":"dashboard-demo"}});
     if(r.status===404){
       box.innerHTML = `<p class="muted">Endpoint not deployed yet — planned payload shown below. The NATS/VPC telemetry stays private; only drift observations ship as API.</p>`;
     }else{
@@ -176,6 +189,15 @@ $("#btnWallet").onclick = ()=>{
   else { $("#wStatus").textContent = "disconnected"; $("#wAddr").textContent = "—"; }
 };
 
+$("#btnBaseUse").onclick = ()=>{
+  localStorage.setItem("aex_base", $("#backendUrl").value.trim().replace(/\/+$/, ""));
+  refreshBaseState(); loadHealth(); loadTelemetry();
+};
+$("#btnBaseReset").onclick = ()=>{
+  localStorage.removeItem("aex_base");
+  refreshBaseState(); loadHealth(); loadTelemetry();
+};
+refreshBaseState();
 loadHealth();
 loadTelemetry();
 probeDrift();

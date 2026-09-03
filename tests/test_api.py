@@ -180,6 +180,26 @@ def test_telemetry_counts_402_and_wallets():
     assert after["wallets_seen"] == before["wallets_seen"] + 1
 
 
+def test_cors_allows_pages_origin():
+    r = client.options(
+        "/v1/email/validate",
+        headers={"Origin": "https://wilnowilx.github.io",
+                 "Access-Control-Request-Method": "GET"})
+    assert r.status_code == 200
+    assert r.headers.get("access-control-allow-origin") == "https://wilnowilx.github.io"
+    r = client.get("/health", headers={"Origin": "https://wilnowilx.github.io"})
+    assert r.headers.get("access-control-allow-origin") == "https://wilnowilx.github.io"
+
+
+def test_dashboard_backend_setting_present():
+    r = client.get("/dashboard/")
+    assert r.status_code == 200
+    assert 'id="backendUrl"' in r.text
+    js = client.get("/dashboard/app.js")
+    assert js.status_code == 200
+    assert "aex_base" in js.text and "api(" in js.text
+
+
 def test_live_email_valid_shape():
     r = client.get("/v1/email/validate", params={"email": "user@gmail.com"},
                    headers=PAID)

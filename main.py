@@ -34,6 +34,7 @@ from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 from x402_middleware import SimulatedX402Middleware
 from telemetry import Tracker, TelemetryMiddleware
@@ -190,10 +191,24 @@ else:
                        pay_to=PAY_TO, network=NETWORK, currency=CURRENCY)
     print("[x402] SIMULATED mode: pass any X-PAYMENT header", flush=True)
 
-# Telemetry LAST: Starlette's add_middleware() inserts at position 0, so the
-# last-added middleware ends up outermost and observes the FINAL status
-# (paid 200 vs 402 challenge) after the x402 layer above.
+# Telemetry: outermost API observer (see note below on ordering).
 app.add_middleware(TelemetryMiddleware, tracker=tracker)
+
+# CORS LAST (= outermost): browser preflights short-circuit here, never
+# polluting telemetry. Public read API, no cookies: explicit origin list with
+# env override + Codespaces dev regex. (Starlette inserts at position 0, so
+# last-added sits outermost.)
+CORS_ORIGINS = [o.strip() for o in os.getenv(
+    "CORS_ORIGINS",
+    "https://wilnowilx.github.io,http://127.0.0.1:4020,http://localhost:4020"
+).split(",") if o.strip()]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_origin_regex=r"https://.*\.app\.github\.dev",
+    allow_methods=["GET", "OPTIONS"],
+    allow_headers=["*"],
+)
 
 
 # === FREE ROUTES ===

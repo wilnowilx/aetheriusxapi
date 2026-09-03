@@ -22,6 +22,13 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
   border-radius:10px;padding:10px 12px}
 .statusbar label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .statusbar b{font-size:13px;word-break:break-all}
+.backendbar{display:flex;gap:8px;align-items:center;background:var(--card);
+  border:1px solid var(--border);border-radius:10px;padding:8px 12px;margin-bottom:16px;font-size:13px}
+.backendbar input{flex:1;background:#0b0b16;border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:7px 10px;font-size:12.5px;font-family:inherit;min-width:120px}
+.backendbar input:focus{outline:none;border-color:var(--purple)}
+.backendbar .btn{padding:7px 12px;font-size:12.5px;white-space:nowrap}
+@media(max-width:640px){.backendbar{flex-wrap:wrap}}
 .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
 @media(max-width:960px){.grid{grid-template-columns:1fr}}
 .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
