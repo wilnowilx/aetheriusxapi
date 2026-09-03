@@ -28,6 +28,7 @@
 - [🔥 The Problem](#the-problem)
 - [🗺️ System Overview](#system-overview)
 - [📡 Live Status](#live-status)
+- [🎬 Live Demo](#live-demo)
 - [🐍 SDKs](#sdks)
 - [🔭 The Vision](#the-vision)
 - [🧠 Mental Model: How x402 Changes Everything](#mental-model-how-x402-changes-everything)
@@ -229,6 +230,21 @@ Runnable flows: [`examples/`](examples/) · JS SDK in roadmap.
 | Version | v2.0.0 · 11 endpoints · 29/29 tests green |
 
 Snapshot 2026-09-03: E2E 6/6 paid endpoints → 200 with real settlement.
+
+---
+
+## 🎬 Live Demo
+
+Unedited terminal replay: agent discovers the catalog → hits `402` → pays real
+USDC → gets `200` + data → telemetry moves. Recorded against Base Sepolia.
+
+**[▶ Watch the 19-second demo](https://wilnowilx.github.io/aetheriusxapi/docs/demo/player.html)**
+· [raw .cast](https://wilnowilx.github.io/aetheriusxapi/docs/demo/take-1.cast)
+· [script](docs/demo/demo_90s.py)
+
+> Reproduce it: set `DEMO_STEP=1`, run the script with a testnet key, press
+> ENTER per scene. Same code path as `sdks/python` — what you see is what
+> a client gets.
 
 ---
 
