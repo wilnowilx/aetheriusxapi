@@ -54,6 +54,10 @@ h1 .grad{background:linear-gradient(90deg,#a855f7,#d946ef,#ec4899);-webkit-backg
 .wiki-zone:hover{border-bottom-color:var(--magenta)}
 .wiki{position:fixed;z-index:9999;max-width:380px;min-width:260px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-family:Inter,system-ui,sans-serif;font-size:13px;line-height:1.55;color:var(--text);box-shadow:0 12px 48px rgba(0,0,0,.6),0 0 24px rgba(168,85,247,.15);pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .35s,transform .35s}
 .wiki.show{opacity:1;transform:translateY(0)}
+.wiki.auto{transition:opacity .75s ease,transform .75s ease}
+@media(max-width:1300px){
+  .wiki.auto{max-width:340px}
+}
 .wiki .wk{color:var(--purple);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
 .wiki .wt{font-weight:600;margin-bottom:4px}
 .wiki .wd{color:var(--sec)}
@@ -148,13 +152,18 @@ function wikiHTML(key){
 function showWikiAuto(key){
   var html = wikiHTML(key); if(!html) return;
   wiki.innerHTML = html;
+  wiki.classList.add('auto');
   var tr = term.getBoundingClientRect();
+  var ww = Math.min(380, window.innerWidth - 32);
   var wx = tr.right + 16;
-  if(wx + 400 > window.innerWidth) wx = Math.max(8, tr.left - 396);
-  var wy = tr.top + 40;
+  /* si no cabe a la derecha, anclar al borde derecho del viewport */
+  if(wx + ww + 16 > window.innerWidth) wx = window.innerWidth - ww - 16;
+  if(wx < 16) wx = 16;
+  var wy = tr.top + 24;
   if(wy + 230 > window.innerHeight) wy = Math.max(8, window.innerHeight - 240);
   wiki.style.left = wx + 'px';
   wiki.style.top = wy + 'px';
+  void wiki.offsetWidth;
   wiki.classList.add('show');
 }
 /* HOVER manual: al lado del elemento, solo cuando NO hay auto visible */
@@ -231,15 +240,25 @@ var PCHAR = 8;
 var cur = document.createElement('span');
 cur.className = 'cursor';
 
+var autoFadeTimer = null;
+function hideWikiAuto(){
+  wiki.classList.remove('show');
+  /* deja el fade de .auto (0.75s) antes de limpiar */
+  clearTimeout(autoFadeTimer);
+  autoFadeTimer = setTimeout(function(){
+    if(!autoWikiVisible) wiki.classList.remove('auto');
+  }, 800);
+}
 function runStep(idx){
   if(!playing || idx >= S.length){
     playing = false; btnPlay.textContent = '▶ Play'; autoWikiVisible = false;
-    wiki.classList.remove('show');
+    hideWikiAuto();
     if(castBtn) castBtn.classList.add('big');
     return;
   }
-  autoWikiVisible = false; /* el step nuevo manda: se oculta el anterior */
-  wiki.classList.remove('show');
+  /* fade out del auto anterior */
+  if(autoWikiVisible) hideWikiAuto();
+  autoWikiVisible = false;
   var s = S[idx];
   function advance(){
     done = idx + 1; prog();
@@ -303,7 +322,7 @@ function renderAll(){
 }
 
 btnPlay.onclick = function(){
-  if(playing){ clear(); playing = false; btnPlay.textContent = '▶ Play'; autoWikiVisible = false; wiki.classList.remove('show'); }
+  if(playing){ clear(); playing = false; btnPlay.textContent = '▶ Play'; autoWikiVisible = false; hideWikiAuto(); }
   else { play(); }
 };
 btnReplay.onclick = function(){ play(); };
