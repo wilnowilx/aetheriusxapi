@@ -29,7 +29,7 @@ h1 .grad{background:linear-gradient(90deg,#a855f7,#d946ef,#ec4899);-webkit-backg
 .term .ok{color:var(--green)} .term .warn{color:var(--orange)} .term .dim{color:var(--sec)}
 .cursor{display:inline-block;width:9px;height:17px;background:var(--purple);vertical-align:-3px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
-.controls{margin:16px 0;display:flex;gap:10px;justify-content:center}
+.controls{margin:16px 0;display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap}
 .controls button{background:linear-gradient(90deg,var(--purple),var(--magenta));color:#fff;border:none;
   border-radius:9px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;min-height:44px}
 .controls button.ghost{background:transparent;border:1px solid rgba(255,255,255,.2)}
@@ -60,8 +60,9 @@ h1 .grad{background:linear-gradient(90deg,#a855f7,#d946ef,#ec4899);-webkit-backg
 <div class="controls">
 <button id="btnPlay">▶ Play</button>
 <button id="btnReplay" class="ghost">↻ Replay</button>
+<a class="btnlink ghost" href="https://wilnowilx.github.io/aetheriusxapi/">← back</a>
+<a class="btnlink" id="btnCast" href="./take-1.cast" download>⬇ .cast</a>
 </div>
-<p class="back"><a class="btnlink ghost" href="https://wilnowilx.github.io/aetheriusxapi/">← back to aetheriusxapi</a> <a class="btnlink" id="btnCast" href="./take-1.cast" download>⬇ raw .cast file</a></p>
 </div>
 <script>window.AEX_FX={n:45,speed:.7};</script>
 <script src="../../fx.js"></script>
