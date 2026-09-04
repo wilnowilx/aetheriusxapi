@@ -29,6 +29,7 @@
 ## Table of Contents
 
 - [⚡ Built in 48 Hours](#built-in-48-hours)
+- [🕐 Build Timeline](#build-timeline)
 - [🔥 The Problem](#the-problem)
 - [🗺️ System Overview](#system-overview)
 - [📡 Live Status](#live-status)
@@ -70,6 +71,32 @@
 | Team | 1 human + AI builders |
 
 If one person with <$99 builds this in 48 hours, imagine what funded builders ship on Base. That is the democratization thesis: lowering the cost of building until anyone can. Velocity isn't our bragging — it's our evidence.
+
+---
+
+## 🕐 Build Timeline
+
+<!-- RITUAL: append a row + gantt bar on every release. This timeline stays alive. -->
+
+```mermaid
+gantt
+    title AETHERIUS build log — verify every line in git log
+    dateFormat YYYY-MM-DD
+    section Day 1 — Sep 2
+    Repo born + landing online          :done, d1, 2026-09-02, 1d
+    Python SDK + persistent telemetry   :done, d2, 2026-09-02, 1d
+    section Day 2 — Sep 3
+    Backend v2 + dashboard + HTTPS/TLS  :done, d3, 2026-09-03, 1d
+    Wave 2 + Wave 3 (40 endpoints)      :done, d4, 2026-09-03, 1d
+    JS SDK + Etherscan V2 + demo+player :done, d5, 2026-09-03, 1d
+```
+
+| Day | Shipped | Verify |
+|-----|---------|--------|
+| Sep 2 | Repo born, landing + docs online, Python SDK, SQLite-persistent telemetry | `git log --since=2026-09-02 --until=2026-09-03` |
+| Sep 3 | Backend v2 (real x402), dashboard, CORS, HTTPS/TLS, Waves 2+3 (40 endpoints), JS SDK, Etherscan V2, demo script + player, brutal README | `git log --since=2026-09-03` |
+
+Marketing truth, stated plainly: **no code is shared here — the timeline PROVES you can do it too.** Fork the process, not the product: small team, free tools, dialectic + exocortex + daily shipping. That is democratization of information.
 
 ---
 
