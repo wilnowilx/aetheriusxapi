@@ -205,16 +205,14 @@ Snapshot 2026-09-03: E2E 6/6 paid endpoints → 200 with real settlement.
 
 ## 🎬 Live Demo
 
-Unedited terminal replay: agent discovers the catalog → hits `402` → pays real
-USDC → gets `200` + data → telemetry moves. Recorded against Base Sepolia.
+Unedited terminal replay. One agent, one call, real USDC on Base Sepolia.
+What you see is exactly what a paying client gets.
 
-**[▶ Watch the 19-second demo](https://wilnowilx.github.io/aetheriusxapi/docs/demo/player.html)**
-· [raw .cast](https://wilnowilx.github.io/aetheriusxapi/docs/demo/take-1.cast)
-· [script](docs/demo/demo_90s.py)
+**[▶ Watch the demo](https://wilnowilx.github.io/aetheriusxapi/docs/demo/player.html)**
 
-> Reproduce it: set `DEMO_STEP=1`, run the script with a testnet key, press
-> ENTER per scene. Same code path as `sdks/python` — what you see is what
-> a client gets.
+The replay shows the full x402 loop — discovery, payment challenge, settlement, data. No cuts, no simulated responses, no fake data. Every response is a real endpoint on testnet. The telemetry you see on the dashboard updates live.
+
+**[Dashboard](https://wilnowilx.github.io/aetheriusxapi/dashboard/)** · [raw .cast](https://wilnowilx.github.io/aetheriusxapi/docs/demo/take-1.cast) · [script](docs/demo/demo_90s.py)
 
 ---
 
