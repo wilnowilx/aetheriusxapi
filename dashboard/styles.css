@@ -37,13 +37,14 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
 .tag{font-size:11px;background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.4);
   padding:1px 8px;border-radius:20px;vertical-align:middle}
 .catalog-list{display:flex;flex-direction:column;gap:8px;max-height:520px;overflow:auto}
-.ep{display:flex;justify-content:space-between;align-items:center;gap:10px;
-  border:1px solid var(--border);border-radius:10px;padding:9px 12px;cursor:pointer;transition:.15s}
+.ep{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+  border:1px solid var(--border);border-radius:10px;padding:9px 12px;cursor:pointer;transition:.15s;flex-wrap:nowrap}
 .ep:hover{border-color:var(--purple)}
 .ep.sel{border-color:var(--magenta);background:rgba(217,70,239,.06)}
-.ep code{font-size:12.5px;color:#e9d5ff}
-.ep .price{font-size:12px;color:var(--green);white-space:nowrap}
-.ep small{display:block;color:var(--sec);font-size:11.5px;margin-top:2px}
+.ep code{font-size:12.5px;color:#e9d5ff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ep .ep-info{flex:1;min-width:0;overflow:hidden}
+.ep .price{font-size:12px;color:var(--green);white-space:nowrap;flex-shrink:0}
+.ep small{display:block;color:var(--sec);font-size:11.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .form{display:flex;flex-direction:column;gap:8px;margin:10px 0}
 .form label{font-size:12px;color:var(--sec)}
 .form input{width:100%;background:#0b0b16;border:1px solid var(--border);color:var(--text);
@@ -142,9 +143,11 @@ body{font-size:16px}
 .topbar .brand{font-size:19px}
 .topbar{padding:20px 4px}
 .catalog-list{gap:10px}
+.catalog-list .ep .ep-info{flex:1;min-width:0}
+.catalog-list .ep code{max-width:calc(100% - 90px)}
 .ep{padding:14px 16px;border-radius:12px}
 .ep code{font-size:15px}
-.ep small{font-size:12.5px}
+.ep small{font-size:12.5px;max-width:100%}
 .ep .price{font-size:13px;font-weight:700;background:linear-gradient(90deg,rgba(16,185,129,.18),rgba(16,185,129,.05));border:1px solid rgba(16,185,129,.35);padding:3px 10px;border-radius:20px;white-space:nowrap}
 .ep:hover{transform:translateY(-2px)}
 .mrow{padding:8px 0}

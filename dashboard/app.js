@@ -169,7 +169,7 @@ function renderCatalog(eps){
     const [price,desc] = splitMeta(eps[route] || FALLBACK_META[route]);
     const d = document.createElement("div");
     d.className = "ep"; d.dataset.route = route;
-    d.innerHTML = `<div><code>GET ${route}</code><small>${desc}</small></div><span class="price">${price}</span>`;
+    d.innerHTML = `<div class="ep-info"><code>GET ${route}</code><small>${desc}</small></div><span class="price">${price}</span>`;
     d.onclick = ()=>select(route);
     box.appendChild(d);
   });
