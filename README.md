@@ -32,15 +32,11 @@
 <!-- Repo history below is exact (git). Pre-repo phases are honest ranges from project records. -->
 
 ```mermaid
-gantt
-    title AETHERIUS journey — repo Sep 2026, project ~4 months earlier
-    dateFormat YYYY-MM-DD
-    section Research May-Aug 2026
-    x402 study + market mapping        :done, r1, 2026-05-15, 60d
-    VM + infra stabilization           :done, r2, 2026-07-01, 45d
-    section Build Sep 2026
-    Repo + 40 endpoints live           :done, b1, 2026-09-02, 2d
-    Hardening + demo + docs            :done, b2, 2026-09-03, 2d
+timeline
+    title AETHERIUS journey (repo Sep 2026, project ~4 months earlier)
+    Research : x402 study : market mapping : VM stabilization
+    Sep 2 : Repo born : landing + docs : Python SDK : persistent telemetry
+    Sep 3 : Backend v2 + dashboard + HTTPS : 40 endpoints : JS SDK : demo + player
 ```
 
 | Phase | Work | Verify |
