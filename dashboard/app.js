@@ -252,6 +252,20 @@ async function loadTelemetry(){
   }catch(e){ /* telemetry unreachable — explorer still works */ }
 }
 
+function escH(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function hlJSON(src){
+  return escH(src).replace(/("(\\u[0-9a-fA-F]{4}|\\[^]|[^"\\])*")(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d+)?([eE][+-]?\d+)?/g, function(m, str, _e, key, bool, num){
+    if(str) return key ? '<span class="jk">' + str + '</span>:' : '<span class="js">' + str + '</span>';
+    if(bool) return '<span class="jb">' + bool + '</span>';
+    if(num) return '<span class="jn">' + num + '</span>';
+    return m;
+  });
+}
+function copyResult(){
+  const el = document.getElementById("resultBox");
+  const t = el ? el.innerText : "";
+  if(navigator.clipboard) navigator.clipboard.writeText(t).catch(function(){});
+}
 async function execute(paid){
   if(!state.selected) return;
   const route = state.selected;
@@ -268,7 +282,10 @@ async function execute(paid){
     const cls = r.status===200 ? "ok" : (r.status===402 ? "warn" : "bad");
     $("#resultMeta").innerHTML = `HTTP <b class="${cls}">${r.status}</b> · ${Math.round(ms)} ms` +
       (r.headers.get("X-PAYMENT-SETTLED") ? ` · settled: ${r.headers.get("X-PAYMENT-SETTLED")}` : "");
-    $("#resultBox").textContent = typeof body === "string" ? body : JSON.stringify(body,null,2);
+    const pretty = typeof body === "string" ? body : JSON.stringify(body,null,2);
+    $("#resultBox").innerHTML = hlJSON(pretty);
+    const mt = $("#resultMeta");
+    if(mt) mt.innerHTML += ` · <button class="copybtn" onclick="copyResult()">⧉ copy</button>`;
   }catch(e){
     loadTelemetry();
     $("#resultMeta").innerHTML = `<b class="bad">network error</b>`;
@@ -278,6 +295,7 @@ async function execute(paid){
 
 async function probeDrift(){
   const box = $("#driftBody");
+  try{ Array.prototype.forEach.call(box.parentElement.querySelectorAll("pre"), function(p){ if(p.textContent.indexOf("ingress") >= 0) p.remove(); }); }catch(_){}
   try{
     const {data: body} = await getJSON("/v1/storage/drift/sample?chain=base");
     box.innerHTML = `<p><b class="ok">LIVE</b> <span class="muted">${body.chain} slot ${body.slot} via ${body.layer} · ${body.latency_ms} ms</span></p><pre class="result small">slot ${body.slot} @ ${body.observed_at}\nfree sample — full multi-layer comparison is paid, try it in Explorer →</pre>`;
@@ -310,7 +328,24 @@ refreshBaseState();
 loadHealth();
 loadTelemetry();
 probeDrift();
-setInterval(loadTelemetry, 10000);
+    setInterval(loadTelemetry, 10000);
+    /* dock auto-hide: appears near bottom edge or on window actions */
+    (function dockWatch(){
+      var dock = document.getElementById('osdock');
+      if(!dock){ setTimeout(dockWatch, 500); return; }
+      var t = null;
+      function show(ms){
+        dock.classList.add('show');
+        if(t) clearTimeout(t);
+        t = setTimeout(function(){ dock.classList.remove('show'); }, ms || 2600);
+      }
+      window.__dockShow = show;
+      window.addEventListener('mousemove', function(e){
+        if(e.clientY > window.innerHeight - 70) show();
+      }, {passive:true});
+      dock.addEventListener('mouseleave', function(){ show(1200); });
+      show(3500);
+    })();
 
 /* ===== OS MODE (toggleable) + STATIC MODE (default-safe grid) ===== */
 var OS_ON = (function(){ try{ return localStorage.getItem("aex_os") !== "0"; }catch(e){ return true; } })();
@@ -327,11 +362,17 @@ var OS_ON = (function(){ try{ return localStorage.getItem("aex_os") !== "0"; }ca
     var h = card.querySelector('h2');
     var bar = document.createElement('div');
     bar.className = 'wintitle';
-    bar.innerHTML = '<span class="wdots"><i class="r"></i><i class="y"></i><i class="g"></i></span>';
+    bar.innerHTML = '<span class="wbrand"><svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,1 13,13 1,13" fill="none" stroke="#a855f7" stroke-width="1.6"/><circle cx="7" cy="9.2" r="1.6" fill="#d946ef"/></svg></span>';
     if(h){ bar.appendChild(h); }
+    var max = document.createElement('button');
+    max.className = 'wmin'; max.title = 'Maximize';
+    max.innerHTML = '<svg width="11" height="11" viewBox="0 0 11 11"><rect x="1.5" y="1.5" width="8" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
+    bar.appendChild(max);
     var min = document.createElement('button');
-    min.className = 'wmin'; min.title = 'Minimize'; min.textContent = '–';
+    min.className = 'wmin'; min.title = 'Minimize';
+    min.innerHTML = '<svg width="11" height="11" viewBox="0 0 11 11"><line x1="1.5" y1="5.5" x2="9.5" y2="5.5" stroke="currentColor" stroke-width="1.6"/></svg>';
     bar.appendChild(min);
+    max.onclick = function(e){ e.stopPropagation(); card.classList.toggle('max'); if(window.__dockShow) window.__dockShow(); focus(); };
     card.insertBefore(bar, card.firstChild);
     var dbtn = document.createElement('button');
     dbtn.textContent = h ? h.textContent.trim().slice(0, 14) : ('Win ' + (ci + 1));
@@ -346,7 +387,7 @@ var OS_ON = (function(){ try{ return localStorage.getItem("aex_os") !== "0"; }ca
     card.addEventListener('pointerdown', focus);
     var sx = 0, sy = 0, ox = 0, oy = 0, drag = false;
     bar.addEventListener('pointerdown', function(e){
-      if(e.target === min || card.classList.contains('min')) return;
+      if((e.target.closest && e.target.closest('button')) || card.classList.contains('min') || card.classList.contains('max')) return;
       drag = true; card.classList.add('drag');
       sx = e.clientX; sy = e.clientY;
       ox = parseFloat(card.dataset.ox || '0'); oy = parseFloat(card.dataset.oy || '0');
