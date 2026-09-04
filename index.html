@@ -161,7 +161,8 @@
         }
 
         #hero .inner {
-            padding: 40px 40px 60px;
+            max-width: 1280px;
+            padding: 56px 56px 72px;
         }
 
         /* ===== NAV ===== */
@@ -244,7 +245,7 @@
         html{scrollbar-width:none}
         html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0}
         #hero h1{
-            font-size: clamp(2.9rem, 6.2vw, 5.2rem) !important;
+            font-size: clamp(3.4rem, 7.5vw, 6.5rem) !important;
             font-weight: 900;
             letter-spacing: -0.04em;
             margin-bottom: 32px;
@@ -402,7 +403,7 @@
         @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.5; transform:scale(1.4); } }
 
         .hero h1 {
-            font-size: clamp(2.9rem, 6vw, 5rem);
+            font-size: clamp(3.4rem, 7.2vw, 6.2rem);
             font-weight: 900;
             line-height: 1.04;
             letter-spacing: -0.04em;
@@ -413,13 +414,13 @@
         }
 
         .hero h1 .grad {
-            background: linear-gradient(120deg, #c084fc 0%, #a855f7 25%, #d946ef 55%, #ec4899 80%, #f0abfc 100%);
+            background: linear-gradient(100deg, #a855f7 0%, #d946ef 30%, #f0abfc 50%, #e879f9 55%, #d946ef 70%, #a855f7 100%);
             background-size: 220% 220%;
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gShift 5s ease infinite;
-            filter: drop-shadow(0 0 26px rgba(217,70,239,0.35));
+            animation: gShift 4s ease infinite;
+            filter: drop-shadow(0 0 30px rgba(217,70,239,0.55)) drop-shadow(0 2px 12px rgba(168,85,247,0.4));
         }
 
         @keyframes gShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
@@ -1406,7 +1407,7 @@
                     Live on Base Mainnet
                 </div>
             </div>
-            <h1>The Infrastructure for<br><span class="grad">Autonomous AI Agents</span></h1>
+            <h1>The Infrastructure for<br><span class="grad">Agents That Pay</span></h1>
             <p class="hero-sub">120+ APIs your agents can pay for in USDC on Base. No accounts, no subscriptions, no human friction. The operating system for machine-to-machine commerce.</p>
             <div class="hero-actions">
                 <a href="#cta" class="btn btn-primary">
