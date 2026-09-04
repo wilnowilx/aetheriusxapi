@@ -143,6 +143,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(168,85,247,0.15);
+            box-shadow: 0 0 60px rgba(168,85,247,0.1);
         }
 
         .inner {
@@ -235,7 +240,16 @@
         /* slide UI + hero scale (dots rail is the scrollbar now) */
         html{scrollbar-width:none}
         html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0}
-        #hero h1{font-size:clamp(3.6rem,8vw,6.5rem) !important;letter-spacing:-0.04em;color:var(--text)}
+        #hero h1{
+            font-size: clamp(5rem, 10vw, 9rem) !important;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            margin-bottom: 32px;
+            opacity: 0; transform: translateY(50px);
+            animation: fadeUp 1s 0.4s forwards;
+            text-shadow: 0 2px 40px rgba(6,6,14,0.8), 0 0 80px rgba(6,6,14,0.5);
+            color: var(--text) !important;
+        }
         #mainNav .brand{font-size:1.6rem !important;letter-spacing:.1em !important}
 
         .mobile-toggle { display: none; background: none; border: none; color: var(--text); cursor: pointer; }
@@ -403,14 +417,14 @@
         @keyframes gShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
         .hero-sub {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: var(--text);
-            max-width: 700px;
-            margin: 0 auto 48px;
-            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto 64px;
+            line-height: 1.5;
             opacity: 0; transform: translateY(50px);
             animation: fadeUp 1s 0.6s forwards;
-            text-shadow: 0 1px 20px rgba(6,6,14,0.9);
+            text-shadow: 0 2px 40px rgba(6,6,14,0.9);
         }
 
         .hero-actions {
