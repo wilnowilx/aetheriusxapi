@@ -33,9 +33,9 @@ https://x.com/aetheriusxAPI
 
 ## Team
 
-Solo builder, 13+ years in crypto (since 2013). Python, FastAPI, GCP/Kubernetes,
-telemetry/NATS, x402 protocol. Google for Startups member with GCP infrastructure
-(Europe region, systemd + Nginx, monitored 24/7).
+Solo builder operating live x402 infrastructure on Base. Python, FastAPI,
+GCP/Kubernetes, telemetry/NATS, x402 protocol. Google for Startups member with
+self-operated GCP infrastructure (Europe region, systemd + Nginx, auto-restart).
 
 ## Why Base?
 
