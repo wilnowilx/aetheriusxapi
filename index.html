@@ -228,6 +228,11 @@
             line-height: 1.2 !important;
         }
         .btn-nav:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(168,85,247,0.4); }
+        /* slide UI + hero scale (dots rail is the scrollbar now) */
+        html{scrollbar-width:none}
+        html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0}
+        #hero h1{font-size:clamp(2.8rem,7vw,5.2rem) !important;letter-spacing:-0.02em}
+        #mainNav .brand{font-size:1.6rem !important;letter-spacing:.1em !important}
 
         .mobile-toggle { display: none; background: none; border: none; color: var(--text); cursor: pointer; }
 
@@ -1311,6 +1316,9 @@
         <div class="sdot" data-s="7"></div>
         <div class="sdot" data-s="8"></div>
         <div class="sdot" data-s="9"></div>
+            <div class="sdot" data-s="10"></div>
+            <div class="sdot" data-s="11"></div>
+            <div class="sdot" data-s="12"></div>
     </div>
 
     <!-- Mobile Nav -->
@@ -1612,11 +1620,19 @@
                 <div style="flex:1;min-width:200px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:16px;padding:26px;"><div style="font-size:1.4rem;font-weight:800;">Vote roadmap</div><div style="color:var(--text-sec);font-size:.85rem;margin-top:6px;">you steer what ships</div></div>
                 <div style="flex:1;min-width:200px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:16px;padding:26px;"><div style="font-size:1.4rem;font-weight:800;">Direct line</div><div style="color:var(--text-sec);font-size:.85rem;margin-top:6px;">priority support on X</div></div>
             </div>
-            <p class="sdesc anim" style="margin:0 auto;">Own an API? We turn it into a paid x402 API for you (white-label). <a href="https://x.com/aetheriusxAPI" target="_blank" style="color:var(--purple-light);">Talk to us ↗</a></p>
+            <div class="anim" style="max-width:640px;margin:8px auto 0;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:left;">
+                <div style="font-weight:700;margin-bottom:12px;">💰 Founder math — what would YOU pay?</div>
+                <label style="display:block;font-size:.8rem;color:var(--text-sec);margin-bottom:4px;">Endpoint</label>
+                <select id="calcRoute" onchange="calcUpdate()" style="width:100%;background:#0b0b16;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;margin-bottom:12px;font-family:monospace;font-size:.85rem;min-height:44px;"><option>loading live prices…</option></select>
+                <label style="display:block;font-size:.8rem;color:var(--text-sec);margin-bottom:4px;">Calls / month: <span id="calcCallsVal">5,000</span></label>
+                <input id="calcCalls" type="range" min="100" max="100000" step="100" value="5000" oninput="calcUpdate()" style="width:100%;accent-color:#a855f7;min-height:44px;">
+                <div id="calcOut" style="margin-top:12px;font-family:monospace;font-size:1rem;">…loading live prices…</div>
+            </div>
+            <p class="sdesc anim" style="margin:24px auto 0;">Own an API? We turn it into a paid x402 API for you (white-label). <a href="https://x.com/aetheriusxAPI" target="_blank" style="color:var(--purple-light);">Talk to us ↗</a></p>
             <div class="hero-actions anim" style="justify-content:center;display:flex;">
                 <a href="https://x.com/aetheriusxAPI" target="_blank" class="btn btn-primary">Claim founder spot →</a>
             </div>
-            <p class="sdesc anim" style="margin:16px auto 0;font-size:.8rem;">Cohort: <strong>0 / 10 claimed</strong> — updated live as wallets join.</p>
+            <p class="sdesc anim" style="margin:16px auto 0;font-size:.8rem;">Cohort: <strong id="fCounter">0 / 10 claimed</strong> — updated live as wallets join.</p>
         </div>
     </section>
 
@@ -1877,6 +1893,64 @@
     }
     refreshLiveStats();
     setInterval(refreshLiveStats, 60000);
+
+    /* slide-gesture: wheel glides section-to-section like slides (tall content scrolls natively) */
+    (function(){
+        var secs = Array.prototype.slice.call(document.querySelectorAll('section'));
+        var lock = false;
+        function current(){
+            var y = window.scrollY, best = 0, bd = 1e12;
+            secs.forEach(function(s, i){ var d = Math.abs(s.offsetTop - y - 90); if(d < bd){ bd = d; best = i; } });
+            return best;
+        }
+        window.addEventListener('wheel', function(e){
+            if(lock || Math.abs(e.deltaY) < 14) return;
+            var i = current(), s = secs[i];
+            if(!s) return;
+            var r = s.getBoundingClientRect(), vh = window.innerHeight;
+            var nxt = e.deltaY > 0 ? i + 1 : i - 1;
+            if(nxt < 0 || nxt >= secs.length) return;
+            if(e.deltaY > 0 && r.bottom > vh + 140) return;
+            if(e.deltaY < 0 && r.top < -140) return;
+            e.preventDefault();
+            lock = true;
+            try{ if(typeof curS === 'number') curS = nxt; }catch(_){}
+            secs[nxt].scrollIntoView({behavior:'smooth'});
+            setTimeout(function(){ lock = false; }, 1300);
+        }, {passive:false});
+    })();
+
+    /* founders live counter (wallets seen on the VM) */
+    aexGet('/v1/telemetry').then(function(t){
+      if(t && t.totals){ var el = document.getElementById('fCounter'); if(el) el.textContent = Math.min(10, t.wallets_seen || 0) + ' / 10 claimed'; }
+    }).catch(function(){});
+
+    /* founder price calculator (live prices from /health) */
+    window.calcUpdate = function(){
+      var r = document.getElementById('calcRoute'), calls = document.getElementById('calcCalls');
+      var out = document.getElementById('calcOut');
+      if(!r || !calls || !out) return;
+      var price = parseFloat((r.selectedOptions[0] && r.selectedOptions[0].dataset.price) || '0');
+      var n = parseInt(calls.value, 10) || 0;
+      var full = price * n;
+      out.textContent = n.toLocaleString() + ' calls/mo → $' + full.toFixed(2) + '  ·  founder: $' + (full / 2).toFixed(2);
+      var v = document.getElementById('calcCallsVal'); if(v) v.textContent = n.toLocaleString();
+    };
+    aexGet('/api/v1/health').then(function(h){
+      var sel = document.getElementById('calcRoute'); if(!sel || !h || !h.endpoints) return;
+      sel.innerHTML = '';
+      Object.keys(h.endpoints).forEach(function(route){
+        var m = /\$(\d+(?:\.\d+)?)\/call/.exec(h.endpoints[route] || '');
+        var o = document.createElement('option');
+        o.value = route; o.textContent = route + ' — $' + (m ? m[1] : '?');
+        o.dataset.price = m ? m[1] : '0';
+        sel.appendChild(o);
+      });
+      window.calcUpdate();
+    }).catch(function(){
+      var out = document.getElementById('calcOut');
+      if(out) out.textContent = 'offline — most endpoints start at $0.005/call';
+    });
 
     // Hero parallax: content drifts up and fades as you scroll away.
     (function () {
