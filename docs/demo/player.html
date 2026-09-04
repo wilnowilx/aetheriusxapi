@@ -52,20 +52,11 @@ h1 .grad{background:linear-gradient(90deg,#a855f7,#d946ef,#ec4899);-webkit-backg
 /* === WIKI TOOLTIPS === */
 .wiki-zone{position:relative;cursor:help;border-bottom:1px dashed rgba(168,85,247,.3);transition:border-color .2s;padding-bottom:6px}
 .wiki-zone:hover{border-bottom-color:var(--magenta)}
-.wiki-zone .wiki-tip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%) translateY(8px);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
-.wiki-zone:hover .wiki-tip{opacity:1;transform:translateX(-50%) translateY(4px)}
-.wiki{position:fixed;z-index:9999;max-width:380px;min-width:260px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-family:Inter,system-ui,sans-serif;font-size:13px;line-height:1.55;color:var(--text);box-shadow:0 12px 48px rgba(0,0,0,.6),0 0 24px rgba(168,85,247,.15);pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .3s,transform .3s}
+.wiki{position:fixed;z-index:9999;max-width:380px;min-width:260px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-family:Inter,system-ui,sans-serif;font-size:13px;line-height:1.55;color:var(--text);box-shadow:0 12px 48px rgba(0,0,0,.6),0 0 24px rgba(168,85,247,.15);pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .35s,transform .35s}
 .wiki.show{opacity:1;transform:translateY(0)}
 .wiki .wk{color:var(--purple);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
 .wiki .wt{font-weight:600;margin-bottom:4px}
 .wiki .wd{color:var(--sec)}
-/* Tooltip arrow */
-.wiki-tip{width:0;height:0;margin-left:-5px;border-left:5px solid var(--surface);border-top:5px solid transparent;border-bottom:5px solid transparent}
-
-/* Auto-appear: each step zone can have .auto-wiki that shows automatically */
-.step-wiki{position:relative}
-.step-wiki .auto-wiki{position:absolute;bottom:100%;left:50%;transform:translateX(-50%) translateY(8px);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100}
-.step-wiki:hover .auto-wiki{opacity:1;transform:translateX(-50%) translateY(4px)}
 
 /* === CONTROLS — RIGHT ALIGNED, spaced ===== */
 .controls{margin:16px 0 0;display:flex;gap:24px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
@@ -133,7 +124,7 @@ var castBtn = document.getElementById('btnCast');
 var wiki = document.getElementById('wiki');
 
 /* === WIKI SYSTEM === */
-var autoWikiVisible = false; /* flag: auto-tooltip shown during playback */
+var autoWikiVisible = false;
 var WIKI = {
   hook:     {k:'HOOK',       t:'Why x402 matters',         d:'AI agents can\'t hold credit cards. x402 lets them pay per API call in USDC — no accounts, no invoices, no humans in the loop. This is the fundamental problem AETHERIUS solves.'},
   discovery:{k:'DISCOVERY',  t:'SDK discovers live APIs',   d:'The AETHERIUS SDK queries the service catalog in real-time. It shows all 40 endpoints, pricing, and chain info. Agents don\'t need hardcoded URLs — they discover what\'s available.'},
@@ -149,62 +140,53 @@ var WIKI = {
   price:    {k:'PRICING',    t:'Pay-per-call economics',    d:'Each endpoint has a USDC price. /v1/data/define costs $0.005/call. /v1/email/validate costs $0.005/call. No subscriptions. No minimums. Pay only for what you use.'}
 };
 
-function showWiki(e, key, autoPos){
-  var w = WIKI[key]; if(!w) return;
-  wiki.innerHTML = '<div class="wk">'+w.k+'</div><div class="wt">'+w.t+'</div><div class="wd">'+w.d+'</div>';
-  var wx, wy;
-  if(autoPos){
-    /* Auto-mode: position RIGHT of the terminal, centered vertically */
-    var tr = term.getBoundingClientRect();
-    wx = tr.right + 16;
-    if(wx + 400 > window.innerWidth) wx = 16; /* fallback left if no space */
-    wy = tr.top + tr.height * 0.2;
-    if(wy + 200 > window.innerHeight) wy = window.innerHeight - 220;
-    if(wy < 8) wy = 8;
-  } else {
-    var r = e.target.getBoundingClientRect();
-    wx = r.right + 14;
-    if(wx + 400 > window.innerWidth) wx = r.left - 400;
-    if(wx < 8) wx = 8;
-    wy = r.top - 20;
-    if(wy + 180 > window.innerHeight) wy = window.innerHeight - 200;
-    if(wy < 8) wy = 8;
-  }
+function wikiHTML(key){
+  var w = WIKI[key]; if(!w) return null;
+  return '<div class="wk">'+w.k+'</div><div class="wt">'+w.t+'</div><div class="wd">'+w.d+'</div>';
+}
+/* AUTO: siempre a la DERECHA del terminal, nunca encima del contenido */
+function showWikiAuto(key){
+  var html = wikiHTML(key); if(!html) return;
+  wiki.innerHTML = html;
+  var tr = term.getBoundingClientRect();
+  var wx = tr.right + 16;
+  if(wx + 400 > window.innerWidth) wx = Math.max(8, tr.left - 396);
+  var wy = tr.top + 40;
+  if(wy + 230 > window.innerHeight) wy = Math.max(8, window.innerHeight - 240);
   wiki.style.left = wx + 'px';
   wiki.style.top = wy + 'px';
   wiki.classList.add('show');
 }
-function hideWiki(){ 
-  if(autoWikiVisible) return; /* don't hide while auto-tooltip is active */
-  wiki.classList.remove('show'); 
+/* HOVER manual: al lado del elemento, solo cuando NO hay auto visible */
+function showWikiHover(e, key){
+  if(autoWikiVisible) return;
+  var html = wikiHTML(key); if(!html) return;
+  wiki.innerHTML = html;
+  var r = e.target.getBoundingClientRect();
+  var wx = r.right + 14;
+  if(wx + 400 > window.innerWidth) wx = r.left - 400;
+  if(wx < 8) wx = 8;
+  var wy = r.top - 20;
+  if(wy + 180 > window.innerHeight) wy = window.innerHeight - 200;
+  if(wy < 8) wy = 8;
+  wiki.style.left = wx + 'px';
+  wiki.style.top = wy + 'px';
+  wiki.classList.add('show');
 }
-/* auto-show: track current step and show wiki tooltip */
-var lastWikiStep = -1;
-function updateWikiTooltip(){
-  if(!playing) return;
-  var idx = done - 1; /* the step just completed */
-  if(idx !== lastWikiStep && idx >= 0 && idx < S.length){
-    var s = S[idx];
-    if(s.wiki){
-      autoWikiVisible = true;
-      showWiki({target: term}, s.wiki, true); /* autoPos=true → RIGHT of terminal */
-    }
-  }
-  lastWikiStep = idx;
-  if(playing) setTimeout(updateWikiTooltip, 100);
+function hideWikiHover(){
+  if(autoWikiVisible) return; /* el auto se queda hasta el siguiente step */
+  wiki.classList.remove('show');
 }
 term.addEventListener('mouseover', function(e){
   var z = e.target.closest('.wiki-zone');
-  if(z) showWiki(e, z.getAttribute('data-wiki'));
+  if(z) showWikiHover(e, z.getAttribute('data-wiki'));
 });
 term.addEventListener('mouseout', function(e){
   var z = e.target.closest('.wiki-zone');
-  if(z && !z.contains(e.relatedTarget)) hideWiki();
+  if(z && !z.contains(e.relatedTarget)) hideWikiHover();
 });
-/* Hide auto-wiki when playing moves to next step */
-term.addEventListener('mousemove', function(){
-  if(playing && autoWikiVisible){ autoWikiVisible = false; wiki.classList.remove('show'); }
-});
+/* Sin polling y sin mousemove-killer: el auto-tooltip aparece al insertar
+   el step y vive hasta que empieza el siguiente step o se pausa. */
 
 /* === TERMINAL STEPS === */
 var EQ = '========================================================';
@@ -256,7 +238,7 @@ function runStep(idx){
     if(castBtn) castBtn.classList.add('big');
     return;
   }
-  autoWikiVisible = false; /* reset each step so new auto-wiki can appear */
+  autoWikiVisible = false; /* el step nuevo manda: se oculta el anterior */
   wiki.classList.remove('show');
   var s = S[idx];
   function advance(){
@@ -266,12 +248,12 @@ function runStep(idx){
   }
 if(s.h){
     var html = s.h;
-    if(s.wiki) html = '<div class="wiki-zone step-wiki" data-wiki="'+s.wiki+'"><div class="auto-wiki"></div>' + html + '</div>';
+    if(s.wiki) html = '<div class="wiki-zone" data-wiki="'+s.wiki+'">' + html + '</div>';
     term.insertAdjacentHTML('beforeend', html);
-    /* Auto-show wiki tooltip immediately when step with wiki is inserted */
+    /* Auto-show a la DERECHA del terminal; vive hasta el siguiente step */
     if(s.wiki && playing){
       autoWikiVisible = true;
-      showWiki({target: term}, s.wiki, true); /* autoPos=true → RIGHT of terminal */
+      showWikiAuto(s.wiki);
     }
     scroll(); advance();
   } else {
@@ -280,6 +262,10 @@ if(s.h){
     if(s.wiki){ d.className += ' wiki-zone'; d.setAttribute('data-wiki', s.wiki); }
     d.appendChild(cur);
     term.appendChild(d);
+    if(s.wiki && playing){
+      autoWikiVisible = true;
+      showWikiAuto(s.wiki);
+    }
     var full = s.t, i = 0;
     (function type(){
       if(!playing) return;
@@ -317,7 +303,7 @@ function renderAll(){
 }
 
 btnPlay.onclick = function(){
-  if(playing){ clear(); playing = false; btnPlay.textContent = '▶ Play'; }
+  if(playing){ clear(); playing = false; btnPlay.textContent = '▶ Play'; autoWikiVisible = false; wiki.classList.remove('show'); }
   else { play(); }
 };
 btnReplay.onclick = function(){ play(); };

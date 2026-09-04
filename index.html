@@ -143,11 +143,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid rgba(168,85,247,0.2);
-            box-shadow: 0 0 40px rgba(168,85,247,0.12), 0 0 80px rgba(168,85,247,0.06), inset 0 0 40px rgba(168,85,247,0.04);
+            /* full-bleed transparente: sin borde ni radio ni sombra
+               para que no aparezcan líneas de costura al hacer scroll */
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            overflow: clip;
         }
 
         .inner {
@@ -241,7 +244,7 @@
         html{scrollbar-width:none}
         html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0}
         #hero h1{
-            font-size: clamp(5rem, 10vw, 9rem) !important;
+            font-size: clamp(2.9rem, 6.2vw, 5.2rem) !important;
             font-weight: 900;
             letter-spacing: -0.04em;
             margin-bottom: 32px;
@@ -358,15 +361,18 @@
 
         /* Text readability over plasma: subtle backdrop for all content sections */
         section .inner {
-            background: radial-gradient(ellipse at center, rgba(6,6,14,0.85) 0%, rgba(6,6,14,0.6) 60%, transparent 100%);
+            background: radial-gradient(ellipse at center, rgba(6,6,14,0.88) 0%, rgba(6,6,14,0.62) 60%, transparent 100%);
             border-radius: 24px;
+            border: 1px solid rgba(168,85,247,0.14);
+            border-bottom: 1px solid rgba(168,85,247,0.38);
+            box-shadow: 0 30px 80px -30px rgba(168,85,247,0.5), 0 12px 40px -18px rgba(217,70,239,0.35);
         }
 
         .hero-badges {
             display: flex;
             justify-content: center;
             gap: 16px;
-            margin-bottom: 48px;
+            margin-bottom: 30px;
             opacity: 0; transform: translateY(30px);
             animation: fadeUp 0.8s 0.2s forwards;
             flex-wrap: wrap;
@@ -396,31 +402,33 @@
         @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.5; transform:scale(1.4); } }
 
         .hero h1 {
-            font-size: clamp(3.2rem, 7vw, 5.8rem);
+            font-size: clamp(2.9rem, 6vw, 5rem);
             font-weight: 900;
-            line-height: 1.02;
+            line-height: 1.04;
             letter-spacing: -0.04em;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
             opacity: 0; transform: translateY(50px);
             animation: fadeUp 1s 0.4s forwards;
             text-shadow: 0 2px 40px rgba(6,6,14,0.8), 0 0 80px rgba(6,6,14,0.5);
         }
 
         .hero h1 .grad {
-            background: linear-gradient(135deg, var(--purple) 0%, var(--magenta) 50%, var(--pink) 100%);
+            background: linear-gradient(120deg, #c084fc 0%, #a855f7 25%, #d946ef 55%, #ec4899 80%, #f0abfc 100%);
+            background-size: 220% 220%;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-size: 200% 200%;
-            animation: gShift 4s ease infinite;
+            animation: gShift 5s ease infinite;
+            filter: drop-shadow(0 0 26px rgba(217,70,239,0.35));
         }
 
         @keyframes gShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
         .hero-sub {
-            font-size: 1.8rem;
+            font-size: 1.25rem;
             color: var(--text);
-            max-width: 800px;
-            margin: 0 auto 64px;
+            max-width: 760px;
+            margin: 0 auto 40px;
             line-height: 1.5;
             opacity: 0; transform: translateY(50px);
             animation: fadeUp 1s 0.6s forwards;
@@ -1989,7 +1997,7 @@
         window.addEventListener('scroll', onScroll, { passive: true });
     })();
     </script>
-    <script>window.AEX_FX = { n: 95, speed: 1.25 };</script>
-    <script src="fx.js?v=4"></script>
+    <script>window.AEX_FX = { n: 120, speed: 1.25, maxR: 2.6 };</script>
+    <script src="fx.js?v=5"></script>
 </body>
 </html>
