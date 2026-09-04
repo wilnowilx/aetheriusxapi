@@ -31,6 +31,9 @@ https://wilnowilx.github.io/aetheriusxapi/
 
 https://x.com/aetheriusxAPI
 
+## Telegram
+https://t.me/aetheriusxAPI
+
 ## Team
 
 Solo builder operating live x402 infrastructure on Base. Python, FastAPI,

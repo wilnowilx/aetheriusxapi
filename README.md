@@ -20,7 +20,7 @@
 **40 live APIs (120+ on the roadmap) where autonomous AI agents pay per request in USDC on Base.**
 **No accounts. No subscriptions. No human friction. Just code.**
 
-[Website](https://wilnowilx.github.io/aetheriusxapi/) · [Documentation](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) · [Twitter](https://x.com/aetheriusxAPI) · [x402 Protocol](https://x402.org)
+[Website](https://wilnowilx.github.io/aetheriusxapi/) · [Documentation](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) · [Twitter](https://x.com/aetheriusxAPI) · [Telegram](https://t.me/aetheriusxAPI) · [x402 Protocol](https://x402.org)
 
 </div>
 
@@ -460,6 +460,7 @@ MIT License — see [LICENSE](LICENSE) for details.
 | **Website** | [wilnowilx.github.io/aetheriusxapi](https://wilnowilx.github.io/aetheriusxapi/) |
 | **Documentation** | [GitHub Docs](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) |
 | **Twitter** | [@aetheriusxAPI](https://x.com/aetheriusxAPI) |
+| **Telegram** | [@aetheriusxAPI](https://t.me/aetheriusxAPI) |
 | **GitHub** | [wilnowilx/aetheriusxapi](https://github.com/wilnowilx/aetheriusxapi) |
 | **x402 Protocol** | [docs.x402.org](https://docs.x402.org) |
 | **Base** | [base.org](https://base.org) |
@@ -475,6 +476,7 @@ AETHERIUS — The infrastructure that lets AI agents pay for themselves.
 
 [![Twitter](https://img.shields.io/badge/Follow-%40aetheriusxAPI-1DA1F2?style=for-the-badge&logo=twitter&labelColor=09090b)](https://x.com/aetheriusxAPI)
 [![GitHub](https://img.shields.io/badge/Star-wilnowilx-fff?style=for-the-badge&logo=github&labelColor=09090b)](https://github.com/wilnowilx/aetheriusxapi)
+[![Telegram](https://img.shields.io/badge/Telegram-@aetheriusxAPI-26A5E4?style=for-the-badge&logo=telegram&labelColor=09090b)](https://t.me/aetheriusxAPI)
 
 **Built for AETHERIUS** 💜
 
