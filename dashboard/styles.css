@@ -115,8 +115,8 @@ body{padding-bottom:76px}
   border-radius:6px;width:26px;height:22px;font-size:12px;cursor:pointer;line-height:1;flex-shrink:0}
 .wintitle .wmin:hover{color:var(--text);border-color:var(--purple)}
 .card.drag{opacity:.92;z-index:60;transition:none !important;box-shadow:0 24px 70px rgba(0,0,0,.5)}
-.card.min > *:not(.wintitle){display:none}
-.card.min{min-height:0 !important}
+.card.min{display:none !important}
+#osToggle{min-width:34px}
 #osdock{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:100;
   display:flex;gap:6px;max-width:96vw;overflow-x:auto;background:rgba(10,10,20,.8);border:1px solid var(--border);border-radius:14px;padding:7px 10px}
 #osdock button{background:transparent;border:1px solid transparent;color:var(--sec);border-radius:8px;

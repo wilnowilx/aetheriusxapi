@@ -270,6 +270,11 @@ $("#btnWallet").onclick = ()=>{
 };
 
 $("#backendGear").onclick = ()=>{ $("#backendBar").classList.toggle("collapsed"); };
+$("#osToggle").onclick = ()=>{
+  try{ localStorage.setItem("aex_os", OS_ON ? "0" : "1"); }catch(e){}
+  location.reload();
+};
+(function(){ var b=$("#osToggle"); if(b) b.textContent = OS_ON ? "🖥️" : "▦"; })();
 $("#btnBaseUse").onclick = ()=>{
   localStorage.setItem("aex_base", $("#backendUrl").value.trim().replace(/\/+$/, ""));
   refreshBaseState(); loadHealth(); loadTelemetry();
@@ -284,8 +289,10 @@ loadTelemetry();
 probeDrift();
 setInterval(loadTelemetry, 10000);
 
-/* ===== OS MODE: draggable windows + dock (fine pointers, wide screens) ===== */
+/* ===== OS MODE (toggleable) + STATIC MODE (default-safe grid) ===== */
+var OS_ON = (function(){ try{ return localStorage.getItem("aex_os") !== "0"; }catch(e){ return true; } })();
 (function(){
+  if(!OS_ON) return;
   if(!window.matchMedia('(pointer:fine)').matches) return;
   if(window.innerWidth <= 760) return;
   var z = 40;
