@@ -14,7 +14,7 @@ FastAPI mounts this folder via `StaticFiles(directory="dashboard", html=True)`.
 ## What it does
 
 - **Health panel** — live data from `GET /health` (service, version, mode, network, wallet, endpoint count).
-- **API Catalog** — all 11 paid endpoints with prices from `/health`.
+- **API Catalog** — all 40 paid endpoints with prices from `/health`.
 - **Explorer** — param forms per endpoint. `Execute (pay)` sends `X-PAYMENT: dashboard-demo`
   (simulated settlement locally, real USDC on the live server). `Show 402` calls without
   the header and renders the payment challenge.

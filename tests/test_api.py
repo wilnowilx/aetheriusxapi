@@ -2,7 +2,7 @@
 
 Deterministic gates (no network needed):
   - /health is free (200, no payment header)
-  - all 11 paid endpoints return 402 without X-PAYMENT, with x402 body shape
+  - all 40 paid endpoints return 402 without X-PAYMENT, with x402 body shape
   - invalid email is rejected deterministically (no MX lookup reached)
   - missing params return docs-compliant 400
   - legacy /api/v1/* prefix behaves identically

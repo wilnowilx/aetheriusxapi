@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="AETHERIUS — AI Agent Commerce on Base">
-    <meta property="og:description" content="17 APIs where AI agents pay per request in USDC on Base. No accounts. No subscriptions. Just code.">
+    <meta property="og:description" content="40 live APIs where AI agents pay per request in USDC on Base. No accounts. No subscriptions. Just code.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://wilnowilx.github.io/aetheriusxapi/">
     <meta property="og:image" content="https://img.shields.io/badge/AETHERIUS-live_on_Base_Sepolia-8B5CF6?style=for-the-badge">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@aetheriusxAPI">
     <title>AETHERIUS — AI Agent Commerce Platform | x402 API Marketplace</title>
-    <meta name="description" content="120+ APIs where AI agents pay per request in USDC on Base. The operating system for machine-to-machine commerce. Built on x402 protocol.">
+    <meta name="description" content="40+ live APIs where AI agents pay per request in USDC on Base. The operating system for machine-to-machine commerce. Built on x402 protocol.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -414,13 +414,15 @@
         }
 
         .hero h1 .grad {
-            background: linear-gradient(100deg, #a855f7 0%, #d946ef 30%, #f0abfc 50%, #e879f9 55%, #d946ef 70%, #a855f7 100%);
+            background: linear-gradient(100deg, #e879f9 0%, #d946ef 25%, #a855f7 50%, #d946ef 75%, #e879f9 100%);
             background-size: 220% 220%;
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
+            color: transparent;
             animation: gShift 4s ease infinite;
-            filter: drop-shadow(0 0 30px rgba(217,70,239,0.55)) drop-shadow(0 2px 12px rgba(168,85,247,0.4));
+            text-shadow: none;
+            filter: drop-shadow(0 0 32px rgba(217,70,239,0.65)) drop-shadow(0 2px 14px rgba(168,85,247,0.5));
         }
 
         @keyframes gShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
@@ -624,6 +626,7 @@
 
         .cat-title { font-size: 1rem; font-weight: 700; margin-bottom: 8px; position: relative; z-index: 1; }
         .cat-count { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--magenta-light); position: relative; z-index: 1; }
+        .cat-count.soon { color: var(--text-muted); border: 1px dashed rgba(255,255,255,0.2); border-radius: 9999px; padding: 2px 12px; display: inline-block; }
 
         /* ===== HOW IT WORKS ===== */
         .how-section { text-align: center; }
@@ -1404,11 +1407,11 @@
                 </div>
                 <div class="hero-badge">
                     <div class="hero-dot dot-orange"></div>
-                    Live on Base Mainnet
+                    Base Mainnet soon
                 </div>
             </div>
             <h1>The Infrastructure for<br><span class="grad">Agents That Pay</span></h1>
-            <p class="hero-sub">120+ APIs your agents can pay for in USDC on Base. No accounts, no subscriptions, no human friction. The operating system for machine-to-machine commerce.</p>
+            <p class="hero-sub">40+ live APIs your agents can pay for in USDC on Base. No accounts, no subscriptions, no human friction. The operating system for machine-to-machine commerce.</p>
             <div class="hero-actions">
                 <a href="#cta" class="btn btn-primary">
                     Start Building
@@ -1467,22 +1470,22 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                 API Categories
             </div>
-            <h2 class="stitle anim">12 Verticals, 120+ Endpoints</h2>
-            <p class="sdesc anim" style="margin: 0 auto;">Each category has 10+ production APIs. More added weekly.</p>
+            <h2 class="stitle anim">40 Live Endpoints, More Weekly</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">Production APIs across maps, DeFi, web, data, forex and news — new verticals shipping weekly.</p>
             
             <div class="cats-grid">
-                <div class="cat-card anim ad1"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="cat-title">Maps & Location</div><div class="cat-count">10+ APIs</div></div>
-                <div class="cat-card anim ad2"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10l4-4 4 4"/></svg></div><div class="cat-title">Crypto & DeFi</div><div class="cat-count">15+ APIs</div></div>
-                <div class="cat-card anim ad3"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="cat-title">Web & Scraping</div><div class="cat-count">10+ APIs</div></div>
-                <div class="cat-card anim ad4"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1M12 19v3"/></svg></div><div class="cat-title">AI & ML</div><div class="cat-count">12+ APIs</div></div>
-                <div class="cat-card anim ad1"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="cat-title">Finance</div><div class="cat-count">10+ APIs</div></div>
-                <div class="cat-card anim ad2"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg></div><div class="cat-title">Communication</div><div class="cat-count">10+ APIs</div></div>
-                <div class="cat-card anim ad3"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="9" x2="12" y2="2"/></svg></div><div class="cat-title">Weather</div><div class="cat-count">10+ APIs</div></div>
-                <div class="cat-card anim ad4"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/></svg></div><div class="cat-title">News & Media</div><div class="cat-count">10+ APIs</div></div>
-                <div class="cat-card anim ad1"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div class="cat-title">Security</div><div class="cat-count">10+ APIs</div></div>
-                <div class="cat-card anim ad2"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></div><div class="cat-title">Data & Analytics</div><div class="cat-count">10+ APIs</div></div>
-                <div class="cat-card anim ad3"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M14 12h4"/></svg></div><div class="cat-title">Gaming</div><div class="cat-count">10+ APIs</div></div>
-                <div class="cat-card anim ad4"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div class="cat-title">Health & Science</div><div class="cat-count">10+ APIs</div></div>
+                <div class="cat-card anim ad1"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="cat-title">Maps & Location</div><div class="cat-count">5 live</div></div>
+                <div class="cat-card anim ad2"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10l4-4 4 4"/></svg></div><div class="cat-title">Crypto & DeFi</div><div class="cat-count">16 live</div></div>
+                <div class="cat-card anim ad3"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="cat-title">Web & Scraping</div><div class="cat-count">4 live</div></div>
+                <div class="cat-card anim ad4"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1M12 19v3"/></svg></div><div class="cat-title">AI & ML</div><div class="cat-count soon">soon</div></div>
+                <div class="cat-card anim ad1"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="cat-title">Finance</div><div class="cat-count">3 live</div></div>
+                <div class="cat-card anim ad2"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg></div><div class="cat-title">Communication</div><div class="cat-count">1 live</div></div>
+                <div class="cat-card anim ad3"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="9" x2="12" y2="2"/></svg></div><div class="cat-title">Weather</div><div class="cat-count">3 live</div></div>
+                <div class="cat-card anim ad4"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/></svg></div><div class="cat-title">News & Media</div><div class="cat-count">4 live</div></div>
+                <div class="cat-card anim ad1"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div class="cat-title">Security</div><div class="cat-count soon">soon</div></div>
+                <div class="cat-card anim ad2"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></div><div class="cat-title">Data & Analytics</div><div class="cat-count">4 live</div></div>
+                <div class="cat-card anim ad3"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M14 12h4"/></svg></div><div class="cat-title">Gaming</div><div class="cat-count soon">soon</div></div>
+                <div class="cat-card anim ad4"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div class="cat-title">Health & Science</div><div class="cat-count soon">soon</div></div>
             </div>
         </div>
     </section>
@@ -1497,7 +1500,7 @@
             <div class="steps-flow">
                 <div class="step-card anim ad1"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span class="step-num">1</span></div><h3 class="step-title">Connect Wallet</h3><p class="step-desc">Your crypto wallet is your identity. No signup, no KYC.</p></div>
                 <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-                <div class="step-card anim ad2"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span class="step-num">2</span></div><h3 class="step-title">Choose API</h3><p class="step-desc">Browse 120+ endpoints. Pick what your agent needs.</p></div>
+                <div class="step-card anim ad2"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span class="step-num">2</span></div><h3 class="step-title">Choose API</h3><p class="step-desc">Browse 40 live endpoints. Pick what your agent needs.</p></div>
                 <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
                 <div class="step-card anim ad3"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span class="step-num">3</span></div><h3 class="step-title">Pay Per Request</h3><p class="step-desc">x402 handles payment. USDC on Base. Sub-cent fees.</p></div>
                 <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
@@ -1551,7 +1554,7 @@
                     <p>The SDK handles wallet connection, payment negotiation, request signing, and response parsing. Just import and call.</p>
                     <ul class="code-list">
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Auto-negotiates payment via x402</li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Python, JavaScript, Go, Rust</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Python + JavaScript SDKs, typed and tested</li>
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Type-safe with full IDE support</li>
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Built-in retry and error handling</li>
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Zero configuration needed</li>
@@ -1576,9 +1579,9 @@
                     </div>
                     <div class="hb-graph"><canvas id="heartbeatCanvas"></canvas></div>
                     <div class="hb-stats">
-                        <div class="hb-stat"><div class="hb-stat-val green">99.9%</div><div class="hb-stat-label">Uptime</div></div>
-                        <div class="hb-stat"><div class="hb-stat-val purple">32ms</div><div class="hb-stat-label">Avg Latency</div></div>
-                        <div class="hb-stat"><div class="hb-stat-val orange">0</div><div class="hb-stat-label">Errors (24h)</div></div>
+                        <div class="hb-stat"><div class="hb-stat-val green" id="hbUp">…</div><div class="hb-stat-label">Uptime</div></div>
+                        <div class="hb-stat"><div class="hb-stat-val purple" id="hbLat">…</div><div class="hb-stat-label">Avg Latency</div></div>
+                        <div class="hb-stat"><div class="hb-stat-val orange" id="hbErr">…</div><div class="hb-stat-label">Errors (total)</div></div>
                     </div>
                 </div>
 
@@ -1680,7 +1683,7 @@
             <div class="cta-box">
                 <div class="stag anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Get Started</div>
                 <h2 class="anim">Ready to Build the<br><span class="grad">Agent Economy</span>?</h2>
-                <p class="anim">Start building today. First 100 requests free.</p>
+                <p class="anim">Start building today. Health and telemetry free, forever.</p>
                 <div class="cta-actions anim">
                     <a href="https://x.com/aetheriusxAPI" class="btn btn-primary">Follow on X<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
                     <a href="https://github.com/wilnowilx/aetheriusxapi" class="btn btn-secondary">View GitHub<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
@@ -1904,6 +1907,17 @@
             if (t && t.totals) {
                 if (t.totals.avg_latency_ms) document.getElementById('lvLatency').textContent = Math.round(t.totals.avg_latency_ms) + 'ms';
                 document.getElementById('lvVolume').textContent = '$' + (t.totals.volume_usdc || 0);
+                /* heartbeat card: real uptime / latency / errors, no hardcoded stats */
+                var hbLat = document.getElementById('hbLat');
+                if (hbLat) hbLat.textContent = t.totals.avg_latency_ms != null ? t.totals.avg_latency_ms.toFixed(1) + 'ms' : '—';
+                var hbErr = document.getElementById('hbErr');
+                if (hbErr) hbErr.textContent = t.totals.errors ?? 0;
+                var hbUp = document.getElementById('hbUp');
+                if (hbUp) {
+                    var s = Math.floor(t.uptime_s || 0);
+                    var d = Math.floor(s / 86400), hh = Math.floor(s % 86400 / 3600), mm = Math.floor(s % 3600 / 60);
+                    hbUp.textContent = (d ? d + 'd ' : '') + (hh ? hh + 'h ' : '') + mm + 'm';
+                }
             }
         } catch (e) { /* keep placeholders when offline */ }
     }

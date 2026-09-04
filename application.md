@@ -56,7 +56,7 @@ in English + Spanish (underserved audience).
 **Content series (8 pieces, 6 weeks):**
 1. An agent pays for its first API call (video + code, EN/ES)
 2. Inside an x402 round-trip: 402 → sign → settle (deep-dive)
-3. Operating 11 paid endpoints on $X/month GCP (cost transparency)
+3. Operating 40 paid endpoints on <$50/mo GCP (cost transparency)
 4. When upstreams throttle datacenters: building a 5-source price chain (postmortem)
 5. Distributed telemetry with NATS: what each layer sees (video)
 6. Storage-layout drift: detecting divergent state between layers (demo + API preview)
@@ -81,14 +81,14 @@ delivery (APIs) → observability (telemetry, drift detection).
 **Use of funds:** mainnet deployment + audit ($800) · 12-month infra ($2,400) ·
 provider onboarding + SDKs ($3,000) · security review ($1,500) · content/growth ($2,300).
 
-**90-day targets post-funding:** mainnet live · 25+ endpoints · Python/JS SDKs ·
+**90-day targets post-funding:** mainnet live · 60+ endpoints · Python/JS SDKs ·
 100 paying agent-wallets · public status page with uptime/latency/volume.
 
 ## Metrics (verifiable today)
 
 - Testnet: Base Sepolia (`eip155:84532`), wallet `0x677B…7f61`
 - E2E: 6/6 paid endpoints → 200 (receipts in repo history / demo video)
-- Suite: 23/23 tests green (`pytest -q`), incl. telemetry accounting tests
+- Suite: 60/60 tests green (`pytest -q`), incl. telemetry accounting tests
 - Public telemetry: `GET /v1/telemetry` (free) — uptime, per-endpoint stats,
   settled USDC volume, latency feed. Powers the live dashboard.
 - Uptime: systemd + auto-restart, Nginx reverse proxy, 90s upstream budget

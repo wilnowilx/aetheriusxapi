@@ -6,7 +6,7 @@ Eight pieces over six weeks. The series documents real infrastructure for agent 
 |---:|---|---|---|---|
 | 1 | An agent pays for its first API call | Video + code, EN/ES | hecho | `docs/tutorials/01-first-x402-call.md`, `examples/` |
 | 2 | Inside an x402 round-trip: 402 -> sign -> settle | Technical deep dive | pendiente | Capture a signed testnet flow and receipt |
-| 3 | Operating 11 paid endpoints on $X/month GCP | Cost transparency post | borrador | Collect one month of infra, latency, and volume data |
+| 3 | Operating 40 paid endpoints on <$50/mo GCP | Cost transparency post | borrador | Collect one month of infra, latency, and volume data |
 | 4 | When upstreams throttle datacenters: a 5-source price chain | Postmortem | hecho | Document fallback behavior and observed provider responses |
 | 5 | Distributed telemetry with NATS: what each layer sees | Video + architecture walkthrough | pendiente | Publish a sanitized event trace and diagram |
 | 6 | Storage-layout drift: divergent state between layers | Demo + API preview | hecho | Live at `GET /v1/storage/drift` ($0.02): cross-RPC slot divergence with converged/diverged/degraded status |
