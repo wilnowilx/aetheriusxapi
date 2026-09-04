@@ -144,6 +144,12 @@ async function loadHealth(){
     $("#hWallet").title = h.wallet;
     $("#hEndpoints").textContent = Object.keys(h.endpoints).length;
     renderCatalog(h.endpoints);
+    try{
+      var secure = window.location.protocol === "https:";
+      var sp = $("#secPill");
+      if(sp){ sp.textContent = secure ? "🔒 Secure" : "⚠ HTTP"; sp.className = "secpill " + (secure ? "ok" : "warn"); sp.title = secure ? "TLS encrypted connection" : "Unencrypted connection — use the https host"; }
+      var av = $("#appVer"); if(av) av.textContent = "v" + h.version;
+    }catch(_){}
   }catch(e){
     const why = (e && e.message) || e || "network";
     $("#netBadge").innerHTML = `<span class="dot"></span>offline`;

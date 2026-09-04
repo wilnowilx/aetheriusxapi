@@ -125,3 +125,14 @@ body{padding-bottom:76px}
 #osdock button.on{color:var(--text);border-color:var(--purple);background:rgba(168,85,247,.12)}
 @media(max-width:760px){#osdock{display:none}}
 @media (pointer:coarse){.wintitle{cursor:default}}
+/* readability + trust */
+body{font-size:16px}
+.ep code{font-size:14.5px}
+.result{font-size:13.5px}
+.mrow{font-size:14px}
+.activity{font-size:13.5px}
+.form label{font-size:13px}
+.secpill{font-size:12px;border:1px solid var(--border);border-radius:20px;padding:4px 12px;color:var(--sec);white-space:nowrap}
+.secpill.ok{color:var(--green);border-color:rgba(16,185,129,.45)}
+.secpill.warn{color:var(--orange);border-color:rgba(245,158,11,.45)}
+.footver{color:var(--sec);font-family:ui-monospace,monospace}
