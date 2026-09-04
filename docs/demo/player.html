@@ -243,10 +243,15 @@ function runStep(idx){
     term.appendChild(cur);
     timers.push(setTimeout(function(){ runStep(idx + 1); }, s.g || 850));
   }
-  if(s.h){
+if(s.h){
     var html = s.h;
     if(s.wiki) html = '<div class="wiki-zone step-wiki" data-wiki="'+s.wiki+'"><div class="auto-wiki"></div>' + html + '</div>';
     term.insertAdjacentHTML('beforeend', html);
+    /* Auto-show wiki tooltip immediately when step with wiki is inserted */
+    if(s.wiki && playing){
+      var zone = term.querySelector('.wiki-zone.step-wiki[data-wiki="'+s.wiki+'"]');
+      if(zone) showWiki({target: zone}, s.wiki);
+    }
     scroll(); advance();
   } else {
     var d = document.createElement('div');

@@ -136,21 +136,13 @@
         }
 
         section {
+            min-height: 100vh;
             scroll-snap-align: start;
             position: relative;
             z-index: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        #hero {
-            min-height: 100vh;
-            padding-top: 80px;
-        }
-
-        section:not(#hero) {
-            min-height: auto;
         }
 
         .inner {
@@ -1917,29 +1909,65 @@
     refreshLiveStats();
     setInterval(refreshLiveStats, 60000);
 
-    /* slide-gesture: wheel glides section-to-section like slides (tall content scrolls natively) */
+/* slide-gesture: wheel glides section-to-section like slideshow */
     (function(){
         var secs = Array.prototype.slice.call(document.querySelectorAll('section'));
         var lock = false;
-        function current(){
-            var y = window.scrollY, best = 0, bd = 1e12;
-            secs.forEach(function(s, i){ var d = Math.abs(s.offsetTop - y - 40); if(d < bd){ bd = d; best = i; } });
-            return best;
+        var totalSections = secs.length;
+        /* Track which section is "active" based on intersection observer */
+        var activeIdx = 0;
+        
+        /* Intersection observer to track active section */
+        var io = new IntersectionObserver(entries => {
+            entries.forEach((entry, i) => {
+                if(entry.isIntersecting) {
+                    activeIdx = i;
+                    document.querySelectorAll('.sdot').forEach((d, idx) => {
+                        d.classList.toggle('active', idx === i);
+                    });
+                }
+            });
+        }, {threshold: 0.5});
+        secs.forEach(s => io.observe(s));
+        
+        function goTo(idx){
+            if(idx < 0 || idx >= totalSections) return;
+            if(lock) return;
+            activeIdx = idx;
+            lock = true;
+            secs[idx].scrollIntoView({behavior:'smooth'});
+            setTimeout(function(){ lock = false; }, 800);
         }
+        
+        function current(){
+            return activeIdx;
+        }
+        
         window.addEventListener('wheel', function(e){
             if(lock || Math.abs(e.deltaY) < 8) return;
-            var i = current(), s = secs[i];
-            if(!s) return;
-            var r = s.getBoundingClientRect(), vh = window.innerHeight;
+            var i = current();
             var nxt = e.deltaY > 0 ? i + 1 : i - 1;
-            if(nxt < 0 || nxt >= secs.length) return;
-            if(e.deltaY > 0 && r.bottom > vh) return;
-            if(e.deltaY < 0 && r.top > vh + 100) return;
+            if(nxt < 0 || nxt >= totalSections) return;
             e.preventDefault();
-            lock = true;
-            try{ if(typeof curS === 'number') curS = nxt; }catch(_){}
-            secs[nxt].scrollIntoView({behavior:'smooth'});
-            setTimeout(function(){ lock = false; }, 650);
+            goTo(nxt);
+        }, {passive:false});
+        
+        /* Keyboard navigation */
+        document.addEventListener('keydown', e => {
+            if(e.key === 'ArrowDown') {
+                e.preventDefault();
+                goTo(current() + 1);
+            } else if(e.key === 'ArrowUp') {
+                e.preventDefault();
+                goTo(current() - 1);
+            }
+        });
+        
+        /* Mouse wheel delta more sensitive */
+        window.addEventListener('DOMMouseScroll', function(e){
+            if(lock) return;
+            e.preventDefault();
+            goTo(current() - (e.detail > 0 ? 1 : -1));
         }, {passive:false});
     })();
 
