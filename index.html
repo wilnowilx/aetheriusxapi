@@ -243,7 +243,7 @@
         /* slide UI + hero scale (dots rail is the scrollbar now) */
         html{scrollbar-width:none}
         html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0}
-        #hero h1{font-size:clamp(2.8rem,7vw,5.2rem) !important;letter-spacing:-0.02em}
+        #hero h1{font-size:clamp(3.6rem,8vw,6.5rem) !important;letter-spacing:-0.04em;color:var(--text)}
         #mainNav .brand{font-size:1.6rem !important;letter-spacing:.1em !important}
 
         .mobile-toggle { display: none; background: none; border: none; color: var(--text); cursor: pointer; }
@@ -411,11 +411,11 @@
         @keyframes gShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
         .hero-sub {
-            font-size: 1.25rem;
-            color: var(--text-sec);
+            font-size: 1.5rem;
+            color: var(--text);
             max-width: 700px;
-            margin: 0 auto 56px;
-            line-height: 1.7;
+            margin: 0 auto 48px;
+            line-height: 1.6;
             opacity: 0; transform: translateY(50px);
             animation: fadeUp 1s 0.6s forwards;
             text-shadow: 0 1px 20px rgba(6,6,14,0.9);
@@ -1933,8 +1933,8 @@
             var r = s.getBoundingClientRect(), vh = window.innerHeight;
             var nxt = e.deltaY > 0 ? i + 1 : i - 1;
             if(nxt < 0 || nxt >= secs.length) return;
-            if(e.deltaY > 0 && r.bottom > vh + 40) return;
-            if(e.deltaY < 0 && r.top < -40) return;
+            if(e.deltaY > 0 && r.bottom > vh) return;
+            if(e.deltaY < 0 && r.top > vh + 100) return;
             e.preventDefault();
             lock = true;
             try{ if(typeof curS === 'number') curS = nxt; }catch(_){}

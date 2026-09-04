@@ -41,10 +41,10 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
   border:1px solid var(--border);border-radius:10px;padding:9px 12px;cursor:pointer;transition:.15s;flex-wrap:nowrap}
 .ep:hover{border-color:var(--purple)}
 .ep.sel{border-color:var(--magenta);background:rgba(217,70,239,.06)}
-.ep code{font-size:12.5px;color:#e9d5ff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ep code{font-size:14px;color:#e9d5ff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ep .ep-info{flex:1;min-width:0;overflow:hidden}
-.ep .price{font-size:12px;color:var(--green);white-space:nowrap;flex-shrink:0}
-.ep small{display:block;color:var(--sec);font-size:11.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ep .price{font-size:14px;color:var(--green);white-space:nowrap;padding:2px 8px;border:1px solid var(--green);border-radius:20px;flex-shrink:0}
+.ep small{display:block;color:var(--sec);font-size:12px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .form{display:flex;flex-direction:column;gap:8px;margin:10px 0}
 .form label{font-size:12px;color:var(--sec)}
 .form input{width:100%;background:#0b0b16;border:1px solid var(--border);color:var(--text);

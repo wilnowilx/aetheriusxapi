@@ -14,6 +14,12 @@
 
 # AETHERIUS — aetheriusxAPI
 
+<div align="center">
+
+# OUR DOCTRINE IS NOT DOGMA, IT'S A GUIDE FOR ACTION
+
+</div>
+
 ### The Operating System for AI Agent Commerce
 
 **40 live APIs (120+ on the roadmap) where autonomous AI agents pay per request in USDC on Base.**
