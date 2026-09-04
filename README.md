@@ -28,6 +28,7 @@
 
 ## Table of Contents
 
+- [⚡ Built in 48 Hours](#built-in-48-hours)
 - [🔥 The Problem](#the-problem)
 - [🗺️ System Overview](#system-overview)
 - [📡 Live Status](#live-status)
@@ -55,6 +56,20 @@
 ![System flow](https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKZmxvd2NoYXJ0IExSCiAgICBBW_CfpJYgQUkgQWdlbnRdIC0tPnxHRVQgL3YxLy4uLnwgR1tBRVRIRVJJVVMgR2F0ZXdheTxici8-RmFzdEFQSSDCtyB4NDAyXQogICAgRyAtLT58NDAyICsgcHJpY2V8IEEKICAgIEcgLS0-fHBhaWQgMjAwfCBBCiAgICBHIC0tPiBNW01hcHMgwrcgT1NNXQogICAgRyAtLT4gQ1tDcnlwdG8gwrcgQ29pbkdlY2tvL0NvaW5iYXNlL0xsYW1hXQogICAgRyAtLT4gV1tXZWIgwrcgZGlyZWN0IGZldGNoXQogICAgRyAtLT4gRFtEYXRhIMK3IE9wZW4tTWV0ZW8vTm9taW5hdGltXQogICAgRyAtLT4gUltEcmlmdCDCtyBwdWJsaWMgUlBDc10KICAgIEcgLS0-IFRbVGVsZW1ldHJ5PGJyLz5TUUxpdGUgKyAvdjEvdGVsZW1ldHJ5XQogICAgQSAtLT58JCBVU0RDIHNldHRsZXwgQlsoQmFzZSBMMildCiAgICBHIC0uLT58dmVyaWZ5IHByb29mfCBGW0ZhY2lsaXRhdG9yXQ==)
 
 ![x402 payment sequence](https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKc2VxdWVuY2VEaWFncmFtCiAgICBwYXJ0aWNpcGFudCBBZ2VudCBhcyDwn6SWIEFnZW50CiAgICBwYXJ0aWNpcGFudCBBUEkgYXMgYWV0aGVyaXVzeEFQSQogICAgcGFydGljaXBhbnQgRmFjIGFzIEZhY2lsaXRhdG9yCiAgICBwYXJ0aWNpcGFudCBCYXNlIGFzIEJhc2UgTDIKICAgIEFnZW50LT4-QVBJOiBHRVQgL3YxL2VtYWlsL3ZhbGlkYXRlCiAgICBBUEktLT4-QWdlbnQ6IDQwMiArIHByaWNlICQwLjAwNSBVU0RDCiAgICBBZ2VudC0-PkFnZW50OiBzaWduIFVTREMgdHJhbnNmZXIKICAgIEFnZW50LT4-QVBJOiByZXRyeSArIFgtUEFZTUVOVCBwcm9vZgogICAgQVBJLT4-RmFjOiB2ZXJpZnkgcHJvb2YKICAgIEZhYy0tPj5BUEk6IHZhbGlkIOKGkiBzZXR0bGUgb24gQmFzZQogICAgQVBJLS0-PkFnZW50OiAyMDAgKyBkYXRh)
+
+---
+
+## ⚡ Built in 48 Hours — With <$99
+
+| Fact | Proof |
+|------|-------|
+| Repo born | Sep 2, 2026 — `3a6aeb6` "Initial commit", LICENSE timestamp |
+| 40 paid endpoints live | Sep 3, 2026 — every one settled real USDC on Base Sepolia |
+| Commits | 87+ and counting (`git log` — velocity is public) |
+| Total spend | <$99 — dialectic, exocortex, workflow. No salaries, no agency |
+| Team | 1 human + AI builders |
+
+If one person with <$99 builds this in 48 hours, imagine what funded builders ship on Base. That is the democratization thesis: lowering the cost of building until anyone can. Velocity isn't our bragging — it's our evidence.
 
 ---
 
