@@ -266,6 +266,7 @@ def test_dashboard_os_mode_present():
     css = client.get("/dashboard/styles.css")
     assert css.status_code == 200
     assert "#osdock" in css.text
+    assert "VM_BASE" in js.text and "getJSON" in js.text
     fx = client.get("/dashboard/fx.js")
     assert fx.status_code == 200
     assert "aex-fx" in fx.text

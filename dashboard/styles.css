@@ -93,6 +93,15 @@ body{font-size:15px}
 .form input{min-height:44px;font-size:14px}
 .wrow input{min-height:44px;font-size:14px}
 .result{font-size:12.5px}
+/* invisible scrollbars everywhere (wheel/touch/keys still scroll) */
+html,body,.card,.catalog-list,.activity,.result,.form,.metrics{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar,.card::-webkit-scrollbar,.catalog-list::-webkit-scrollbar,.activity::-webkit-scrollbar,.result::-webkit-scrollbar,.form::-webkit-scrollbar,.metrics::-webkit-scrollbar{display:none;width:0;height:0}
+/* header upgrade: gradient brand + breathing status dot + dock clearance */
+body{padding-bottom:76px}
+.topbar .brand{background:linear-gradient(90deg,#a855f7,#d946ef,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800;letter-spacing:.1em}
+.topbar .brand em{color:var(--sec);font-style:normal;font-weight:400;letter-spacing:.02em}
+.net .dot{animation:dotpulse 2s ease-in-out infinite}
+@keyframes dotpulse{0%,100%{opacity:1}50%{opacity:.3}}
 /* ===== OS MODE: floating windows + dock ===== */
 .card{position:relative}
 .wintitle{display:flex;align-items:center;gap:8px;cursor:grab;user-select:none;-webkit-user-select:none;

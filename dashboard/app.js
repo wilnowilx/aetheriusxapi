@@ -99,6 +99,22 @@ function api(path){
   const base = (localStorage.getItem("aex_base") || "").replace(/\/+$/, "");
   return base ? base + path : ".." + path;
 }
+/* auto-fallback: same-origin first, then the public VM over HTTPS.
+   Dashboard shows REAL data everywhere with zero config. */
+const VM_BASE = "https://34-156-149-38.sslip.io/aetherapi";
+async function getJSON(path){
+  const custom = (localStorage.getItem("aex_base") || "").replace(/\/+$/, "");
+  const bases = custom ? [custom, "..", VM_BASE] : ["..", VM_BASE];
+  let err = null;
+  for(const b of bases){
+    try{
+      const url = b === ".." ? ".." + path : b + path;
+      const r = await fetch(url);
+      if(r.ok) return {data: await r.json(), base: b === ".." ? "same origin" : b};
+    }catch(e){ err = e; }
+  }
+  throw err || 0;
+}
 function refreshBaseState(){
   const b = localStorage.getItem("aex_base") || "";
   $("#backendState").textContent = b ? "→ " + b : "→ same origin";
@@ -109,10 +125,9 @@ function splitMeta(s){ const i=s.indexOf(" - "); return i<0?[s,""]:[s.slice(0,i)
 
 async function loadHealth(){
   try{
-    const r = await fetch(api("/health"));
-    if(!r.ok) throw 0;
-    const h = await r.json();
-    state.health = h;
+    const {data: h, base: usedBase} = await getJSON("/health");
+    state.health = h; state.base = usedBase;
+    $("#backendState").textContent = "→ " + usedBase;
     $("#netBadge").innerHTML = `<span class="dot on"></span>${h.network} · ${h.mode}`;
     $("#hService").textContent = h.service;
     $("#hVersion").textContent = h.version;
@@ -174,9 +189,7 @@ function fmtUptime(s){
 /* REAL server-side telemetry — no simulated numbers anywhere. */
 async function loadTelemetry(){
   try{
-    const r = await fetch(api("/v1/telemetry"));
-    if(!r.ok) return;
-    const t = await r.json();
+    const {data: t} = await getJSON("/v1/telemetry");
     const T = t.totals || {};
     $("#mUp").textContent = fmtUptime(t.uptime_s);
     $("#mCalls").textContent = T.calls ?? 0;
