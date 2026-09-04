@@ -95,15 +95,22 @@ const state = { health:null, selected:null };
 /* Backend base URL: same-origin by default (local uvicorn / VM proxy).
    Override via the Backend bar (stored in localStorage) when the page is
    served elsewhere (e.g. GitHub Pages) — requires CORS on the backend. */
+function store(k, v){
+  try{
+    if(v === undefined) return localStorage.getItem(k) || "";
+    if(v === null) localStorage.removeItem(k); else localStorage.setItem(k, v);
+  }catch(e){ if(v === undefined) return ""; }
+  return "";
+}
 function api(path){
-  const base = (localStorage.getItem("aex_base") || "").replace(/\/+$/, "");
+  const base = store("aex_base").replace(/\/+$/, "");
   return base ? base + path : ".." + path;
 }
 /* auto-fallback: same-origin first, then the public VM over HTTPS.
    Dashboard shows REAL data everywhere with zero config. */
 const VM_BASE = "https://34-156-149-38.sslip.io/aetherapi";
 async function getJSON(path){
-  const custom = (localStorage.getItem("aex_base") || "").replace(/\/+$/, "");
+  const custom = store("aex_base").replace(/\/+$/, "");
   const bases = custom ? [custom, "..", VM_BASE] : ["..", VM_BASE];
   let err = null;
   for(const b of bases){
@@ -116,9 +123,9 @@ async function getJSON(path){
   throw err || 0;
 }
 function refreshBaseState(){
-  const b = localStorage.getItem("aex_base") || "";
+  const b = store("aex_base");
   $("#backendState").textContent = b ? "→ " + b : "→ same origin";
-  $("#backendUrl").value = b;
+  try{ $("#backendUrl").value = b; }catch(e){}
 }
 
 function splitMeta(s){ const i=s.indexOf(" - "); return i<0?[s,""]:[s.slice(0,i),s.slice(i+3)]; }
@@ -138,10 +145,14 @@ async function loadHealth(){
     $("#hEndpoints").textContent = Object.keys(h.endpoints).length;
     renderCatalog(h.endpoints);
   }catch(e){
+    const why = (e && e.message) || e || "network";
     $("#netBadge").innerHTML = `<span class="dot"></span>offline`;
+    $("#netBadge").title = "health fetch failed: " + why;
     const eps = FALLBACK_META;
     $("#hEndpoints").textContent = Object.keys(eps).length;
     renderCatalog(eps);
+    const act = $("#activity");
+    if(act) act.innerHTML = `<li class="muted">Backend unreachable (${why}). Set Backend URL ⚙ or check VM.</li>`;
   }
 }
 
@@ -245,14 +256,9 @@ async function execute(paid){
 async function probeDrift(){
   const box = $("#driftBody");
   try{
-    const r = await fetch(api("/v1/storage/drift?layers=3"), {headers:{"X-PAYMENT":"dashboard-demo"}});
-    if(r.status===404){
-      box.innerHTML = `<p class="muted">Endpoint not deployed yet — planned payload shown below. The NATS/VPC telemetry stays private; only drift observations ship as API.</p>`;
-    }else{
-      const body = await r.json();
-      box.innerHTML = `<p><b class="ok">LIVE</b> <span class="muted">slot_delta=${(body.drift||{}).slot_delta ?? "?"}</span></p><pre class="result small">${JSON.stringify(body,null,2)}</pre>`;
-    }
-  }catch(e){ box.innerHTML = `<p class="muted">Probe failed: ${e}</p>`; }
+    const {data: body} = await getJSON("/v1/storage/drift/sample?chain=base");
+    box.innerHTML = `<p><b class="ok">LIVE</b> <span class="muted">${body.chain} slot ${body.slot} via ${body.layer} · ${body.latency_ms} ms</span></p><pre class="result small">slot ${body.slot} @ ${body.observed_at}\nfree sample — full multi-layer comparison is paid, try it in Explorer →</pre>`;
+  }catch(e){ box.innerHTML = `<p class="muted">Drift probe failed (${(e && e.message) || e || "network"}). Check Backend URL ⚙.</p>`; }
 }
 
 $("#btnPay").onclick = ()=>execute(true);

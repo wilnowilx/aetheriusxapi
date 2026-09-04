@@ -267,6 +267,13 @@ def test_dashboard_os_mode_present():
     assert css.status_code == 200
     assert "#osdock" in css.text
     assert "VM_BASE" in js.text and "getJSON" in js.text
+
+
+def test_drift_sample_free():
+    r = client.get("/v1/storage/drift/sample", params={"chain": "base"})
+    assert r.status_code in (200, 502)
+    body = r.json()
+    assert ("slot" in body and "paid_route" in body) or "error" in body
     fx = client.get("/dashboard/fx.js")
     assert fx.status_code == 200
     assert "aex-fx" in fx.text

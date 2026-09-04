@@ -1674,6 +1674,28 @@ async def web_dns(name: str = Query(..., description="Domain to resolve"),
         return _err(500, {"error": str(e)})
 
 
+@app.get("/v1/storage/drift/sample")
+@app.get("/api/v1/storage/drift/sample")
+async def storage_drift_sample(chain: str = Query("base", description="Chain")):
+    """FREE sample: single-layer slot observation (marketing for the paid full comparison)."""
+    rpcs = DRIFT_RPCS.get(chain.lower())
+    if not rpcs:
+        return _err(400, {"error": f"Unsupported chain: {chain}"})
+    try:
+        async with httpx.AsyncClient(timeout=12) as client:
+            layer = await _rpc_slot(client, rpcs[0])
+            if layer["slot"] is None:
+                return _err(502, {"error": "RPC layer unreachable"})
+            return {"chain": chain.lower(), "slot": layer["slot"],
+                    "layer": layer["name"], "latency_ms": layer["latency_ms"],
+                    "observed_at": layer["observed_at"],
+                    "note": "Free sample. Full multi-layer drift comparison is paid.",
+                    "paid_route": "/v1/storage/drift",
+                    "data_source": "public-rpc", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
 if __name__ == "__main__":
     import uvicorn
 

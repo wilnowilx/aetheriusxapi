@@ -104,7 +104,7 @@ body{padding-bottom:76px}
 @keyframes dotpulse{0%,100%{opacity:1}50%{opacity:.3}}
 /* ===== OS MODE: floating windows + dock ===== */
 .card{position:relative}
-.wintitle{display:flex;align-items:center;gap:8px;cursor:grab;user-select:none;-webkit-user-select:none;
+.wintitle{display:flex;align-items:center;gap:8px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;
   background:rgba(255,255,255,.03);border:1px solid var(--border);border-bottom:none;border-radius:12px 12px 0 0;
   padding:8px 12px;margin:-18px -18px 12px;font-size:12.5px}
 .wintitle h2{font-size:12.5px !important;margin:0 !important;letter-spacing:.06em;text-transform:uppercase;color:var(--sec)}
@@ -116,6 +116,7 @@ body{padding-bottom:76px}
 .wintitle .wmin:hover{color:var(--text);border-color:var(--purple)}
 .card.drag{opacity:.92;z-index:60;transition:none !important;box-shadow:0 24px 70px rgba(0,0,0,.5)}
 .card.min > *:not(.wintitle){display:none}
+.card.min{min-height:0 !important}
 #osdock{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:100;
   display:flex;gap:6px;max-width:96vw;overflow-x:auto;background:rgba(10,10,20,.8);border:1px solid var(--border);border-radius:14px;padding:7px 10px}
 #osdock button{background:transparent;border:1px solid transparent;color:var(--sec);border-radius:8px;
