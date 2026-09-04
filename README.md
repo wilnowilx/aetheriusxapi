@@ -26,10 +26,35 @@
 
 ---
 
+## 🕐 Build Timeline
+
+<!-- RITUAL: append a row + gantt bar on every release. This timeline stays alive. -->
+<!-- Repo history below is exact (git). Pre-repo phases are honest ranges from project records. -->
+
+```mermaid
+gantt
+    title AETHERIUS journey — repo Sep 2026, project ~4 months earlier
+    dateFormat YYYY-MM-DD
+    section Research May-Aug 2026
+    x402 study + market mapping        :done, r1, 2026-05-15, 60d
+    VM + infra stabilization           :done, r2, 2026-07-01, 45d
+    section Build Sep 2026
+    Repo + 40 endpoints live           :done, b1, 2026-09-02, 2d
+    Hardening + demo + docs            :done, b2, 2026-09-03, 2d
+```
+
+| Phase | Work | Verify |
+|-------|------|--------|
+| May–Aug 2026 | Research, x402 study, VM stabilization — an idea this size needs study before it can be visualized | workspace history |
+| Sep 2 | Repo born, landing + docs, Python SDK, persistent telemetry | `git log --since=2026-09-02 --until=2026-09-03` |
+| Sep 3 | Backend v2, dashboard, HTTPS, 40 endpoints, JS SDK, demo + player | `git log --since=2026-09-03` |
+
+---
+
 ## Table of Contents
 
-- [⚡ Built in 48 Hours](#built-in-48-hours)
 - [🕐 Build Timeline](#build-timeline)
+- [⚡ Built in 48 Hours](#built-in-48-hours)
 - [🔥 The Problem](#the-problem)
 - [🗺️ System Overview](#system-overview)
 - [📡 Live Status](#live-status)
@@ -40,7 +65,7 @@
 - [🏗️ Architecture](#architecture)
 - [🚀 Quick Start](#quick-start)
 - [🎛️ Dashboard](#dashboard)
-- [⚡ Endpoints](#endpoints)
+- [🔌 Endpoints](#endpoints)
 - [🗂️ Categories](#categories)
 - [🚦 Rate Limits](#rate-limits)
 - [🧱 Tech Stack](#tech-stack)
@@ -56,47 +81,22 @@
 
 ![System flow](https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKZmxvd2NoYXJ0IExSCiAgICBBW_CfpJYgQUkgQWdlbnRdIC0tPnxHRVQgL3YxLy4uLnwgR1tBRVRIRVJJVVMgR2F0ZXdheTxici8-RmFzdEFQSSDCtyB4NDAyXQogICAgRyAtLT58NDAyICsgcHJpY2V8IEEKICAgIEcgLS0-fHBhaWQgMjAwfCBBCiAgICBHIC0tPiBNW01hcHMgwrcgT1NNXQogICAgRyAtLT4gQ1tDcnlwdG8gwrcgQ29pbkdlY2tvL0NvaW5iYXNlL0xsYW1hXQogICAgRyAtLT4gV1tXZWIgwrcgZGlyZWN0IGZldGNoXQogICAgRyAtLT4gRFtEYXRhIMK3IE9wZW4tTWV0ZW8vTm9taW5hdGltXQogICAgRyAtLT4gUltEcmlmdCDCtyBwdWJsaWMgUlBDc10KICAgIEcgLS0-IFRbVGVsZW1ldHJ5PGJyLz5TUUxpdGUgKyAvdjEvdGVsZW1ldHJ5XQogICAgQSAtLT58JCBVU0RDIHNldHRsZXwgQlsoQmFzZSBMMildCiAgICBHIC0uLT58dmVyaWZ5IHByb29mfCBGW0ZhY2lsaXRhdG9yXQ==)
 
-![x402 payment sequence](https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKc2VxdWVuY2VEaWFncmFtCiAgICBwYXJ0aWNpcGFudCBBZ2VudCBhcyDwn6SWIEFnZW50CiAgICBwYXJ0aWNpcGFudCBBUEkgYXMgYWV0aGVyaXVzeEFQSQogICAgcGFydGljaXBhbnQgRmFjIGFzIEZhY2lsaXRhdG9yCiAgICBwYXJ0aWNpcGFudCBCYXNlIGFzIEJhc2UgTDIKICAgIEFnZW50LT4-QVBJOiBHRVQgL3YxL2VtYWlsL3ZhbGlkYXRlCiAgICBBUEktLT4-QWdlbnQ6IDQwMiArIHByaWNlICQwLjAwNSBVU0RDCiAgICBBZ2VudC0-PkFnZW50OiBzaWduIFVTREMgdHJhbnNmZXIKICAgIEFnZW50LT4-QVBJOiByZXRyeSArIFgtUEFZTUVOVCBwcm9vZgogICAgQVBJLT4-RmFjOiB2ZXJpZnkgcHJvb2YKICAgIEZhYy0tPj5BUEk6IHZhbGlkIOKGkiBzZXR0bGUgb24gQmFzZQogICAgQVBJLS0-PkFnZW50OiAyMDAgKyBkYXRh)
+![x402 payment sequence](docs/diagrams/sequence.svg)
 
 ---
 
-## ⚡ Built in 48 Hours — With <$99
+## ⚡ Built in 48 Hours
 
 | Fact | Proof |
 |------|-------|
 | Repo born | Sep 2, 2026 — `3a6aeb6` "Initial commit", LICENSE timestamp |
 | 40 paid endpoints live | Sep 3, 2026 — every one settled real USDC on Base Sepolia |
 | Commits | 87+ and counting (`git log` — velocity is public) |
-| Total spend | <$99 — dialectic, exocortex, workflow. No salaries, no agency |
 | Team | 1 human + AI builders |
 
-If one person with <$99 builds this in 48 hours, imagine what funded builders ship on Base. That is the democratization thesis: lowering the cost of building until anyone can. Velocity isn't our bragging — it's our evidence.
+If one person builds this in 48 hours, imagine what funded builders ship on Base. Velocity isn't our bragging — it's our evidence.
 
 ---
-
-## 🕐 Build Timeline
-
-<!-- RITUAL: append a row + gantt bar on every release. This timeline stays alive. -->
-
-```mermaid
-gantt
-    title AETHERIUS build log — verify every line in git log
-    dateFormat YYYY-MM-DD
-    section Day 1 — Sep 2
-    Repo born + landing online          :done, d1, 2026-09-02, 1d
-    Python SDK + persistent telemetry   :done, d2, 2026-09-02, 1d
-    section Day 2 — Sep 3
-    Backend v2 + dashboard + HTTPS/TLS  :done, d3, 2026-09-03, 1d
-    Wave 2 + Wave 3 (40 endpoints)      :done, d4, 2026-09-03, 1d
-    JS SDK + Etherscan V2 + demo+player :done, d5, 2026-09-03, 1d
-```
-
-| Day | Shipped | Verify |
-|-----|---------|--------|
-| Sep 2 | Repo born, landing + docs online, Python SDK, SQLite-persistent telemetry | `git log --since=2026-09-02 --until=2026-09-03` |
-| Sep 3 | Backend v2 (real x402), dashboard, CORS, HTTPS/TLS, Waves 2+3 (40 endpoints), JS SDK, Etherscan V2, demo script + player, brutal README | `git log --since=2026-09-03` |
-
-Marketing truth, stated plainly: **no code is shared here — the timeline PROVES you can do it too.** Fork the process, not the product: small team, free tools, dialectic + exocortex + daily shipping. That is democratization of information.
 
 ---
 
@@ -107,6 +107,13 @@ Marketing truth, stated plainly: **no code is shared here — the timeline PROVE
 Most APIs are designed for a human-led workflow: a developer creates an account, provisions credentials, accepts a subscription or credit limit, and reconciles usage through a separate billing system. That model works for teams, but adds coordination and trust boundaries when the client is an autonomous agent.
 
 An agent needs to discover a service, authorize a bounded amount, call it, and receive a verifiable result without a human present for every transaction. API keys identify a client but do not provide per-request authorization; subscription billing separates consumption from settlement; and conventional payment rails are not optimized for low-value, high-frequency machine-to-machine calls.
+
+### What we verified in production
+
+- Testnet facilitators verify signatures without always settling on-chain — our volume metric counts facilitator-approved payments, stated as such.
+- Datacenter IPs get throttled by free upstreams (CoinGecko 429s, Etherscan V1 deprecation) — hence mirror chains and multi-source fallbacks, not bigger promises.
+- A `402` with an empty body is the honest challenger: no proof, no data.
+- Naming these plainly is what separates our docs from generic API-marketplace copy.
 
 ### Thesis
 
@@ -313,7 +320,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ---
 
-## ⚡ Endpoints
+## 🔌 Endpoints
 
 | Endpoint | Description | Price | Latency |
 |----------|-------------|-------|---------|
