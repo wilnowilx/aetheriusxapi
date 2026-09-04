@@ -9,8 +9,9 @@
 - [04 — Storage Drift Slots (EN)](04-storage-drift.md) — cross-RPC slot drift: converged / diverged / degraded
 
 ## Español
+- [01 — Tu Primera Llamada x402 (ES)](01-primera-llamada-x402.md) — 402 sin pago → 200 con `X-PAYMENT` (simulado en local, USDC real en testnet)
 - [03 — Llamada Pagada del Agente (ES)](03-llamada-pagada-agente.md) — agente Python descubre el endpoint más barato y liquida
-- *01 y 02 en ES — en traducción (ver abajo). El código es idéntico; solo cambia el texto.*
+- *02 en ES — en traducción. El código es idéntico; solo cambia el texto.*
 
 ## Roadmap EN→ES (honesto)
 La serie completa prometida para el Creator Grant es **8 piezas en 6 semanas, con versión EN y ES** (o subtítulos). Hoy tienes **1 ES 100% + 5 EN** revisables. Las traducciones faltantes no bloquean el uso — el código y los endpoints son los mismos.
