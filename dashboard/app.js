@@ -264,3 +264,57 @@ loadHealth();
 loadTelemetry();
 probeDrift();
 setInterval(loadTelemetry, 10000);
+
+/* ===== OS MODE: draggable windows + dock (fine pointers, wide screens) ===== */
+(function(){
+  if(!window.matchMedia('(pointer:fine)').matches) return;
+  if(window.innerWidth <= 760) return;
+  var z = 40;
+  var dock = document.createElement('div');
+  dock.id = 'osdock';
+  document.body.appendChild(dock);
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.grid .card'));
+  cards.forEach(function(card, ci){
+    var h = card.querySelector('h2');
+    var bar = document.createElement('div');
+    bar.className = 'wintitle';
+    bar.innerHTML = '<span class="wdots"><i class="r"></i><i class="y"></i><i class="g"></i></span>';
+    if(h){ bar.appendChild(h); }
+    var min = document.createElement('button');
+    min.className = 'wmin'; min.title = 'Minimize'; min.textContent = '–';
+    bar.appendChild(min);
+    card.insertBefore(bar, card.firstChild);
+    var dbtn = document.createElement('button');
+    dbtn.textContent = h ? h.textContent.trim().slice(0, 14) : ('Win ' + (ci + 1));
+    dock.appendChild(dbtn);
+    function focus(){
+      z++; card.style.zIndex = z;
+      Array.prototype.forEach.call(dock.children, function(b){ b.classList.remove('on'); });
+      if(!card.classList.contains('min')) dbtn.classList.add('on');
+    }
+    dbtn.onclick = function(){ card.classList.toggle('min'); focus(); };
+    min.onclick = function(e){ e.stopPropagation(); card.classList.add('min'); focus(); };
+    card.addEventListener('pointerdown', focus);
+    var sx = 0, sy = 0, ox = 0, oy = 0, drag = false;
+    bar.addEventListener('pointerdown', function(e){
+      if(e.target === min || card.classList.contains('min')) return;
+      drag = true; card.classList.add('drag');
+      sx = e.clientX; sy = e.clientY;
+      ox = parseFloat(card.dataset.ox || '0'); oy = parseFloat(card.dataset.oy || '0');
+      if(bar.setPointerCapture){ try{ bar.setPointerCapture(e.pointerId); }catch(_){} }
+      focus(); e.preventDefault();
+    });
+    bar.addEventListener('pointermove', function(e){
+      if(!drag) return;
+      var nx = ox + e.clientX - sx, ny = oy + e.clientY - sy;
+      card.dataset.ox = nx; card.dataset.oy = ny;
+      card.style.transform = 'translate(' + nx + 'px,' + ny + 'px)';
+    });
+    ['pointerup','pointercancel'].forEach(function(ev){
+      bar.addEventListener(ev, function(){ drag = false; card.classList.remove('drag'); });
+    });
+    bar.addEventListener('dblclick', function(){
+      card.dataset.ox = '0'; card.dataset.oy = '0'; card.style.transform = '';
+    });
+  });
+})();

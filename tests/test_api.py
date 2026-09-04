@@ -257,6 +257,15 @@ def test_dashboard_backend_setting_present():
     js = client.get("/dashboard/app.js")
     assert js.status_code == 200
     assert "aex_base" in js.text and "api(" in js.text
+
+
+def test_dashboard_os_mode_present():
+    js = client.get("/dashboard/app.js")
+    assert js.status_code == 200
+    assert "wintitle" in js.text and "osdock" in js.text
+    css = client.get("/dashboard/styles.css")
+    assert css.status_code == 200
+    assert "#osdock" in css.text
     fx = client.get("/dashboard/fx.js")
     assert fx.status_code == 200
     assert "aex-fx" in fx.text
