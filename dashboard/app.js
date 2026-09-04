@@ -205,18 +205,34 @@ function fmtUptime(s){
 }
 
 /* REAL server-side telemetry — no simulated numbers anywhere. */
+function tweenNum(el, to, fmt){
+  if(!el) return;
+  to = Number(to) || 0;
+  const from = parseFloat(String(el.dataset.v || "0").replace(/[^0-9.\-]/g, "")) || 0;
+  el.dataset.v = to;
+  if(from === to){ el.textContent = fmt(to); return; }
+  const t0 = performance.now(), dur = 650;
+  el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+  (function step(t){
+    const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    el.textContent = fmt(from + (to - from) * e);
+    if(k < 1) requestAnimationFrame(step);
+  })(t0);
+}
 async function loadTelemetry(){
   try{
     const {data: t} = await getJSON("/v1/telemetry");
     const T = t.totals || {};
     $("#mUp").textContent = fmtUptime(t.uptime_s);
-    $("#mCalls").textContent = T.calls ?? 0;
-    $("#mOk").textContent = T.ok_200 ?? 0;
-    $("#m402").textContent = T.challenges_402 ?? 0;
-    $("#mErr").textContent = T.errors ?? 0;
-    $("#mVol").textContent = "$" + (T.volume_usdc ?? 0) + " USDC";
-    $("#mWal").textContent = t.wallets_seen ?? 0;
-    $("#mAvg").textContent = T.avg_latency_ms != null ? T.avg_latency_ms + " ms" : "—";
+    const _int = v=>Math.round(v).toLocaleString();
+    tweenNum($("#mCalls"), T.calls ?? 0, _int);
+    tweenNum($("#mOk"), T.ok_200 ?? 0, _int);
+    tweenNum($("#m402"), T.challenges_402 ?? 0, _int);
+    tweenNum($("#mErr"), T.errors ?? 0, _int);
+    tweenNum($("#mVol"), T.volume_usdc ?? 0, v=>"$" + v.toFixed(4) + " USDC");
+    tweenNum($("#mWal"), t.wallets_seen ?? 0, _int);
+    if(T.avg_latency_ms != null) tweenNum($("#mAvg"), T.avg_latency_ms, v=>v.toFixed(1) + " ms");
+    else { const _m = $("#mAvg"); if(_m) _m.textContent = "—"; }
     const bars = $("#latBars"); bars.innerHTML = "";
     const samples = t.recent_latency_ms || [];
     const mx = Math.max(...samples, 1);
