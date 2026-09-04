@@ -144,6 +144,7 @@ async function loadHealth(){
     $("#hWallet").title = h.wallet;
     $("#hEndpoints").textContent = Object.keys(h.endpoints).length;
     renderCatalog(h.endpoints);
+    try{ var ch = document.querySelector(".catalog h2"); if(ch) ch.innerHTML = 'API Catalog <span class="tag">' + Object.keys(h.endpoints).length + ' live</span>'; }catch(_){}
     try{
       var secure = window.location.protocol === "https:";
       var sp = $("#secPill");

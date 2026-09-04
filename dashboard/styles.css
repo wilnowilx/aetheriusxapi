@@ -136,3 +136,18 @@ body{font-size:16px}
 .secpill.ok{color:var(--green);border-color:rgba(16,185,129,.45)}
 .secpill.warn{color:var(--orange);border-color:rgba(245,158,11,.45)}
 .footver{color:var(--sec);font-family:ui-monospace,monospace}
+/* brutal pass: scale, catalog presence, dock polish */
+.grid{gap:20px}
+.card h2{font-size:16px}
+.topbar .brand{font-size:19px}
+.topbar{padding:20px 4px}
+.catalog-list{gap:10px}
+.ep{padding:14px 16px;border-radius:12px}
+.ep code{font-size:15px}
+.ep small{font-size:12.5px}
+.ep .price{font-size:13px;font-weight:700;background:linear-gradient(90deg,rgba(16,185,129,.18),rgba(16,185,129,.05));border:1px solid rgba(16,185,129,.35);padding:3px 10px;border-radius:20px;white-space:nowrap}
+.ep:hover{transform:translateY(-2px)}
+.mrow{padding:8px 0}
+#osdock{padding:10px 14px;gap:8px;box-shadow:0 10px 40px rgba(0,0,0,.5),0 0 24px rgba(168,85,247,.15)}
+#osdock button{font-size:12.5px;padding:8px 14px}
+#osdock button.on{box-shadow:0 0 12px rgba(168,85,247,.35)}
