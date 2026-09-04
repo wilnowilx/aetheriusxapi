@@ -25,7 +25,7 @@
 **40 live APIs (120+ on the roadmap) where autonomous AI agents pay per request in USDC on Base.**
 **No accounts. No subscriptions. No human friction. Just code.**
 
-[Website](https://wilnowilx.github.io/aetheriusxapi/) · [Documentation](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) · [Twitter](https://x.com/aetheriusxAPI) · [Telegram](https://t.me/aetheriusxAPI) · [x402 Protocol](https://x402.org)
+[Website](https://wilnowilx.github.io/aetheriusxapi/) · [Documentation](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) · [Tutoriales (ES)](https://github.com/wilnowilx/aetheriusxapi/tree/main/docs/tutorials) · [Twitter](https://x.com/aetheriusxAPI) · [Telegram](https://t.me/aetheriusxAPI) · [x402 Protocol](https://x402.org)
 
 </div>
 
