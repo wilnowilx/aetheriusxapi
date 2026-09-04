@@ -56,11 +56,13 @@
 <!-- EPOCH = 2026-09-02T00:00:00Z  (repo first commit) -->
 <!-- To update: just push any commit — this badge regenerates on every page load. -->
 
-![Days](https://img.shields.io/badge/days累计-since%20Sep%202%202026-a855f7?style=for-the-badge&labelColor=09090b&cacheSeconds=600)
+<div align="center">
+
+![Days](https://img.shields.io/badge/🕐_days_since_repo_born-2-blueviolet?style=for-the-badge&labelColor=09090b&cacheSeconds=3600)
 
 > **Repo born:** Sep 2, 2026 — `3a6aeb6` "Initial commit"
->
-> **This badge is alive.** It recalculates on every page load. No manual edits needed.
+
+</div>
 
 ---
 

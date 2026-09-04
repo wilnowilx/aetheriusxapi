@@ -1,5 +1,5 @@
 :root{
-  --bg:#06060e; --card:rgba(255,255,255,.03); --border:rgba(255,255,255,.08);
+  --bg:#06060e; --card:rgba(14,14,24,.92); --border:rgba(255,255,255,.08);
   --text:#f0f0f5; --sec:#8a8a9a; --muted:#55556a;
   --purple:#a855f7; --magenta:#d946ef; --pink:#ec4899;
   --green:#10b981; --orange:#f59e0b; --red:#ef4444;
@@ -31,7 +31,7 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-ser
 @media(max-width:640px){.backendbar{flex-wrap:wrap}}
 .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
 @media(max-width:960px){.grid{grid-template-columns:1fr}}
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 .card h2{font-size:15px;margin-bottom:12px;letter-spacing:.04em}
 .muted{color:var(--sec);font-size:13px}
 .tag{font-size:11px;background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.4);

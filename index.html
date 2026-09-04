@@ -136,7 +136,6 @@
         }
 
         section {
-            min-height: 100vh;
             scroll-snap-align: start;
             position: relative;
             z-index: 1;
@@ -145,11 +144,24 @@
             justify-content: center;
         }
 
+        #hero {
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        section:not(#hero) {
+            min-height: auto;
+        }
+
         .inner {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 100px 40px;
+            padding: 60px 40px;
             width: 100%;
+        }
+
+        #hero .inner {
+            padding: 40px 40px 60px;
         }
 
         /* ===== NAV ===== */
@@ -324,6 +336,7 @@
             letter-spacing: -0.03em;
             margin-bottom: 20px;
             line-height: 1.1;
+            text-shadow: 0 2px 30px rgba(6,6,14,0.9), 0 0 60px rgba(6,6,14,0.5);
         }
 
         .sdesc {
@@ -331,10 +344,17 @@
             color: var(--text-sec);
             max-width: 620px;
             line-height: 1.7;
+            text-shadow: 0 1px 16px rgba(6,6,14,0.9);
         }
 
         /* ===== HERO ===== */
         .hero { text-align: center; }
+
+        /* Text readability over plasma: subtle backdrop for all content sections */
+        section .inner {
+            background: radial-gradient(ellipse at center, rgba(6,6,14,0.85) 0%, rgba(6,6,14,0.6) 60%, transparent 100%);
+            border-radius: 24px;
+        }
 
         .hero-badges {
             display: flex;
@@ -377,6 +397,7 @@
             margin-bottom: 32px;
             opacity: 0; transform: translateY(50px);
             animation: fadeUp 1s 0.4s forwards;
+            text-shadow: 0 2px 40px rgba(6,6,14,0.8), 0 0 80px rgba(6,6,14,0.5);
         }
 
         .hero h1 .grad {
@@ -397,6 +418,7 @@
             line-height: 1.7;
             opacity: 0; transform: translateY(50px);
             animation: fadeUp 1s 0.6s forwards;
+            text-shadow: 0 1px 20px rgba(6,6,14,0.9);
         }
 
         .hero-actions {
@@ -1901,23 +1923,23 @@
         var lock = false;
         function current(){
             var y = window.scrollY, best = 0, bd = 1e12;
-            secs.forEach(function(s, i){ var d = Math.abs(s.offsetTop - y - 90); if(d < bd){ bd = d; best = i; } });
+            secs.forEach(function(s, i){ var d = Math.abs(s.offsetTop - y - 40); if(d < bd){ bd = d; best = i; } });
             return best;
         }
         window.addEventListener('wheel', function(e){
-            if(lock || Math.abs(e.deltaY) < 14) return;
+            if(lock || Math.abs(e.deltaY) < 8) return;
             var i = current(), s = secs[i];
             if(!s) return;
             var r = s.getBoundingClientRect(), vh = window.innerHeight;
             var nxt = e.deltaY > 0 ? i + 1 : i - 1;
             if(nxt < 0 || nxt >= secs.length) return;
-            if(e.deltaY > 0 && r.bottom > vh + 140) return;
-            if(e.deltaY < 0 && r.top < -140) return;
+            if(e.deltaY > 0 && r.bottom > vh + 40) return;
+            if(e.deltaY < 0 && r.top < -40) return;
             e.preventDefault();
             lock = true;
             try{ if(typeof curS === 'number') curS = nxt; }catch(_){}
             secs[nxt].scrollIntoView({behavior:'smooth'});
-            setTimeout(function(){ lock = false; }, 1300);
+            setTimeout(function(){ lock = false; }, 650);
         }, {passive:false});
     })();
 
