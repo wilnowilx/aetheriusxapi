@@ -133,6 +133,7 @@ var castBtn = document.getElementById('btnCast');
 var wiki = document.getElementById('wiki');
 
 /* === WIKI SYSTEM === */
+var autoWikiVisible = false; /* flag: auto-tooltip shown during playback */
 var WIKI = {
   hook:     {k:'HOOK',       t:'Why x402 matters',         d:'AI agents can\'t hold credit cards. x402 lets them pay per API call in USDC — no accounts, no invoices, no humans in the loop. This is the fundamental problem AETHERIUS solves.'},
   discovery:{k:'DISCOVERY',  t:'SDK discovers live APIs',   d:'The AETHERIUS SDK queries the service catalog in real-time. It shows all 40 endpoints, pricing, and chain info. Agents don\'t need hardcoded URLs — they discover what\'s available.'},
@@ -148,22 +149,35 @@ var WIKI = {
   price:    {k:'PRICING',    t:'Pay-per-call economics',    d:'Each endpoint has a USDC price. /v1/data/define costs $0.005/call. /v1/email/validate costs $0.005/call. No subscriptions. No minimums. Pay only for what you use.'}
 };
 
-function showWiki(e, key){
+function showWiki(e, key, autoPos){
   var w = WIKI[key]; if(!w) return;
   wiki.innerHTML = '<div class="wk">'+w.k+'</div><div class="wt">'+w.t+'</div><div class="wd">'+w.d+'</div>';
-  var r = e.target.getBoundingClientRect();
-  /* always RIGHT of the hovered element */
-  var wx = r.right + 14;
-  if(wx + 400 > window.innerWidth) wx = r.left - 400;
-  if(wx < 8) wx = 8;
-  var wy = r.top - 20;
-  if(wy + 180 > window.innerHeight) wy = window.innerHeight - 200;
-  if(wy < 8) wy = 8;
+  var wx, wy;
+  if(autoPos){
+    /* Auto-mode: position RIGHT of the terminal, centered vertically */
+    var tr = term.getBoundingClientRect();
+    wx = tr.right + 16;
+    if(wx + 400 > window.innerWidth) wx = 16; /* fallback left if no space */
+    wy = tr.top + tr.height * 0.2;
+    if(wy + 200 > window.innerHeight) wy = window.innerHeight - 220;
+    if(wy < 8) wy = 8;
+  } else {
+    var r = e.target.getBoundingClientRect();
+    wx = r.right + 14;
+    if(wx + 400 > window.innerWidth) wx = r.left - 400;
+    if(wx < 8) wx = 8;
+    wy = r.top - 20;
+    if(wy + 180 > window.innerHeight) wy = window.innerHeight - 200;
+    if(wy < 8) wy = 8;
+  }
   wiki.style.left = wx + 'px';
   wiki.style.top = wy + 'px';
   wiki.classList.add('show');
 }
-function hideWiki(){ wiki.classList.remove('show'); }
+function hideWiki(){ 
+  if(autoWikiVisible) return; /* don't hide while auto-tooltip is active */
+  wiki.classList.remove('show'); 
+}
 /* auto-show: track current step and show wiki tooltip */
 var lastWikiStep = -1;
 function updateWikiTooltip(){
@@ -171,9 +185,9 @@ function updateWikiTooltip(){
   var idx = done - 1; /* the step just completed */
   if(idx !== lastWikiStep && idx >= 0 && idx < S.length){
     var s = S[idx];
-    if(s.wiki && document.querySelector('.wiki-zone[data-wiki="'+s.wiki+'"]')){
-      /* show automatically */
-      showWiki({target: document.querySelector('.wiki-zone[data-wiki="'+s.wiki+'"]')}, s.wiki);
+    if(s.wiki){
+      autoWikiVisible = true;
+      showWiki({target: term}, s.wiki, true); /* autoPos=true → RIGHT of terminal */
     }
   }
   lastWikiStep = idx;
@@ -186,6 +200,10 @@ term.addEventListener('mouseover', function(e){
 term.addEventListener('mouseout', function(e){
   var z = e.target.closest('.wiki-zone');
   if(z && !z.contains(e.relatedTarget)) hideWiki();
+});
+/* Hide auto-wiki when playing moves to next step */
+term.addEventListener('mousemove', function(){
+  if(playing && autoWikiVisible){ autoWikiVisible = false; wiki.classList.remove('show'); }
 });
 
 /* === TERMINAL STEPS === */
@@ -233,10 +251,13 @@ cur.className = 'cursor';
 
 function runStep(idx){
   if(!playing || idx >= S.length){
-    playing = false; btnPlay.textContent = '▶ Play';
+    playing = false; btnPlay.textContent = '▶ Play'; autoWikiVisible = false;
+    wiki.classList.remove('show');
     if(castBtn) castBtn.classList.add('big');
     return;
   }
+  autoWikiVisible = false; /* reset each step so new auto-wiki can appear */
+  wiki.classList.remove('show');
   var s = S[idx];
   function advance(){
     done = idx + 1; prog();
@@ -249,8 +270,8 @@ if(s.h){
     term.insertAdjacentHTML('beforeend', html);
     /* Auto-show wiki tooltip immediately when step with wiki is inserted */
     if(s.wiki && playing){
-      var zone = term.querySelector('.wiki-zone.step-wiki[data-wiki="'+s.wiki+'"]');
-      if(zone) showWiki({target: zone}, s.wiki);
+      autoWikiVisible = true;
+      showWiki({target: term}, s.wiki, true); /* autoPos=true → RIGHT of terminal */
     }
     scroll(); advance();
   } else {

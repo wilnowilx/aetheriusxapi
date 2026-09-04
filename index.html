@@ -146,8 +146,8 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-radius: 24px;
-            border: 1px solid rgba(168,85,247,0.15);
-            box-shadow: 0 0 60px rgba(168,85,247,0.1);
+            border: 1px solid rgba(168,85,247,0.2);
+            box-shadow: 0 0 40px rgba(168,85,247,0.12), 0 0 80px rgba(168,85,247,0.06), inset 0 0 40px rgba(168,85,247,0.04);
         }
 
         .inner {
@@ -576,10 +576,10 @@
         }
 
         .cat-card {
-            padding: 36px 24px;
+            padding: 24px 18px;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 20px;
+            border-radius: 16px;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             position: relative;
@@ -601,16 +601,17 @@
         .cat-card:hover::after { opacity: 1; }
 
         .cat-icon {
-            width: 56px; height: 56px;
-            margin: 0 auto 18px;
+            width: 44px; height: 44px;
+            margin: 0 auto 12px;
             background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(217,70,239,0.1));
-            border-radius: 16px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--purple-light);
             position: relative; z-index: 1;
         }
+        .cat-icon svg { width: 22px; height: 22px; }
 
         .cat-title { font-size: 1rem; font-weight: 700; margin-bottom: 8px; position: relative; z-index: 1; }
         .cat-count { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--magenta-light); position: relative; z-index: 1; }
@@ -1616,7 +1617,7 @@
             <div class="docs-grid">
                 <a href="https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md" target="_blank" class="docs-card anim ad1"><div class="docs-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div><h3>Getting Started</h3><p>Quick start guide. From zero to first request in 5 minutes.</p><span class="docs-link">Read guide <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span></a>
                 <a href="https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md" target="_blank" class="docs-card anim ad2"><div class="docs-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><h3>API Reference</h3><p>Complete endpoint documentation with parameters and responses.</p><span class="docs-link">Explore APIs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span></a>
-                <a href="https://github.com/wilnowilx/aetheriusxapi" target="_blank" class="docs-card anim ad3"><div class="docs-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h3>Guides & Tutorials</h3><p>Tutorials for DeFi bots, data aggregators, and AI agents.</p><span class="docs-link">View tutorials <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span></a>
+                <a href="https://github.com/wilnowilx/aetheriusxapi/tree/main/docs/tutorials" target="_blank" class="docs-card anim ad3"><div class="docs-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h3>Guides & Tutorials</h3><p>Tutorials for DeFi bots, data aggregators, and AI agents.</p><span class="docs-link">View tutorials <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span></a>
             </div>
         </div>
     </section>
@@ -1834,16 +1835,10 @@
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.querySelectorAll('.anim').forEach((el, i) => { setTimeout(() => el.classList.add('vis'), i * 100); });
-                const idx = Array.from(sections).indexOf(entry.target);
-                document.querySelectorAll('.sdot').forEach((d, i) => d.classList.toggle('active', i === idx));
             }
         });
     }, { threshold: 0.3 });
     sections.forEach(s => sObs.observe(s));
-
-    document.querySelectorAll('.sdot').forEach(d => {
-        d.addEventListener('click', () => { const idx = parseInt(d.dataset.s); if (sections[idx]) sections[idx].scrollIntoView({ behavior: 'smooth' }); });
-    });
 
     window.addEventListener('scroll', () => { document.getElementById('mainNav').classList.toggle('scrolled', scrollY > 50); });
 
@@ -1858,23 +1853,6 @@
     function closeMobile() { document.getElementById('mobileNav').classList.remove('open'); }
 
     let touchY = 0, curS = 0;
-    document.addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, { passive: true });
-    document.addEventListener('touchend', e => {
-        const dy = touchY - e.changedTouches[0].clientY;
-        if (Math.abs(dy) > 60) {
-            if (dy > 0 && curS < sections.length-1) { curS++; sections[curS].scrollIntoView({ behavior: 'smooth' }); }
-            else if (dy < 0 && curS > 0) { curS--; sections[curS].scrollIntoView({ behavior: 'smooth' }); }
-        }
-    }, { passive: true });
-
-    document.addEventListener('keydown', e => {
-        if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); if (curS < sections.length-1) { curS++; sections[curS].scrollIntoView({ behavior: 'smooth' }); } }
-        else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); if (curS > 0) { curS--; sections[curS].scrollIntoView({ behavior: 'smooth' }); } }
-    });
-
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-        a.addEventListener('click', function(e) { e.preventDefault(); const t = document.querySelector(this.getAttribute('href')); if (t) t.scrollIntoView({ behavior: 'smooth' }); });
-    });
 
     const sTrack = new IntersectionObserver(entries => {
         entries.forEach(e => { if (e.isIntersecting) curS = Array.from(sections).indexOf(e.target); });
@@ -1925,64 +1903,37 @@
 
 /* slide-gesture: wheel glides section-to-section like slideshow */
     (function(){
-        var secs = Array.prototype.slice.call(document.querySelectorAll('section'));
         var lock = false;
-        var totalSections = secs.length;
-        /* Track which section is "active" based on intersection observer */
-        var activeIdx = 0;
-        
-        /* Intersection observer to track active section */
-        var io = new IntersectionObserver(entries => {
-            entries.forEach((entry, i) => {
-                if(entry.isIntersecting) {
-                    activeIdx = i;
-                    document.querySelectorAll('.sdot').forEach((d, idx) => {
-                        d.classList.toggle('active', idx === i);
-                    });
-                }
-            });
-        }, {threshold: 0.5});
-        secs.forEach(s => io.observe(s));
-        
         function goTo(idx){
-            if(idx < 0 || idx >= totalSections) return;
+            if(idx < 0 || idx >= sections.length) return;
             if(lock) return;
-            activeIdx = idx;
             lock = true;
-            secs[idx].scrollIntoView({behavior:'smooth'});
-            setTimeout(function(){ lock = false; }, 800);
+            curS = idx;
+            sections[idx].scrollIntoView({behavior:'smooth'});
+            document.querySelectorAll('.sdot').forEach((d, i) => d.classList.toggle('active', i === idx));
+            setTimeout(function(){ lock = false; }, 600);
         }
         
-        function current(){
-            return activeIdx;
-        }
-        
+        /* Wheel: slideshow-style navigation */
         window.addEventListener('wheel', function(e){
-            if(lock || Math.abs(e.deltaY) < 8) return;
-            var i = current();
-            var nxt = e.deltaY > 0 ? i + 1 : i - 1;
-            if(nxt < 0 || nxt >= totalSections) return;
+            if(lock || Math.abs(e.deltaY) < 12) return;
             e.preventDefault();
-            goTo(nxt);
+            goTo(curS + (e.deltaY > 0 ? 1 : -1));
         }, {passive:false});
         
-        /* Keyboard navigation */
+        /* Keyboard: ArrowDown/ArrowUp and PageDown/PageUp */
         document.addEventListener('keydown', e => {
-            if(e.key === 'ArrowDown') {
-                e.preventDefault();
-                goTo(current() + 1);
-            } else if(e.key === 'ArrowUp') {
-                e.preventDefault();
-                goTo(current() - 1);
+            if(e.key === 'ArrowDown' || e.key === 'PageDown') {
+                e.preventDefault(); goTo(curS + 1);
+            } else if(e.key === 'ArrowUp' || e.key === 'PageUp') {
+                e.preventDefault(); goTo(curS - 1);
             }
         });
         
-        /* Mouse wheel delta more sensitive */
-        window.addEventListener('DOMMouseScroll', function(e){
-            if(lock) return;
-            e.preventDefault();
-            goTo(current() - (e.detail > 0 ? 1 : -1));
-        }, {passive:false});
+        /* Dot navigation */
+        document.querySelectorAll('.sdot').forEach(d => {
+            d.addEventListener('click', () => goTo(parseInt(d.dataset.s)));
+        });
     })();
 
     /* founders live counter (wallets seen on the VM) */

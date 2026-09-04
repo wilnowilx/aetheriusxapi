@@ -163,13 +163,56 @@ async function loadHealth(){
   }
 }
 
+const WIKI_DB = {
+  "/v1/maps/search":"Searches businesses by keyword and location via OpenStreetMap. Returns name, address, distance. Good for location-aware agents.",
+  "/v1/maps/reviews":"Looks up a specific place by name. Returns rating, type, coordinates. Useful for business research agents.",
+  "/v1/maps/nearby":"Finds nearby places by lat/lon coordinates. Filter by radius and category. Perfect for navigation agents.",
+  "/v1/maps/reverse":"Reverse geocoding: converts lat/lon coordinates to a human-readable address. Used by mapping agents.",
+  "/v1/maps/geocode":"Forward geocoding: converts a place name or address to coordinates. Essential for location-based queries.",
+  "/v1/token/analyze":"Analyzes an ERC-20 token contract. Returns name, symbol, decimals, total supply. Used by DeFi agents.",
+  "/v1/token/holders":"Shows the top holders of a token. Returns wallet addresses and balances. Key for whale-watching agents.",
+  "/v1/token/price":"Real-time token price in USD. Supports Base, Ethereum, and other chains. Used by trading agents.",
+  "/v1/token/prices":"Batch token prices for multiple addresses in one call. Saves gas and latency for portfolio agents.",
+  "/v1/token/gas":"Current gas price oracle for any EVM chain. Helps agents estimate transaction costs.",
+  "/v1/token/global":"Global crypto market stats: total market cap, BTC dominance, total volume. Used by macro agents.",
+  "/v1/token/balance":"Reads ETH or ERC-20 balance for any wallet address on any supported chain.",
+  "/v1/token/transactions":"Lists recent transactions for a wallet address. Returns hash, value, timestamps.",
+  "/v1/web/scrape":"Scrapes any URL and returns the full HTML content. Powers content extraction agents.",
+  "/v1/web/screenshot":"Takes a screenshot of any URL. Returns the image. Used by monitoring agents.",
+  "/v1/web/geoip":"Geolocates an IP address. Returns country, city, ISP. Used by security and analytics agents.",
+  "/v1/web/dns":"DNS lookup for any domain. Returns A, AAAA, MX, TXT records. Used by infrastructure agents.",
+  "/v1/email/validate":"Validates email syntax, MX records, and disposable detection. Returns risk score and verdict.",
+  "/v1/data/weather":"Current weather by coordinates. Returns temp, humidity, conditions. Used by logistics agents.",
+  "/v1/data/forecast":"7-day weather forecast by coordinates. Returns daily high/low and conditions.",
+  "/v1/data/airquality":"Air quality index by coordinates. Returns AQI and pollutant levels. Used by health agents.",
+  "/v1/data/define":"Dictionary lookup: returns definition, part of speech, synonyms, antonyms. Used by NLP agents.",
+  "/v1/data/elevation":"Returns elevation above sea level for any coordinates. Used by terrain and mapping agents.",
+  "/v1/data/words":"Word relationship API: synonyms, antonyms, hypernyms. Powers language and NLP agents.",
+  "/v1/storage/drift":"Measures cross-RPC slot drift on Base. Shows clock skew between different data layers.",
+  "/v1/defi/yields":"Top yield farming pools across DeFi. Returns APY, TVL, chain. Used by yield-aggregator agents.",
+  "/v1/defi/stablecoins":"Lists all stablecoins with market cap, peg info, and chain distribution.",
+  "/v1/defi/fees":"Protocol fee revenue across DeFi. Returns 24h fees, 7d fees. Used by fundamental analysis agents.",
+  "/v1/defi/tvl":"Total value locked by chain. Shows which chains are attracting the most capital.",
+  "/v1/defi/protocols":"Lists DeFi protocols ranked by TVL. Returns name, chain, category.",
+  "/v1/defi/dexs":"DEX trading volumes. Returns 24h volume, chain, type. Used by market analysis agents.",
+  "/v1/defi/stablecoinchains":"Stablecoin distribution across chains. Shows where stablecoin liquidity sits.",
+  "/v1/defi/stablecoin-history":"Historical stablecoin market cap data. Used by macro analysis agents.",
+  "/v1/forex/rates":"Real-time fiat forex rates. Returns rates for any base currency pair.",
+  "/v1/forex/history":"Historical forex rates for a date range. Used by financial analysis agents.",
+  "/v1/forex/convert":"Converts an amount between any two currencies using live rates.",
+  "/v1/news/hackernews":"Hacker News front page. Returns top/new/best stories with scores and comment counts.",
+  "/v1/news/hn-item":"Fetches any HN item by ID. Returns title, URL, score, comments.",
+  "/v1/news/hn-user":"Fetches any HN user profile. Returns karma, about, submission count.",
+  "/v1/news/hn-feed":"HN Ask/Show/Jobs feeds. Returns curated content from specific HN categories."
+};
 function renderCatalog(eps){
   const box = $("#catalog"); box.innerHTML = "";
   Object.keys(SPECS).forEach(route=>{
     const [price,desc] = splitMeta(eps[route] || FALLBACK_META[route]);
+    const wiki = WIKI_DB[route] || desc;
     const d = document.createElement("div");
     d.className = "ep"; d.dataset.route = route;
-    d.innerHTML = `<div class="ep-info"><code>GET ${route}</code><small>${desc}</small></div><span class="price">${price}</span>`;
+    d.innerHTML = `<div class="ep-row"><span class="method-badge">GET</span><code>${route}</code><span class="price">${price}</span></div><div class="ep-info">${desc}</div><div class="ep-wiki"><div class="wk-title">${route}</div><div class="wk-desc">${wiki}</div></div>`;
     d.onclick = ()=>select(route);
     box.appendChild(d);
   });
