@@ -1,7 +1,7 @@
 <div align="center">
 
 ![AETHERIUS](https://img.shields.io/badge/AETHERIUS-aetheriusxAPI-8B5CF6?style=for-the-badge&labelColor=09090b)
-![Testnet](https://img.shields.io/badge/Base_Sepolia-Live-10B981?style=for-the-badge&labelColor=09090b)
+![Mainnet](https://img.shields.io/badge/Base_Mainnet-LIVE-10B981?style=for-the-badge&labelColor=09090b)
 ![x402](https://img.shields.io/badge/x402-Protocol-10B981?style=for-the-badge&labelColor=09090b)
 ![USDC](https://img.shields.io/badge/USDC-Payments-2775CA?style=for-the-badge&labelColor=09090b)
 ![Endpoints](https://img.shields.io/badge/Endpoints-64-d946ef?style=for-the-badge&labelColor=09090b)
@@ -65,9 +65,10 @@
 
 <div align="center">
 
-![Days](https://img.shields.io/badge/🕐_days_since_repo_born-2-blueviolet?style=for-the-badge&labelColor=09090b&cacheSeconds=3600)
+![Days](https://img.shields.io/badge/🕐_days_since_repo_born-3-blueviolet?style=for-the-badge&labelColor=09090b&cacheSeconds=3600)
 
 > **Repo born:** Sep 2, 2026 — `3a6aeb6` "Initial commit"
+> **Mainnet deploy:** Sep 5, 2026 — Real x402 payments on Base Mainnet 🚀
 
 </div>
 
@@ -195,8 +196,8 @@ If payment authorization and API access are expressed in the same HTTP interacti
 
 | Signal | Value |
 |--------|-------|
-| Network | Base Sepolia `eip155:84532` (mainnet after funding) |
-| Mode | `real` — on-chain USDC verification via facilitator |
+| **Network** | **Base Mainnet `eip155:8453`** 🔴 LIVE |
+| **Mode** | **`real` — on-chain USDC verification via x402 facilitator** |
 | Health | `GET /health` (free) |
 | Telemetry | `GET /v1/telemetry` (free): uptime, per-endpoint stats, settled USDC volume |
 | Playground | [`/`](https://wilnowilx.github.io/aetheriusxapi/) — interactive endpoint testing |
@@ -205,7 +206,8 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | Version | v2.0.0 · 64 endpoints · 60/60 tests green |
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 testnet USDC |
 
-Snapshot 2026-09-04: E2E 6/6 paid endpoints → 200 with real settlement.
+🚀 **Sep 5, 2026:** Deployed to Base Mainnet! Real USDC payments now live.
+💵 **Wallet:** `0x677B483128D0399bCD0A5AB36eE990C0246d7f61` (receiving real payments)
 
 ---
 
