@@ -7,7 +7,7 @@
     <meta property="og:description" content="64 live APIs where AI agents pay per request in USDC on Base. No accounts. No subscriptions. Just code.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://wilnowilx.github.io/aetheriusxapi/">
-    <meta property="og:image" content="https://img.shields.io/badge/AETHERIUS-live_on_Base_Sepolia-8B5CF6?style=for-the-badge">
+    <meta property="og:image" content="https://img.shields.io/badge/AETHERIUS-live_on_Base_Mainnet-8B5CF6?style=for-the-badge">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@aetheriusxAPI">
     <title>AETHERIUS — AI Agent Commerce Platform | x402 API Marketplace</title>
@@ -1861,7 +1861,7 @@
             <div class="hero-badges">
                 <div class="hero-badge">
                     <div class="hero-dot dot-green"></div>
-                    Live on Testnet
+                    Live on Mainnet
                 </div>
                 <div class="hero-badge">
                     <div class="hero-dot dot-orange"></div>
@@ -2300,8 +2300,8 @@
                             <div class="timeline-dot"></div>
                             <div class="timeline-content">
                                 <div class="timeline-date">Aug 2026</div>
-                                <div class="timeline-title">Testnet Launch</div>
-                                <div class="timeline-desc">64 live APIs on Base Sepolia</div>
+                                <div class="timeline-title">Mainnet Launch</div>
+                                <div class="timeline-desc">64 live APIs on Base Mainnet</div>
                             </div>
                         </div>
                         <div class="timeline-item done">
@@ -2840,14 +2840,14 @@
             };
             const demo = demoResponses[selectedEndpoint] || { message: 'Demo response — API will return real data on mainnet', endpoint: selectedEndpoint };
 
-            responseEl.innerHTML = `<span style="color:var(--cyan);">// Demo response (testnet offline)</span>\n` +
+            responseEl.innerHTML = `<span style="color:var(--cyan);">// Demo response (mainnet live)</span>\n` +
                 JSON.stringify(demo, null, 2).split('\n').map(line =>
                     line.replace(/"([^"]+)":/g, '<span style="color:var(--purple-light);">"$1"</span>:')
                         .replace(/: "([^"]+)"/g, ': <span style="color:var(--magenta-light);">"$1"</span>')
                         .replace(/: (\d+)/g, ': <span style="color:var(--orange);">$1</span>')
                         .replace(/: (true|false)/g, ': <span style="color:var(--cyan);">$1</span>')
                 ).join('\n') +
-                `\n\n<span style="color:var(--text-muted);">// ⚠️ Testnet is currently offline</span>\n<span style="color:var(--text-muted);">// On mainnet, this returns live data + settles USDC</span>`;
+                `\n\n<span style="color:var(--text-muted);">// ⚠️ Mainnet is currently offline</span>\n<span style="color:var(--text-muted);">// On mainnet, this returns live data + settles USDC</span>`;
             statusEl.textContent = 'Demo Mode';
             statusEl.style.background = 'rgba(6, 182, 212, 0.15)';
             statusEl.style.color = 'var(--cyan)';

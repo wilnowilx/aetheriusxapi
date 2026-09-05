@@ -94,7 +94,7 @@ timeline
 |-------|------|------|--------|
 | May–Aug 2026 | Research, x402 study, VM stabilization — an idea this size needs study before it can be visualized | ~4 months | workspace history |
 | **Sep 2** — 1st deploy | Repo born, landing page, docs, Python SDK, persistent SQLite telemetry | **t+0 min** | `git log --oneline 3a6aeb6` |
-| **Sep 2** — 2nd deploy | Backend v2.0, 40 endpoints, real USDC on Base Sepolia, 5-source price chain | **t+47 min** | `git log --oneline --since="2026-09-02" --until="2026-09-03"` |
+| **Sep 2** — 2nd deploy | Backend v2.0, 40 endpoints, real USDC on Base Mainnet, 5-source price chain | **t+47 min** | `git log --oneline --since="2026-09-02" --until="2026-09-03"` |
 | **Sep 5** — 8th deploy | 64 endpoints (+24): crypto market, web tools, data utils, news, DeFi tools, NFT | **t+55h+** | `git log -1 --format=%H` |
 | **Sep 3** — 3rd deploy | Dashboard OS mode, HTTPS (Let's Encrypt), CORS, JS SDK, 60/60 tests | **t+18h 23min** | `git log --oneline --since="2026-09-03"` |
 | **Sep 3** — 4th deploy | Demo player, cast replay, typewriter, 10+ tutorials EN/ES | **t+22h 41min** | same |
@@ -149,7 +149,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 **Mission:** Become the default API layer for autonomous agents — the Stripe of the agent economy.
 
 **Strategy:**
-1. **Live now:** 8 categories, 64 endpoints verified with real USDC on Base Sepolia
+1. **Live now:** 8 categories, 64 endpoints verified with real USDC on Base Mainnet
 2. **Next:** mainnet (1 env var + funding) + 10-per-category depth
 3. **Scale** to 120+ with grant funding, then 500+
 4. **Become** the infrastructure that AI agents depend on
@@ -204,7 +204,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | Dashboard | [`/dashboard/`](https://wilnowilx.github.io/aetheriusxapi/dashboard/) + backend bar |
 | Live API | `http://34.156.149.38/aetherapi` · TLS `https://34-156-149-38.sslip.io/aetherapi` |
 | Version | v2.0.0 · 64 endpoints · 60/60 tests green |
-| YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 testnet USDC |
+| YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 mainnet USDC |
 
 🚀 **Sep 5, 2026:** Deployed to Base Mainnet! Real USDC payments now live.
 💵 **Wallet:** `0x677B483128D0399bCD0A5AB36eE990C0246d7f61` (receiving real payments)
@@ -213,12 +213,12 @@ If payment authorization and API access are expressed in the same HTTP interacti
 
 ## 🎬 Live Demo
 
-Unedited terminal replay. One agent, one call, real USDC on Base Sepolia.
+Unedited terminal replay. One agent, one call, real USDC on Base Mainnet.
 What you see is exactly what a paying client gets.
 
 **[▶ Watch the demo](https://youtu.be/TDzMALSe00A)** · [interactive player](https://wilnowilx.github.io/aetheriusxapi/docs/demo/player.html)
 
-The replay shows the full x402 loop — discovery, payment challenge, settlement, data. No cuts, no simulated responses, no fake data. Every response is a real endpoint on testnet. The telemetry you see on the dashboard updates live.
+The replay shows the full x402 loop — discovery, payment challenge, settlement, data. No cuts, no simulated responses, no fake data. Every response is a real endpoint on mainnet. The telemetry you see on the dashboard updates live.
 
 **[Dashboard](https://wilnowilx.github.io/aetheriusxapi/dashboard/)** · [raw .cast](https://wilnowilx.github.io/aetheriusxapi/docs/demo/take-1.cast) · [script](docs/demo/demo_90s.py)
 
@@ -243,7 +243,7 @@ with AetheriusXClient() as client:  # default: http://127.0.0.1:4020
 ```
 
 `payment` is caller-supplied: any string works in local simulated mode,
-live testnet needs a real x402 USDC proof. The client never touches private keys.
+live mainnet needs a real x402 USDC proof. The client never touches private keys.
 
 ### JavaScript (`sdks/javascript/`)
 
@@ -336,7 +336,7 @@ uvicorn main:app --reload --port 4020
 - **Storage Drift** — probes `/v1/storage/drift`, shows planned payload until Phase 2
 - **Activity** — client-side call log
 
-Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
+Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ---
 
@@ -447,7 +447,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 ### Phase 1: Foundation (Current)
 - [x] Core API server with x402 middleware (simulated + real modes)
 - [x] 64 endpoints, 64 verified live with real USDC payments (no mocked data)
-- [x] E2E payment flow proven on testnet (6/6 → 200, real USDC settled)
+- [x] E2E payment flow proven on mainnet (6/6 → 200, real USDC settled)
 - [x] Upstream resilience (Overpass mirrors, 5-source price chain, Nominatim fallbacks)
 - [x] Interactive dashboard (`/dashboard/`) with API explorer
 - [x] Interactive playground — try any endpoint live from the landing page

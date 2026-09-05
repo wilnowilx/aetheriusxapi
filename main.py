@@ -45,7 +45,7 @@ from telemetry import Tracker, TelemetryMiddleware
 PAY_TO = os.getenv(
     "AETHERIUS_WALLET", "0x677B483128D0399bCD0A5AB36eE990C0246d7f61"
 )
-NETWORK = os.getenv("AETHERIUS_NETWORK", "eip155:84532")  # Base Sepolia testnet
+NETWORK = os.getenv("AETHERIUS_NETWORK", "eip155:8453")  # Base Mainnet
 CURRENCY = "USDC"
 X402_MODE = os.getenv("X402_MODE", "simulated").lower()
 FACILITATOR_URL = os.getenv("FACILITATOR_URL", "https://x402.org/facilitator")

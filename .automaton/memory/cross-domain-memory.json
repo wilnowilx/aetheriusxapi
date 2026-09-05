@@ -1,0 +1,76 @@
+{
+  "patterns": [
+    {
+      "id": "ssh-key-selector",
+      "domain": "devops",
+      "rule": "When multiple SSH keys exist, use the specific key (id_ed25519_sentinel) instead of default (google_compute_engine). SSH config overrides may not work.",
+      "confidence": 0.95
+    },
+    {
+      "id": "systemd-service-update",
+      "domain": "devops",
+      "rule": "To update systemd service: sudo tee /etc/systemd/system/service.service > /dev/null << 'EOF' ... EOF, then sudo systemctl daemon-reload && sudo systemctl restart service",
+      "confidence": 0.95
+    },
+    {
+      "id": "x402-mainnet-config",
+      "domain": "crypto",
+      "rule": "x402 mainnet requires AETHERIUS_NETWORK=eip155:8453 (Base Mainnet), not eip155:84532 (Base Sepolia). Service must set both X402_MODE=real and AETHERIUS_NETWORK.",
+      "confidence": 0.95
+    },
+    {
+      "id": "telegram-utf8-encoding",
+      "domain": "automation",
+      "rule": "Telegram API requires UTF-8 encoding. Remove emoji and special characters from message text. Use plain text without HTML parse_mode if emoji causes issues.",
+      "confidence": 0.9
+    }
+  ],
+  "mappings": [
+    {
+      "from": "ssh-config",
+      "to": "specific-key",
+      "proven_in": ["devops"]
+    },
+    {
+      "from": "x402-testnet",
+      "to": "x402-mainnet",
+      "proven_in": ["crypto"]
+    }
+  ],
+  "learnings": [
+    {
+      "date": "2026-09-05",
+      "text": "SSH key for VM sentinel-v4 is id_ed25519_sentinel, not google_compute_engine. The SSH config file points to wrong key.",
+      "files": ["~/.ssh/config"]
+    },
+    {
+      "date": "2026-09-05",
+      "text": "x402 SDK v2.21.0 already installed in VM venv. No need to reinstall.",
+      "files": ["/opt/aetherapi/venv/"]
+    },
+    {
+      "date": "2026-09-05",
+      "text": "Service uses venv at /opt/aetherapi/venv/bin/python, not system python.",
+      "files": ["/etc/systemd/system/aetherapi.service"]
+    },
+    {
+      "date": "2026-09-05",
+      "text": "Telegram bot token works for posting to channel. Use plain text without HTML for emoji compatibility.",
+      "files": ["content/telegram-mainnet-announcement.md"]
+    }
+  ],
+  "decisions": [
+    {
+      "date": "2026-09-05",
+      "question": "How to deploy to mainnet when SSH config points to wrong key?",
+      "answer": "Use specific key file: ssh -i ~/.ssh/id_ed25519_sentinel instead of relying on SSH config.",
+      "rationale": "SSH config was using google_compute_engine key which was denied. id_ed25519_sentinel works."
+    },
+    {
+      "date": "2026-09-05",
+      "question": "What network ID for Base Mainnet?",
+      "answer": "eip155:8453 (not eip155:84532 which is Base Sepolia testnet).",
+      "rationale": "x402 protocol requires correct chain ID for on-chain verification."
+    }
+  ]
+}
