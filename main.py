@@ -1870,7 +1870,7 @@ async def crypto_dominance():
 async def web_whois(domain: str = Query(..., description="Domain name")):
     """Domain WHOIS lookup."""
     try:
-        async with httpx.AsyncClient(timeout=15) as client:
+        async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
             ok, data = await fetch_json(client,
                 f"https://rdap.org/domain/{domain}")
             if not ok:
@@ -1921,7 +1921,7 @@ async def web_ssl(domain: str = Query(..., description="Domain to check")):
     try:
         ctx = ssl.create_default_context()
         with ctx.wrap_socket(socket.socket(), server_hostname=domain) as s:
-            s.settimeout(10)
+            s.settimeout(15)
             s.connect((domain, 443))
             cert = s.getpeercert()
             issuer = dict(x[0] for x in cert.get("issuer", []))
