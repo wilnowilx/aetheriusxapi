@@ -10,14 +10,15 @@
 Full-stack developer and infrastructure builder. Self-operated GCP/Europe
 environment with systemd + Nginx + auto-restart since 2024.
 
-Built AETHERIUS: 40 live x402 endpoints on Base Sepolia where AI agents
+Built AETHERIUS: 64 live x402 endpoints on Base where AI agents
 pay per request in USDC. 60/60 tests passing. Real onchain settlement.
 Interactive dashboard with API explorer. Open-source MIT license.
+Telegram bot with autonomous AI brain. GitHub Actions auto-posting.
 
 Stack: Python, FastAPI, x402 protocol, NATS telemetry, SQLite,
-Kubernetes, CI/CD pipelines. Google for Startups member.
+Docker, CI/CD pipelines. Google for Startups member.
 
-Currently scaling from 40 to 120+ endpoints across 12 categories.
+Currently scaling to 120+ endpoints across 12 categories.
 Targeting mainnet deployment with grant funding.
 ```
 
@@ -35,7 +36,10 @@ https://x.com/aetheriusxAPI
 ```
 https://x.com/aetheriusxAPI
 ```
-(Usa tu X como LinkedIn — no es mentira, es el perfil profesional público)
+(Use tu X como LinkedIn — es tu perfil profesional público con historial de construccion)
+
+**Si el formulario exige linkedin.com:** Contactar a Base por DM en X explicando
+la situacion con KYC. Los builders de Base entienden estas barreras.
 
 ### Team Size
 ```
@@ -55,7 +59,11 @@ Mexico City, Mexico
 ```
 Crypto-native API marketplace where AI agents pay per request in USDC on Base via x402.
 
-40 live endpoints (maps, crypto, DeFi, news, web, forex, data) verified on Base Sepolia testnet. Real USDC payments settling onchain. Interactive dashboard. Open-source MIT. EN + ES tutorials.
+64 live endpoints (maps, crypto, DeFi, news, web, forex, data, NFT, translation)
+verified on Base Sepolia with real USDC payments settling onchain.
+Interactive dashboard. Open-source MIT. EN + ES tutorials.
+Telegram bot with autonomous AI brain for community engagement.
+GitHub Actions auto-posting for hands-off marketing.
 
 Video demo: https://youtu.be/TDzMALSe00A
 ```
@@ -80,7 +88,7 @@ Video demo: https://youtu.be/TDzMALSe00A
 
 ### What will you build with the grant?
 ```
-Scale AETHERIUS from 40 to 120+ live x402 endpoints across 12 categories.
+Scale AETHERIUS from 64 to 120+ live x402 endpoints across 12 categories.
 Deploy to Base Mainnet with real USDC settlement. Build Python + JavaScript
 SDKs for agent developers. Implement drift detection and NATS-based
 distributed telemetry. Create EN/ES tutorials documenting real infrastructure.
