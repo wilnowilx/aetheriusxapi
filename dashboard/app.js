@@ -46,6 +46,26 @@ const SPECS = {
   "/v1/forex/convert": [{n:"from",r:0,d:"USD"},{n:"to",r:0,d:"MXN"},{n:"amount",r:0,t:"n",d:"100"}],
   "/v1/news/hn-feed": [{n:"kind",r:0,d:"ask"},{n:"limit",r:0,t:"n",d:"5"}],
   "/v1/web/dns": [{n:"name",r:1,d:"example.com"},{n:"type",r:0,d:"A"}],
+  "/v1/crypto/market": [],
+  "/v1/crypto/fear-greed": [{n:"limit",r:0,t:"n",d:"30"}],
+  "/v1/crypto/trending": [],
+  "/v1/crypto/ohlcv": [{n:"coin",r:0,d:"bitcoin"},{n:"vs",r:0,d:"usd"},{n:"days",r:0,t:"n",d:"7"}],
+  "/v1/crypto/dominance": [],
+  "/v1/web/whois": [{n:"domain",r:1}],
+  "/v1/web/headers": [{n:"url",r:1}],
+  "/v1/web/ssl": [{n:"domain",r:1}],
+  "/v1/data/ip": [{n:"ip",r:0,d:"me"}],
+  "/v1/data/ua": [{n:"user_agent",r:1}],
+  "/v1/data/hash": [{n:"text",r:1},{n:"algo",r:0,d:"sha256"}],
+  "/v1/data/uuid": [{n:"count",r:0,t:"n",d:"1"}],
+  "/v1/data/qrcode": [{n:"text",r:1},{n:"size",r:0,t:"n",d:"200"}],
+  "/v1/news/reddit": [{n:"subreddit",r:0,d:"cryptocurrency"},{n:"sort",r:0,d:"hot"},{n:"limit",r:0,t:"n",d:"25"}],
+  "/v1/news/devto": [{n:"tag",r:0,d:"javascript"},{n:"per_page",r:0,t:"n",d:"20"}],
+  "/v1/defi/impermanent-loss": [{n:"entry_price",r:1,t:"n"},{n:"current_price",r:1,t:"n"}],
+  "/v1/defi/staking-apy": [],
+  "/v1/token/nft": [{n:"contract",r:1},{n:"token_id",r:0,d:"1"},{n:"chain",r:0,d:"ethereum"}],
+  "/v1/data/translate": [{n:"text",r:1},{n:"source",r:0,d:"auto"},{n:"target",r:0,d:"es"}],
+  "/v1/data/summarize": [{n:"text",r:1},{n:"sentences",r:0,t:"n",d:"3"}],
 };
 const FALLBACK_META = {
   "/v1/maps/search":"$0.01/call - Business search via OpenStreetMap",
@@ -88,6 +108,26 @@ const FALLBACK_META = {
   "/v1/forex/convert":"$0.008/call - Convert",
   "/v1/news/hn-feed":"$0.01/call - Ask/Show/Jobs",
   "/v1/web/dns":"$0.005/call - DNS lookup",
+  "/v1/crypto/market":"$0.01/call - Global crypto market",
+  "/v1/crypto/fear-greed":"$0.005/call - Fear & Greed",
+  "/v1/crypto/trending":"$0.01/call - Trending coins",
+  "/v1/crypto/ohlcv":"$0.015/call - OHLCV candles",
+  "/v1/crypto/dominance":"$0.008/call - Crypto dominance",
+  "/v1/web/whois":"$0.01/call - WHOIS lookup",
+  "/v1/web/headers":"$0.005/call - HTTP headers",
+  "/v1/web/ssl":"$0.008/call - SSL cert info",
+  "/v1/data/ip":"$0.005/call - IP geolocation",
+  "/v1/data/ua":"$0.003/call - User-Agent parser",
+  "/v1/data/hash":"$0.002/call - Hash generator",
+  "/v1/data/uuid":"$0.001/call - UUID generator",
+  "/v1/data/qrcode":"$0.005/call - QR code",
+  "/v1/news/reddit":"$0.01/call - Reddit posts",
+  "/v1/news/devto":"$0.008/call - Dev.to articles",
+  "/v1/defi/impermanent-loss":"$0.01/call - IL calculator",
+  "/v1/defi/staking-apy":"$0.01/call - Staking APY",
+  "/v1/token/nft":"$0.02/call - NFT metadata",
+  "/v1/data/translate":"$0.01/call - Text translation",
+  "/v1/data/summarize":"$0.015/call - Text summarizer",
 };
 
 const state = { health:null, selected:null };
@@ -203,16 +243,53 @@ const WIKI_DB = {
   "/v1/news/hackernews":"Hacker News front page. Returns top/new/best stories with scores and comment counts.",
   "/v1/news/hn-item":"Fetches any HN item by ID. Returns title, URL, score, comments.",
   "/v1/news/hn-user":"Fetches any HN user profile. Returns karma, about, submission count.",
-  "/v1/news/hn-feed":"HN Ask/Show/Jobs feeds. Returns curated content from specific HN categories."
+  "/v1/news/hn-feed":"HN Ask/Show/Jobs feeds. Returns curated content from specific HN categories.",
+  "/v1/crypto/market": { name: "Crypto Market", category: "Crypto", description: "Global crypto market data - total MC, volume, BTC dominance", params: [], response: "{ total_market_cap_usd, total_volume_usd, btc_dominance, eth_dominance, active_cryptos }", price: "$0.01" },
+  "/v1/crypto/fear-greed": { name: "Fear & Greed Index", category: "Crypto", description: "Crypto Fear & Greed Index - current value and history", params: [{ name: "limit", type: "int", default: 30, description: "Data points" }], response: "{ current_value, current_label, history[] }", price: "$0.005" },
+  "/v1/crypto/trending": { name: "Trending Coins", category: "Crypto", description: "Trending coins on CoinGecko", params: [], response: "{ trending[] }", price: "$0.01" },
+  "/v1/crypto/ohlcv": { name: "OHLCV Candles", category: "Crypto", description: "OHLCV candlestick data for any coin pair", params: [{ name: "coin", type: "string", default: "bitcoin" }, { name: "vs", type: "string", default: "usd" }, { name: "days", type: "int", default: 7 }], response: "{ coin, candles[] }", price: "$0.015" },
+  "/v1/crypto/dominance": { name: "Crypto Dominance", category: "Crypto", description: "Crypto dominance indices - BTC, ETH, and altcoin shares", params: [], response: "{ btc, eth, usdt, bnb, sol, others }", price: "$0.008" },
+  "/v1/web/whois": { name: "WHOIS Lookup", category: "Web", description: "Domain WHOIS lookup - registrar, dates, nameservers", params: [{ name: "domain", type: "string", required: true }], response: "{ domain, status, registration, expiration, nameservers[] }", price: "$0.01" },
+  "/v1/web/headers": { name: "HTTP Headers", category: "Web", description: "HTTP response headers checker for any URL", params: [{ name: "url", type: "string", required: true }], response: "{ url, status_code, headers, content_type, server, cors }", price: "$0.005" },
+  "/v1/web/ssl": { name: "SSL Certificate", category: "Web", description: "SSL certificate info - issuer, expiry, chain", params: [{ name: "domain", type: "string", required: true }], response: "{ domain, subject, issuer_org, not_before, not_after, san[] }", price: "$0.008" },
+  "/v1/data/ip": { name: "IP Geolocation", category: "Data", description: "IP address geolocation - city, country, coordinates", params: [{ name: "ip", type: "string", default: "me" }], response: "{ ip, city, region, country, lat, lon, org, timezone }", price: "$0.005" },
+  "/v1/data/ua": { name: "User-Agent Parser", category: "Data", description: "User-Agent parser - browser, OS, device type", params: [{ name: "user_agent", type: "string", required: true }], response: "{ user_agent, browser, os, device }", price: "$0.003" },
+  "/v1/data/hash": { name: "Hash Generator", category: "Data", description: "Hash generator - MD5, SHA1, SHA256, SHA512", params: [{ name: "text", type: "string", required: true }, { name: "algo", type: "string", default: "sha256" }], response: "{ text, algorithm, hash }", price: "$0.002" },
+  "/v1/data/uuid": { name: "UUID Generator", category: "Data", description: "UUID v4 generator", params: [{ name: "count", type: "int", default: 1 }], response: "{ uuids[], count }", price: "$0.001" },
+  "/v1/data/qrcode": { name: "QR Code Generator", category: "Data", description: "QR code generator as data URL", params: [{ name: "text", type: "string", required: true }, { name: "size", type: "int", default: 200 }], response: "{ text, data_url, qr_url }", price: "$0.005" },
+  "/v1/news/reddit": { name: "Reddit Posts", category: "News", description: "Reddit posts from any subreddit", params: [{ name: "subreddit", type: "string", default: "cryptocurrency" }, { name: "sort", type: "string", default: "hot" }, { name: "limit", type: "int", default: 25 }], response: "{ subreddit, posts[] }", price: "$0.01" },
+  "/v1/news/devto": { name: "Dev.to Articles", category: "News", description: "Dev.to articles - latest tech posts", params: [{ name: "tag", type: "string", default: "javascript" }, { name: "per_page", type: "int", default: 20 }], response: "{ articles[] }", price: "$0.008" },
+  "/v1/defi/impermanent-loss": { name: "IL Calculator", category: "DeFi", description: "Impermanent loss calculator for LP positions", params: [{ name: "entry_price", type: "float", required: true }, { name: "current_price", type: "float", required: true }], response: "{ price_ratio, impermanent_loss_pct }", price: "$0.01" },
+  "/v1/defi/staking-apy": { name: "Staking APY", category: "DeFi", description: "Staking APY tracker for major protocols", params: [], response: "{ pools[] }", price: "$0.01" },
+  "/v1/token/nft": { name: "NFT Metadata", category: "Token", description: "NFT metadata fetcher - name, image, attributes", params: [{ name: "contract", type: "string", required: true }, { name: "token_id", type: "string", default: "1" }, { name: "chain", type: "string", default: "ethereum" }], response: "{ name, description, image_url, collection, attributes[] }", price: "$0.02" },
+  "/v1/data/translate": { name: "Text Translation", category: "Data", description: "Text translation via free API", params: [{ name: "text", type: "string", required: true }, { name: "source", type: "string", default: "auto" }, { name: "target", type: "string", default: "es" }], response: "{ text, translation, confidence }", price: "$0.01" },
+  "/v1/data/summarize": { name: "Text Summarizer", category: "Data", description: "Extractive text summarizer", params: [{ name: "text", type: "string", required: true }, { name: "sentences", type: "int", default: 3 }], response: "{ summary, original_sentences, summary_sentences }", price: "$0.015" }
 };
 function renderCatalog(eps){
   const box = $("#catalog"); box.innerHTML = "";
-  Object.keys(SPECS).forEach(route=>{
+  const CARDINALS = {};
+  const allRoutes = [...Object.keys(SPECS)];
+  allRoutes.forEach(route=>{
     const [price,desc] = splitMeta(eps[route] || FALLBACK_META[route]);
-    const wiki = WIKI_DB[route] || desc;
+    const wikiRaw = WIKI_DB[route];
+    let wiki, wikiName;
+    if(wikiRaw && typeof wikiRaw === "object"){
+      wiki = wikiRaw.description;
+      wikiName = wikiRaw.name || route;
+      const cat = wikiRaw.category || "Other";
+      CARDINALS[cat] = (CARDINALS[cat]||0) + 1;
+    } else {
+      wiki = wikiRaw || desc;
+      wikiName = route;
+    }
     const d = document.createElement("div");
     d.className = "ep"; d.dataset.route = route;
-    d.innerHTML = `<div class="ep-row"><span class="method-badge">GET</span><code>${route}</code><span class="price">${price}</span></div><div class="ep-info">${desc}</div><div class="ep-wiki"><div class="wk-title">${route}</div><div class="wk-desc">${wiki}</div></div>`;
+    if(wikiRaw && typeof wikiRaw === "object"){
+      d.dataset.category = wikiRaw.category || "";
+      d.innerHTML = `<div class="ep-row"><span class="method-badge">GET</span><code>${route}</code><span class="price">${wikiRaw.price || price}</span></div><div class="ep-info">${wikiRaw.description || desc}</div><div class="ep-wiki"><div class="wk-title">${wikiName} <span class="wk-cat">${wikiRaw.category||""}</span></div><div class="wk-desc">${wiki}</div>${wikiRaw.response ? '<div class="wk-resp"><code>'+wikiRaw.response+'</code></div>' : ''}</div>`;
+    } else {
+      d.innerHTML = `<div class="ep-row"><span class="method-badge">GET</span><code>${route}</code><span class="price">${price}</span></div><div class="ep-info">${desc}</div><div class="ep-wiki"><div class="wk-title">${route}</div><div class="wk-desc">${wiki}</div></div>`;
+    }
     d.onclick = ()=>select(route);
     box.appendChild(d);
   });

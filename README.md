@@ -4,7 +4,7 @@
 ![Testnet](https://img.shields.io/badge/Base_Sepolia-Live-10B981?style=for-the-badge&labelColor=09090b)
 ![x402](https://img.shields.io/badge/x402-Protocol-10B981?style=for-the-badge&labelColor=09090b)
 ![USDC](https://img.shields.io/badge/USDC-Payments-2775CA?style=for-the-badge&labelColor=09090b)
-![Endpoints](https://img.shields.io/badge/Endpoints-40-d946ef?style=for-the-badge&labelColor=09090b)
+![Endpoints](https://img.shields.io/badge/Endpoints-64-d946ef?style=for-the-badge&labelColor=09090b)
 ![Tests](https://img.shields.io/badge/Tests-60_passing-brightgreen?style=for-the-badge&labelColor=09090b)
 ![Dashboard](https://img.shields.io/badge/Dashboard-Live-ec4899?style=for-the-badge&labelColor=09090b)
 ![SDK](https://img.shields.io/badge/Python_SDK-ready-3776AB?style=for-the-badge&labelColor=09090b)
@@ -23,7 +23,7 @@
 
 ### The Operating System for AI Agent Commerce
 
-**40 live APIs (120+ on the roadmap) where autonomous AI agents pay per request in USDC on Base.**
+**64 live APIs (120+ on the roadmap) where autonomous AI agents pay per request in USDC on Base.**
 **No accounts. No subscriptions. No human friction. Just code.**
 
 [Website](https://wilnowilx.github.io/aetheriusxapi/) · [Documentation](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) · [Tutoriales (ES)](https://github.com/wilnowilx/aetheriusxapi/tree/main/docs/tutorials) · [Twitter](https://x.com/aetheriusxAPI) · [Telegram](https://t.me/aetheriusxAPI) · [x402 Protocol](https://x402.org)
@@ -85,6 +85,7 @@ timeline
     Research : x402 study : market mapping : VM stabilization
     Sep 2 : Repo born : landing + docs : Python SDK : persistent telemetry
     Sep 3 : Backend v2 + dashboard + HTTPS : 40 endpoints : JS SDK : demo + player
+    Sep 5 : 64 endpoints : crypto, web, data, news, defi, token categories
     Sep 4 : Player v2 + wiki tooltips : Dashboard catalog fix : README rewrite
 ```
 
@@ -93,6 +94,7 @@ timeline
 | May–Aug 2026 | Research, x402 study, VM stabilization — an idea this size needs study before it can be visualized | ~4 months | workspace history |
 | **Sep 2** — 1st deploy | Repo born, landing page, docs, Python SDK, persistent SQLite telemetry | **t+0 min** | `git log --oneline 3a6aeb6` |
 | **Sep 2** — 2nd deploy | Backend v2.0, 40 endpoints, real USDC on Base Sepolia, 5-source price chain | **t+47 min** | `git log --oneline --since="2026-09-02" --until="2026-09-03"` |
+| **Sep 5** — 8th deploy | 64 endpoints (+24): crypto market, web tools, data utils, news, DeFi tools, NFT | **t+55h+** | `git log -1 --format=%H` |
 | **Sep 3** — 3rd deploy | Dashboard OS mode, HTTPS (Let's Encrypt), CORS, JS SDK, 60/60 tests | **t+18h 23min** | `git log --oneline --since="2026-09-03"` |
 | **Sep 3** — 4th deploy | Demo player, cast replay, typewriter, 10+ tutorials EN/ES | **t+22h 41min** | same |
 | **Sep 3** — 5th deploy | README brutal (7 SVG diagrams), release v2.0.0, 15 GitHub topics | **t+23h 15min** | `git tag -l` |
@@ -101,7 +103,7 @@ timeline
 
 **Total commits:** 100+ and counting (`git log --oneline | wc -l` — velocity is public).
 
-**Build velocity:** 40 endpoints + 60 tests + 2 SDKs + dashboard + landing + playground + demo + 2 grant submissions in **55 hours**.
+**Build velocity:** 64 endpoints + 60 tests + 2 SDKs + dashboard + landing + playground + demo + 2 grant submissions in **55 hours**.
 If one person builds this in 55 hours, imagine what funded builders ship on Base.
 
 ---
@@ -146,7 +148,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 **Mission:** Become the default API layer for autonomous agents — the Stripe of the agent economy.
 
 **Strategy:**
-1. **Live now:** 8 categories, 40 endpoints verified with real USDC on Base Sepolia
+1. **Live now:** 8 categories, 64 endpoints verified with real USDC on Base Sepolia
 2. **Next:** mainnet (1 env var + funding) + 10-per-category depth
 3. **Scale** to 120+ with grant funding, then 500+
 4. **Become** the infrastructure that AI agents depend on
@@ -200,7 +202,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | Playground | [`/`](https://wilnowilx.github.io/aetheriusxapi/) — interactive endpoint testing |
 | Dashboard | [`/dashboard/`](https://wilnowilx.github.io/aetheriusxapi/dashboard/) + backend bar |
 | Live API | `http://34.156.149.38/aetherapi` · TLS `https://34-156-149-38.sslip.io/aetherapi` |
-| Version | v2.0.0 · 40 endpoints · 60/60 tests green |
+| Version | v2.0.0 · 64 endpoints · 60/60 tests green |
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 testnet USDC |
 
 Snapshot 2026-09-04: E2E 6/6 paid endpoints → 200 with real settlement.
@@ -325,7 +327,7 @@ uvicorn main:app --reload --port 4020
 # open http://127.0.0.1:4020/dashboard/
 ```
 
-- **API Catalog** — all 40 endpoints with live prices from `/health`
+- **API Catalog** — all 64 endpoints with live prices from `/health`
 - **Explorer** — param forms, one-click paid calls, `Show 402` renders the payment challenge
 - **Live Metrics** — REAL server telemetry (`/v1/telemetry`): uptime, totals, settled USDC volume, wallets seen, latency bars, event feed. Zero simulated numbers.
 - **Wallet** — memory-only demo connect (real x402 signing in production client)
@@ -380,8 +382,28 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 | `GET /v1/news/hn-item` | HN item by ID | $0.005 | ~30ms |
 | `GET /v1/news/hn-user` | HN user profile | $0.005 | ~25ms |
 | `GET /v1/news/hn-feed` | HN Ask/Show/Jobs | $0.01 | ~45ms |
+| `GET /v1/crypto/market` | Global crypto market data | $0.01 | ~50ms |
+| `GET /v1/crypto/fear-greed` | Fear & Greed Index | $0.005 | ~30ms |
+| `GET /v1/crypto/trending` | Trending coins | $0.008 | ~40ms |
+| `GET /v1/crypto/ohlcv` | OHLCV candlestick data | $0.015 | ~60ms |
+| `GET /v1/crypto/dominance` | BTC/ETH dominance | $0.005 | ~35ms |
+| `GET /v1/web/whois` | Domain WHOIS lookup | $0.015 | ~80ms |
+| `GET /v1/web/headers` | HTTP headers checker | $0.008 | ~40ms |
+| `GET /v1/web/ssl` | SSL certificate info | $0.008 | ~45ms |
+| `GET /v1/data/ip` | IP geolocation | $0.005 | ~30ms |
+| `GET /v1/data/ua` | User-Agent parser | $0.003 | ~15ms |
+| `GET /v1/data/hash` | Hash generator (MD5/SHA) | $0.003 | ~10ms |
+| `GET /v1/data/uuid` | UUID generator | $0.003 | ~10ms |
+| `GET /v1/data/qrcode` | QR code generator | $0.005 | ~25ms |
+| `GET /v1/data/translate` | Text translation | $0.01 | ~50ms |
+| `GET /v1/data/summarize` | Text summarizer | $0.015 | ~70ms |
+| `GET /v1/news/reddit` | Reddit posts | $0.008 | ~45ms |
+| `GET /v1/news/devto` | Dev.to articles | $0.008 | ~40ms |
+| `GET /v1/defi/impermanent-loss` | IL calculator | $0.005 | ~20ms |
+| `GET /v1/defi/staking-apy` | Staking APY tracker | $0.008 | ~35ms |
+| `GET /v1/token/nft` | NFT metadata | $0.015 | ~60ms |
 
-> **Note:** These are the initial 40 endpoints. With Base Builder Grant funding, we'll expand to **120+ endpoints across 12 categories.**
+> **Note:** These are the initial 64 endpoints. With Base Builder Grant funding, we'll expand to **120+ endpoints across 12 categories.**
 
 ---
 
@@ -390,12 +412,12 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 | Category | APIs | Examples |
 |----------|------|----------|
 | **Maps & Location** | 5 | Geocoding, business search, nearby places, reverse geocode |
-| **Crypto & Tokens** | 8 | Price feeds, token analysis, holder tracking, gas oracle |
-| **Web & Scraping** | 4 | Web scraper, screenshots, DNS, IP geolocation |
-| **Email & Data** | 6 | Email validation, weather, forecasts, definitions, elevation |
-| **DeFi & Finance** | 8 | Yields, TVL, stablecoins, DEX volumes, protocol fees |
+| **Crypto & Tokens** | 13 | Price feeds, token analysis, holder tracking, gas oracle, market data, Fear & Greed, OHLCV, dominance, NFT metadata |
+| **Web & Scraping** | 7 | Web scraper, screenshots, DNS, IP geolocation, WHOIS, headers, SSL |
+| **Email & Data** | 14 | Email validation, weather, forecasts, definitions, elevation, hash, UUID, QR code, translate, summarize |
+| **DeFi & Finance** | 10 | Yields, TVL, stablecoins, DEX volumes, protocol fees, impermanent loss, staking APY |
 | **Forex** | 3 | Live rates, historical data, currency conversion |
-| **News & Media** | 4 | Hacker News front page, items, users, Ask/Show/Jobs |
+| **News & Media** | 6 | Hacker News, Reddit, Dev.to |
 | **Storage & infra** | 2 | Cross-RPC drift, on-chain verification |
 
 ---
@@ -422,7 +444,7 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ### Phase 1: Foundation (Current)
 - [x] Core API server with x402 middleware (simulated + real modes)
-- [x] 40 endpoints, 40 verified live with real USDC payments (no mocked data)
+- [x] 64 endpoints, 64 verified live with real USDC payments (no mocked data)
 - [x] E2E payment flow proven on testnet (6/6 → 200, real USDC settled)
 - [x] Upstream resilience (Overpass mirrors, 5-source price chain, Nominatim fallbacks)
 - [x] Interactive dashboard (`/dashboard/`) with API explorer
