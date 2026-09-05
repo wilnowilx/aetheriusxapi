@@ -1,5 +1,5 @@
 # AETHERIUS Telegram Auto-Post
-# Posts to Telegram when code is pushed to main
+# Posts to BOTH channel @aetherius_xAPI AND supergroup
 # Also runs daily scheduled content from calendar.json
 
 name: Telegram Auto-Post
@@ -21,13 +21,15 @@ jobs:
         with:
           fetch-depth: 10 # Get last 10 commits
 
-      - name: Post to Telegram (Push)
+      - name: Post to Telegram Channel (Push)
         if: github.event_name == 'push'
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         run: |
-          # Your Telegram chat ID (supergroup)
-          TELEGRAM_CHANNEL="-1004320337418"
+          # Channel: @aetherius_xAPI
+          CHANNEL_ID="-1004315249717"
+          # Supergroup: @aetheriusxAPI_global
+          GROUP_ID="-1004320337418"
           
           # Get commit messages
           COMMITS=$(git log --oneline -5 --pretty=format:"• %s" | head -5)
@@ -52,9 +54,16 @@ ${COMMITS}
 
 #aetheriusxAPI #Base #x402"
           
-          # Send to Telegram
+          # Send to Channel
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
-            -d chat_id="${TELEGRAM_CHANNEL}" \
+            -d chat_id="${CHANNEL_ID}" \
+            -d text="${MESSAGE}" \
+            -d parse_mode="Markdown" \
+            -d disable_web_page_preview="true"
+          
+          # Send to Supergroup
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d chat_id="${GROUP_ID}" \
             -d text="${MESSAGE}" \
             -d parse_mode="Markdown" \
             -d disable_web_page_preview="true"
@@ -64,8 +73,10 @@ ${COMMITS}
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         run: |
-          # Your Telegram chat ID (supergroup)
-          TELEGRAM_CHANNEL="-1004320337418"
+          # Channel: @aetherius_xAPI
+          CHANNEL_ID="-1004315249717"
+          # Supergroup: @aetheriusxAPI_global
+          GROUP_ID="-1004320337418"
           
           # Get today's tweet from calendar
           DAY_OF_WEEK=$(date -u +%u) # 1=Monday, 7=Sunday
@@ -83,9 +94,16 @@ ${COMMITS}
               print('🚀 AETHERIUS: Building the agent economy. 40 APIs live on Base.')
           ")
           
-          # Send to Telegram
+          # Send to Channel
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
-            -d chat_id="${TELEGRAM_CHANNEL}" \
+            -d chat_id="${CHANNEL_ID}" \
+            -d text="${CONTENT}" \
+            -d parse_mode="Markdown" \
+            -d disable_web_page_preview="true"
+          
+          # Send to Supergroup
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d chat_id="${GROUP_ID}" \
             -d text="${CONTENT}" \
             -d parse_mode="Markdown" \
             -d disable_web_page_preview="true"
