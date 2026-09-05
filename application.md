@@ -34,6 +34,9 @@ https://x.com/aetheriusxAPI
 ## Telegram
 https://t.me/aetheriusxAPI
 
+## Demo Video
+https://youtu.be/TDzMALSe00A (unedited 402→200 loop, real testnet USDC)
+
 ## Team
 
 Solo builder operating live x402 infrastructure on Base. Python, FastAPI,

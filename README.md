@@ -9,6 +9,7 @@
 ![Dashboard](https://img.shields.io/badge/Dashboard-Live-ec4899?style=for-the-badge&labelColor=09090b)
 ![SDK](https://img.shields.io/badge/Python_SDK-ready-3776AB?style=for-the-badge&labelColor=09090b)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge&labelColor=09090b)
+![YouTube](https://img.shields.io/badge/YouTube-Demo-red?style=for-the-badge&labelColor=09090b)
 ![Stars](https://img.shields.io/github/stars/wilnowilx/aetheriusxapi?style=for-the-badge&labelColor=09090b&color=8B5CF6)
 ![Forks](https://img.shields.io/github/forks/wilnowilx/aetheriusxapi?style=for-the-badge&labelColor=09090b&color=8B5CF6)
 
@@ -208,7 +209,7 @@ Snapshot 2026-09-03: E2E 6/6 paid endpoints → 200 with real settlement.
 Unedited terminal replay. One agent, one call, real USDC on Base Sepolia.
 What you see is exactly what a paying client gets.
 
-**[▶ Watch the demo](https://wilnowilx.github.io/aetheriusxapi/docs/demo/player.html)**
+**[▶ Watch the demo](https://youtu.be/TDzMALSe00A)** · [interactive player](https://wilnowilx.github.io/aetheriusxapi/docs/demo/player.html)
 
 The replay shows the full x402 loop — discovery, payment challenge, settlement, data. No cuts, no simulated responses, no fake data. Every response is a real endpoint on testnet. The telemetry you see on the dashboard updates live.
 
