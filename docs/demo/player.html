@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>aetheriusxapi — live demo (real mainnet USDC)</title>
+<title>aetheriusxapi — live demo (real testnet USDC)</title>
 <style>
 :root{--bg:#06060e;--purple:#a855f7;--magenta:#d946ef;--pink:#ec4899;--green:#10b981;--orange:#f59e0b;--text:#f0f0f5;--sec:#8a8a9a;--surface:#0e0e18;--border:rgba(168,85,247,.3)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -88,8 +88,8 @@ h1 .grad{background:linear-gradient(90deg,#a855f7,#d946ef,#ec4899);-webkit-backg
 <body>
 <div id="plasma-bg"><div class="plasma-blob"></div><div class="plasma-blob"></div><div class="plasma-blob"></div></div>
 <div class="wrap">
-<h1><span class="grad">AETHERIUS</span> — live 402→200 demo (real mainnet USDC)</h1>
-<p class="sub">Unedited terminal replay. Every call settled on Base Mainnet — verify on the <a href="https://basescan.org/address/0x677B483128D0399bCD0A5AB36eE990C0246d7f61" target="_blank">block explorer</a>.</p>
+<h1><span class="grad">AETHERIUS</span> — live 402→200 demo (real testnet USDC)</h1>
+<p class="sub">Unedited terminal replay. Every call settled on Base Sepolia — verify on the <a href="https://sepolia.basescan.org/address/0x677B483128D0399bCD0A5AB36eE990C0246d7f61" target="_blank">block explorer</a>.</p>
 <div class="stats"><span class="stat">40 ENDPOINTS LIVE</span><span class="stat">x402 + USDC</span><span class="stat">BASE SEPOLIA</span><span class="stat">~30S REPLAY</span></div>
 
 <!-- CHROME: title center, icons RIGHT -->
@@ -133,12 +133,12 @@ var WIKI = {
   hook:     {k:'HOOK',       t:'Why x402 matters',         d:'AI agents can\'t hold credit cards. x402 lets them pay per API call in USDC — no accounts, no invoices, no humans in the loop. This is the fundamental problem AETHERIUS solves.'},
   discovery:{k:'DISCOVERY',  t:'SDK discovers live APIs',   d:'The AETHERIUS SDK queries the service catalog in real-time. It shows all 40 endpoints, pricing, and chain info. Agents don\'t need hardcoded URLs — they discover what\'s available.'},
   challenge:{k:'CHALLENGE',  t:'402 — Payment required',    d:'HTTP 402 is the "Payment Required" status. Without a valid x402 payment proof in the headers, the API refuses to respond. This is enforcement — not a suggestion.'},
-  settle:   {k:'SETTLEMENT', t:'Real USDC moves on-chain',  d:'The agent\'s wallet pays USDC directly to the service wallet on Base Mainnet. The transaction is verifiable on-chain. The balance change is the proof.'},
+  settle:   {k:'SETTLEMENT', t:'Real USDC moves on-chain',  d:'The agent\'s wallet pays USDC directly to the service wallet on Base Sepolia. The transaction is verifiable on-chain. The balance change is the proof.'},
   proof:    {k:'PROOF',      t:'Balance delta = proof',      d:'Before: 20.0 USDC. After: 20.0 USDC (spent: $0.0000 with volume discount). The tiny deduction IS the cryptographic proof that real money moved. No simulation.'},
   montage:  {k:'MONTAGE',    t:'Same flow, any API',        d:'Three more endpoints called in sequence — dictionary lookup, token price, Hacker News item. Same 402→200 flow. Same USDC settlement. The pattern is universal.'},
   telemetry:{k:'TELEMETRY',  t:'Public dashboard moves',     d:'Every API call updates live telemetry — total calls, paid calls, USDC settled. This dashboard is public and real-time. The numbers moved because of our demo calls.'},
-  cta:      {k:'CTA',        t:'Try it yourself',           d:'AETHERIUS is live on Base Mainnet. Connect a wallet, fund it with mainnet USDC, and make your first paid API call. The block explorer proves every transaction.'},
-  wallet:   {k:'WALLET',     t:'Agent wallet address',      d:'This is the agent\'s Ethereum address on Base Mainnet. All USDC payments flow from this wallet. Anyone can verify the balance and transaction history on-chain.'},
+  cta:      {k:'CTA',        t:'Try it yourself',           d:'AETHERIUS is live on Base Sepolia. Connect a wallet, fund it with testnet USDC, and make your first paid API call. The block explorer proves every transaction.'},
+  wallet:   {k:'WALLET',     t:'Agent wallet address',      d:'This is the agent\'s Ethereum address on Base Sepolia. All USDC payments flow from this wallet. Anyone can verify the balance and transaction history on-chain.'},
   balance:  {k:'BALANCE',    t:'USDC balance tracking',     d:'The SDK reads the wallet\'s USDC balance before and after each call. The difference is the actual cost. With volume discounts, the cost can be near-zero.'},
   verdict:  {k:'VERDICT',    t:'API response data',         d:'Real data returned from the email validation API. Syntax check, MX records, disposable detection, risk scoring — all computed server-side and returned as JSON.'},
   price:    {k:'PRICING',    t:'Pay-per-call economics',    d:'Each endpoint has a USDC price. /v1/data/define costs $0.005/call. /v1/email/validate costs $0.005/call. No subscriptions. No minimums. Pay only for what you use.'}
@@ -204,9 +204,9 @@ var S = [
   {h: B('  t+  0s  [1/6] HOOK — agents can hold credit cards? No. So how do they pay?'), g: 700, wiki:'hook'},
   {t: 'AETHERIUS: where AI agents pay per call in USDC on Base.', g: 500},
   {t: 'Agent wallet: 0x677B483128D0399bCD0A5AB36eE990C0246d7f61', g: 500, wiki:'wallet'},
-  {t: 'Verify yourself: https://basescan.org/address/0x677B483128D0399bCD0A5AB36eE990C0246d7f61', c: 'dim', g: 900},
+  {t: 'Verify yourself: https://sepolia.basescan.org/address/0x677B483128D0399bCD0A5AB36eE990C0246d7f61', c: 'dim', g: 900},
   {h: B('  t+  2s  [2/6] DISCOVERY — live catalog via the SDK'), g: 600, wiki:'discovery'},
-  {t: 'Service 2.0.0 on eip155:8453', g: 400},
+  {t: 'Service 2.0.0 on eip155:84532', g: 400},
   {t: 'Live endpoints: 40', g: 400},
   {t: 'Cheapest: /v1/data/define at $0.005/call', g: 400, wiki:'price'},
   {t: 'Demoing /v1/email/validate at $0.005/call.', g: 900},
@@ -227,8 +227,8 @@ var S = [
   {t: 'Calls: 1114 | Paid: 1022 | Settled USDC: $0.52', c: 'ok', g: 900},
   {h: B('  t+ 19s  [6/6] CTA'), g: 600, wiki:'cta'},
   {t: 'AETHERIUS — https://wilnowilx.github.io/aetheriusxapi/', g: 500},
-  {t: 'Verifiable txs: https://basescan.org/address/0x677B483128D0399bCD0A5AB36eE990C0246d7f61', c: 'dim', g: 500},
-  {t: 'Done in t+19s with real USDC on Base Mainnet.', c: 'ok', g: 800}
+  {t: 'Verifiable txs: https://sepolia.basescan.org/address/0x677B483128D0399bCD0A5AB36eE990C0246d7f61', c: 'dim', g: 500},
+  {t: 'Done in t+19s with real USDC on Base Sepolia.', c: 'ok', g: 800}
 ];
 
 var timers = [], playing = false, total = S.length, done = 0;
