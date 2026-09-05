@@ -1,0 +1,17 @@
+# AETHERIUS Telegram Bot Dependencies
+# Install: pip install -r requirements_telegram.txt
+
+# Telegram Bot API
+python-telegram-bot>=20.0
+
+# HTTP requests
+requests>=2.28.0
+
+# JSON handling (built-in, but for safety)
+ujson>=5.0.0
+
+# Scheduling (for auto-posting)
+schedule>=1.2.0
+
+# Environment variables
+python-dotenv>=1.0.0

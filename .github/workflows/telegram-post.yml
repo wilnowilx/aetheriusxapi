@@ -1,0 +1,91 @@
+# AETHERIUS Telegram Auto-Post
+# Posts to Telegram when code is pushed to main
+# Also runs daily scheduled content from calendar.json
+
+name: Telegram Auto-Post
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Daily at 10:00 UTC (4:00 AM Vzla / 5:00 AM Mexico)
+    - cron: '0 10 * * *'
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  post-telegram:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 10 # Get last 10 commits
+
+      - name: Post to Telegram (Push)
+        if: github.event_name == 'push'
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        run: |
+          # Your Telegram chat ID (supergroup)
+          TELEGRAM_CHANNEL="-1004320337418"
+          
+          # Get commit messages
+          COMMITS=$(git log --oneline -5 --pretty=format:"• %s" | head -5)
+          
+          # Get file count changed
+          FILES_CHANGED=$(git diff --name-only HEAD~1 HEAD | wc -l)
+          
+          # Get current date
+          DATE=$(date -u +"%b %d, %Y")
+          
+          # Format message
+          MESSAGE="🚀 AETHERIUS Deploy
+
+📅 ${DATE}
+📁 ${FILES_CHANGED} files changed
+
+Latest commits:
+${COMMITS}
+
+🔗 wilnowilx.github.io/aetheriusxapi
+🧪 Base Sepolia | x402 | USDC
+
+#aetheriusxAPI #Base #x402"
+          
+          # Send to Telegram
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHANNEL}" \
+            -d text="${MESSAGE}" \
+            -d parse_mode="Markdown" \
+            -d disable_web_page_preview="true"
+
+      - name: Post Daily Content
+        if: github.event_name == 'schedule'
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        run: |
+          # Your Telegram chat ID (supergroup)
+          TELEGRAM_CHANNEL="-1004320337418"
+          
+          # Get today's tweet from calendar
+          DAY_OF_WEEK=$(date -u +%u) # 1=Monday, 7=Sunday
+          
+          # Use python to extract content from calendar.json
+          CONTENT=$(python3 -c "
+          import json
+          with open('content/calendar.json') as f:
+              data = json.load(f)
+          tweets = data['tweets']
+          day_index = int('${DAY_OF_WEEK}') - 1
+          if day_index < len(tweets):
+              print(tweets[day_index]['content'])
+          else:
+              print('🚀 AETHERIUS: Building the agent economy. 40 APIs live on Base.')
+          ")
+          
+          # Send to Telegram
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHANNEL}" \
+            -d text="${CONTENT}" \
+            -d parse_mode="Markdown" \
+            -d disable_web_page_preview="true"

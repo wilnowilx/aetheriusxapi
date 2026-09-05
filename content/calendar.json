@@ -1,0 +1,220 @@
+{
+  "meta": {
+    "version": "1.0",
+    "description": "AETHERIUS content calendar — 30 days of pre-written tweets",
+    "rotation": "daily",
+    "lastUpdated": "2026-09-04"
+  },
+  "tweets": [
+    {
+      "id": 1,
+      "day": "Mon",
+      "category": "vision",
+      "content": "40 APIs live on Base. Real USDC. Open-source. Solo builder.\n\nWhat will YOUR agent pay for? 🧠\n\n#AI #Base #x402 #Crypto",
+      "type": "text"
+    },
+    {
+      "id": 2,
+      "day": "Tue",
+      "category": "education",
+      "content": "The problem with APIs for AI agents:\n\n❌ Accounts\n❌ Subscriptions\n❌ Human friction\n❌ API keys\n\nThe solution: x402\n\n✅ Agent pays\n✅ Agent gets data\n✅ No signup\n\nThat's it. That's the future.",
+      "type": "text"
+    },
+    {
+      "id": 3,
+      "day": "Wed",
+      "category": "community",
+      "content": "500M+ Spanish-speaking developers don't have access to the agent economy.\n\nAETHERIUS changes that:\n→ EN/ES tutorials\n→ Bilingual docs\n→ @aetheriusxAPI\n\nVenezuelan builder in Mexico, building for the world 🇻🇪🇲🇽",
+      "type": "text"
+    },
+    {
+      "id": 4,
+      "day": "Thu",
+      "category": "feature",
+      "content": "New: Interactive Playground on our landing page 🎮\n\nTry any endpoint right now:\n→ Select an API\n→ See the parameters\n→ Watch the x402 payment flow\n\nNo signup. No API key. Just code.\n\nTry it → wilnowilx.github.io/aetheriusxapi",
+      "type": "text"
+    },
+    {
+      "id": 5,
+      "day": "Fri",
+      "category": "milestone",
+      "content": "Build velocity: 40 endpoints + 60 tests + 2 SDKs + dashboard + landing + playground in 55 hours.\n\nIf one person builds this in 55 hours, imagine what funded builders ship on Base.\n\n#BuildOnBase",
+      "type": "text"
+    },
+    {
+      "id": 6,
+      "day": "Sat",
+      "category": "education",
+      "content": "How x402 works (simple version):\n\n1. Agent calls API\n2. API responds: \"402 — pay $0.01 in USDC\"\n3. Agent signs payment\n4. API verifies on-chain\n5. Agent gets data\n\nTotal time: ~200ms\n\nNo accounts. No subscriptions. Just crypto.",
+      "type": "text"
+    },
+    {
+      "id": 7,
+      "day": "Sun",
+      "category": "vision",
+      "content": "The agent economy is coming.\n\nAutonomous AI agents will:\n→ Discover services\n→ Pay for data\n→ Make decisions\n→ Execute trades\n\nAll without human friction.\n\nAETHERIUS is building the infrastructure layer.\n\n#AIAgents #x402 #Base",
+      "type": "text"
+    },
+    {
+      "id": 8,
+      "day": "Mon",
+      "category": "feature",
+      "content": "Live Telemetry Dashboard 📊\n\nEvery API call is tracked:\n→ Uptime: live\n→ Latency: real-time\n→ Volume: USDC settled\n→ Errors: zero\n\nTransparency isn't a feature — it's the default.\n\nwilnowilx.github.io/aetheriusxapi/dashboard/",
+      "type": "text"
+    },
+    {
+      "id": 9,
+      "day": "Tue",
+      "category": "education",
+      "content": "Why USDC on Base?\n\n→ Sub-cent transaction fees\n→ Instant settlement\n→ Coinbase backing\n→ Ethereum security\n→ Low latency\n\nFor micro-payments ($0.005-$0.05), this is the only viable chain.\n\n#Base #USDC #x402",
+      "type": "text"
+    },
+    {
+      "id": 10,
+      "day": "Wed",
+      "category": "community",
+      "content": "I'm building AETHERIUS solo from Mexico City.\n\nNo VC. No team. No office.\n\nJust code, crypto, and a vision:\n→ AI agents that pay for themselves\n→ 500M+ developers included\n→ Open-source, always\n\nDay 4. 40 APIs live. 60 tests green.\n\nLet's go 🚀",
+      "type": "text"
+    },
+    {
+      "id": 11,
+      "day": "Thu",
+      "category": "feature",
+      "content": "40 live endpoints across 8 categories:\n\n🗺️ Maps (5)\n💰 Crypto (8)\n🌐 Web (4)\n📧 Email (1)\n📊 Data (6)\n📈 DeFi (8)\n💱 Forex (3)\n📰 News (4)\n\nAll payable in USDC on Base.\n\n#APIs #x402 #Base",
+      "type": "text"
+    },
+    {
+      "id": 12,
+      "day": "Fri",
+      "category": "milestone",
+      "content": "Applied to:\n✅ Base Batches 004 ($100K)\n✅ Base Creator Grant ($4K)\n⬜ Base Ecosystem Fund\n\nResult: Sep 17\n\nBuilding in public. Applying everywhere. Let's see what happens.\n\n#BuildOnBase",
+      "type": "text"
+    },
+    {
+      "id": 13,
+      "day": "Sat",
+      "category": "education",
+      "content": "API keys are broken for AI agents.\n\nWhy? Because:\n→ Keys identify clients, not authorize payments\n→ Subscriptions separate consumption from settlement\n→ Humans manage billing, not machines\n\nx402 fixes this: payment IS authorization.\n\n#xAI #Crypto",
+      "type": "text"
+    },
+    {
+      "id": 14,
+      "day": "Sun",
+      "category": "vision",
+      "content": "Imagine:\n\nAn AI agent that:\n→ Needs weather data for Mexico City\n→ Calls /v1/data/weather\n→ Pays $0.008 in USDC\n→ Gets response in 50ms\n→ Uses it in its decision\n→ All autonomously\n\nThat's AETHERIUS. That's today.",
+      "type": "text"
+    },
+    {
+      "id": 15,
+      "day": "Mon",
+      "category": "feature",
+      "content": "Python SDK is live 🐍\n\npip install aetheriusx\n\nfrom aetheriusx import Client\nclient = Client(\"0xYourWallet\")\nresp = client.get(\"/v1/token/price\", params={\"token\": \"ETH\"})\n\n3 lines. Payment handled.\n\n#Python #AI #x402",
+      "type": "code"
+    },
+    {
+      "id": 16,
+      "day": "Tue",
+      "category": "education",
+      "content": "What can your AI agent buy?\n\n→ Maps (geocoding, search, reviews)\n→ Crypto (prices, analysis, gas)\n→ Web (scraping, screenshots)\n→ Data (weather, forecasts, definitions)\n→ DeFi (yields, TVL, protocols)\n→ Forex (rates, conversion)\n→ News (Hacker News, tech news)\n\nAll for $0.005-$0.05 per call.",
+      "type": "text"
+    },
+    {
+      "id": 17,
+      "day": "Wed",
+      "category": "community",
+      "content": "Open source isn't a business model — it's a philosophy.\n\nAETHERIUS is MIT licensed.\n→ Every line of code is public\n→ Every transaction is on-chain\n→ Every metric is transparent\n\nFork it. Learn from it. Build on it.\n\n#OpenSource #MIT",
+      "type": "text"
+    },
+    {
+      "id": 18,
+      "day": "Thu",
+      "category": "feature",
+      "content": "Rate Limits — Fair and Transparent:\n\n🆓 Free: 10 req/min, 100/day\n⚡ Pro: 100 req/min, 10K/day\n🏢 Enterprise: 1K req/min, unlimited\n\nNo hidden throttling. No surprise bans.\n\nAll tiers documented. All limits visible.",
+      "type": "text"
+    },
+    {
+      "id": 19,
+      "day": "Fri",
+      "category": "milestone",
+      "content": "60/60 tests passing ✅\n\nEvery endpoint tested.\nEvery payment flow verified.\nEvery error handled.\n\nGreen means: it works.\n\n#Testing #Quality #x402",
+      "type": "text"
+    },
+    {
+      "id": 20,
+      "day": "Sat",
+      "category": "education",
+      "content": "x402 isn't just crypto payments.\n\nIt's:\n→ Machine-to-machine commerce\n→ Autonomous agent infrastructure\n→ The HTTP layer for the agent economy\n\nThink Stripe, but for AI agents.\nThink AWS, but pay-per-call with crypto.\n\nThat's x402.",
+      "type": "text"
+    },
+    {
+      "id": 21,
+      "day": "Sun",
+      "category": "vision",
+      "content": "What if every API on the internet was x402-native?\n\n→ No more API keys\n→ No more billing dashboards\n→ No more human intervention\n\nAgent discovers → Agent pays → Agent uses → Done.\n\nThat's the world we're building.",
+      "type": "text"
+    },
+    {
+      "id": 22,
+      "day": "Mon",
+      "category": "feature",
+      "content": "JavaScript SDK is live 🟨\n\nnpm install aetheriusx\n\nimport { Client } from 'aetheriusx';\nconst client = new Client('0xYourWallet');\nconst resp = await client.get('/v1/token/price', { params: { token: 'ETH' } });\n\n3 lines. Agent pays.",
+      "type": "code"
+    },
+    {
+      "id": 23,
+      "day": "Tue",
+      "category": "education",
+      "content": "The 402 status code was created in 1997 for this exact purpose.\n\n\"Payment Required\"\n\nIt took 29 years for crypto to catch up.\n\nx402 makes HTTP 402 actually work.\n\n#HTTP #x402 #Crypto",
+      "type": "text"
+    },
+    {
+      "id": 24,
+      "day": "Wed",
+      "category": "community",
+      "content": "Building AETHERIUS as a solo dev from Mexico:\n\nDay 1: Repo born\nDay 2: 40 APIs live\nDay 3: Dashboard + SDKs\nDay 4: Playground + grants\n\nTotal cost: $0 in infra (testnet)\nTotal team: 1 person\n\nVelocity is public. Check the git log.",
+      "type": "text"
+    },
+    {
+      "id": 25,
+      "day": "Thu",
+      "category": "feature",
+      "content": "Tutoriales en español 🇪🇸\n\nAprende x402 desde cero:\n→ Primera llamada API\n→ Pagos con USDC\n→ Integración con agentes\n\n500M+ developers, ahora incluidos.\n\ngithub.com/wilnowilx/aetheriusxapi/tree/main/docs/tutorials",
+      "type": "text"
+    },
+    {
+      "id": 26,
+      "day": "Fri",
+      "category": "milestone",
+      "content": "Sep 17: Batches 004 result\n\n$100K + accelerator program\n\nIf accepted → mainnet in 4 weeks\nIf not → Ecosystem Fund application ready\n\nBuilding regardless. The code doesn't wait.\n\n#Base #Grant",
+      "type": "text"
+    },
+    {
+      "id": 27,
+      "day": "Sat",
+      "category": "education",
+      "content": "Why should AI agents pay for APIs?\n\nBecause:\n→ Free APIs get rate-limited\n→ Shared keys create bottlenecks\n→ Human billing doesn't scale\n\nPay-per-call:\n→ Unlimited access\n→ Instant settlement\n→ No human friction\n\n#xAI #Crypto",
+      "type": "text"
+    },
+    {
+      "id": 28,
+      "day": "Sun",
+      "category": "vision",
+      "content": "2026: The year AI agents learned to pay.\n\nBefore: Agent needs data → Ask human → Wait → Get data\nAfter: Agent needs data → Pay $0.01 → Get data → Done\n\nAETHERIUS is making this real.\n\n#AI #Future #x402",
+      "type": "text"
+    },
+    {
+      "id": 29,
+      "day": "Mon",
+      "category": "feature",
+      "content": "Live Telemetry: Every metric is real.\n\n→ Uptime: tracked in seconds\n→ Latency: measured per endpoint\n→ Volume: USDC settled on-chain\n→ Errors: zero tolerance\n\nNo fake numbers. No simulated data.\n\nTransparency = Trust.",
+      "type": "text"
+    },
+    {
+      "id": 30,
+      "day": "Tue",
+      "category": "vision",
+      "content": "The agent economy isn't coming — it's here.\n\nAETHERIUS: The infrastructure for agents that pay.\n\n40 APIs. Real USDC. Open-source. Bilingual.\n\nBuilt by one person. Built for everyone.\n\nLet's build the future together 🚀\n\n#AIAgents #x402 #Base #OpenSource",
+      "type": "text"
+    }
+  ]
+}
