@@ -138,6 +138,27 @@ PRICES = {
     "/v1/forex/convert": "$0.008",
     "/v1/news/hn-feed": "$0.01",
     "/v1/web/dns": "$0.005",
+    # === NEW v2.1 endpoints (20 new) ===
+    "/v1/crypto/market": "$0.01",
+    "/v1/crypto/fear-greed": "$0.005",
+    "/v1/crypto/trending": "$0.01",
+    "/v1/crypto/ohlcv": "$0.015",
+    "/v1/web/whois": "$0.01",
+    "/v1/web/headers": "$0.005",
+    "/v1/web/ssl": "$0.008",
+    "/v1/data/ip": "$0.005",
+    "/v1/data/ua": "$0.003",
+    "/v1/data/hash": "$0.002",
+    "/v1/data/uuid": "$0.001",
+    "/v1/data/qrcode": "$0.005",
+    "/v1/news/reddit": "$0.01",
+    "/v1/news/devto": "$0.008",
+    "/v1/defi/impermanent-loss": "$0.01",
+    "/v1/defi/staking-apy": "$0.01",
+    "/v1/token/nft": "$0.02",
+    "/v1/data/translate": "$0.01",
+    "/v1/data/summarize": "$0.015",
+    "/v1/crypto/dominance": "$0.008",
 }
 
 DESCRIPTIONS = {
@@ -181,6 +202,27 @@ DESCRIPTIONS = {
     "/v1/forex/convert": "Currency conversion via Frankfurter",
     "/v1/news/hn-feed": "HN Ask/Show/Jobs feeds",
     "/v1/web/dns": "DNS over HTTPS via Google",
+    # === NEW v2.1 descriptions ===
+    "/v1/crypto/market": "Global crypto market data - total MC, volume, BTC dominance",
+    "/v1/crypto/fear-greed": "Crypto Fear and Greed Index - current value and history",
+    "/v1/crypto/trending": "Trending coins on CoinGecko",
+    "/v1/crypto/ohlcv": "OHLCV candlestick data for any coin pair",
+    "/v1/web/whois": "Domain WHOIS lookup - registrar, dates, nameservers",
+    "/v1/web/headers": "HTTP headers checker - response headers for any URL",
+    "/v1/web/ssl": "SSL certificate info - issuer, expiry, chain",
+    "/v1/data/ip": "IP address geolocation - city, country, coordinates",
+    "/v1/data/ua": "User-Agent parser - browser, OS, device type",
+    "/v1/data/hash": "Hash generator - MD5, SHA1, SHA256, SHA512",
+    "/v1/data/uuid": "UUID v4 generator",
+    "/v1/data/qrcode": "QR code generator as data URL",
+    "/v1/news/reddit": "Reddit posts from any subreddit",
+    "/v1/news/devto": "Dev.to articles - latest tech posts",
+    "/v1/defi/impermanent-loss": "Impermanent loss calculator for LP positions",
+    "/v1/defi/staking-apy": "Staking APY tracker for major protocols",
+    "/v1/token/nft": "NFT metadata fetcher - name, image, attributes",
+    "/v1/data/translate": "Text translation via free API",
+    "/v1/data/summarize": "Text summarizer - extract key sentences",
+    "/v1/crypto/dominance": "Crypto dominance indices - BTC, ETH, altcoin shares",
 }
 
 # Public JSON-RPC endpoints used as independent observation layers.
@@ -1694,6 +1736,546 @@ async def storage_drift_sample(chain: str = Query("base", description="Chain")):
                     "data_source": "public-rpc", "fetched_at": _now()}
     except Exception as e:
         return _err(500, {"error": str(e)})
+
+
+# ============================================================
+#  NEW v2.1 ENDPOINTS (20 new — from 44 to 64 unique routes)
+# ============================================================
+
+@app.get("/v1/crypto/market")
+@app.get("/api/v1/crypto/market")
+async def crypto_market():
+    """Global crypto market overview via CoinGecko."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client, "https://api.coingecko.com/api/v3/global")
+            if not ok:
+                return _err(502, data)
+            g = data.get("data", {})
+            return {
+                "total_market_cap_usd": g.get("total_market_cap", {}).get("usd"),
+                "total_volume_usd": g.get("total_volume", {}).get("usd"),
+                "btc_dominance": g.get("market_cap_percentage", {}).get("btc"),
+                "eth_dominance": g.get("market_cap_percentage", {}).get("eth"),
+                "active_cryptos": g.get("active_cryptocurrencies"),
+                "markets": g.get("markets"),
+                "data_source": "coingecko", "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/crypto/fear-greed")
+@app.get("/api/v1/crypto/fear-greed")
+async def crypto_fear_greed(limit: int = Query(30, description="Data points")):
+    """Crypto Fear and Greed Index."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                "https://api.alternative.me/fng/",
+                params={"limit": limit, "format": "json"})
+            if not ok:
+                return _err(502, data)
+            entries = data.get("data", [])
+            current = entries[0] if entries else {}
+            history = [{"value": e.get("value"), "label": e.get("value_classification"),
+                        "timestamp": e.get("timestamp")} for e in entries[:limit]]
+            return {
+                "current_value": current.get("value"),
+                "current_label": current.get("value_classification"),
+                "history": history,
+                "data_source": "alternative.me", "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/crypto/trending")
+@app.get("/api/v1/crypto/trending")
+async def crypto_trending():
+    """Trending coins on CoinGecko."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                "https://api.coingecko.com/api/v3/search/trending")
+            if not ok:
+                return _err(502, data)
+            coins = []
+            for c in data.get("coins", [])[:10]:
+                item = c.get("item", {})
+                coins.append({
+                    "name": item.get("name"),
+                    "symbol": item.get("symbol"),
+                    "market_cap_rank": item.get("market_cap_rank"),
+                    "score": item.get("score"),
+                    "price_btc": item.get("price_btc"),
+                })
+            return {"trending": coins, "data_source": "coingecko",
+                    "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/crypto/ohlcv")
+@app.get("/api/v1/crypto/ohlcv")
+async def crypto_ohlcv(
+    coin: str = Query("bitcoin", description="CoinGecko coin id"),
+    vs: str = Query("usd", description="vs currency"),
+    days: int = Query(7, description="Days of data"),
+):
+    """OHLCV candlestick data for a coin."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                f"https://api.coingecko.com/api/v3/coins/{coin}/ohlc",
+                params={"vs_currency": vs, "days": days})
+            if not ok:
+                return _err(502, data)
+            candles = [{"timestamp": c[0], "open": c[1], "high": c[2],
+                        "low": c[3], "close": c[4]} for c in (data or [])]
+            return {"coin": coin, "vs": vs, "days": days,
+                    "candles": candles[-50:],
+                    "data_source": "coingecko", "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/crypto/dominance")
+@app.get("/api/v1/crypto/dominance")
+async def crypto_dominance():
+    """Crypto dominance indices."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                "https://api.coingecko.com/api/v3/global")
+            if not ok:
+                return _err(502, data)
+            pct = data.get("data", {}).get("market_cap_percentage", {})
+            return {
+                "btc": round(pct.get("btc", 0), 2),
+                "eth": round(pct.get("eth", 0), 2),
+                "usdt": round(pct.get("usdt", 0), 2),
+                "bnb": round(pct.get("bnb", 0), 2),
+                "sol": round(pct.get("sol", 0), 2),
+                "others": round(100 - sum(v for k, v in pct.items()
+                    if k in ("btc", "eth", "usdt", "bnb", "sol")), 2),
+                "data_source": "coingecko", "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/web/whois")
+@app.get("/api/v1/web/whois")
+async def web_whois(domain: str = Query(..., description="Domain name")):
+    """Domain WHOIS lookup."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                f"https://rdap.org/domain/{domain}")
+            if not ok:
+                return _err(502, data)
+            events = {e.get("eventAction"): e.get("eventDate")
+                      for e in data.get("events", [])}
+            nameservers = [ns.get("ldhName", "") for ns in data.get("nameservers", [])]
+            return {
+                "domain": domain,
+                "status": data.get("status", []),
+                "registration": events.get("registration"),
+                "expiration": events.get("expiration"),
+                "last_update": events.get("last changed"),
+                "nameservers": nameservers,
+                "data_source": "rdap.org", "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/web/headers")
+@app.get("/api/v1/web/headers")
+async def web_headers(url: str = Query(..., description="URL to check")):
+    """HTTP response headers checker."""
+    try:
+        async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
+            resp = await client.head(url, headers=UA)
+            headers = dict(resp.headers)
+            return {
+                "url": url, "status_code": resp.status_code,
+                "headers": headers,
+                "content_type": headers.get("content-type"),
+                "server": headers.get("server"),
+                "cache_control": headers.get("cache-control"),
+                "cors": headers.get("access-control-allow-origin"),
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/web/ssl")
+@app.get("/api/v1/web/ssl")
+async def web_ssl(domain: str = Query(..., description="Domain to check")):
+    """SSL certificate info."""
+    import ssl
+    import socket
+    try:
+        ctx = ssl.create_default_context()
+        with ctx.wrap_socket(socket.socket(), server_hostname=domain) as s:
+            s.settimeout(10)
+            s.connect((domain, 443))
+            cert = s.getpeercert()
+            issuer = dict(x[0] for x in cert.get("issuer", []))
+            subject = dict(x[0] for x in cert.get("subject", []))
+            return {
+                "domain": domain,
+                "subject": subject.get("commonName"),
+                "issuer_org": issuer.get("organizationName"),
+                "issuer_cn": issuer.get("commonName"),
+                "not_before": cert.get("notBefore"),
+                "not_after": cert.get("notAfter"),
+                "serial": cert.get("serialNumber"),
+                "san": [v for t, v in cert.get("subjectAltName", [])
+                        if t == "DNS"],
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/data/ip")
+@app.get("/api/v1/data/ip")
+async def data_ip(ip: str = Query("me", description="IP or 'me'")):
+    """IP address geolocation."""
+    try:
+        url = "https://ipinfo.io/json" if ip == "me" else f"https://ipinfo.io/{ip}/json"
+        async with httpx.AsyncClient(timeout=10) as client:
+            ok, data = await fetch_json(client, url)
+            if not ok:
+                return _err(502, data)
+            loc = data.get("loc", ",").split(",")
+            return {
+                "ip": data.get("ip"),
+                "city": data.get("city"),
+                "region": data.get("region"),
+                "country": data.get("country"),
+                "lat": float(loc[0]) if len(loc) == 2 else None,
+                "lon": float(loc[1]) if len(loc) == 2 else None,
+                "org": data.get("org"),
+                "timezone": data.get("timezone"),
+                "data_source": "ipinfo.io", "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/data/ua")
+@app.get("/api/v1/data/ua")
+async def data_ua(user_agent: str = Query(..., description="User-Agent string")):
+    """User-Agent parser."""
+    ua = user_agent.lower()
+    # Simple detection
+    browser = "Unknown"
+    if "chrome" in ua and "edg" not in ua:
+        browser = "Chrome"
+    elif "firefox" in ua:
+        browser = "Firefox"
+    elif "safari" in ua and "chrome" not in ua:
+        browser = "Safari"
+    elif "edg" in ua:
+        browser = "Edge"
+    elif "opera" in ua or "opr" in ua:
+        browser = "Opera"
+
+    os_name = "Unknown"
+    if "windows" in ua:
+        os_name = "Windows"
+    elif "mac os" in ua or "macos" in ua:
+        os_name = "macOS"
+    elif "linux" in ua:
+        os_name = "Linux"
+    elif "android" in ua:
+        os_name = "Android"
+    elif "iphone" in ua or "ipad" in ua:
+        os_name = "iOS"
+
+    device = "Desktop"
+    if "mobile" in ua or "android" in ua:
+        device = "Mobile"
+    elif "tablet" in ua or "ipad" in ua:
+        device = "Tablet"
+    elif "bot" in ua or "crawler" in ua or "spider" in ua:
+        device = "Bot"
+
+    return {"user_agent": user_agent, "browser": browser,
+            "os": os_name, "device": device, "fetched_at": _now()}
+
+
+@app.get("/v1/data/hash")
+@app.get("/api/v1/data/hash")
+async def data_hash(
+    text: str = Query(..., description="Text to hash"),
+    algo: str = Query("sha256", description="Algorithm: md5, sha1, sha256, sha512"),
+):
+    """Hash generator."""
+    import hashlib
+    algos = {"md5": hashlib.md5, "sha1": hashlib.sha1,
+             "sha256": hashlib.sha256, "sha512": hashlib.sha512}
+    algo_lower = algo.lower()
+    if algo_lower not in algos:
+        return _err(400, {"error": f"Unsupported algorithm. Use: {', '.join(algos.keys())}"})
+    h = algos[algo_lower](text.encode()).hexdigest()
+    return {"text": text, "algorithm": algo_lower, "hash": h, "fetched_at": _now()}
+
+
+@app.get("/v1/data/uuid")
+@app.get("/api/v1/data/uuid")
+async def data_uuid(count: int = Query(1, description="Number of UUIDs (1-100)")):
+    """UUID v4 generator."""
+    import uuid
+    count = min(max(count, 1), 100)
+    return {"uuids": [str(uuid.uuid4()) for _ in range(count)],
+            "count": count, "fetched_at": _now()}
+
+
+@app.get("/v1/data/qrcode")
+@app.get("/api/v1/data/qrcode")
+async def data_qrcode(
+    text: str = Query(..., description="Text/URL for QR code"),
+    size: int = Query(200, description="Image size in pixels"),
+):
+    """QR code generator as data URL."""
+    try:
+        # Use quickchart.io API (free, no key)
+        encoded = text.replace("&", "%26").replace("=", "%3D")
+        qr_url = f"https://quickchart.io/qr?text={encoded}&size={size}"
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.get(qr_url)
+            if resp.status_code == 200:
+                import base64
+                b64 = base64.b64encode(resp.content).decode()
+                return {"text": text, "size": size,
+                        "data_url": f"data:image/png;base64,{b64}",
+                        "qr_url": qr_url, "fetched_at": _now()}
+            return _err(502, {"error": "QR generation failed"})
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/news/reddit")
+@app.get("/api/v1/news/reddit")
+async def news_reddit(
+    subreddit: str = Query("cryptocurrency", description="Subreddit"),
+    sort: str = Query("hot", description="Sort: hot, new, top"),
+    limit: int = Query(25, description="Posts to fetch"),
+):
+    """Reddit posts from any subreddit."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.get(
+                f"https://www.reddit.com/r/{subreddit}/{sort}.json",
+                params={"limit": limit},
+                headers={**UA, "Accept": "application/json"})
+            if resp.status_code != 200:
+                return _err(502, {"error": f"Reddit returned {resp.status_code}"})
+            data = resp.json()
+            posts = []
+            for child in data.get("data", {}).get("children", [])[:limit]:
+                d = child.get("data", {})
+                posts.append({
+                    "title": d.get("title"),
+                    "author": d.get("author"),
+                    "score": d.get("score"),
+                    "num_comments": d.get("num_comments"),
+                    "url": d.get("url"),
+                    "permalink": f"https://reddit.com{d.get('permalink', '')}",
+                    "created_utc": d.get("created_utc"),
+                })
+            return {"subreddit": subreddit, "sort": sort,
+                    "count": len(posts), "posts": posts, "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/news/devto")
+@app.get("/api/v1/news/devto")
+async def news_devto(
+    tag: str = Query("javascript", description="Tag to filter"),
+    per_page: int = Query(20, description="Articles per page"),
+    page: int = Query(1, description="Page number"),
+):
+    """Dev.to articles."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                "https://dev.to/api/articles",
+                params={"tag": tag, "per_page": per_page, "page": page})
+            if not ok:
+                return _err(502, data)
+            articles = [{"title": a.get("title"),
+                         "description": a.get("description"),
+                         "url": a.get("url"),
+                         "author": a.get("user", {}).get("name"),
+                         "reactions": a.get("positive_reactions_count"),
+                         "comments": a.get("comments_count"),
+                         "published": a.get("published_at"),
+                         "tags": a.get("tag_list", [])}
+                        for a in (data or [])]
+            return {"tag": tag, "page": page, "count": len(articles),
+                    "articles": articles, "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/defi/impermanent-loss")
+@app.get("/api/v1/defi/impermanent-loss")
+async def defi_impermanent_loss(
+    entry_price: float = Query(..., description="Entry price of both tokens"),
+    current_price: float = Query(..., description="Current price of token A"),
+):
+    """Impermanent loss calculator."""
+    try:
+        ratio = current_price / entry_price
+        il = 2 * (ratio ** 0.5) / (1 + ratio) - 1
+        il_pct = abs(il) * 100
+        return {
+            "entry_price": entry_price,
+            "current_price": current_price,
+            "price_ratio": round(ratio, 4),
+            "impermanent_loss_pct": round(il_pct, 4),
+            "impermanent_loss_decimal": round(il, 6),
+            "note": "IL is relative to just holding. Negative = loss vs holding.",
+            "fetched_at": _now(),
+        }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/defi/staking-apy")
+@app.get("/api/v1/defi/staking-apy")
+async def defi_staking_apy():
+    """Staking APY for major protocols via DefiLlama."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                "https://yields.llama.fi/pools")
+            if not ok:
+                return _err(502, data)
+            pools = data.get("data", [])
+            # Filter for staking pools with good TVL
+            staking = [p for p in pools if p.get("tvlUsd", 0) > 1_000_000
+                       and p.get("apy", 0) > 0
+                       and "staking" in p.get("category", "").lower()
+                       or "lending" in p.get("category", "").lower()]
+            staking.sort(key=lambda x: x.get("apy", 0), reverse=True)
+            results = [{"project": p.get("project"), "symbol": p.get("symbol"),
+                        "chain": p.get("chain"), "tvl_usd": round(p.get("tvlUsd", 0)),
+                        "apy": round(p.get("apy", 0), 2),
+                        "apy_base": round(p.get("apyBase", 0) or 0, 2),
+                        "apy_reward": round(p.get("apyReward", 0) or 0, 2),
+                        "category": p.get("category")}
+                       for p in staking[:30]]
+            return {"count": len(results), "pools": results, "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/token/nft")
+@app.get("/api/v1/token/nft")
+async def token_nft(
+    contract: str = Query(..., description="NFT contract address"),
+    token_id: str = Query("1", description="Token ID"),
+    chain: str = Query("ethereum", description="Chain"),
+):
+    """NFT metadata fetcher."""
+    try:
+        # Use SimpleHash free API for NFT metadata
+        chain_map = {"ethereum": "ethereum", "base": "base",
+                     "polygon": "polygon", "optimism": "optimism"}
+        chain_name = chain_map.get(chain.lower(), "ethereum")
+        url = f"https://api.simplehash.com/api/v0/nfts/metadata?chain={chain_name}&contract={contract}&token_ids={token_id}"
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.get(url, headers={"Accept": "application/json"})
+            if resp.status_code == 200:
+                data = resp.json()
+                nfts = data.get("nfts", [])
+                if nfts:
+                    nft = nfts[0]
+                    return {
+                        "contract": contract, "token_id": token_id,
+                        "chain": chain_name,
+                        "name": nft.get("name"),
+                        "description": nft.get("description"),
+                        "image_url": nft.get("image_url"),
+                        "collection": nft.get("collection", {}).get("name"),
+                        "attributes": nft.get("attributes", []),
+                        "data_source": "simplehash", "fetched_at": _now(),
+                    }
+            # Fallback: return what we have
+            return {"contract": contract, "token_id": token_id,
+                    "chain": chain_name, "note": "Metadata not available",
+                    "fetched_at": _now()}
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/data/translate")
+@app.get("/api/v1/data/translate")
+async def data_translate(
+    text: str = Query(..., description="Text to translate"),
+    source: str = Query("auto", description="Source language code"),
+    target: str = Query("es", description="Target language code"),
+):
+    """Text translation via MyMemory (free, no key)."""
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client,
+                "https://api.mymemory.translated.net/get",
+                params={"q": text, "langpair": f"{source}|{target}"})
+            if not ok:
+                return _err(502, data)
+            translated = data.get("responseData", {}).get("translatedText", "")
+            match = data.get("responseData", {}).get("match", 0)
+            return {
+                "text": text, "source": source, "target": target,
+                "translation": translated,
+                "confidence": round(match * 100) if match else None,
+                "data_source": "mymemory", "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/data/summarize")
+@app.get("/api/v1/data/summarize")
+async def data_summarize(
+    text: str = Query(..., description="Text to summarize"),
+    sentences: int = Query(3, description="Number of sentences"),
+):
+    """Extractive text summarizer."""
+    import re
+    # Split into sentences
+    sents = re.split(r'(?<=[.!?])\s+', text.strip())
+    if len(sents) <= sentences:
+        return {"text": text, "summary": text,
+                "original_sentences": len(sents),
+                "summary_sentences": len(sents), "fetched_at": _now()}
+    # Score sentences by word frequency
+    words = re.findall(r'\w+', text.lower())
+    freq = {}
+    for w in words:
+        if len(w) > 3:
+            freq[w] = freq.get(w, 0) + 1
+    scored = []
+    for i, s in enumerate(sents):
+        score = sum(freq.get(w.lower(), 0) for w in re.findall(r'\w+', s) if len(w) > 3)
+        scored.append((i, score, s))
+    scored.sort(key=lambda x: x[1], reverse=True)
+    top = sorted(scored[:sentences], key=lambda x: x[0])
+    summary = " ".join(s[2] for s in top)
+    return {"text": text[:200] + "..." if len(text) > 200 else text,
+            "summary": summary,
+            "original_sentences": len(sents),
+            "summary_sentences": sentences, "fetched_at": _now()}
 
 
 if __name__ == "__main__":
