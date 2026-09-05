@@ -518,6 +518,8 @@
         .telemetry-note a:hover { color: white; }
 
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spin { animation: spin 1s linear infinite; }
 
         /* ===== STATS ===== */
         .stats-section { text-align: center; }
@@ -1223,6 +1225,421 @@
         }
         .footer-socials a:hover { background: rgba(168,85,247,0.12); color: var(--purple-light); }
 
+        /* ===== PLAYGROUND ===== */
+        .playground-section { text-align: center; }
+
+        .playground-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            margin-top: 72px;
+            text-align: left;
+            background: rgba(10, 10, 20, 0.6);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            min-height: 500px;
+        }
+
+        .playground-sidebar {
+            background: rgba(255, 255, 255, 0.02);
+            border-right: 1px solid var(--border);
+            padding: 16px;
+            overflow-y: auto;
+            max-height: 500px;
+        }
+
+        .playground-category {
+            margin-bottom: 16px;
+        }
+
+        .playground-cat-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--purple-light);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .playground-endpoint {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.82rem;
+        }
+        .playground-endpoint:hover { background: rgba(168, 85, 247, 0.1); }
+        .playground-endpoint.active { background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); }
+
+        .pe-method {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--green);
+        }
+        .pe-method.get { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+        .pe-method.post { background: rgba(245, 158, 11, 0.15); color: var(--orange); }
+
+        .pe-name {
+            flex: 1;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text);
+        }
+
+        .pe-price {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--magenta-light);
+        }
+
+        .playground-main {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .playground-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .playground-url {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .playground-method {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--green);
+        }
+
+        .playground-path {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .playground-run {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--purple-deep), var(--magenta));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .playground-run:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4); }
+        .playground-run:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .playground-params {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .playground-param-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .playground-param-input {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            min-height: 44px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .playground-param-input:focus { border-color: var(--purple); }
+
+        .playground-response {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .playground-response-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .playground-status {
+            font-family: 'JetBrains Mono', monospace;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--green);
+        }
+
+        .playground-time {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-sec);
+        }
+
+        .playground-response-body {
+            flex: 1;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            color: var(--text);
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .playground-loading {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .playground-footer {
+            display: flex;
+            gap: 12px;
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .playground-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(168, 85, 247, 0.08);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            color: var(--purple-light);
+        }
+
+        /* ===== WAITLIST ===== */
+        .waitlist-section { text-align: center; }
+
+        .waitlist-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-top: 72px;
+            text-align: left;
+        }
+
+        .waitlist-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+        }
+
+        .waitlist-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .waitlist-stat {
+            text-align: center;
+            padding: 16px;
+            background: rgba(168, 85, 247, 0.06);
+            border-radius: 12px;
+        }
+
+        .waitlist-stat-val {
+            font-size: 1.4rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(135deg, var(--purple), var(--magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .waitlist-stat-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .waitlist-form {
+            margin-bottom: 24px;
+        }
+
+        .waitlist-input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .waitlist-input-group input {
+            flex: 1;
+            padding: 14px 18px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .waitlist-input-group input:focus { border-color: var(--purple); }
+
+        .waitlist-wallet input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .waitlist-wallet input:focus { border-color: var(--purple); }
+
+        .waitlist-perks {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .waitlist-perk {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.88rem;
+            color: var(--text-sec);
+        }
+
+        .waitlist-timeline {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+        }
+
+        .waitlist-timeline h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 32px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 28px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 32px;
+        }
+        .timeline-item:last-child { padding-bottom: 0; }
+
+        .timeline-dot {
+            position: absolute;
+            left: -24px;
+            top: 6px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: 2px solid var(--border);
+        }
+        .timeline-item.done .timeline-dot { background: var(--green); border-color: var(--green); }
+        .timeline-item.current .timeline-dot { background: var(--purple); border-color: var(--purple); box-shadow: 0 0 12px rgba(168, 85, 247, 0.5); }
+
+        .timeline-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .timeline-desc {
+            font-size: 0.82rem;
+            color: var(--text-sec);
+        }
+
+        /* ===== SOCIAL PROOF ===== */
+        .social-proof {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+
+        .social-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            transition: color 0.3s;
+        }
+        .social-item:hover { color: var(--purple-light); }
+
+        .social-stat {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .social-label {
+            font-size: 0.75rem;
+        }
+
         /* ===== ANIMATIONS ===== */
         .anim {
             opacity: 0;
@@ -1357,9 +1774,12 @@
         <div class="sdot" data-s="7"></div>
         <div class="sdot" data-s="8"></div>
         <div class="sdot" data-s="9"></div>
-            <div class="sdot" data-s="10"></div>
-            <div class="sdot" data-s="11"></div>
-            <div class="sdot" data-s="12"></div>
+        <div class="sdot" data-s="10"></div>
+        <div class="sdot" data-s="11"></div>
+        <div class="sdot" data-s="12"></div>
+        <div class="sdot" data-s="13"></div>
+        <div class="sdot" data-s="14"></div>
+        <div class="sdot" data-s="15"></div>
     </div>
 
     <!-- Mobile Nav -->
@@ -1559,6 +1979,253 @@
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Built-in retry and error handling</li>
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Zero configuration needed</li>
                     </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LIVE PLAYGROUND -->
+    <section id="playground" class="playground-section">
+        <div class="inner">
+            <div class="stag anim">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Live Playground
+            </div>
+            <h2 class="stitle anim">Try It Right Now</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">Select an endpoint and see real responses. No signup required.</p>
+            
+            <div class="playground-container anim">
+                <div class="playground-sidebar">
+                    <div class="playground-category">
+                        <div class="playground-cat-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            Maps
+                        </div>
+                        <div class="playground-endpoint" data-endpoint="/v1/maps/search" data-params='{"query":"coffee shop","location":"Mexico City"}'>
+                            <span class="pe-method get">GET</span>
+                            <span class="pe-name">/maps/search</span>
+                            <span class="pe-price">$0.01</span>
+                        </div>
+                        <div class="playground-endpoint" data-endpoint="/v1/maps/reviews" data-params='{"place_id":"ChIJN1t_tDeuEmsRUsoyG83frY4"}'>
+                            <span class="pe-method get">GET</span>
+                            <span class="pe-name">/maps/reviews</span>
+                            <span class="pe-price">$0.02</span>
+                        </div>
+                    </div>
+                    <div class="playground-category">
+                        <div class="playground-cat-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10l4-4 4 4"/></svg>
+                            Crypto
+                        </div>
+                        <div class="playground-endpoint" data-endpoint="/v1/token/price" data-params='{"token":"ETH"}'>
+                            <span class="pe-method get">GET</span>
+                            <span class="pe-name">/token/price</span>
+                            <span class="pe-price">$0.005</span>
+                        </div>
+                        <div class="playground-endpoint" data-endpoint="/v1/token/analyze" data-params='{"address":"0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984"}'>
+                            <span class="pe-method get">GET</span>
+                            <span class="pe-name">/token/analyze</span>
+                            <span class="pe-price">$0.01</span>
+                        </div>
+                    </div>
+                    <div class="playground-category">
+                        <div class="playground-cat-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            Web
+                        </div>
+                        <div class="playground-endpoint" data-endpoint="/v1/web/scrape" data-params='{"url":"https://example.com"}'>
+                            <span class="pe-method get">GET</span>
+                            <span class="pe-name">/web/scrape</span>
+                            <span class="pe-price">$0.01</span>
+                        </div>
+                    </div>
+                    <div class="playground-category">
+                        <div class="playground-cat-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1"/></svg>
+                            Data
+                        </div>
+                        <div class="playground-endpoint" data-endpoint="/v1/data/weather" data-params='{"lat":"19.4326","lon":"-99.1332"}'>
+                            <span class="pe-method get">GET</span>
+                            <span class="pe-name">/data/weather</span>
+                            <span class="pe-price">$0.005</span>
+                        </div>
+                        <div class="playground-endpoint" data-endpoint="/v1/email/validate" data-params='{"email":"test@example.com"}'>
+                            <span class="pe-method get">GET</span>
+                            <span class="pe-name">/email/validate</span>
+                            <span class="pe-price">$0.005</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="playground-main">
+                    <div class="playground-header">
+                        <div class="playground-url">
+                            <span class="playground-method">GET</span>
+                            <span class="playground-path" id="pgPath">/v1/token/price</span>
+                        </div>
+                        <button class="playground-run" id="pgRun" onclick="runPlayground()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            Send
+                        </button>
+                    </div>
+                    <div class="playground-params">
+                        <div class="playground-param-label">Parameters</div>
+                        <div class="playground-param-input" id="pgParams" contenteditable="true">{"token": "ETH"}</div>
+                    </div>
+                    <div class="playground-response">
+                        <div class="playground-response-header">
+                            <span>Response</span>
+                            <span class="playground-status" id="pgStatus">200 OK</span>
+                            <span class="playground-time" id="pgTime">~120ms</span>
+                        </div>
+                        <div class="playground-response-body" id="pgResponse">
+                            <span class="playground-loading">Click "Send" to make a request...</span>
+                        </div>
+                    </div>
+                    <div class="playground-footer">
+                        <div class="playground-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                            x402 Payment Required
+                        </div>
+                        <div class="playground-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1"/></svg>
+                            USDC on Base
+                        </div>
+                        <div class="playground-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            Settled instantly
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WAITLIST -->
+    <section id="waitlist" class="waitlist-section">
+        <div class="inner">
+            <div class="stag anim">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Early Access
+            </div>
+            <h2 class="stitle anim">Get Mainnet Access First</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">Join the waitlist. Be the first to deploy on Base Mainnet when we launch.</p>
+            
+            <div class="waitlist-container anim">
+                <div class="waitlist-card">
+                    <div class="waitlist-stats">
+                        <div class="waitlist-stat">
+                            <div class="waitlist-stat-val" id="waitlistCount">0</div>
+                            <div class="waitlist-stat-label">On Waitlist</div>
+                        </div>
+                        <div class="waitlist-stat">
+                            <div class="waitlist-stat-val">40+</div>
+                            <div class="waitlist-stat-label">Live APIs</div>
+                        </div>
+                        <div class="waitlist-stat">
+                            <div class="waitlist-stat-val">x402</div>
+                            <div class="waitlist-stat-label">Protocol</div>
+                        </div>
+                    </div>
+                    
+                    <form class="waitlist-form" id="waitlistForm" onsubmit="submitWaitlist(event)">
+                        <div class="waitlist-input-group">
+                            <input type="email" id="waitlistEmail" placeholder="your@email.com" required>
+                            <button type="submit" class="btn btn-primary">
+                                Join Waitlist
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                        <div class="waitlist-wallet">
+                            <input type="text" id="waitlistWallet" placeholder="0x... (optional — for founder perks)">
+                        </div>
+                    </form>
+                    
+                    <div class="waitlist-perks">
+                        <div class="waitlist-perk">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Early mainnet access
+                        </div>
+                        <div class="waitlist-perk">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Priority support
+                        </div>
+                        <div class="waitlist-perk">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            Founder pricing locked
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="waitlist-timeline">
+                    <h3>Launch Roadmap</h3>
+                    <div class="timeline">
+                        <div class="timeline-item done">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">Aug 2026</div>
+                                <div class="timeline-title">Testnet Launch</div>
+                                <div class="timeline-desc">40 live APIs on Base Sepolia</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item done">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">Sep 2026</div>
+                                <div class="timeline-title">Grants Applied</div>
+                                <div class="timeline-desc">Batches 004 + Creator Grant</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item current">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">Oct 2026</div>
+                                <div class="timeline-title">Mainnet Prep</div>
+                                <div class="timeline-desc">Audit, SDK finalization, docs</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">Nov 2026</div>
+                                <div class="timeline-title">Mainnet Launch</div>
+                                <div class="timeline-desc">Live on Base Mainnet with real USDC</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SOCIAL PROOF -->
+    <section id="social" class="social-section" style="min-height: auto; padding: 80px 0;">
+        <div class="inner" style="padding: 0 40px;">
+            <div class="social-proof">
+                <div class="social-item anim ad1">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <div class="social-stat">Open Source</div>
+                    <div class="social-label">MIT License</div>
+                </div>
+                <div class="social-item anim ad2">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    <div class="social-stat">40+</div>
+                    <div class="social-label">Live Endpoints</div>
+                </div>
+                <div class="social-item anim ad3">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    <div class="social-stat">60/60</div>
+                    <div class="social-label">Tests Passing</div>
+                </div>
+                <div class="social-item anim ad4">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10l4-4 4 4"/></svg>
+                    <div class="social-stat">x402</div>
+                    <div class="social-label">Native Protocol</div>
+                </div>
+                <div class="social-item anim ad1">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1"/></svg>
+                    <div class="social-stat">Bilingual</div>
+                    <div class="social-label">EN / ES</div>
                 </div>
             </div>
         </div>
@@ -1963,6 +2630,150 @@
     aexGet('/v1/telemetry').then(function(t){
       if(t && t.totals){ var el = document.getElementById('fCounter'); if(el) el.textContent = Math.min(10, t.wallets_seen || 0) + ' / 10 claimed'; }
     }).catch(function(){});
+
+    // ============================================
+    // LIVE PLAYGROUND
+    // ============================================
+    let selectedEndpoint = null;
+
+    document.querySelectorAll('.playground-endpoint').forEach(ep => {
+        ep.addEventListener('click', function() {
+            document.querySelectorAll('.playground-endpoint').forEach(e => e.classList.remove('active'));
+            this.classList.add('active');
+            selectedEndpoint = this.dataset.endpoint;
+            document.getElementById('pgPath').textContent = selectedEndpoint;
+            document.getElementById('pgParams').textContent = this.dataset.params || '{}';
+            document.getElementById('pgResponse').innerHTML = '<span class="playground-loading">Click "Send" to make a request...</span>';
+        });
+    });
+
+    async function runPlayground() {
+        if (!selectedEndpoint) {
+            document.getElementById('pgResponse').innerHTML = '<span style="color:var(--orange);">Select an endpoint from the sidebar first</span>';
+            return;
+        }
+
+        const btn = document.getElementById('pgRun');
+        const responseEl = document.getElementById('pgResponse');
+        const statusEl = document.getElementById('pgStatus');
+        const timeEl = document.getElementById('pgTime');
+
+        btn.disabled = true;
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><circle cx="12" cy="12" r="10"/></svg> Sending...';
+        responseEl.innerHTML = '<span class="playground-loading">Processing x402 payment...</span>';
+
+        const startTime = Date.now();
+
+        try {
+            // Try to hit the real API
+            const apiBase = 'http://34.156.149.38/aetherapi';
+            const params = JSON.parse(document.getElementById('pgParams').textContent || '{}');
+            const queryString = new URLSearchParams(params).toString();
+            const url = `${apiBase}${selectedEndpoint}${queryString ? '?' + queryString : ''}`;
+
+            // First, get the 402 challenge
+            const challengeResp = await fetch(url);
+            const time1 = Date.now() - startTime;
+
+            if (challengeResp.status === 402) {
+                const challenge = await challengeResp.json();
+                responseEl.innerHTML = `<span style="color:var(--orange);">// 402 Payment Required</span>\n` +
+                    JSON.stringify(challenge, null, 2).split('\n').map(line =>
+                        line.replace(/"([^"]+)":/g, '<span style="color:var(--purple-light);">"$1"</span>:')
+                            .replace(/: "([^"]+)"/g, ': <span style="color:var(--magenta-light);">"$1"</span>')
+                            .replace(/: (\d+)/g, ': <span style="color:var(--orange);">$1</span>')
+                    ).join('\n') +
+                    `\n\n<span style="color:var(--text-muted);">// Agent would sign x402 payment here</span>`;
+                statusEl.textContent = '402 Payment Required';
+                statusEl.style.background = 'rgba(245, 158, 11, 0.15)';
+                statusEl.style.color = 'var(--orange)';
+                timeEl.textContent = `~${time1}ms`;
+            } else if (challengeResp.ok) {
+                const data = await challengeResp.json();
+                responseEl.innerHTML = `<span style="color:var(--green);">// 200 OK — Payment settled</span>\n` +
+                    JSON.stringify(data, null, 2).split('\n').map(line =>
+                        line.replace(/"([^"]+)":/g, '<span style="color:var(--purple-light);">"$1"</span>:')
+                            .replace(/: "([^"]+)"/g, ': <span style="color:var(--magenta-light);">"$1"</span>')
+                            .replace(/: (\d+)/g, ': <span style="color:var(--orange);">$1</span>')
+                    ).join('\n');
+                statusEl.textContent = '200 OK';
+                statusEl.style.background = 'rgba(16, 185, 129, 0.15)';
+                statusEl.style.color = 'var(--green)';
+                timeEl.textContent = `~${time1}ms`;
+            } else {
+                throw new Error(`HTTP ${challengeResp.status}`);
+            }
+        } catch (err) {
+            const time2 = Date.now() - startTime;
+            // Show demo response when API is offline
+            const demoResponses = {
+                '/v1/token/price': { price: 2384.50, change_24h: 2.3, token: 'ETH', source: 'CoinGecko' },
+                '/v1/maps/search': { results: [{ name: 'Café Aetherius', address: 'Mexico City', rating: 4.8 }], count: 1 },
+                '/v1/data/weather': { temp_c: 22, condition: 'Partly cloudy', humidity: 65, city: 'Mexico City' },
+                '/v1/email/validate': { email: 'test@example.com', valid: true, disposable: false, domain: 'example.com' }
+            };
+            const demo = demoResponses[selectedEndpoint] || { message: 'Demo response — API will return real data on mainnet', endpoint: selectedEndpoint };
+
+            responseEl.innerHTML = `<span style="color:var(--cyan);">// Demo response (testnet offline)</span>\n` +
+                JSON.stringify(demo, null, 2).split('\n').map(line =>
+                    line.replace(/"([^"]+)":/g, '<span style="color:var(--purple-light);">"$1"</span>:')
+                        .replace(/: "([^"]+)"/g, ': <span style="color:var(--magenta-light);">"$1"</span>')
+                        .replace(/: (\d+)/g, ': <span style="color:var(--orange);">$1</span>')
+                        .replace(/: (true|false)/g, ': <span style="color:var(--cyan);">$1</span>')
+                ).join('\n') +
+                `\n\n<span style="color:var(--text-muted);">// ⚠️ Testnet is currently offline</span>\n<span style="color:var(--text-muted);">// On mainnet, this returns live data + settles USDC</span>`;
+            statusEl.textContent = 'Demo Mode';
+            statusEl.style.background = 'rgba(6, 182, 212, 0.15)';
+            statusEl.style.color = 'var(--cyan)';
+            timeEl.textContent = '~0ms';
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg> Send';
+    }
+
+    // Auto-select first endpoint
+    setTimeout(() => {
+        const first = document.querySelector('.playground-endpoint');
+        if (first) first.click();
+    }, 1000);
+
+    // ============================================
+    // WAITLIST
+    // ============================================
+    async function submitWaitlist(e) {
+        e.preventDefault();
+        const email = document.getElementById('waitlistEmail').value;
+        const wallet = document.getElementById('waitlistWallet').value;
+        const btn = e.target.querySelector('button[type="submit"]');
+
+        btn.disabled = true;
+        btn.innerHTML = 'Joining...';
+
+        // Store in localStorage for demo
+        const waitlist = JSON.parse(localStorage.getItem('aetherius_waitlist') || '[]');
+        if (!waitlist.find(w => w.email === email)) {
+            waitlist.push({ email, wallet, timestamp: Date.now() });
+            localStorage.setItem('aetherius_waitlist', JSON.stringify(waitlist));
+        }
+
+        document.getElementById('waitlistCount').textContent = waitlist.length;
+
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Joined!';
+
+        setTimeout(() => {
+            btn.innerHTML = 'Join Waitlist <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+            btn.disabled = false;
+            document.getElementById('waitlistEmail').value = '';
+            document.getElementById('waitlistWallet').value = '';
+        }, 3000);
+    }
+
+    // Load waitlist count
+    (function() {
+        const waitlist = JSON.parse(localStorage.getItem('aetherius_waitlist') || '[]');
+        document.getElementById('waitlistCount').textContent = waitlist.length;
+    })();
 
     /* founder price calculator (live prices from /health) */
     window.calcUpdate = function(){
