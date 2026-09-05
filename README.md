@@ -96,12 +96,13 @@ timeline
 | **Sep 3** — 3rd deploy | Dashboard OS mode, HTTPS (Let's Encrypt), CORS, JS SDK, 60/60 tests | **t+18h 23min** | `git log --oneline --since="2026-09-03"` |
 | **Sep 3** — 4th deploy | Demo player, cast replay, typewriter, 10+ tutorials EN/ES | **t+22h 41min** | same |
 | **Sep 3** — 5th deploy | README brutal (7 SVG diagrams), release v2.0.0, 15 GitHub topics | **t+23h 15min** | `git tag -l` |
-| **Sep 4** — 6th deploy | Player v2 (wiki tooltips, SVG icons, right-aligned), dashboard catalog fix | **t+48h 06min** | `git log -1 --format=%H` |
+| **Sep 3** — 6th deploy | Player v2 (wiki tooltips, SVG icons, right-aligned), dashboard catalog fix | **t+48h 06min** | `git log -1 --format=%H` |
+| **Sep 4** — 7th deploy | Interactive playground (live API testing), waitlist, Docker, JS SDK, grant submissions, YouTube demo, 60/60 tests | **t+55h** | `git log -1 --format=%H` |
 
-**Total commits:** 90+ and counting (`git log --oneline | wc -l` — velocity is public).
+**Total commits:** 100+ and counting (`git log --oneline | wc -l` — velocity is public).
 
-**Build velocity:** 40 endpoints + 60 tests + 2 SDKs + dashboard + landing + demo in **48 hours**.
-If one person builds this in 48 hours, imagine what funded builders ship on Base.
+**Build velocity:** 40 endpoints + 60 tests + 2 SDKs + dashboard + landing + playground + demo + 2 grant submissions in **55 hours**.
+If one person builds this in 55 hours, imagine what funded builders ship on Base.
 
 ---
 
@@ -196,11 +197,13 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | Mode | `real` — on-chain USDC verification via facilitator |
 | Health | `GET /health` (free) |
 | Telemetry | `GET /v1/telemetry` (free): uptime, per-endpoint stats, settled USDC volume |
+| Playground | [`/`](https://wilnowilx.github.io/aetheriusxapi/) — interactive endpoint testing |
 | Dashboard | [`/dashboard/`](https://wilnowilx.github.io/aetheriusxapi/dashboard/) + backend bar |
 | Live API | `http://34.156.149.38/aetherapi` · TLS `https://34-156-149-38.sslip.io/aetherapi` |
 | Version | v2.0.0 · 40 endpoints · 60/60 tests green |
+| YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 testnet USDC |
 
-Snapshot 2026-09-03: E2E 6/6 paid endpoints → 200 with real settlement.
+Snapshot 2026-09-04: E2E 6/6 paid endpoints → 200 with real settlement.
 
 ---
 
@@ -423,13 +426,18 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 - [x] E2E payment flow proven on testnet (6/6 → 200, real USDC settled)
 - [x] Upstream resilience (Overpass mirrors, 5-source price chain, Nominatim fallbacks)
 - [x] Interactive dashboard (`/dashboard/`) with API explorer
+- [x] Interactive playground — try any endpoint live from the landing page
 - [x] Coinbase CDP API credentials
 - [x] Professional landing page with aurora plasma background
 - [x] Demo player with wiki tooltips and typewriter replay
 - [x] Python + JavaScript SDKs
 - [x] 10+ tutorials EN/ES
+- [x] Base Batches 004 application submitted (result: Sep 17)
+- [x] Base Creator Grant application submitted ($4K)
+- [x] Waitlist with email + wallet capture
+- [x] Dockerfile + docker-compose for local dev
 - [ ] **Mainnet deployment** (pending ETH funding)
-- [ ] Base grant applications (Creator + Ecosystem Fund)
+- [ ] Base Ecosystem Fund application
 
 ### Phase 2: Scale (Post-Grant)
 - [ ] Expand to 120+ endpoints
@@ -448,14 +456,23 @@ Live (testnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ---
 
-## 💰 Grant Application
+## 💰 Grant Applications
 
-We are applying for the **Base Builder Grants** program:
+We are building on Base with support from the ecosystem:
 
-- **Amount:** $5,000 seed + GTM support
+### Base Batches 004 — Applied ✅
+- **Amount:** $100K + accelerator
+- **Status:** Submitted. Result: **Sep 17, 2026**
 - **Use of funds:** Mainnet deployment, expand to 120+ endpoints, SDK development
-- **Timeline:** 4 weeks post-funding
-- **Metrics:** First 100 paying API consumers within 90 days
+
+### Base Creator Grant — Applied ✅
+- **Amount:** $4K
+- **Status:** Submitted
+- **Use of funds:** Spanish tutorials, content creation, documentation
+
+### Base Ecosystem Fund — Not yet applied
+- **Amount:** Variable
+- **Status:** Next
 
 [Application text](application.md) · [Base Builder Grants](https://www.base.org/ecosystem-fund/apply)
 
@@ -500,14 +517,14 @@ We are applying for the **Base Builder Grants** program:
 ```bash
 # Clone the repository
 git clone https://github.com/wilnowilx/aetheriusxapi.git
-
-# Navigate to the project
 cd aetheriusxapi
 
-# Install dependencies
-pip install -r requirements.txt
+# Option 1: Docker (recommended)
+docker-compose up
+# Open http://localhost:4020
 
-# Run the server locally
+# Option 2: Python
+pip install -r requirements.txt
 uvicorn main:app --reload --port 4020
 
 # Open dashboard
@@ -537,9 +554,12 @@ MIT License — see [LICENSE](LICENSE) for details.
 | Resource | URL |
 |----------|-----|
 | **Website** | [wilnowilx.github.io/aetheriusxapi](https://wilnowilx.github.io/aetheriusxapi/) |
+| **Dashboard** | [wilnowilx.github.io/aetheriusxapi/dashboard](https://wilnowilx.github.io/aetheriusxapi/dashboard/) |
 | **Documentation** | [GitHub Docs](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) |
+| **Tutorials (ES)** | [docs/tutorials](https://github.com/wilnowilx/aetheriusxapi/tree/main/docs/tutorials) |
 | **Twitter** | [@aetheriusxAPI](https://x.com/aetheriusxAPI) |
 | **Telegram** | [@aetheriusxAPI](https://t.me/aetheriusxAPI) |
+| **YouTube** | [Demo video](https://youtu.be/TDzMALSe00A) |
 | **GitHub** | [wilnowilx/aetheriusxapi](https://github.com/wilnowilx/aetheriusxapi) |
 | **x402 Protocol** | [docs.x402.org](https://docs.x402.org) |
 | **Base** | [base.org](https://base.org) |

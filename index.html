@@ -1226,7 +1226,7 @@
         .footer-socials a:hover { background: rgba(168,85,247,0.12); color: var(--purple-light); }
 
         /* ===== PLAYGROUND ===== */
-        .playground-section { text-align: center; }
+        .playground-section { text-align: center; padding-top: 40px; }
 
         .playground-container {
             display: grid;
@@ -1235,10 +1235,21 @@
             margin-top: 72px;
             text-align: left;
             background: rgba(10, 10, 20, 0.6);
-            border: 1px solid rgba(168, 85, 247, 0.2);
+            border: 1px solid rgba(168, 85, 247, 0.25);
             border-radius: 20px;
             overflow: hidden;
             min-height: 500px;
+            box-shadow: 0 0 60px rgba(168, 85, 247, 0.08), 0 0 120px rgba(217, 70, 239, 0.04);
+            position: relative;
+        }
+        .playground-container::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px; right: -1px; bottom: -1px;
+            border-radius: 21px;
+            background: linear-gradient(135deg, rgba(168,85,247,0.3), transparent 40%, transparent 60%, rgba(217,70,239,0.2));
+            z-index: -1;
+            pointer-events: none;
         }
 
         .playground-sidebar {
@@ -1272,11 +1283,16 @@
             padding: 10px 12px;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             font-size: 0.82rem;
+            border: 1px solid transparent;
         }
-        .playground-endpoint:hover { background: rgba(168, 85, 247, 0.1); }
-        .playground-endpoint.active { background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); }
+        .playground-endpoint:hover { background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.15); }
+        .playground-endpoint.active {
+            background: rgba(168, 85, 247, 0.15);
+            border-color: rgba(168, 85, 247, 0.35);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.08);
+        }
 
         .pe-method {
             font-family: 'JetBrains Mono', monospace;
@@ -1342,7 +1358,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 20px;
+            padding: 10px 22px;
             background: linear-gradient(135deg, var(--purple-deep), var(--magenta));
             color: white;
             border: none;
@@ -1350,10 +1366,16 @@
             font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(168, 85, 247, 0.3);
         }
-        .playground-run:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4); }
-        .playground-run:disabled { opacity: 0.5; cursor: not-allowed; }
+        .playground-run:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(168, 85, 247, 0.5);
+            background: linear-gradient(135deg, var(--purple), var(--magenta-light));
+        }
+        .playground-run:active { transform: translateY(0); }
+        .playground-run:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
         .playground-params {
             padding: 16px 20px;
@@ -1379,9 +1401,12 @@
             color: var(--text);
             min-height: 44px;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .playground-param-input:focus { border-color: var(--purple); }
+        .playground-param-input:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+        }
 
         .playground-response {
             flex: 1;
@@ -1421,12 +1446,19 @@
             color: var(--text);
             overflow-y: auto;
             max-height: 300px;
+            background: rgba(0, 0, 0, 0.15);
+            white-space: pre-wrap;
+            word-break: break-word;
         }
+        .playground-response-body::-webkit-scrollbar { width: 4px; }
+        .playground-response-body::-webkit-scrollbar-thumb { background: var(--purple-deep); border-radius: 2px; }
 
         .playground-loading {
             color: var(--text-muted);
             font-style: italic;
+            animation: pulse 1.5s ease-in-out infinite;
         }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
         .playground-footer {
             display: flex;
@@ -1434,18 +1466,21 @@
             padding: 12px 20px;
             border-top: 1px solid var(--border);
             background: rgba(255, 255, 255, 0.02);
+            flex-wrap: wrap;
         }
 
         .playground-badge {
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 12px;
-            background: rgba(168, 85, 247, 0.08);
-            border: 1px solid rgba(168, 85, 247, 0.2);
+            padding: 6px 14px;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.25);
             border-radius: 9999px;
             font-size: 0.72rem;
+            font-weight: 500;
             color: var(--purple-light);
+            letter-spacing: 0.02em;
         }
 
         /* ===== WAITLIST ===== */
@@ -1712,20 +1747,24 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .playground-container { grid-template-columns: 240px 1fr; }
             .cats-grid { grid-template-columns: repeat(3, 1fr); }
             .features-grid { grid-template-columns: repeat(2, 1fr); }
             .code-wrap { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr 1fr; }
             .docs-grid { grid-template-columns: 1fr 1fr; }
             .heartbeat-container { grid-template-columns: 1fr; }
+            .waitlist-container { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 768px) {
             html { scroll-snap-type: none; }
             .nav-links { display: none; }
             .mobile-toggle { display: flex; }
-            .stats-grid, .cats-grid { grid-template-columns: 1fr 1fr; }
+            .playground-container { grid-template-columns: 1fr; min-height: auto; }
+            .playground-sidebar { max-height: 200px; border-right: none; border-bottom: 1px solid var(--border); }
+            .playground-response-body { min-height: 180px; }
+            .cats-grid { grid-template-columns: 1fr 1fr; }
             .steps-flow { flex-direction: column; align-items: center; gap: 24px; }
             .step-arrow { transform: rotate(90deg); padding-top: 0; }
             .step-card { max-width: 100%; }
@@ -1779,7 +1818,6 @@
         <div class="sdot" data-s="12"></div>
         <div class="sdot" data-s="13"></div>
         <div class="sdot" data-s="14"></div>
-        <div class="sdot" data-s="15"></div>
     </div>
 
     <!-- Mobile Nav -->
@@ -1788,7 +1826,7 @@
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
         <a href="#hero" onclick="closeMobile()">Home</a>
-        <a href="#stats" onclick="closeMobile()">Stats</a>
+        <a href="#playground" onclick="closeMobile()">Playground</a>
         <a href="#categories" onclick="closeMobile()">APIs</a>
         <a href="#how" onclick="closeMobile()">How It Works</a>
         <a href="#features" onclick="closeMobile()">Features</a>
@@ -1842,149 +1880,13 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
                 </a>
             </div>
-            <a href="#stats" class="scroll-cue" aria-label="Scroll to metrics">
+            <a href="#playground" class="scroll-cue" aria-label="Scroll to playground">
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
             </a>
         </div>
     </section>
 
-    <!-- STATS -->
-    <section id="stats" class="stats-section">
-        <div class="inner">
-            <div class="stag anim">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                Platform Metrics
-            </div>
-            <h2 class="stitle anim">Built for Scale</h2>
-            <p class="sdesc anim" style="margin: 0 auto;">Machine-to-machine commerce at planetary scale.</p>
-            
-            <div class="stats-grid">
-                <div class="stat-card anim ad1">
-                    <div class="stat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg></div>
-                    <div class="stat-val" id="lvEndpoints">…</div>
-                    <div class="stat-label">Live Endpoints</div>
-                </div>
-                <div class="stat-card anim ad2">
-                    <div class="stat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
-                    <div class="stat-val" id="lvVolume">…</div>
-                    <div class="stat-label">USDC Settled</div>
-                </div>
-                <div class="stat-card anim ad3">
-                    <div class="stat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-                    <div class="stat-val" id="lvPrice">…</div>
-                    <div class="stat-label">Starting Price</div>
-                </div>
-                <div class="stat-card anim ad4">
-                    <div class="stat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-                    <div class="stat-val" id="lvLatency">…</div>
-                    <div class="stat-label">Avg Latency</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CATEGORIES -->
-    <section id="categories" class="cats-section">
-        <div class="inner">
-            <div class="stag anim">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                API Categories
-            </div>
-            <h2 class="stitle anim">40 Live Endpoints, More Weekly</h2>
-            <p class="sdesc anim" style="margin: 0 auto;">Production APIs across maps, DeFi, web, data, forex and news — new verticals shipping weekly.</p>
-            
-            <div class="cats-grid">
-                <div class="cat-card anim ad1"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="cat-title">Maps & Location</div><div class="cat-count">5 live</div></div>
-                <div class="cat-card anim ad2"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10l4-4 4 4"/></svg></div><div class="cat-title">Crypto & DeFi</div><div class="cat-count">16 live</div></div>
-                <div class="cat-card anim ad3"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="cat-title">Web & Scraping</div><div class="cat-count">4 live</div></div>
-                <div class="cat-card anim ad4"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1M12 19v3"/></svg></div><div class="cat-title">AI & ML</div><div class="cat-count soon">soon</div></div>
-                <div class="cat-card anim ad1"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="cat-title">Finance</div><div class="cat-count">3 live</div></div>
-                <div class="cat-card anim ad2"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg></div><div class="cat-title">Communication</div><div class="cat-count">1 live</div></div>
-                <div class="cat-card anim ad3"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="9" x2="12" y2="2"/></svg></div><div class="cat-title">Weather</div><div class="cat-count">3 live</div></div>
-                <div class="cat-card anim ad4"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/></svg></div><div class="cat-title">News & Media</div><div class="cat-count">4 live</div></div>
-                <div class="cat-card anim ad1"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div class="cat-title">Security</div><div class="cat-count soon">soon</div></div>
-                <div class="cat-card anim ad2"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></div><div class="cat-title">Data & Analytics</div><div class="cat-count">4 live</div></div>
-                <div class="cat-card anim ad3"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M14 12h4"/></svg></div><div class="cat-title">Gaming</div><div class="cat-count soon">soon</div></div>
-                <div class="cat-card anim ad4"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div class="cat-title">Health & Science</div><div class="cat-count soon">soon</div></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- HOW IT WORKS -->
-    <section id="how" class="how-section">
-        <div class="inner">
-            <div class="stag anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>How It Works</div>
-            <h2 class="stitle anim">Four Steps to Autonomous Access</h2>
-            <p class="sdesc anim" style="margin: 0 auto;">From zero to API access in under a minute.</p>
-            
-            <div class="steps-flow">
-                <div class="step-card anim ad1"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span class="step-num">1</span></div><h3 class="step-title">Connect Wallet</h3><p class="step-desc">Your crypto wallet is your identity. No signup, no KYC.</p></div>
-                <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-                <div class="step-card anim ad2"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span class="step-num">2</span></div><h3 class="step-title">Choose API</h3><p class="step-desc">Browse 40 live endpoints. Pick what your agent needs.</p></div>
-                <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-                <div class="step-card anim ad3"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span class="step-num">3</span></div><h3 class="step-title">Pay Per Request</h3><p class="step-desc">x402 handles payment. USDC on Base. Sub-cent fees.</p></div>
-                <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-                <div class="step-card anim ad4"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span class="step-num">4</span></div><h3 class="step-title">Get Data</h3><p class="step-desc">Instant response. The agent gets exactly what it needs.</p></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FEATURES -->
-    <section id="features" class="features-section">
-        <div class="inner">
-            <div class="stag anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Features</div>
-            <h2 class="stitle anim">Built for the Agent Economy</h2>
-            <p class="sdesc anim" style="margin: 0 auto;">Every feature designed for machine-to-machine commerce.</p>
-            
-            <div class="features-grid">
-                <div class="feature-card anim ad1"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1"/></svg></div><h3 class="feature-title">AI-Native Design</h3><p class="feature-desc">Built for machines. No accounts, no UI, no human friction. Agents pay and use directly.</p></div>
-                <div class="feature-card anim ad2"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div><h3 class="feature-title">x402 Protocol</h3><p class="feature-desc">HTTP 402 with crypto payments. The emerging standard for machine-to-machine commerce.</p></div>
-                <div class="feature-card anim ad3"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><h3 class="feature-title">USDC on Base</h3><p class="feature-desc">Stablecoin payments on L2. Sub-cent fees, instant finality, global reach.</p></div>
-                <div class="feature-card anim ad1"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><h3 class="feature-title">Permissionless</h3><p class="feature-desc">No KYC, no subscriptions. Connect wallet and use. That's it.</p></div>
-                <div class="feature-card anim ad2"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><h3 class="feature-title">Global Access</h3><p class="feature-desc">Anyone with a crypto wallet. No bank account needed. No borders.</p></div>
-                <div class="feature-card anim ad3"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><h3 class="feature-title">Instant Settlement</h3><p class="feature-desc">Payments verified on-chain in seconds. No waiting, no intermediaries.</p></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CODE -->
-    <section id="code" class="code-section">
-        <div class="inner">
-            <div class="stag anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>For Developers</div>
-            <h2 class="stitle anim">Integrate in Minutes</h2>
-            <p class="sdesc anim" style="margin: 0 auto;">One SDK. Every API. Zero configuration.</p>
-            
-            <div class="code-wrap anim">
-                <div>
-                    <div class="terminal">
-                        <div class="term-header"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">terminal</span></div>
-                        <div class="term-tabs">
-                            <button class="term-tab active" onclick="switchCode(this, 'py')">Python</button>
-                            <button class="term-tab" onclick="switchCode(this, 'js')">JavaScript</button>
-                            <button class="term-tab" onclick="switchCode(this, 'curl')">cURL</button>
-                        </div>
-                        <div class="term-body" id="code-py"></div>
-                        <div class="term-body" id="code-js" style="display:none"></div>
-                        <div class="term-body" id="code-curl" style="display:none"></div>
-                    </div>
-                </div>
-                
-                <div class="code-info">
-                    <h3>One line of code.</h3>
-                    <p>The SDK handles wallet connection, payment negotiation, request signing, and response parsing. Just import and call.</p>
-                    <ul class="code-list">
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Auto-negotiates payment via x402</li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Python + JavaScript SDKs, typed and tested</li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Type-safe with full IDE support</li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Built-in retry and error handling</li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Zero configuration needed</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- LIVE PLAYGROUND -->
+    <!-- LIVE PLAYGROUND (hero position) -->
     <section id="playground" class="playground-section">
         <div class="inner">
             <div class="stag anim">
@@ -2096,6 +1998,107 @@
                             Settled instantly
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section id="categories" class="cats-section">
+        <div class="inner">
+            <div class="stag anim">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                API Categories
+            </div>
+            <h2 class="stitle anim">40 Live Endpoints, More Weekly</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">Production APIs across maps, DeFi, web, data, forex and news — new verticals shipping weekly.</p>
+            
+            <div class="cats-grid">
+                <div class="cat-card anim ad1"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="cat-title">Maps & Location</div><div class="cat-count">5 live</div></div>
+                <div class="cat-card anim ad2"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10l4-4 4 4"/></svg></div><div class="cat-title">Crypto & DeFi</div><div class="cat-count">16 live</div></div>
+                <div class="cat-card anim ad3"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="cat-title">Web & Scraping</div><div class="cat-count">4 live</div></div>
+                <div class="cat-card anim ad4"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1M12 19v3"/></svg></div><div class="cat-title">AI & ML</div><div class="cat-count soon">soon</div></div>
+                <div class="cat-card anim ad1"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="cat-title">Finance</div><div class="cat-count">3 live</div></div>
+                <div class="cat-card anim ad2"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg></div><div class="cat-title">Communication</div><div class="cat-count">1 live</div></div>
+                <div class="cat-card anim ad3"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="9" x2="12" y2="2"/></svg></div><div class="cat-title">Weather</div><div class="cat-count">3 live</div></div>
+                <div class="cat-card anim ad4"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/></svg></div><div class="cat-title">News & Media</div><div class="cat-count">4 live</div></div>
+                <div class="cat-card anim ad1"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div class="cat-title">Security</div><div class="cat-count soon">soon</div></div>
+                <div class="cat-card anim ad2"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></div><div class="cat-title">Data & Analytics</div><div class="cat-count">4 live</div></div>
+                <div class="cat-card anim ad3"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M14 12h4"/></svg></div><div class="cat-title">Gaming</div><div class="cat-count soon">soon</div></div>
+                <div class="cat-card anim ad4"><div class="cat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div class="cat-title">Health & Science</div><div class="cat-count soon">soon</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how" class="how-section">
+        <div class="inner">
+            <div class="stag anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>How It Works</div>
+            <h2 class="stitle anim">Four Steps to Autonomous Access</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">From zero to API access in under a minute.</p>
+            
+            <div class="steps-flow">
+                <div class="step-card anim ad1"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span class="step-num">1</span></div><h3 class="step-title">Connect Wallet</h3><p class="step-desc">Your crypto wallet is your identity. No signup, no KYC.</p></div>
+                <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                <div class="step-card anim ad2"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span class="step-num">2</span></div><h3 class="step-title">Choose API</h3><p class="step-desc">Browse 40 live endpoints. Pick what your agent needs.</p></div>
+                <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                <div class="step-card anim ad3"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span class="step-num">3</span></div><h3 class="step-title">Pay Per Request</h3><p class="step-desc">x402 handles payment. USDC on Base. Sub-cent fees.</p></div>
+                <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                <div class="step-card anim ad4"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span class="step-num">4</span></div><h3 class="step-title">Get Data</h3><p class="step-desc">Instant response. The agent gets exactly what it needs.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="features-section">
+        <div class="inner">
+            <div class="stag anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Features</div>
+            <h2 class="stitle anim">Built for the Agent Economy</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">Every feature designed for machine-to-machine commerce.</p>
+            
+            <div class="features-grid">
+                <div class="feature-card anim ad1"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1"/></svg></div><h3 class="feature-title">AI-Native Design</h3><p class="feature-desc">Built for machines. No accounts, no UI, no human friction. Agents pay and use directly.</p></div>
+                <div class="feature-card anim ad2"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div><h3 class="feature-title">x402 Protocol</h3><p class="feature-desc">HTTP 402 with crypto payments. The emerging standard for machine-to-machine commerce.</p></div>
+                <div class="feature-card anim ad3"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><h3 class="feature-title">USDC on Base</h3><p class="feature-desc">Stablecoin payments on L2. Sub-cent fees, instant finality, global reach.</p></div>
+                <div class="feature-card anim ad1"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><h3 class="feature-title">Permissionless</h3><p class="feature-desc">No KYC, no subscriptions. Connect wallet and use. That's it.</p></div>
+                <div class="feature-card anim ad2"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><h3 class="feature-title">Global Access</h3><p class="feature-desc">Anyone with a crypto wallet. No bank account needed. No borders.</p></div>
+                <div class="feature-card anim ad3"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><h3 class="feature-title">Instant Settlement</h3><p class="feature-desc">Payments verified on-chain in seconds. No waiting, no intermediaries.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CODE -->
+    <section id="code" class="code-section">
+        <div class="inner">
+            <div class="stag anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>For Developers</div>
+            <h2 class="stitle anim">Integrate in Minutes</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">One SDK. Every API. Zero configuration.</p>
+            
+            <div class="code-wrap anim">
+                <div>
+                    <div class="terminal">
+                        <div class="term-header"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">terminal</span></div>
+                        <div class="term-tabs">
+                            <button class="term-tab active" onclick="switchCode(this, 'py')">Python</button>
+                            <button class="term-tab" onclick="switchCode(this, 'js')">JavaScript</button>
+                            <button class="term-tab" onclick="switchCode(this, 'curl')">cURL</button>
+                        </div>
+                        <div class="term-body" id="code-py"></div>
+                        <div class="term-body" id="code-js" style="display:none"></div>
+                        <div class="term-body" id="code-curl" style="display:none"></div>
+                    </div>
+                </div>
+                
+                <div class="code-info">
+                    <h3>One line of code.</h3>
+                    <p>The SDK handles wallet connection, payment negotiation, request signing, and response parsing. Just import and call.</p>
+                    <ul class="code-list">
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Auto-negotiates payment via x402</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Python + JavaScript SDKs, typed and tested</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Type-safe with full IDE support</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Built-in retry and error handling</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Zero configuration needed</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -2562,18 +2565,8 @@
     }
     async function refreshLiveStats() {
         try {
-            const h = await aexGet('/api/v1/health');
-            if (h && h.endpoints) {
-                const eps = Object.values(h.endpoints);
-                document.getElementById('lvEndpoints').textContent = Object.keys(h.endpoints).length;
-                let min = Infinity;
-                eps.forEach(d => { const m = /\$(\d+(?:\.\d+)?)\/call/.exec(d); if (m) min = Math.min(min, parseFloat(m[1])); });
-                if (min < Infinity) document.getElementById('lvPrice').textContent = '$' + min;
-            }
             const t = await aexGet('/v1/telemetry');
             if (t && t.totals) {
-                if (t.totals.avg_latency_ms) document.getElementById('lvLatency').textContent = Math.round(t.totals.avg_latency_ms) + 'ms';
-                document.getElementById('lvVolume').textContent = '$' + (t.totals.volume_usdc || 0);
                 /* heartbeat card: real uptime / latency / errors, no hardcoded stats */
                 var hbLat = document.getElementById('hbLat');
                 if (hbLat) hbLat.textContent = t.totals.avg_latency_ms != null ? t.totals.avg_latency_ms.toFixed(1) + 'ms' : '—';
