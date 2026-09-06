@@ -727,6 +727,42 @@ async def hype(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 # ============================================
+# WELCOME HANDLER (new members)
+# ============================================
+
+async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Greet new members with a rich welcome message."""
+    if not update.message or not update.message.new_chat_members:
+        return
+
+    for member in update.message.new_chat_members:
+        if member.is_bot:
+            continue  # Skip other bots
+
+        name = member.first_name or "Builder"
+        welcome = (
+            f"Welcome to AETHERIUS, {name}! 💜\n\n"
+            f"You just joined the agent economy.\n\n"
+            f"What we're building:\n"
+            f"80 APIs where AI agents pay per request in USDC on Base.\n"
+            f"20 of them are FREE on-chain analytics — nobody else has this.\n\n"
+            f"Quick start:\n"
+            f"/help — all commands\n"
+            f"/apis — explore the API catalog\n"
+            f"/x402 — learn how x402 works\n"
+            f"/price — live crypto prices\n"
+            f"/quiz — test your crypto knowledge\n\n"
+            f"Built by a solo builder from LATAM 🇻🇪\n"
+            f"GitHub: github.com/wilnowilx/aetheriusxapi"
+        )
+
+        try:
+            await update.message.reply_text(welcome, parse_mode="HTML")
+        except Exception:
+            await update.message.reply_text(welcome)
+
+
+# ============================================
 # MESSAGE HANDLER (keywords + quiz + riddle)
 # ============================================
 
@@ -783,20 +819,17 @@ async def auto_post_daily(context: ContextTypes.DEFAULT_TYPE):
     except Exception:
         post_content = generate_alpha_drop()
 
-    targets = [CHANNEL_ID]
-    if GROUP_ID:
-        targets.append(GROUP_ID)
-
-    for target in targets:
-        try:
-            await context.bot.send_message(
-                chat_id=target,
-                text=post_content,
-                parse_mode=None
-            )
-            logger.info(f"Auto-posted to {target}: {post_content[:50]}...")
-        except Exception as e:
-            logger.error(f"Failed to auto-post to {target}: {e}")
+    # Updates go to CHANNEL only — group is for discussion
+    target = CHANNEL_ID
+    try:
+        await context.bot.send_message(
+            chat_id=target,
+            text=post_content,
+            parse_mode=None
+        )
+        logger.info(f"Auto-posted to channel: {post_content[:50]}...")
+    except Exception as e:
+        logger.error(f"Failed to auto-post to channel: {e}")
 
     last_daily_post = today
 
@@ -811,22 +844,19 @@ async def auto_post_deploy(context: ContextTypes.DEFAULT_TYPE, commits: list, fi
         f"📁 {files_changed} files changed\n\n"
         f"Latest commits:\n{commits_text}\n\n"
         f"🔗 wilnowilx.github.io/aetheriusxapi\n"
-        f"🧪 Base Sepolia | x402 | USDC"
+        f"🧪 Base Mainnet | x402 | USDC"
     )
 
-    targets = [CHANNEL_ID]
-    if GROUP_ID:
-        targets.append(GROUP_ID)
-
-    for target in targets:
-        try:
-            await context.bot.send_message(
-                chat_id=target,
-                text=message,
-                parse_mode=None
-            )
-        except Exception as e:
-            logger.error(f"Failed deploy notification to {target}: {e}")
+    # Updates go to CHANNEL only — group is for discussion
+    target = CHANNEL_ID
+    try:
+        await context.bot.send_message(
+            chat_id=target,
+            text=message,
+            parse_mode=None
+        )
+    except Exception as e:
+        logger.error(f"Failed deploy notification to channel: {e}")
 
 
 # ============================================
@@ -928,6 +958,9 @@ def main():
 
     # Message handler with keyword auto-response
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+    # Welcome handler — greets new members
+    app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_new_members))
 
     # Global error handler
     app.add_error_handler(error_handler)

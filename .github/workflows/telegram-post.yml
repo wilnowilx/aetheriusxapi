@@ -41,8 +41,8 @@ jobs:
               data = json.load(f)
           tweets = data['tweets']
           i = int('$DAY') - 1
-          print(tweets[i]['content'] if i < len(tweets) else 'AETHERIUS: 40 APIs live on Base. The Infrastructure for Agents That Pay.')
-          " 2>/dev/null || echo "AETHERIUS: 40 APIs live on Base. The Infrastructure for Agents That Pay.")
+          print(tweets[i]['content'] if i < len(tweets) else 'AETHERIUS: 80 APIs live on Base Mainnet. 20 FREE on-chain analytics.')
+          " 2>/dev/null || echo "AETHERIUS: 80 APIs live on Base Mainnet. 20 FREE on-chain analytics.")
           else
             CONTENT="AETHERIUS Deploy - $DATE
           Files changed: $FILES_CHANGED
@@ -55,9 +55,4 @@ jobs:
             -d text="${CONTENT}" \
             -d disable_web_page_preview="true"
           
-          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
-            -d chat_id="${GROUP_ID}" \
-            -d text="${CONTENT}" \
-            -d disable_web_page_preview="true"
-          
-          echo "Posted to channel and supergroup!"
+          echo "Posted to channel!"
