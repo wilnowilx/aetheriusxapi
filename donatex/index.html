@@ -7,6 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💜</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 :root{--bg:#09090b;--purple:#a855f7;--magenta:#d946ef;--pink:#ec4899;--green:#10b981;--orange:#f59e0b;--text:#f0f0f5;--sec:#8a8a9a;--surface:#0e0e18;--border:rgba(168,85,247,.3)}
 ::-webkit-scrollbar{display:none}*{margin:0;padding:0;box-sizing:border-box;scrollbar-width:none}
@@ -21,6 +22,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .plasma-blob:nth-child(3){width:420px;height:420px;background:radial-gradient(circle,rgba(236,72,153,.4) 0%,transparent 70%);bottom:-8%;left:25%;animation-duration:15s;animation-delay:-9s}
 @keyframes plasmaFloat{0%{transform:translate(0,0) scale(1)}25%{transform:translate(80px,-55px) scale(1.14)}50%{transform:translate(-45px,70px) scale(.94)}75%{transform:translate(60px,25px) scale(1.06)}100%{transform:translate(-30px,-45px) scale(1)}}
 @keyframes auroraMorph{0%,100%{border-radius:42% 58% 63% 37%/45% 42% 58% 55%}33%{border-radius:63% 37% 42% 58%/55% 58% 42% 45%}66%{border-radius:37% 63% 55% 45%/42% 55% 45% 58%}}
+
+/* === THREE.JS CANVAS === */
+#three-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
 
 /* === FADE UP === */
 .fade-up{opacity:0;transform:translateY(40px);transition:all .8s cubic-bezier(.16,1,.3,1)}
@@ -149,6 +153,7 @@ footer a{color:var(--purple);text-decoration:none}
 </head>
 <body>
 
+<canvas id="three-canvas"></canvas>
 <div id="plasma-bg"><div class="plasma-blob"></div><div class="plasma-blob"></div><div class="plasma-blob"></div></div>
 
 <nav id="nav">
@@ -649,6 +654,210 @@ document.getElementById('verifyBtn').onclick = async function(){
     result.innerHTML='<span style="color:#ef4444">Error: '+e.message+'</span>';
   }
 };
+</script>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- THREE.JS: USDC FLOW VISUALIZATION                  -->
+<!-- ═══════════════════════════════════════════════════ -->
+<script>
+(function(){
+  var canvas=document.getElementById('three-canvas');
+  var scene=new THREE.Scene();
+  var camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
+  renderer.setSize(window.innerWidth,window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+
+  // Colors: purple, magenta, pink
+  var colors=[
+    new THREE.Color(0xa855f7),
+    new THREE.Color(0xd946ef),
+    new THREE.Color(0xec4899),
+    new THREE.Color(0x8b5cf6),
+    new THREE.Color(0xf472b6)
+  ];
+
+  // Particle system: USDC transfers flowing
+  var PARTICLE_COUNT=800;
+  var geometry=new THREE.BufferGeometry();
+  var positions=new Float32Array(PARTICLE_COUNT*3);
+  var velocities=new Float32Array(PARTICLE_COUNT*3);
+  var particleColors=new Float32Array(PARTICLE_COUNT*3);
+  var sizes=new Float32Array(PARTICLE_COUNT);
+  var lifetimes=new Float32Array(PARTICLE_COUNT);
+
+  for(var i=0;i<PARTICLE_COUNT;i++){
+    // Random spawn positions
+    positions[i*3]=(Math.random()-0.5)*20;     // x
+    positions[i*3+1]=(Math.random()-0.5)*12;   // y
+    positions[i*3+2]=(Math.random()-0.5)*10;   // z
+
+    // Velocities: flowing right with slight drift
+    velocities[i*3]=0.01+Math.random()*0.03;   // x speed
+    velocities[i*3+1]=(Math.random()-0.5)*0.005; // y drift
+    velocities[i*3+2]=(Math.random()-0.5)*0.005; // z drift
+
+    // Random color from palette
+    var c=colors[Math.floor(Math.random()*colors.length)];
+    particleColors[i*3]=c.r;
+    particleColors[i*3+1]=c.g;
+    particleColors[i*3+2]=c.b;
+
+    // Random sizes
+    sizes[i]=0.02+Math.random()*0.06;
+    lifetimes[i]=Math.random();
+  }
+
+  geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
+  geometry.setAttribute('color',new THREE.BufferAttribute(particleColors,3));
+  geometry.setAttribute('size',new THREE.BufferAttribute(sizes,1));
+
+  // Shader material for glowing particles
+  var material=new THREE.ShaderMaterial({
+    uniforms:{
+      time:{value:0},
+      mouse:{value:new THREE.Vector2(0,0)}
+    },
+    vertexShader:`
+      attribute float size;
+      attribute vec3 color;
+      varying vec3 vColor;
+      varying float vAlpha;
+      uniform float time;
+      uniform vec2 mouse;
+      void main(){
+        vColor=color;
+        vec3 pos=position;
+        // Subtle wave motion
+        pos.y+=sin(time*0.5+position.x*0.3)*0.1;
+        pos.z+=cos(time*0.3+position.y*0.2)*0.05;
+        // Mouse interaction
+        float dx=pos.x-mouse.x*10.0;
+        float dy=pos.y-mouse.y*5.0;
+        float dist=sqrt(dx*dx+dy*dy);
+        if(dist<2.0){
+          pos.x+=dx*0.1*(1.0-dist/2.0);
+          pos.y+=dy*0.1*(1.0-dist/2.0);
+        }
+        vec4 mvPosition=modelViewMatrix*vec4(pos,1.0);
+        gl_PointSize=size*(300.0/-mvPosition.z);
+        gl_Position=projectionMatrix*mvPosition;
+        vAlpha=0.4+0.6*sin(time+position.x*2.0);
+      }
+    `,
+    fragmentShader:`
+      varying vec3 vColor;
+      varying float vAlpha;
+      void main(){
+        float d=length(gl_PointCoord-vec2(0.5));
+        if(d>0.5)discard;
+        float glow=1.0-d*2.0;
+        glow=pow(glow,2.0);
+        gl_FragColor=vec4(vColor,vAlpha*glow*0.6);
+      }
+    `,
+    transparent:true,
+    blending:THREE.AdditiveBlending,
+    depthWrite:false
+  });
+
+  var particles=new THREE.Points(geometry,material);
+  scene.add(particles);
+
+  // Connection lines between nearby particles
+  var lineGeometry=new THREE.BufferGeometry();
+  var linePositions=new Float32Array(200*6); // 200 max lines
+  lineGeometry.setAttribute('position',new THREE.BufferAttribute(linePositions,3));
+  var lineMaterial=new THREE.LineBasicMaterial({
+    color:0xa855f7,
+    transparent:true,
+    opacity:0.08,
+    blending:THREE.AdditiveBlending
+  });
+  var lines=new THREE.LineSegments(lineGeometry,lineMaterial);
+  scene.add(lines);
+
+  camera.position.z=5;
+
+  // Mouse tracking
+  var mouse={x:0,y:0};
+  document.addEventListener('mousemove',function(e){
+    mouse.x=(e.clientX/window.innerWidth)*2-1;
+    mouse.y=-(e.clientY/window.innerHeight)*2+1;
+  });
+
+  // Scroll tracking
+  var scrollY=0;
+  window.addEventListener('scroll',function(){
+    scrollY=window.scrollY;
+  });
+
+  // Animation loop
+  var clock=new THREE.Clock();
+  function animate(){
+    requestAnimationFrame(animate);
+    var t=clock.getElapsedTime();
+    var pos=geometry.attributes.position.array;
+
+    // Move particles
+    for(var i=0;i<PARTICLE_COUNT;i++){
+      pos[i*3]+=velocities[i*3];
+      pos[i*3+1]+=velocities[i*3+1];
+      pos[i*3+2]+=velocities[i*3+2];
+
+      // Reset when out of bounds
+      if(pos[i*3]>10){
+        pos[i*3]=-10;
+        pos[i*3+1]=(Math.random()-0.5)*12;
+        pos[i*3+2]=(Math.random()-0.5)*10;
+      }
+    }
+    geometry.attributes.position.needsUpdate=true;
+
+    // Update connection lines
+    var lineIdx=0;
+    var maxLines=200;
+    for(var i=0;i<PARTICLE_COUNT&&lineIdx<maxLines;i++){
+      for(var j=i+1;j<PARTICLE_COUNT&&lineIdx<maxLines;j++){
+        var dx=pos[i*3]-pos[j*3];
+        var dy=pos[i*3+1]-pos[j*3+1];
+        var dz=pos[i*3+2]-pos[j*3+2];
+        var dist=Math.sqrt(dx*dx+dy*dy+dz*dz);
+        if(dist<1.5){
+          linePositions[lineIdx*6]=pos[i*3];
+          linePositions[lineIdx*6+1]=pos[i*3+1];
+          linePositions[lineIdx*6+2]=pos[i*3+2];
+          linePositions[lineIdx*6+3]=pos[j*3];
+          linePositions[lineIdx*6+4]=pos[j*3+1];
+          linePositions[lineIdx*6+5]=pos[j*3+2];
+          lineIdx++;
+        }
+      }
+    }
+    // Clear remaining lines
+    for(var i=lineIdx*6;i<200*6;i++)linePositions[i]=0;
+    lineGeometry.attributes.position.needsUpdate=true;
+
+    // Update uniforms
+    material.uniforms.time.value=t;
+    material.uniforms.mouse.value.set(mouse.x,mouse.y);
+
+    // Camera subtle movement
+    camera.position.x=mouse.x*0.3;
+    camera.position.y=mouse.y*0.2+scrollY*0.001;
+    camera.lookAt(0,0,0);
+
+    renderer.render(scene,camera);
+  }
+  animate();
+
+  // Resize handler
+  window.addEventListener('resize',function(){
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+  });
+})();
 </script>
 </body>
 </html>
