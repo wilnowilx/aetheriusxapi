@@ -62,21 +62,21 @@ nav.scrolled{padding:12px 40px;background:rgba(9,9,11,.95)}
 .term-section{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:60px 20px;scroll-snap-align:start;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
 .term-section h2{text-align:center;font-size:38px;font-weight:800;margin-bottom:12px}
 .term-section .sub{text-align:center;color:var(--sec);margin-bottom:40px;font-size:17px}
-.term-wrap{background:#0c0c10;border:1px solid rgba(168,85,247,.4);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
-.term-chrome{display:flex;align-items:center;gap:8px;padding:12px 18px;background:#111116;border-bottom:1px solid rgba(168,85,247,.1);font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec)}
+.term-wrap{background:#0c0c10;border:1px solid rgba(168,85,247,.4);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);height:480px;display:flex;flex-direction:column}
+.term-chrome{display:flex;align-items:center;gap:8px;padding:12px 18px;background:#111116;border-bottom:1px solid rgba(168,85,247,.1);font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec);flex-shrink:0}
 .term-chrome .title{flex:1;text-align:center;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .term-chrome .dots{display:flex;gap:6px}
 .term-chrome .dot{width:12px;height:12px;border-radius:50%}
 .dot.r{background:#ef4444}.dot.y{background:#eab308}.dot.g{background:#22c55e}
-.progress-bar{height:3px;background:rgba(255,255,255,.06);border-left:1px solid rgba(168,85,247,.4);border-right:1px solid rgba(168,85,247,.4)}
+.progress-bar{height:3px;background:rgba(255,255,255,.06);border-left:1px solid rgba(168,85,247,.4);border-right:1px solid rgba(168,85,247,.4);flex-shrink:0}
 .progress-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--magenta),var(--pink));transition:width .3s}
-.term{font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1.7;padding:24px;min-height:400px;max-height:560px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;position:relative;scrollbar-width:none}
+.term{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;padding:20px 24px;flex:1;overflow-y:auto;white-space:pre-wrap;word-break:break-word;position:relative;scrollbar-width:none}
 .term::-webkit-scrollbar{display:none}
 .term .banner{color:var(--purple);font-weight:700}
 .term .ok{color:var(--green)}.term .warn{color:var(--orange)}.term .dim{color:var(--sec)}.term .key{color:var(--purple)}.term .val{color:var(--pink)}.term .num{color:var(--orange)}.term .str{color:var(--green)}
 .cursor{display:inline-block;width:9px;height:17px;background:var(--purple);vertical-align:-3px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
-.term-controls{display:flex;gap:12px;justify-content:center;padding:16px;background:#111116;border-top:1px solid rgba(168,85,247,.1)}
+.term-controls{display:flex;gap:12px;justify-content:center;padding:14px;background:#111116;border-top:1px solid rgba(168,85,247,.1);flex-shrink:0}
 .term-controls button{background:linear-gradient(90deg,var(--purple),var(--magenta));color:#fff;border:none;border-radius:9px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
 .term-controls button:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(168,85,247,.4)}
 .term-controls button.ghost{background:transparent;border:1px solid rgba(255,255,255,.2)}
@@ -99,12 +99,12 @@ nav.scrolled{padding:12px 40px;background:rgba(9,9,11,.95)}
 .feat p{font-size:13px;color:var(--sec);line-height:1.6}
 
 /* === COMPARE TABLE === */
-.compare{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:60px 20px;scroll-snap-align:start}
-.compare h2{text-align:center;font-size:38px;font-weight:800;margin-bottom:16px}
-.compare .sub{text-align:center;color:var(--sec);margin-bottom:40px;font-size:17px}
-.compare table{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid rgba(168,85,247,.15);border-radius:16px;overflow:hidden}
-.compare th{background:rgba(168,85,247,.1);padding:16px 20px;text-align:left;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--purple)}
-.compare td{padding:14px 20px;font-size:14px;border-top:1px solid rgba(168,85,247,.06)}
+.compare{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:60px 20px;scroll-snap-align:start}
+.compare h2{text-align:center;font-size:28px;font-weight:700;margin-bottom:8px}
+.compare .sub{text-align:center;color:var(--sec);margin-bottom:28px;font-size:14px}
+.compare table{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid rgba(168,85,247,.12);border-radius:14px;overflow:hidden;font-size:13px}
+.compare th{background:rgba(168,85,247,.08);padding:12px 16px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--purple)}
+.compare td{padding:10px 16px;font-size:13px;border-top:1px solid rgba(168,85,247,.06)}
 .compare tr:hover td{background:rgba(168,85,247,.03)}
 .compare .win{color:var(--green);font-weight:600}.compare .lose{color:#ef4444}
 
@@ -172,14 +172,6 @@ footer a{color:var(--purple);text-decoration:none}
   </div>
 </section>
 
-<!-- STATS -->
-<div class="stats fade-up">
-  <div class="stat"><div class="stat-val">0%</div><div class="stat-lbl">Platform Fees</div></div>
-  <div class="stat"><div class="stat-val">0</div><div class="stat-lbl">Sign-ups</div></div>
-  <div class="stat"><div class="stat-val">3KB</div><div class="stat-lbl">Widget Size</div></div>
-  <div class="stat"><div class="stat-val">$0.001</div><div class="stat-lbl">Gas on Base</div></div>
-</div>
-
 <!-- TERMINAL DEMO -->
 <section class="term-section fade-up" id="terminal">
   <h2>See It In Action</h2>
@@ -201,16 +193,48 @@ footer a{color:var(--purple);text-decoration:none}
 <!-- WIKI TOOLTIP -->
 <div class="wiki" id="wiki"></div>
 
+<!-- STATS -->
+<div class="stats fade-up">
+  <div class="stat"><div class="stat-val">0%</div><div class="stat-lbl">Platform Fees</div></div>
+  <div class="stat"><div class="stat-val">0</div><div class="stat-lbl">Sign-ups</div></div>
+  <div class="stat"><div class="stat-val">3KB</div><div class="stat-lbl">Widget Size</div></div>
+  <div class="stat"><div class="stat-val">$0.001</div><div class="stat-lbl">Gas on Base</div></div>
+</div>
+
 <!-- FEATURES -->
 <section class="features fade-up" id="features">
   <h2>Why DonateX?</h2>
   <div class="feat-grid">
-    <div class="feat"><div class="feat-icon">🔓</div><h3>No KYC Required</h3><p>Just a wallet address. No identity verification, no bank accounts. Works for anyone, anywhere.</p></div>
-    <div class="feat"><div class="feat-icon">⛽</div><h3>$0.001 Gas</h3><p>Built on Base (Coinbase L2). Transactions cost less than a penny. Donors keep 99.9%.</p></div>
-    <div class="feat"><div class="feat-icon">🔍</div><h3>Fully Transparent</h3><p>Every donation on-chain. Your community can verify exactly where funds go.</p></div>
-    <div class="feat"><div class="feat-icon">🌍</div><h3>Works Everywhere</h3><p>Any website, any framework, any platform. If it has a script tag, it works.</p></div>
-    <div class="feat"><div class="feat-icon">🦊</div><h3>Wallet Connect</h3><p>MetaMask, Rabby, or any Base wallet. One click, done.</p></div>
-    <div class="feat"><div class="feat-icon">📦</div><h3>Zero Dependencies</h3><p>Vanilla JavaScript. No React, no Vue, no build tools. Just 3KB.</p></div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg></div>
+      <h3>No KYC Required</h3>
+      <p>Just a wallet address. No identity verification, no bank accounts. Works for anyone, anywhere.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--magenta)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <h3>$0.001 Gas</h3>
+      <p>Built on Base (Coinbase L2). Transactions cost less than a penny. Donors keep 99.9%.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+      <h3>Fully Transparent</h3>
+      <p>Every donation on-chain. Your community can verify exactly where funds go.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+      <h3>Works Everywhere</h3>
+      <p>Any website, any framework, any platform. If it has a script tag, it works.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <h3>Wallet Connect</h3>
+      <p>MetaMask, Rabby, or any Base wallet. One click, done.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+      <h3>Zero Dependencies</h3>
+      <p>Vanilla JavaScript. No React, no Vue, no build tools. Just 3KB.</p>
+    </div>
   </div>
 </section>
 
