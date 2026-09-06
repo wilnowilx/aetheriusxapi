@@ -153,27 +153,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* full-bleed transparente: sin borde ni radio ni sombra
-               para que no aparezcan líneas de costura al hacer scroll */
             border: none;
             border-radius: 0;
             box-shadow: none;
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
-            overflow: clip;
+            overflow: hidden;
+            padding: 0 16px;
         }
 
         .inner {
-            max-width: 1100px;
+            max-width: 960px;
             margin: 0 auto;
-            padding: 48px 32px;
+            padding: 48px 24px;
             width: 100%;
             box-sizing: border-box;
         }
 
         #hero .inner {
             max-width: 1100px;
-            padding: 40px 32px;
+            padding: 36px 24px;
         }
 
         /* ===== NAV ===== */
@@ -374,22 +373,27 @@
         .hero .inner {
             display: flex;
             align-items: center;
-            gap: 32px;
-            padding: 36px 32px;
+            gap: 0;
+            padding: 36px 24px;
             min-height: auto;
-            overflow: hidden;
+            overflow: visible;
         }
 
-        .hero-left { flex: 1; min-width: 0; }
-        .hero-right { flex: 0 0 380px; height: 380px; position: relative; }
+        .hero-left { flex: 1; min-width: 0; position: relative; z-index: 2; }
+        .hero-right { flex: 0 0 440px; height: 440px; position: relative; margin-left: -80px; }
 
         /* Text readability over plasma: subtle backdrop for all content sections */
         section .inner {
-            background: radial-gradient(ellipse at center, rgba(6,6,14,0.88) 0%, rgba(6,6,14,0.62) 60%, transparent 100%);
-            border-radius: 24px;
-            border: 1px solid rgba(168,85,247,0.14);
-            border-bottom: 1px solid rgba(168,85,247,0.38);
-            box-shadow: 0 30px 80px -30px rgba(168,85,247,0.5), 0 12px 40px -18px rgba(217,70,239,0.35);
+            background: radial-gradient(ellipse at center, rgba(6,6,14,0.92) 0%, rgba(6,6,14,0.7) 60%, transparent 100%);
+            border-radius: 20px;
+            border: 1px solid rgba(168,85,247,0.12);
+            border-bottom: 1px solid rgba(168,85,247,0.3);
+            box-shadow: 0 20px 60px -20px rgba(168,85,247,0.4), 0 8px 30px -12px rgba(217,70,239,0.3);
+        }
+        #hero .inner {
+            background: none;
+            border: none;
+            box-shadow: none;
         }
 
         .hero-badges {
@@ -521,12 +525,12 @@
         .globe-label{
             position:absolute;
             font-family:'JetBrains Mono',monospace;
-            font-size:0.62rem;
+            font-size:0.6rem;
             padding:3px 8px;
             border-radius:6px;
             white-space:nowrap;
             opacity:0;
-            animation:labelFloat 8s ease-in-out infinite;
+            animation:labelPulse 7s ease-in-out forwards;
         }
         .globe-label.price{color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25)}
         .globe-label.endpoint{color:#a855f7;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.25)}
@@ -534,11 +538,11 @@
         .globe-label.protocol{color:#d946ef;background:rgba(217,70,239,0.12);border:1px solid rgba(217,70,239,0.25)}
         .globe-label.usdc{color:#ec4899;background:rgba(236,72,153,0.12);border:1px solid rgba(236,72,153,0.25)}
 
-        @keyframes labelFloat{
-          0%{opacity:0;transform:translateY(10px)}
-          8%{opacity:0.8;transform:translateY(0)}
-          85%{opacity:0.8;transform:translateY(-5px)}
-          100%{opacity:0;transform:translateY(-15px)}
+        @keyframes labelPulse{
+          0%{opacity:0;transform:translateY(8px) scale(0.95)}
+          10%{opacity:0.85;transform:translateY(0) scale(1)}
+          80%{opacity:0.85;transform:translateY(-3px) scale(1)}
+          100%{opacity:0;transform:translateY(-10px) scale(0.95)}
         }
 
         .hero-console {
@@ -3175,55 +3179,92 @@
       var canvas=document.getElementById('globe-canvas');
       if(!canvas||typeof THREE==='undefined')return;
       var container=canvas.parentElement;
-      var w=container.clientWidth||420;
-      var h=container.clientHeight||420;
+      var w=container.clientWidth||440;
+      var h=container.clientHeight||440;
 
       var scene=new THREE.Scene();
-      var camera=new THREE.PerspectiveCamera(45,w/h,0.1,1000);
+      var camera=new THREE.PerspectiveCamera(42,w/h,0.1,1000);
       var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
       renderer.setSize(w,h);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
 
-      // === GLOBE WIREFRAME ===
       var globeGroup=new THREE.Group();
       scene.add(globeGroup);
 
-      var globeGeom=new THREE.IcosahedronGeometry(2.2,3);
-      var globeMat=new THREE.MeshBasicMaterial({color:0xa855f7,wireframe:true,transparent:true,opacity:0.08});
+      // === GLOBE WIREFRAME (SphereGeometry for proper poles) ===
+      var globeGeom=new THREE.SphereGeometry(2.2,32,24);
+      var globeMat=new THREE.MeshBasicMaterial({color:0xa855f7,wireframe:true,transparent:true,opacity:0.06});
       var globe=new THREE.Mesh(globeGeom,globeMat);
       globeGroup.add(globe);
 
       // Inner glow
-      var glowGeom=new THREE.SphereGeometry(2.1,32,32);
+      var glowGeom=new THREE.SphereGeometry(2.15,32,32);
       var glowMat=new THREE.ShaderMaterial({
         uniforms:{time:{value:0}},
         vertexShader:'varying vec3 vNormal;void main(){vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
-        fragmentShader:'varying vec3 vNormal;uniform float time;void main(){float intensity=pow(0.65-dot(vNormal,vec3(0.0,0.0,1.0)),2.0);gl_FragColor=vec4(0.66,0.33,0.97,1.0)*intensity*0.5;}',
-        blending:THREE.AdditiveBlending,
-        side:THREE.BackSide,
-        transparent:true
+        fragmentShader:'varying vec3 vNormal;uniform float time;void main(){float intensity=pow(0.6-dot(vNormal,vec3(0.0,0.0,1.0)),2.0);gl_FragColor=vec4(0.66,0.33,0.97,1.0)*intensity*0.5;}',
+        blending:THREE.AdditiveBlending,side:THREE.BackSide,transparent:true
       });
       var glow=new THREE.Mesh(glowGeom,glowMat);
       globeGroup.add(glow);
 
-      // === AGENT NODES (80 API Endpoints) ===
+      // === x402 CENTRAL TEXT (CSS2D or sprite) ===
+      var x402Canvas=document.createElement('canvas');
+      x402Canvas.width=256;x402Canvas.height=128;
+      var x402Ctx=x402Canvas.getContext('2d');
+      x402Ctx.fillStyle='rgba(0,0,0,0)';
+      x402Ctx.fillRect(0,0,256,128);
+      // "x402" text
+      x402Ctx.font='bold 72px JetBrains Mono, monospace';
+      x402Ctx.textAlign='center';
+      x402Ctx.textBaseline='middle';
+      x402Ctx.fillStyle='#d946ef';
+      x402Ctx.shadowColor='#d946ef';
+      x402Ctx.shadowBlur=20;
+      x402Ctx.fillText('x402',128,50);
+      // Subtitle
+      x402Ctx.font='18px Inter, sans-serif';
+      x402Ctx.fillStyle='#a855f7';
+      x402Ctx.shadowBlur=10;
+      x402Ctx.fillText('Protocol',128,95);
+      var x402Tex=new THREE.CanvasTexture(x402Canvas);
+      var x402Mat=new THREE.SpriteMaterial({map:x402Tex,transparent:true,blending:THREE.AdditiveBlending,opacity:0.9});
+      var x402Sprite=new THREE.Sprite(x402Mat);
+      x402Sprite.scale.set(1.4,0.7,1);
+      x402Sprite.position.set(0,0,0);
+      globeGroup.add(x402Sprite);
+
+      // === AGENT NODES (80 endpoints) ===
       var NODE_COUNT=80;
       var nodeGeom=new THREE.BufferGeometry();
       var nodePos=new Float32Array(NODE_COUNT*3);
       var nodeCol=new Float32Array(NODE_COUNT*3);
       var nodeSz=new Float32Array(NODE_COUNT);
 
+      var endpoints=[
+        '/maps/search','/maps/reverse','/maps/geocode','/maps/places','/maps/directions',
+        '/crypto/prices','/crypto/gas','/crypto/whale-alerts','/crypto/trending','/crypto/holders',
+        '/web/scrape','/web/screenshot','/web/metadata','/web/archive',
+        '/forex/rates','/forex/convert','/forex/historical',
+        '/news/crypto','/news/defi','/news/global',
+        '/weather/current','/weather/forecast','/weather/alerts',
+        '/data/usdc-volume','/data/active-wallets','/data/top-agents','/data/payment-flows',
+        '/x402/payments/recent','/x402/agent','/x402/analytics','/x402/leaderboard',
+        '/x402/top-agents','/x402/network-health','/x402/volume-24h','/x402/unique-agents',
+        '/onchain/blocks','/onchain/transactions','/onchain/token-flow','/onchain/addresses'
+      ];
+
       for(var i=0;i<NODE_COUNT;i++){
         var phi=Math.acos(-1+(2*i/NODE_COUNT));
         var theta=Math.sqrt(NODE_COUNT*Math.PI)*phi;
-        var r=2.3;
+        var r=2.35;
         nodePos[i*3]=r*Math.cos(theta)*Math.sin(phi);
         nodePos[i*3+1]=r*Math.sin(theta)*Math.sin(phi);
         nodePos[i*3+2]=r*Math.cos(phi);
         var isFree=i>=60;
         if(isFree){nodeCol[i*3]=0.06;nodeCol[i*3+1]=0.72;nodeCol[i*3+2]=0.51;}
         else{var c=new THREE.Color().setHSL(0.75+Math.random()*0.1,0.7,0.6);nodeCol[i*3]=c.r;nodeCol[i*3+1]=c.g;nodeCol[i*3+2]=c.b;}
-        nodeSz[i]=isFree?0.1:0.06;
+        nodeSz[i]=isFree?0.09:0.055;
       }
       nodeGeom.setAttribute('position',new THREE.BufferAttribute(nodePos,3));
       nodeGeom.setAttribute('color',new THREE.BufferAttribute(nodeCol,3));
@@ -3231,14 +3272,14 @@
 
       var nodeMat=new THREE.ShaderMaterial({
         uniforms:{time:{value:0}},
-        vertexShader:'attribute float size;attribute vec3 color;varying vec3 vColor;uniform float time;void main(){vColor=color;vec3 pos=position;pos+=normalize(position)*sin(time*2.0+position.x*3.0)*0.04;vec4 mv=modelViewMatrix*vec4(pos,1.0);gl_PointSize=size*(350.0/-mv.z);gl_Position=projectionMatrix*mv;}',
+        vertexShader:'attribute float size;attribute vec3 color;varying vec3 vColor;uniform float time;void main(){vColor=color;vec3 pos=position;pos+=normalize(position)*sin(time*2.0+position.x*3.0)*0.03;vec4 mv=modelViewMatrix*vec4(pos,1.0);gl_PointSize=size*(350.0/-mv.z);gl_Position=projectionMatrix*mv;}',
         fragmentShader:'varying vec3 vColor;void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;float glow=1.0-d*2.0;glow=pow(glow,1.5);gl_FragColor=vec4(vColor,glow*0.9);}',
         transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
       });
       var nodes=new THREE.Points(nodeGeom,nodeMat);
       globeGroup.add(nodes);
 
-      // === USDC SWARM (150 particles flowing to endpoints) ===
+      // === SWARM (150 USDC transfer particles) ===
       var SWARM=150;
       var sGeom=new THREE.BufferGeometry();
       var sPos=new Float32Array(SWARM*3);
@@ -3249,14 +3290,14 @@
       var palette=[new THREE.Color(0xa855f7),new THREE.Color(0xd946ef),new THREE.Color(0xec4899),new THREE.Color(0x06b6d4)];
 
       for(var i=0;i<SWARM;i++){
-        var a=Math.random()*Math.PI*2,e=(Math.random()-0.5)*Math.PI,d=2.4+Math.random()*1.2;
+        var a=Math.random()*Math.PI*2,e=(Math.random()-0.5)*Math.PI,d=2.5+Math.random()*1.0;
         sPos[i*3]=d*Math.cos(e)*Math.cos(a);sPos[i*3+1]=d*Math.sin(e);sPos[i*3+2]=d*Math.cos(e)*Math.sin(a);
-        sVel[i*3]=(Math.random()-0.5)*0.008;sVel[i*3+1]=(Math.random()-0.5)*0.008;sVel[i*3+2]=(Math.random()-0.5)*0.008;
+        sVel[i*3]=(Math.random()-0.5)*0.006;sVel[i*3+1]=(Math.random()-0.5)*0.006;sVel[i*3+2]=(Math.random()-0.5)*0.006;
         var ti=Math.floor(Math.random()*NODE_COUNT);
         sTgt[i*3]=nodePos[ti*3];sTgt[i*3+1]=nodePos[ti*3+1];sTgt[i*3+2]=nodePos[ti*3+2];
         var pc=palette[Math.floor(Math.random()*palette.length)];
         sCol[i*3]=pc.r;sCol[i*3+1]=pc.g;sCol[i*3+2]=pc.b;
-        sSz[i]=0.025+Math.random()*0.035;
+        sSz[i]=0.02+Math.random()*0.03;
       }
       sGeom.setAttribute('position',new THREE.BufferAttribute(sPos,3));
       sGeom.setAttribute('color',new THREE.BufferAttribute(sCol,3));
@@ -3264,7 +3305,7 @@
 
       var sMat=new THREE.ShaderMaterial({
         uniforms:{time:{value:0}},
-        vertexShader:'attribute float size;attribute vec3 color;varying vec3 vColor;varying float vAlpha;uniform float time;void main(){vColor=color;vec3 pos=position;pos.y+=sin(time*3.0+position.x*2.0)*0.015;vAlpha=0.5+0.5*sin(time*4.0+position.z*3.0);vec4 mv=modelViewMatrix*vec4(pos,1.0);gl_PointSize=size*(280.0/-mv.z);gl_Position=projectionMatrix*mv;}',
+        vertexShader:'attribute float size;attribute vec3 color;varying vec3 vColor;varying float vAlpha;uniform float time;void main(){vColor=color;vec3 pos=position;pos.y+=sin(time*3.0+position.x*2.0)*0.012;vAlpha=0.5+0.5*sin(time*4.0+position.z*3.0);vec4 mv=modelViewMatrix*vec4(pos,1.0);gl_PointSize=size*(280.0/-mv.z);gl_Position=projectionMatrix*mv;}',
         fragmentShader:'varying vec3 vColor;varying float vAlpha;void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;float glow=pow(1.0-d*2.0,2.0);gl_FragColor=vec4(vColor,vAlpha*glow*0.8);}',
         transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
       });
@@ -3281,17 +3322,17 @@
 
       // === ORBIT RINGS ===
       for(var i=0;i<3;i++){
-        var rGeom=new THREE.RingGeometry(2.8+i*0.4,2.82+i*0.4,64);
-        var rMat=new THREE.MeshBasicMaterial({color:0xa855f7,transparent:true,opacity:0.04-i*0.01,side:THREE.DoubleSide});
+        var rGeom=new THREE.RingGeometry(2.8+i*0.35,2.82+i*0.35,64);
+        var rMat=new THREE.MeshBasicMaterial({color:0xa855f7,transparent:true,opacity:0.035-i*0.008,side:THREE.DoubleSide});
         var ring=new THREE.Mesh(rGeom,rMat);
-        ring.rotation.x=Math.PI/2+i*0.25;ring.rotation.z=i*0.4;
+        ring.rotation.x=Math.PI/2+i*0.2;ring.rotation.z=i*0.35;
         globeGroup.add(ring);
       }
 
-      camera.position.z=5.5;
-      camera.position.y=0.5;
+      camera.position.z=5.2;
+      camera.position.y=0.3;
 
-      // Mouse (relative to canvas)
+      // Mouse
       var mouse={x:0,y:0};
       canvas.addEventListener('mousemove',function(e){
         var rect=canvas.getBoundingClientRect();
@@ -3306,14 +3347,15 @@
         var t=clock.getElapsedTime();
         var sp=sGeom.attributes.position.array;
 
-        globeGroup.rotation.y=t*0.08;
-        globeGroup.rotation.x=Math.sin(t*0.15)*0.12;
+        globeGroup.rotation.y=t*0.06;
+        globeGroup.rotation.x=Math.sin(t*0.12)*0.08;
+        x402Sprite.material.opacity=0.7+0.3*Math.sin(t*1.5);
 
         for(var i=0;i<SWARM;i++){
           var dx=sTgt[i*3]-sp[i*3],dy=sTgt[i*3+1]-sp[i*3+1],dz=sTgt[i*3+2]-sp[i*3+2];
           var dist=Math.sqrt(dx*dx+dy*dy+dz*dz);
           if(dist<0.15){var ti2=Math.floor(Math.random()*NODE_COUNT);sTgt[i*3]=nodePos[ti2*3];sTgt[i*3+1]=nodePos[ti2*3+1];sTgt[i*3+2]=nodePos[ti2*3+2];}
-          sp[i*3]+=dx*0.01+sVel[i*3];sp[i*3+1]+=dy*0.01+sVel[i*3+1];sp[i*3+2]+=dz*0.01+sVel[i*3+2];
+          sp[i*3]+=dx*0.008+sVel[i*3];sp[i*3+1]+=dy*0.008+sVel[i*3+1];sp[i*3+2]+=dz*0.008+sVel[i*3+2];
         }
         sGeom.attributes.position.needsUpdate=true;
 
@@ -3322,7 +3364,7 @@
           var ti3=Math.floor(i/NODE_COUNT*NODE_COUNT);
           var dx2=sp[i*3]-nodePos[ti3*3],dy2=sp[i*3+1]-nodePos[ti3*3+1],dz2=sp[i*3+2]-nodePos[ti3*3+2];
           var d2=Math.sqrt(dx2*dx2+dy2*dy2+dz2*dz2);
-          if(d2<1.5){lPos[li*6]=sp[i*3];lPos[li*6+1]=sp[i*3+1];lPos[li*6+2]=sp[i*3+2];lPos[li*6+3]=nodePos[ti3*3];lPos[li*6+4]=nodePos[ti3*3+1];lPos[li*6+5]=nodePos[ti3*3+2];li++;}
+          if(d2<1.2){lPos[li*6]=sp[i*3];lPos[li*6+1]=sp[i*3+1];lPos[li*6+2]=sp[i*3+2];lPos[li*6+3]=nodePos[ti3*3];lPos[li*6+4]=nodePos[ti3*3+1];lPos[li*6+5]=nodePos[ti3*3+2];li++;}
         }
         for(var i=li*6;i<80*6;i++)lPos[i]=0;
         lGeom.attributes.position.needsUpdate=true;
@@ -3331,8 +3373,8 @@
         sMat.uniforms.time.value=t;
         glowMat.uniforms.time.value=t;
 
-        camera.position.x=mouse.x*0.3;
-        camera.position.y=0.5+mouse.y*0.2;
+        camera.position.x=mouse.x*0.25;
+        camera.position.y=0.3+mouse.y*0.15;
         camera.lookAt(0,0,0);
 
         renderer.render(scene,camera);
@@ -3341,60 +3383,57 @@
 
       // Resize
       var ro=new ResizeObserver(function(){
-        var nw=container.clientWidth||380;
-        var nh=container.clientHeight||380;
+        var nw=container.clientWidth||440;
+        var nh=container.clientHeight||440;
         camera.aspect=nw/nh;
         camera.updateProjectionMatrix();
         renderer.setSize(nw,nh);
       });
       ro.observe(container);
 
-      // === FLOATING DATA LABELS ===
+      // === FLOATING DATA LABELS (real endpoint data) ===
       var labelsEl=document.getElementById('globeLabels');
       if(labelsEl){
-        var labelData=[
-          {text:'/v1/maps/search',type:'endpoint',delay:0},
-          {text:'$0.005/call',type:'price',delay:1.2},
-          {text:'Base Network',type:'network',delay:0.6},
-          {text:'x402 Protocol',type:'protocol',delay:2.0},
-          {text:'USDC on-chain',type:'usdc',delay:3.5},
-          {text:'/v1/crypto/prices',type:'endpoint',delay:1.8},
-          {text:'$0.01/call',type:'price',delay:4.2},
-          {text:'No API key',type:'network',delay:2.8},
-          {text:'80 endpoints',type:'endpoint',delay:5.0},
-          {text:'$0 gas fee',type:'price',delay:0.3},
-          {text:'/v1/web/scrape',type:'endpoint',delay:6.0},
-          {text:'Agent pays USDC',type:'protocol',delay:3.0},
-          {text:'FREE: /v1/onchain/*',type:'endpoint',delay:4.8},
-          {text:'0x402...',type:'usdc',delay:1.5},
-          {text:'MCP ready',type:'network',delay:5.5},
+        var liveData=[
+          {text:'/v1/x402/payments/recent',type:'endpoint'},
+          {text:'$0.005/call',type:'price'},
+          {text:'Base Mainnet',type:'network'},
+          {text:'USDC on-chain',type:'protocol'},
+          {text:'/v1/crypto/prices',type:'endpoint'},
+          {text:'80 live endpoints',type:'network'},
+          {text:'No API key needed',type:'protocol'},
+          {text:'/v1/x402/leaderboard',type:'endpoint'},
+          {text:'$0 gas fee',type:'price'},
+          {text:'Agent pays USDC',type:'protocol'},
+          {text:'/v1/maps/search',type:'endpoint'},
+          {text:'x402 micropayment',type:'protocol'},
+          {text:'/v1/web/scrape',type:'endpoint'},
+          {text:'MCP ready',type:'network'},
+          {text:'/v1/onchain/*',type:'endpoint'},
         ];
         var positions=[
-          {x:5,y:12},{x:65,y:8},{x:85,y:35},{x:10,y:65},{x:70,y:72},
-          {x:30,y:5},{x:50,y:85},{x:5,y:40},{x:80,y:55},{x:40,y:15},
-          {x:15,y:80},{x:75,y:18},{x:25,y:50},{x:60,y:60},{x:90,y:78}
+          {x:2,y:8},{x:72,y:5},{x:85,y:30},{x:5,y:60},{x:68,y:70},
+          {x:28,y:3},{x:48,y:88},{x:8,y:35},{x:78,y:50},{x:35,y:12},
+          {x:12,y:78},{x:72,y:15},{x:22,y:48},{x:58,y:62},{x:88,y:75}
         ];
-        labelData.forEach(function(ld,idx){
+        var idx=0;
+        function showLabel(){
+          if(idx>=liveData.length)idx=0;
+          var ld=liveData[idx];
+          var pos=positions[idx];
           var el=document.createElement('div');
           el.className='globe-label '+ld.type;
           el.textContent=ld.text;
-          var pos=positions[idx%positions.length];
           el.style.left=pos.x+'%';
           el.style.top=pos.y+'%';
-          el.style.animationDelay=ld.delay+'s';
-          el.style.animationDuration=(6+Math.random()*4)+'s';
           labelsEl.appendChild(el);
-        });
-
-        // Refresh labels every 10s
-        setInterval(function(){
-          var els=labelsEl.querySelectorAll('.globe-label');
-          els.forEach(function(el){
-            el.style.animation='none';
-            el.offsetHeight;
-            el.style.animation='';
-          });
-        },10000);
+          // Remove after animation
+          setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},7000);
+          idx++;
+        }
+        // Stagger: show one every 1.5s
+        showLabel();
+        setInterval(showLabel,1500);
       }
     })();
     </script>
