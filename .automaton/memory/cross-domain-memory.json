@@ -23,6 +23,24 @@
       "domain": "automation",
       "rule": "Telegram API requires UTF-8 encoding. Remove emoji and special characters from message text. Use plain text without HTML parse_mode if emoji causes issues.",
       "confidence": 0.9
+    },
+    {
+      "id": "multi-source-intelligence",
+      "domain": "api-design",
+      "rule": "Free endpoints that return zeros are useless. Combine multiple data sources (on-chain RPC + CoinGecko + DefiLlama) to return genuinely useful intelligence. Each endpoint should answer 'so what?' not just 'here's data'.",
+      "confidence": 0.95
+    },
+    {
+      "id": "fingerprint-middleware",
+      "domain": "api-design",
+      "rule": "Add X-AETHERIUS-Fingerprint header via FastAPI middleware to all responses. Brand identity on every response. Pattern: @app.middleware('http') async def middleware(request, call_next).",
+      "confidence": 0.9
+    },
+    {
+      "id": "fastapi-parallel-fetch",
+      "domain": "api-design",
+      "rule": "Use asyncio.gather() for parallel upstream fetches in FastAPI. Reduces latency when combining CoinGecko + DefiLlama + RPC calls.",
+      "confidence": 0.9
     }
   ],
   "mappings": [
@@ -35,6 +53,11 @@
       "from": "x402-testnet",
       "to": "x402-mainnet",
       "proven_in": ["crypto"]
+    },
+    {
+      "from": "single-source-api",
+      "to": "multi-source-intelligence",
+      "proven_in": ["api-design"]
     }
   ],
   "learnings": [
@@ -57,6 +80,21 @@
       "date": "2026-09-05",
       "text": "Telegram bot token works for posting to channel. Use plain text without HTML for emoji compatibility.",
       "files": ["content/telegram-mainnet-announcement.md"]
+    },
+    {
+      "date": "2026-09-06",
+      "text": "QuantumXBrain pattern: free endpoints returning zeros are useless. Combine on-chain RPC + CoinGecko + DefiLlama for each endpoint. Add contextual intelligence (signals, summaries, scores).",
+      "files": ["main.py"]
+    },
+    {
+      "date": "2026-09-06",
+      "text": "FastAPI middleware pattern for branding: @app.middleware('http') adds X-AETHERIUS-Fingerprint header to ALL responses without modifying each endpoint.",
+      "files": ["main.py"]
+    },
+    {
+      "date": "2026-09-06",
+      "text": "Landing page x402-intel section should show 4 key QuantumXBrain endpoints (brain, market-pulse, wallet-intel, sentiment) with green/purple styling.",
+      "files": ["index.html"]
     }
   ],
   "decisions": [
@@ -71,6 +109,18 @@
       "question": "What network ID for Base Mainnet?",
       "answer": "eip155:8453 (not eip155:84532 which is Base Sepolia testnet).",
       "rationale": "x402 protocol requires correct chain ID for on-chain verification."
+    },
+    {
+      "date": "2026-09-06",
+      "question": "How to transform 20 zero-returning free endpoints into something useful?",
+      "answer": "Create QuantumXBrain layer: 20 new enhanced endpoints combining on-chain RPC + CoinGecko + DefiLlama + contextual analysis. Each returns meaningful intelligence, not raw zeros.",
+      "rationale": "User rejected 'stabilize' as downgrade. Wanted each endpoint to return genuinely useful data by combining multiple sources."
+    },
+    {
+      "date": "2026-09-06",
+      "question": "Should we add more endpoints or enhance existing 20?",
+      "answer": "Keep 20 free endpoints as the ceiling. Transform them into QuantumXBrain by combining external APIs. Don't increase count, increase quality.",
+      "rationale": "User said 'no es deployar más endpoints, es que los 20 que tienes es el tope de FREE'"
     }
   ]
 }

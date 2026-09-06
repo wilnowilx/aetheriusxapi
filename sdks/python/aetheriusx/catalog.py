@@ -148,8 +148,32 @@ FREE_ENDPOINTS: list[Endpoint] = [
     Endpoint("/v1/x402/defi-pulse", "FREE", "DeFi protocol activity on Base", "x402-market"),
 ]
 
+# QuantumXBrain — Enhanced Intelligence (20 new FREE endpoints)
+QUANTUMXBRAIN_ENDPOINTS: list[Endpoint] = [
+    Endpoint("/v1/x402/brain", "FREE", "AI endpoint recommender by intent", "qxb-intelligence", ["intent"]),
+    Endpoint("/v1/x402/intelligence", "FREE", "Aggregated multi-source intelligence summary", "qxb-intelligence"),
+    Endpoint("/v1/x402/market-pulse", "FREE", "Real-time Base market conditions + bullish/bearish signal", "qxb-intelligence"),
+    Endpoint("/v1/x402/wallet-intel/{address}", "FREE", "Full wallet profile + risk + spending patterns", "qxb-intelligence", ["address"]),
+    Endpoint("/v1/x402/sentiment", "FREE", "Fear & Greed Index + BTC trend + composite score", "qxb-intelligence"),
+    Endpoint("/v1/x402/compliance", "FREE", "KYC/AML compliance indicators for any wallet", "qxb-intelligence", ["address"]),
+    Endpoint("/v1/x402/gas-intelligence", "FREE", "Gas trends + optimal timing + cost estimates", "qxb-intelligence"),
+    Endpoint("/v1/x402/token-discovery", "FREE", "Discover active contracts on Base", "qxb-intelligence"),
+    Endpoint("/v1/x402/whale-intelligence", "FREE", "Whale tracking + sender clustering", "qxb-intelligence"),
+    Endpoint("/v1/x402/network-health", "FREE", "Full Base network health dashboard", "qxb-intelligence"),
+    Endpoint("/v1/x402/stablecoin-flow", "FREE", "USDC flow analysis + large transfers", "qxb-intelligence"),
+    Endpoint("/v1/x402/defi-yield", "FREE", "Top DeFi yield pools on Base (DefiLlama)", "qxb-intelligence"),
+    Endpoint("/v1/x402/tx-patterns", "FREE", "Transaction size distribution analysis", "qxb-intelligence"),
+    Endpoint("/v1/x402/wallet-compare", "FREE", "Compare two wallets side by side", "qxb-intelligence", ["a", "b"]),
+    Endpoint("/v1/x402/leaderboard", "FREE", "Top USDC activity ranking", "qxb-intelligence"),
+    Endpoint("/v1/x402/contract-intel/{address}", "FREE", "Contract verification + type detection", "qxb-intelligence", ["address"]),
+    Endpoint("/v1/x402/velocity-intel", "FREE", "Transfer velocity with 12h trend", "qxb-intelligence"),
+    Endpoint("/v1/x402/history-intel/{address}", "FREE", "Enhanced transfer history + direction", "qxb-intelligence", ["address"]),
+    Endpoint("/v1/x402/risk-intel/{address}", "FREE", "Multi-factor risk scoring with breakdown", "qxb-intelligence", ["address"]),
+    Endpoint("/v1/x402/search-intel", "FREE", "Universal search — address, tx, domain", "qxb-intelligence", ["q"]),
+]
+
 # All endpoints combined
-ALL_ENDPOINTS = PAID_ENDPOINTS + FREE_ENDPOINTS
+ALL_ENDPOINTS = PAID_ENDPOINTS + FREE_ENDPOINTS + QUANTUMXBRAIN_ENDPOINTS
 
 # Category display names
 CATEGORY_NAMES = {
@@ -168,6 +192,7 @@ CATEGORY_NAMES = {
     "x402-activity": "x402 Intelligence — Activity",
     "x402-wallet": "x402 Intelligence — Wallet",
     "x402-market": "x402 Intelligence — Market",
+    "qxb-intelligence": "QuantumXBrain — Enhanced Intelligence",
 }
 
 
@@ -178,6 +203,7 @@ class Catalog:
         self.endpoints = ALL_ENDPOINTS
         self.paid = PAID_ENDPOINTS
         self.free = FREE_ENDPOINTS
+        self.quantumxbrain = QUANTUMXBRAIN_ENDPOINTS
         self._by_route = {e.route: e for e in ALL_ENDPOINTS}
 
     def by_category(self, category: str) -> list[Endpoint]:
@@ -212,7 +238,7 @@ class Catalog:
     def summary(self) -> str:
         """Human-readable catalog summary."""
         lines = [f"AetheriusX Catalog — {len(self.endpoints)} endpoints"]
-        lines.append(f"  {len(self.paid)} paid | {len(self.free)} free (x402 Intelligence)")
+        lines.append(f"  {len(self.paid)} paid | {len(self.free)} free (x402 Intelligence) | {len(self.quantumxbrain)} QuantumXBrain")
         lines.append("")
         for cat in self.categories():
             eps = self.by_category(cat)

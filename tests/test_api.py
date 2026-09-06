@@ -28,7 +28,7 @@ def test_health_free():
     body = r.json()
     assert body["status"] == "alive"
     assert body["service"] == "aetheriusxAPI"
-    assert len(body["endpoints"]) == 40
+    assert len(body["endpoints"]) >= 40  # 40 paid + free x402
 
 
 @pytest.mark.parametrize("route", sorted(PRICES))
@@ -75,8 +75,34 @@ def test_paid_endpoints_require_payment(route):
         "/v1/forex/convert": {"to": "MXN"},
         "/v1/news/hn-feed": {"kind": "ask"},
         "/v1/web/dns": {"name": "example.com"},
+        "/v1/crypto/market": {},
+        "/v1/crypto/fear-greed": {"limit": 2},
+        "/v1/crypto/trending": {},
+        "/v1/crypto/ohlcv": {},
+        "/v1/crypto/dominance": {},
+        "/v1/token/nft": {"contract": "0x0000000000000000000000000000000000000000"},
+        "/v1/data/ip": {},
+        "/v1/data/ua": {"user_agent": "Mozilla/5.0"},
+        "/v1/data/hash": {"text": "hello"},
+        "/v1/data/uuid": {},
+        "/v1/data/qrcode": {"text": "test"},
+        "/v1/data/translate": {"text": "hello", "target": "es"},
+        "/v1/data/summarize": {"text": "Test sentence. Another sentence."},
+        "/v1/data/define": {"word": "test"},
+        "/v1/data/words": {"word": "test"},
+        "/v1/data/elevation": {"lat": 19.43, "lon": -99.13},
+        "/v1/news/reddit": {"subreddit": "cryptocurrency", "limit": 2},
+        "/v1/news/devto": {"limit": 2},
+        "/v1/defi/impermanent-loss": {"entry_price": 100, "current_price": 150},
+        "/v1/defi/staking-apy": {},
+        "/v1/maps/geocode": {"q": "Paris"},
+        "/v1/token/global": {},
+        "/v1/token/balance": {"address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"},
+        "/v1/token/transactions": {"address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"},
+        "/v1/defi/stablecoin-history": {"chain": "ethereum"},
+        "/v1/forex/convert": {"to": "MXN"},
     }
-    r = client.get(route, params=params[route])
+    r = client.get(route, params=params.get(route, {}))
     assert r.status_code == 402
     body = r.json()
     assert body["error"] == "Payment required"
@@ -289,3 +315,121 @@ def test_live_weather_shape():
     r = client.get("/v1/data/weather",
                    params={"lat": 19.43, "lon": -99.13}, headers=PAID)
     assert_live_or_upstream_error(r, ["current", "data_source"])
+
+
+# ─── QuantumXBrain — Enhanced Intelligence (FREE, no payment header needed) ───
+
+QXB_ROUTES = [
+    ("/v1/x402/brain", {}),
+    ("/v1/x402/brain", {"intent": "defi"}),
+    ("/v1/x402/intelligence", {}),
+    ("/v1/x402/market-pulse", {}),
+    ("/v1/x402/sentiment", {}),
+    ("/v1/x402/gas-intelligence", {}),
+    ("/v1/x402/token-discovery", {}),
+    ("/v1/x402/whale-intelligence", {}),
+    ("/v1/x402/network-health", {}),
+    ("/v1/x402/stablecoin-flow", {}),
+    ("/v1/x402/defi-yield", {}),
+    ("/v1/x402/tx-patterns", {}),
+    ("/v1/x402/leaderboard", {}),
+    ("/v1/x402/velocity-intel", {}),
+    ("/v1/x402/search-intel", {"q": "0x0000000000000000000000000000000000000000"}),
+    ("/v1/x402/compliance", {"address": "0x0000000000000000000000000000000000000000"}),
+    ("/v1/x402/wallet-intel/0x0000000000000000000000000000000000000000", {}),
+    ("/v1/x402/contract-intel/0x0000000000000000000000000000000000000000", {}),
+    ("/v1/x402/history-intel/0x0000000000000000000000000000000000000000", {}),
+    ("/v1/x402/risk-intel/0x0000000000000000000000000000000000000000", {}),
+    ("/v1/x402/wallet-compare", {
+        "a": "0x677B483128D0399bCD0A5AB36eE990C0246d7f61",
+        "b": "0xAc7dA127f89B9caD90241B73d63f2DE8Dbc0d68B",
+    }),
+]
+
+
+@pytest.mark.parametrize("route,params", QXB_ROUTES)
+def test_quantumxbrain_free_no_payment(route, params):
+    """QuantumXBrain endpoints are FREE — no X-PAYMENT header needed."""
+    r = client.get(route, params=params)
+    assert r.status_code == 200, f"{route} returned {r.status_code}: {r.text[:200]}"
+    body = r.json()
+    assert body.get("status") == "ok", f"{route} status not ok: {body}"
+
+
+@pytest.mark.parametrize("route,params", QXB_ROUTES)
+def test_quantumxbrain_fingerprint_header(route, params):
+    """Every QuantumXBrain response carries AETHERIUS fingerprint."""
+    r = client.get(route, params=params)
+    fp = r.headers.get("x-aetherius-fingerprint", "")
+    assert "quantumxbrain-v1" in fp, f"{route} missing fingerprint header"
+    assert r.headers.get("x-powered-by", "") == "AETHERIUS QuantumXBrain"
+
+
+def test_brain_intent_recommendations():
+    """Brain endpoint returns recommendations for known intents."""
+    for intent in ("defi", "wallet", "gas", "market", "security", "token"):
+        r = client.get("/v1/x402/brain", params={"intent": intent})
+        body = r.json()
+        assert body.get("intent") == intent
+        recs = body.get("recommendations", [])
+        assert len(recs) >= 2, f"Brain intent={intent} returned <2 recs"
+
+
+def test_market_pulse_chain_fields():
+    """Market pulse must include chain info + signal."""
+    r = client.get("/v1/x402/market-pulse")
+    body = r.json()
+    assert "chain" in body
+    assert body["chain"]["chain_id"] == 8453
+    assert "signal" in body
+    assert "label" in body["signal"]
+    assert "gas" in body
+    assert "market" in body
+
+
+def test_sentiment_fields():
+    """Sentiment must include composite_score + fear_greed_index."""
+    r = client.get("/v1/x402/sentiment")
+    body = r.json()
+    assert "composite_score" in body
+    assert "fear_greed_index" in body
+    assert "overall_sentiment" in body
+    assert isinstance(body["composite_score"], (int, float))
+
+
+def test_wallet_intel_fields():
+    """Wallet intel returns structured wallet profile."""
+    addr = "0x677B483128D0399bCD0A5AB36eE990C0246d7f61"
+    r = client.get(f"/v1/x402/wallet-intel/{addr}")
+    body = r.json()
+    assert body.get("status") == "ok"
+    assert "address" in body
+    assert "eth_balance" in body
+
+
+def test_risk_intel_score_range():
+    """Risk score must be 0-100."""
+    addr = "0x677B483128D0399bCD0A5AB36eE990C0246d7f61"
+    r = client.get(f"/v1/x402/risk-intel/{addr}")
+    body = r.json()
+    assert "factors" in body
+    assert "risk_score" in body
+    assert 0 <= body["risk_score"] <= 100
+
+
+def test_search_intel_query():
+    """Search intel returns status and type."""
+    r = client.get("/v1/x402/search-intel", params={"q": "0x0000"})
+    body = r.json()
+    assert body.get("status") == "ok"
+    assert "type" in body
+
+
+def test_wallet_compare_two_wallets():
+    """Wallet compare returns both wallets."""
+    a = "0x677B483128D0399bCD0A5AB36eE990C0246d7f61"
+    b = "0xAc7dA127f89B9caD90241B73d63f2DE8Dbc0d68B"
+    r = client.get("/v1/x402/wallet-compare", params={"a": a, "b": b})
+    body = r.json()
+    assert body.get("status") == "ok"
+    assert "wallet_a" in body or "comparison" in body

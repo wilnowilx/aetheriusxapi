@@ -66,6 +66,27 @@ const SPECS = {
   "/v1/token/nft": [{n:"contract",r:1},{n:"token_id",r:0,d:"1"},{n:"chain",r:0,d:"ethereum"}],
   "/v1/data/translate": [{n:"text",r:1},{n:"source",r:0,d:"auto"},{n:"target",r:0,d:"es"}],
   "/v1/data/summarize": [{n:"text",r:1},{n:"sentences",r:0,t:"n",d:"3"}],
+  /* QuantumXBrain */
+  "/v1/x402/brain": [{n:"intent",r:0,d:"defi"}],
+  "/v1/x402/intelligence": [],
+  "/v1/x402/market-pulse": [],
+  "/v1/x402/wallet-intel/{address}": [{n:"address",r:1,d:"0x677B483128D0399bCD0A5AB36eE990C0246d7f61"}],
+  "/v1/x402/sentiment": [],
+  "/v1/x402/compliance": [{n:"address",r:1,d:"0x677B483128D0399bCD0A5AB36eE990C0246d7f61"}],
+  "/v1/x402/gas-intelligence": [],
+  "/v1/x402/token-discovery": [],
+  "/v1/x402/whale-intelligence": [],
+  "/v1/x402/network-health": [],
+  "/v1/x402/stablecoin-flow": [],
+  "/v1/x402/defi-yield": [],
+  "/v1/x402/tx-patterns": [],
+  "/v1/x402/wallet-compare": [{n:"a",r:1,d:"0x677B483128D0399bCD0A5AB36eE990C0246d7f61"},{n:"b",r:1,d:"0xAc7dA127f89B9caD90241B73d63f2DE8Dbc0d68B"}],
+  "/v1/x402/leaderboard": [],
+  "/v1/x402/contract-intel/{address}": [{n:"address",r:1,d:"0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"}],
+  "/v1/x402/velocity-intel": [],
+  "/v1/x402/history-intel/{address}": [{n:"address",r:1,d:"0x677B483128D0399bCD0A5AB36eE990C0246d7f61"}],
+  "/v1/x402/risk-intel/{address}": [{n:"address",r:1,d:"0x677B483128D0399bCD0A5AB36eE990C0246d7f61"}],
+  "/v1/x402/search-intel": [{n:"q",r:1,d:"0x677B483128D0399bCD0A5AB36eE990C0246d7f61"}],
 };
 const FALLBACK_META = {
   "/v1/maps/search":"$0.01/call - Business search via OpenStreetMap",
@@ -128,6 +149,27 @@ const FALLBACK_META = {
   "/v1/token/nft":"$0.02/call - NFT metadata",
   "/v1/data/translate":"$0.01/call - Text translation",
   "/v1/data/summarize":"$0.015/call - Text summarizer",
+  /* QuantumXBrain FREE */
+  "/v1/x402/brain":"FREE - AI endpoint recommender",
+  "/v1/x402/intelligence":"FREE - Aggregated intelligence",
+  "/v1/x402/market-pulse":"FREE - Market pulse + signal",
+  "/v1/x402/wallet-intel/{address}":"FREE - Wallet profile + risk",
+  "/v1/x402/sentiment":"FREE - Fear & Greed + sentiment",
+  "/v1/x402/compliance":"FREE - KYC/AML compliance",
+  "/v1/x402/gas-intelligence":"FREE - Gas trends + timing",
+  "/v1/x402/token-discovery":"FREE - Active token discovery",
+  "/v1/x402/whale-intelligence":"FREE - Whale tracking",
+  "/v1/x402/network-health":"FREE - Network health dashboard",
+  "/v1/x402/stablecoin-flow":"FREE - USDC flow analysis",
+  "/v1/x402/defi-yield":"FREE - DeFi yield pools",
+  "/v1/x402/tx-patterns":"FREE - TX size distribution",
+  "/v1/x402/wallet-compare":"FREE - Compare two wallets",
+  "/v1/x402/leaderboard":"FREE - Top USDC activity",
+  "/v1/x402/contract-intel/{address}":"FREE - Contract verification",
+  "/v1/x402/velocity-intel":"FREE - Transfer velocity",
+  "/v1/x402/history-intel/{address}":"FREE - Enhanced history",
+  "/v1/x402/risk-intel/{address}":"FREE - Risk scoring",
+  "/v1/x402/search-intel":"FREE - Universal search",
 };
 
 const state = { health:null, selected:null };
@@ -263,7 +305,28 @@ const WIKI_DB = {
   "/v1/defi/staking-apy": { name: "Staking APY", category: "DeFi", description: "Staking APY tracker for major protocols", params: [], response: "{ pools[] }", price: "$0.01" },
   "/v1/token/nft": { name: "NFT Metadata", category: "Token", description: "NFT metadata fetcher - name, image, attributes", params: [{ name: "contract", type: "string", required: true }, { name: "token_id", type: "string", default: "1" }, { name: "chain", type: "string", default: "ethereum" }], response: "{ name, description, image_url, collection, attributes[] }", price: "$0.02" },
   "/v1/data/translate": { name: "Text Translation", category: "Data", description: "Text translation via free API", params: [{ name: "text", type: "string", required: true }, { name: "source", type: "string", default: "auto" }, { name: "target", type: "string", default: "es" }], response: "{ text, translation, confidence }", price: "$0.01" },
-  "/v1/data/summarize": { name: "Text Summarizer", category: "Data", description: "Extractive text summarizer", params: [{ name: "text", type: "string", required: true }, { name: "sentences", type: "int", default: 3 }], response: "{ summary, original_sentences, summary_sentences }", price: "$0.015" }
+  "/v1/data/summarize": { name: "Text Summarizer", category: "Data", description: "Extractive text summarizer", params: [{ name: "text", type: "string", required: true }, { name: "sentences", type: "int", default: 3 }], response: "{ summary, original_sentences, summary_sentences }", price: "$0.015" },
+  /* QuantumXBrain — Enhanced Intelligence (FREE) */
+  "/v1/x402/brain": { name: "AI Brain", category: "QuantumXBrain", description: "AI endpoint recommender by intent — finds the best endpoint for your query", params: [{ name: "intent", type: "string", default: "defi" }], response: "{ recommendations[] }", price: "FREE" },
+  "/v1/x402/intelligence": { name: "Intelligence", category: "QuantumXBrain", description: "Aggregated multi-source intelligence summary — gas, transfers, market, sentiment", params: [], response: "{ base_chain, usdc_activity, market }", price: "FREE" },
+  "/v1/x402/market-pulse": { name: "Market Pulse", category: "QuantumXBrain", description: "Real-time Base market conditions + bullish/bearish signal", params: [], response: "{ chain, gas, market, signal }", price: "FREE" },
+  "/v1/x402/wallet-intel/{address}": { name: "Wallet Intel", category: "QuantumXBrain", description: "Full wallet profile — balance, transfers, risk, spending patterns", params: [{ name: "address", type: "string", required: true }], response: "{ address, eth_balance, risk_score, transfers }", price: "FREE" },
+  "/v1/x402/sentiment": { name: "Sentiment", category: "QuantumXBrain", description: "Fear & Greed Index + BTC trend + composite sentiment score", params: [], response: "{ composite_score, fear_greed_index, overall_sentiment }", price: "FREE" },
+  "/v1/x402/compliance": { name: "Compliance", category: "QuantumXBrain", description: "KYC/AML compliance indicators for any wallet", params: [{ name: "address", type: "string", required: true }], response: "{ compliance_score, flags[] }", price: "FREE" },
+  "/v1/x402/gas-intelligence": { name: "Gas Intel", category: "QuantumXBrain", description: "Gas trends + optimal timing + cost estimates for Base", params: [], response: "{ gas_current, trend, optimal_time }", price: "FREE" },
+  "/v1/x402/token-discovery": { name: "Token Discovery", category: "QuantumXBrain", description: "Discover active token contracts on Base", params: [], response: "{ tokens[] }", price: "FREE" },
+  "/v1/x402/whale-intelligence": { name: "Whale Intel", category: "QuantumXBrain", description: "Whale tracking + sender clustering", params: [], response: "{ whales[] }", price: "FREE" },
+  "/v1/x402/network-health": { name: "Network Health", category: "QuantumXBrain", description: "Full Base network health dashboard", params: [], response: "{ block, gas, uptime }", price: "FREE" },
+  "/v1/x402/stablecoin-flow": { name: "Stablecoin Flow", category: "QuantumXBrain", description: "USDC flow analysis + large transfers", params: [], response: "{ flow, large_transfers[] }", price: "FREE" },
+  "/v1/x402/defi-yield": { name: "DeFi Yield", category: "QuantumXBrain", description: "Top DeFi yield pools on Base (DefiLlama)", params: [], response: "{ pools[] }", price: "FREE" },
+  "/v1/x402/tx-patterns": { name: "TX Patterns", category: "QuantumXBrain", description: "Transaction size distribution analysis", params: [], response: "{ distribution }", price: "FREE" },
+  "/v1/x402/wallet-compare": { name: "Wallet Compare", category: "QuantumXBrain", description: "Compare two wallets side by side", params: [{ name: "a", type: "string", required: true }, { name: "b", type: "string", required: true }], response: "{ comparison }", price: "FREE" },
+  "/v1/x402/leaderboard": { name: "Leaderboard", category: "QuantumXBrain", description: "Top USDC activity ranking", params: [], response: "{ ranking[] }", price: "FREE" },
+  "/v1/x402/contract-intel/{address}": { name: "Contract Intel", category: "QuantumXBrain", description: "Contract verification + type detection on Base", params: [{ name: "address", type: "string", required: true }], response: "{ verified, type }", price: "FREE" },
+  "/v1/x402/velocity-intel": { name: "Velocity Intel", category: "QuantumXBrain", description: "Transfer velocity with 12h trend", params: [], response: "{ velocity, trend }", price: "FREE" },
+  "/v1/x402/history-intel/{address}": { name: "History Intel", category: "QuantumXBrain", description: "Enhanced transfer history + direction analysis", params: [{ name: "address", type: "string", required: true }], response: "{ transfers[] }", price: "FREE" },
+  "/v1/x402/risk-intel/{address}": { name: "Risk Intel", category: "QuantumXBrain", description: "Multi-factor risk scoring with detailed breakdown", params: [{ name: "address", type: "string", required: true }], response: "{ risk_score, factors[] }", price: "FREE" },
+  "/v1/x402/search-intel": { name: "Search Intel", category: "QuantumXBrain", description: "Universal search — address, tx hash, domain", params: [{ name: "q", type: "string", required: true }], response: "{ type, suggestion }", price: "FREE" },
 };
 function renderCatalog(eps){
   const box = $("#catalog"); box.innerHTML = "";
@@ -388,8 +451,17 @@ function copyResult(){
 }
 async function execute(paid){
   if(!state.selected) return;
-  const route = state.selected;
-  const url = api(route) + "?" + params();
+  let route = state.selected;
+  /* Resolve path params: /v1/x402/wallet-intel/{address} → /v1/x402/wallet-intel/0x... */
+  const pathParams = (SPECS[route]||[]).filter(p => route.includes("{"+p.n+"}"));
+  const qp = new URLSearchParams();
+  new FormData($("#expForm")).forEach((v,k)=>{
+    const isPath = pathParams.some(p => p.n === k);
+    if(isPath && v) route = route.replace("{"+k+"}", v);
+    else if(v !== "") qp.append(k, v);
+  });
+  const qs = qp.toString();
+  const url = api(route) + (qs ? "?" + qs : "");
   $("#resultMeta").textContent = (paid?"paying → ":"no payment → ") + url;
   $("#resultBox").textContent = "…";
   const t0 = performance.now();

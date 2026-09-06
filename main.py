@@ -2373,6 +2373,26 @@ async def _base_rpc_call(client: httpx.AsyncClient, method: str, params: list) -
 # Cache for block number to avoid repeated RPC calls
 _block_cache = {"block": None, "ts": 0}
 
+# CoinGecko response cache (10s TTL) — prevents rate-limit 429s
+import time as _time
+_cg_cache: dict[str, tuple[float, tuple[bool, dict]]] = {}
+_CG_CACHE_TTL = 10  # seconds
+
+async def fetch_json_cached(client: httpx.AsyncClient, url: str,
+                            params: dict | None = None,
+                            timeout: float = 15,
+                            cache_ttl: float = _CG_CACHE_TTL):
+    """fetch_json with TTL cache. Only caches GET requests to known APIs."""
+    cache_key = url + "?" + "&".join(f"{k}={v}" for k, v in sorted((params or {}).items()))
+    now = _time.time()
+    if cache_key in _cg_cache:
+        ts, cached = _cg_cache[cache_key]
+        if now - ts < cache_ttl:
+            return cached
+    result = await fetch_json(client, url, params, timeout)
+    _cg_cache[cache_key] = (now, result)
+    return result
+
 async def _get_base_block_number(client: httpx.AsyncClient) -> int | None:
     """Get current block number on Base (cached for 10s)."""
     import time
@@ -3888,17 +3908,11 @@ async def qxb_intelligence():
             # Parallel fetch: gas + block + CoinGecko market
             gas_task = _base_rpc_call(client, "eth_gasPrice", [])
             block_task = _base_rpc_call(client, "eth_blockNumber", [])
-            market_task = fetch_json(client, "https://api.coingecko.com/api/v3/simple/price",
+            market_task = fetch_json_cached(client, "https://api.coingecko.com/api/v3/simple/price",
                                      params={"ids": "bitcoin,ethereum", "vs_currencies": "usd",
                                              "include_24hr_change": "true"})
             fear_task = fetch_json(client, "https://api.alternative.me/fng/?limit=1")
 
-            gas_r, block_r, mkt_ok, mkt_data, fear_ok, fear_data = await asyncio.gather(
-                gas_task, block_task, market_task, asyncio.sleep(0), asyncio.sleep(0), asyncio.sleep(0),
-                return_exceptions=True
-            )[:3]  # only first 3
-
-            # Actually, let's do them properly
             gas_r = await gas_task
             block_r = await block_task
             mkt_ok, mkt_data = await market_task
@@ -4031,7 +4045,7 @@ async def qxb_market_pulse():
                         continue
 
             # Market data
-            mkt_ok, mkt = await fetch_json(client, "https://api.coingecko.com/api/v3/simple/price",
+            mkt_ok, mkt = await fetch_json_cached(client, "https://api.coingecko.com/api/v3/simple/price",
                                            params={"ids": "ethereum,usd-coin", "vs_currencies": "usd"})
             eth_price = mkt.get("ethereum", {}).get("usd") if mkt else None
 
@@ -4204,9 +4218,9 @@ async def qxb_sentiment():
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             fear_task = fetch_json(client, "https://api.alternative.me/fng/?limit=7")
-            mkt_task = fetch_json(client, "https://api.coingecko.com/api/v3/simple/price",
-                                  params={"ids": "bitcoin,ethereum", "vs_currencies": "usd",
-                                          "include_24hr_change": "true",
+            mkt_task = fetch_json_cached(client, "https://api.coingecko.com/api/v3/simple/price",
+                                   params={"ids": "bitcoin,ethereum", "vs_currencies": "usd",
+                                           "include_24hr_change": "true",
                                           "include_market_cap": "true"})
 
             (fear_ok, fear_raw), (mkt_ok, mkt) = await asyncio.gather(fear_task, mkt_task)
@@ -4392,7 +4406,7 @@ async def qxb_gas_intelligence():
             trend = "falling" if samples[-1] < samples[0] else "rising" if samples[-1] > samples[0] else "stable"
 
             # ETH price for USD estimates
-            mkt_ok, mkt = await fetch_json(client, "https://api.coingecko.com/api/v3/simple/price",
+            mkt_ok, mkt = await fetch_json_cached(client, "https://api.coingecko.com/api/v3/simple/price",
                                            params={"ids": "ethereum", "vs_currencies": "usd"})
             eth_price = mkt.get("ethereum", {}).get("usd", 2500) if mkt else 2500
 
