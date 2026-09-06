@@ -4,7 +4,7 @@
 ![Mainnet](https://img.shields.io/badge/Base_Mainnet-LIVE-10B981?style=for-the-badge&labelColor=09090b)
 ![x402](https://img.shields.io/badge/x402-Protocol-10B981?style=for-the-badge&labelColor=09090b)
 ![USDC](https://img.shields.io/badge/USDC-Payments-2775CA?style=for-the-badge&labelColor=09090b)
-![Endpoints](https://img.shields.io/badge/Endpoints-64-d946ef?style=for-the-badge&labelColor=09090b)
+![Endpoints](https://img.shields.io/badge/Endpoints-80-d946ef?style=for-the-badge&labelColor=09090b)
 ![Tests](https://img.shields.io/badge/Tests-60_passing-brightgreen?style=for-the-badge&labelColor=09090b)
 ![Dashboard](https://img.shields.io/badge/Dashboard-Live-ec4899?style=for-the-badge&labelColor=09090b)
 ![SDK](https://img.shields.io/badge/Python_SDK-ready-3776AB?style=for-the-badge&labelColor=09090b)
@@ -23,7 +23,7 @@
 
 ### The Operating System for AI Agent Commerce
 
-**64 live APIs (120+ on the roadmap) where autonomous AI agents pay per request in USDC on Base.**
+**80 live APIs (120+ on the roadmap) where autonomous AI agents pay per request in USDC on Base.**
 **No accounts. No API keys. No subscriptions. Just your wallet and code.**
 
 > **What does "xAPI" mean?** The `x` stands for **x402** — the HTTP payment protocol that makes this possible. AETHERIUS is an API marketplace powered by x402 crypto payments. We have APIs. We're just different: agents pay per request with USDC instead of signing up for monthly subscriptions.
@@ -109,7 +109,7 @@ timeline
 
 **Total commits:** 100+ and counting (`git log --oneline | wc -l` — velocity is public).
 
-**Build velocity:** 64 endpoints (60 paid + 4 free x402 Intelligence) + 60 tests + 2 SDKs + dashboard + landing + playground + demo + 2 grant submissions in **56 hours**.
+**Build velocity:** 80 endpoints (60 paid + 20 free x402 Intelligence) + 60 tests + 2 SDKs + dashboard + landing + playground + demo + 2 grant submissions in **56 hours**.
 If one person builds this in 55 hours, imagine what funded builders ship on Base.
 
 ---
@@ -154,7 +154,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 **Mission:** Become the default API layer for autonomous agents — the Stripe of the agent economy.
 
 **Strategy:**
-1. **Live now:** 8 categories, 64 endpoints (60 paid + 4 free x402 Intelligence) verified with real USDC on Base Mainnet
+1. **Live now:** 8 categories, 80 endpoints (60 paid + 20 free x402 Intelligence) verified with real USDC on Base Mainnet
 2. **Next:** expand depth per category + more on-chain analytics
 3. **Scale** to 120+ with grant funding, then 500+
 4. **Become** the infrastructure that AI agents depend on
@@ -208,7 +208,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | Playground | [`/`](https://wilnowilx.github.io/aetheriusxapi/) — interactive endpoint testing |
 | Dashboard | [`/dashboard/`](https://wilnowilx.github.io/aetheriusxapi/dashboard/) + backend bar |
 | Live API | `http://34.156.149.38/aetherapi` · TLS `https://34-156-149-38.sslip.io/aetherapi` |
-| Version | v2.1.0 · 64 endpoints (60 paid + 4 free x402 Intelligence) · 60/60 tests green |
+| Version | v2.2.0 · 80 endpoints (60 paid + 20 free x402 Intelligence) · 60/60 tests green |
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 mainnet USDC |
 
 🚀 **Sep 5, 2026:** Deployed to Base Mainnet! Real USDC payments now live.
@@ -421,14 +421,47 @@ Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ## 🔬 x402 Intelligence — Exclusive On-Chain Analytics
 
-**FREE endpoints that read USDC transfers directly from Base Mainnet. No other API provider offers this.**
+**20 FREE endpoints that read USDC transfers directly from Base Mainnet. No other API provider offers this.**
 
+### Core Intelligence
 | Endpoint | What it does | Example |
 |----------|-------------|---------|
-| `GET /v1/x402/payments/recent` | Recent USDC transfers on Base — see real money moving | `/v1/x402/payments/recent?hours=1&min_amount=100` |
-| `GET /v1/x402/agent/{address}` | Wallet intelligence — spending patterns, counterparties | `/v1/x402/agent/0x677B...7f61` |
-| `GET /v1/x402/analytics` | Network health — volume, unique wallets, trends | `/v1/x402/analytics` |
-| `GET /v1/x402/top-agents` | Top spenders leaderboard — who's spending the most | `/v1/x402/top-agents?limit=10` |
+| `GET /v1/x402/payments/recent` | Recent USDC transfers on Base | `/v1/x402/payments/recent?hours=1&min_amount=100` |
+| `GET /v1/x402/agent/{address}` | Wallet intelligence — spending patterns | `/v1/x402/agent/0x677B...7f61` |
+| `GET /v1/x402/analytics` | Network health — volume, trends | `/v1/x402/analytics` |
+| `GET /v1/x402/top-agents` | Top spenders leaderboard | `/v1/x402/top-agents?limit=10` |
+
+### Chain & Gas
+| Endpoint | What it does | Example |
+|----------|-------------|---------|
+| `GET /v1/x402/base-stats` | Chain health snapshot | `/v1/x402/base-stats` |
+| `GET /v1/x402/gas` | Gas price analysis & cost estimates | `/v1/x402/gas` |
+| `GET /v1/x402/network` | Full network dashboard | `/v1/x402/network` |
+
+### Activity Tracking
+| Endpoint | What it does | Example |
+|----------|-------------|---------|
+| `GET /v1/x402/whales` | Large transfers (>$10K) | `/v1/x402/whales?min_amount=50000` |
+| `GET /v1/x402/velocity` | Transfer frequency (24h) | `/v1/x402/velocity` |
+| `GET /v1/x402/hourly` | Hourly volume breakdown | `/v1/x402/hourly?hours=12` |
+| `GET /v1/x402/mint-burn` | USDC supply changes | `/v1/x402/mint-burn` |
+| `GET /v1/x402/bridge` | Cross-chain bridge flow | `/v1/x402/bridge` |
+
+### Wallet Intelligence
+| Endpoint | What it does | Example |
+|----------|-------------|---------|
+| `GET /v1/x402/search` | Address or tx lookup | `/v1/x402/search?q=0x677B...` |
+| `GET /v1/x402/history/{address}` | Transfer history | `/v1/x402/history/0x677B...7f61` |
+| `GET /v1/x402/compare` | Compare two wallets | `/v1/x402/compare?a=0x...&b=0x...` |
+| `GET /v1/x402/risk/{address}` | Wallet risk score (0-100) | `/v1/x402/risk/0x677B...7f61` |
+
+### Market Intelligence
+| Endpoint | What it does | Example |
+|----------|-------------|---------|
+| `GET /v1/x402/token/{address}` | ERC-20 token metadata | `/v1/x402/token/0x8335...2913` |
+| `GET /v1/x402/contracts` | Top USDC-receiving contracts | `/v1/x402/contracts?limit=10` |
+| `GET /v1/x402/stablecoins` | All stablecoin activity | `/v1/x402/stablecoins` |
+| `GET /v1/x402/defi-pulse` | DeFi protocol activity | `/v1/x402/defi-pulse` |
 
 **Why this matters:** Nobody else is providing on-chain analytics for the agent economy. AETHERIUS reads Base Mainnet directly — no API keys, no rate limits, no middlemen. This is the intelligence layer that makes x402 payments transparent and actionable.
 
@@ -448,7 +481,7 @@ Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 | **Forex** | 3 | Live rates, historical data, currency conversion |
 | **News & Media** | 6 | Hacker News, Reddit, Dev.to |
 | **Storage & infra** | 2 | Cross-RPC drift, on-chain verification |
-| **x402 Intelligence** | 4 | USDC payments on-chain, agent wallet intel, network analytics, top agents (ALL FREE) |
+| **x402 Intelligence** | 20 | USDC payments, agent wallets, network analytics, whales, gas, DeFi, stablecoins, risk scores (ALL FREE) |
 
 ---
 
@@ -474,7 +507,7 @@ Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ### Phase 1: Foundation (Current)
 - [x] Core API server with x402 middleware (simulated + real modes)
-- [x] 64 endpoints (60 paid + 4 free x402 Intelligence), verified live with real USDC payments
+- [x] 80 endpoints (60 paid + 20 free x402 Intelligence), verified live with real USDC payments
 - [x] E2E payment flow proven on mainnet (6/6 → 200, real USDC settled)
 - [x] Upstream resilience (Overpass mirrors, 5-source price chain, Nominatim fallbacks)
 - [x] Interactive dashboard (`/dashboard/`) with API explorer
