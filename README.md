@@ -4,7 +4,7 @@
 ![Mainnet](https://img.shields.io/badge/Base_Mainnet-LIVE-10B981?style=for-the-badge&labelColor=09090b)
 ![x402](https://img.shields.io/badge/x402-Protocol-10B981?style=for-the-badge&labelColor=09090b)
 ![USDC](https://img.shields.io/badge/USDC-Payments-2775CA?style=for-the-badge&labelColor=09090b)
-![Endpoints](https://img.shields.io/badge/Endpoints-64-d946ef?style=for-the-badge&labelColor=09090b)
+![Endpoints](https://img.shields.io/badge/Endpoints-68-d946ef?style=for-the-badge&labelColor=09090b)
 ![Tests](https://img.shields.io/badge/Tests-60_passing-brightgreen?style=for-the-badge&labelColor=09090b)
 ![Dashboard](https://img.shields.io/badge/Dashboard-Live-ec4899?style=for-the-badge&labelColor=09090b)
 ![SDK](https://img.shields.io/badge/Python_SDK-ready-3776AB?style=for-the-badge&labelColor=09090b)
@@ -23,8 +23,10 @@
 
 ### The Operating System for AI Agent Commerce
 
-**64 live APIs (120+ on the roadmap) where autonomous AI agents pay per request in USDC on Base.**
-**No accounts. No subscriptions. No human friction. Just code.**
+**68 live APIs (120+ on the roadmap) where autonomous AI agents pay per request in USDC on Base.**
+**No accounts. No API keys. No subscriptions. Just your wallet and code.**
+
+> **What does "xAPI" mean?** The `x` stands for **x402** — the HTTP payment protocol that makes this possible. AETHERIUS is an API marketplace powered by x402 crypto payments. We have APIs. We're just different: agents pay per request with USDC instead of signing up for monthly subscriptions.
 
 [Website](https://wilnowilx.github.io/aetheriusxapi/) · [Documentation](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) · [Tutoriales (ES)](https://github.com/wilnowilx/aetheriusxapi/tree/main/docs/tutorials) · [Twitter](https://x.com/aetheriusxAPI) · [Telegram](https://t.me/aetheriusxAPI) · [x402 Protocol](https://x402.org)
 
@@ -47,6 +49,7 @@
 - [🚀 Quick Start](#-quick-start)
 - [🎛️ Dashboard](#%EF%B8%8F-dashboard)
 - [🔌 Endpoints](#-endpoints)
+- [🔬 x402 Intelligence](#-x402-intelligence--exclusive-on-chain-analytics)
 - [🗂️ Categories](#%EF%B8%8F-categories)
 - [🧱 Tech Stack](#%EF%B8%8F-tech-stack)
 - [🛣️ Roadmap](#%EF%B8%8F-roadmap)
@@ -87,6 +90,7 @@ timeline
     Sep 2 : Repo born : landing + docs : Python SDK : persistent telemetry
     Sep 3 : Backend v2 + dashboard + HTTPS : 40 endpoints : JS SDK : demo + player
     Sep 5 : 64 endpoints : crypto, web, data, news, defi, token categories
+    Sep 5 : x402 Intelligence : 4 exclusive FREE endpoints : on-chain analytics
     Sep 4 : Player v2 + wiki tooltips : Dashboard catalog fix : README rewrite
 ```
 
@@ -96,6 +100,7 @@ timeline
 | **Sep 2** — 1st deploy | Repo born, landing page, docs, Python SDK, persistent SQLite telemetry | **t+0 min** | `git log --oneline 3a6aeb6` |
 | **Sep 2** — 2nd deploy | Backend v2.0, 40 endpoints, real USDC on Base Mainnet, 5-source price chain | **t+47 min** | `git log --oneline --since="2026-09-02" --until="2026-09-03"` |
 | **Sep 5** — 8th deploy | 64 endpoints (+24): crypto market, web tools, data utils, news, DeFi tools, NFT | **t+55h+** | `git log -1 --format=%H` |
+| **Sep 5** — 9th deploy | x402 Intelligence: 4 exclusive FREE on-chain analytics endpoints, mainnet live | **t+56h+** | `git log -1 --format=%H` |
 | **Sep 3** — 3rd deploy | Dashboard OS mode, HTTPS (Let's Encrypt), CORS, JS SDK, 60/60 tests | **t+18h 23min** | `git log --oneline --since="2026-09-03"` |
 | **Sep 3** — 4th deploy | Demo player, cast replay, typewriter, 10+ tutorials EN/ES | **t+22h 41min** | same |
 | **Sep 3** — 5th deploy | README brutal (7 SVG diagrams), release v2.0.0, 15 GitHub topics | **t+23h 15min** | `git tag -l` |
@@ -104,7 +109,7 @@ timeline
 
 **Total commits:** 100+ and counting (`git log --oneline | wc -l` — velocity is public).
 
-**Build velocity:** 64 endpoints + 60 tests + 2 SDKs + dashboard + landing + playground + demo + 2 grant submissions in **55 hours**.
+**Build velocity:** 68 endpoints (64 paid + 4 free x402 Intelligence) + 60 tests + 2 SDKs + dashboard + landing + playground + demo + 2 grant submissions in **56 hours**.
 If one person builds this in 55 hours, imagine what funded builders ship on Base.
 
 ---
@@ -149,8 +154,8 @@ If payment authorization and API access are expressed in the same HTTP interacti
 **Mission:** Become the default API layer for autonomous agents — the Stripe of the agent economy.
 
 **Strategy:**
-1. **Live now:** 8 categories, 64 endpoints verified with real USDC on Base Mainnet
-2. **Next:** mainnet (1 env var + funding) + 10-per-category depth
+1. **Live now:** 8 categories, 68 endpoints (64 paid + 4 free x402 Intelligence) verified with real USDC on Base Mainnet
+2. **Next:** expand depth per category + more on-chain analytics
 3. **Scale** to 120+ with grant funding, then 500+
 4. **Become** the infrastructure that AI agents depend on
 
@@ -203,7 +208,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | Playground | [`/`](https://wilnowilx.github.io/aetheriusxapi/) — interactive endpoint testing |
 | Dashboard | [`/dashboard/`](https://wilnowilx.github.io/aetheriusxapi/dashboard/) + backend bar |
 | Live API | `http://34.156.149.38/aetherapi` · TLS `https://34-156-149-38.sslip.io/aetherapi` |
-| Version | v2.0.0 · 64 endpoints · 60/60 tests green |
+| Version | v2.1.0 · 68 endpoints (64 paid + 4 free x402 Intelligence) · 60/60 tests green |
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 mainnet USDC |
 
 🚀 **Sep 5, 2026:** Deployed to Base Mainnet! Real USDC payments now live.
@@ -329,7 +334,7 @@ uvicorn main:app --reload --port 4020
 # open http://127.0.0.1:4020/dashboard/
 ```
 
-- **API Catalog** — all 64 endpoints with live prices from `/health`
+- **API Catalog** — all 68 endpoints with live prices from `/health`
 - **Explorer** — param forms, one-click paid calls, `Show 402` renders the payment challenge
 - **Live Metrics** — REAL server telemetry (`/v1/telemetry`): uptime, totals, settled USDC volume, wallets seen, latency bars, event feed. Zero simulated numbers.
 - **Wallet** — memory-only demo connect (real x402 signing in production client)
@@ -404,8 +409,30 @@ Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 | `GET /v1/defi/impermanent-loss` | IL calculator | $0.005 | ~20ms |
 | `GET /v1/defi/staking-apy` | Staking APY tracker | $0.008 | ~35ms |
 | `GET /v1/token/nft` | NFT metadata | $0.015 | ~60ms |
+| **x402 Intelligence (FREE)** | | | |
+| `GET /v1/x402/payments/recent` | Recent USDC transfers on Base | FREE | ~2s |
+| `GET /v1/x402/agent/{address}` | Wallet spending intelligence | FREE | ~2s |
+| `GET /v1/x402/analytics` | Network health & trends | FREE | ~3s |
+| `GET /v1/x402/top-agents` | Top spenders leaderboard | FREE | ~3s |
 
-> **Note:** These are the initial 64 endpoints. With Base Builder Grant funding, we'll expand to **120+ endpoints across 12 categories.**
+> **Note:** 64 paid endpoints + 4 FREE x402 Intelligence endpoints = **68 total**. With grant funding, we'll expand to **120+ endpoints across 12 categories.**
+
+---
+
+## 🔬 x402 Intelligence — Exclusive On-Chain Analytics
+
+**FREE endpoints that read USDC transfers directly from Base Mainnet. No other API provider offers this.**
+
+| Endpoint | What it does | Example |
+|----------|-------------|---------|
+| `GET /v1/x402/payments/recent` | Recent USDC transfers on Base — see real money moving | `/v1/x402/payments/recent?hours=1&min_amount=100` |
+| `GET /v1/x402/agent/{address}` | Wallet intelligence — spending patterns, counterparties | `/v1/x402/agent/0x677B...7f61` |
+| `GET /v1/x402/analytics` | Network health — volume, unique wallets, trends | `/v1/x402/analytics` |
+| `GET /v1/x402/top-agents` | Top spenders leaderboard — who's spending the most | `/v1/x402/top-agents?limit=10` |
+
+**Why this matters:** While XPay, Coinbase, and Stripe build payment infrastructure, nobody is providing the analytics layer. AETHERIUS reads the chain directly — no API keys, no rate limits, no middlemen. This is the "Bloomberg Terminal" for the agent economy.
+
+**100% FREE** — no payment required. These endpoints are our gift to the community and proof of our on-chain intelligence capability.
 
 ---
 
@@ -421,6 +448,7 @@ Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 | **Forex** | 3 | Live rates, historical data, currency conversion |
 | **News & Media** | 6 | Hacker News, Reddit, Dev.to |
 | **Storage & infra** | 2 | Cross-RPC drift, on-chain verification |
+| **x402 Intelligence** | 4 | USDC payments on-chain, agent wallet intel, network analytics, top agents (ALL FREE) |
 
 ---
 
@@ -446,7 +474,7 @@ Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ### Phase 1: Foundation (Current)
 - [x] Core API server with x402 middleware (simulated + real modes)
-- [x] 64 endpoints, 64 verified live with real USDC payments (no mocked data)
+- [x] 68 endpoints (64 paid + 4 free x402 Intelligence), verified live with real USDC payments
 - [x] E2E payment flow proven on mainnet (6/6 → 200, real USDC settled)
 - [x] Upstream resilience (Overpass mirrors, 5-source price chain, Nominatim fallbacks)
 - [x] Interactive dashboard (`/dashboard/`) with API explorer
@@ -460,7 +488,8 @@ Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 - [x] Base Creator Grant application submitted ($4K)
 - [x] Waitlist with email + wallet capture
 - [x] Dockerfile + docker-compose for local dev
-- [ ] **Mainnet deployment** (pending ETH funding)
+- [x] **Mainnet deployment** ✅ Live on Base Mainnet since Sep 5, 2026
+- [x] x402 Intelligence: 4 exclusive FREE on-chain analytics endpoints
 - [ ] Base Ecosystem Fund application
 
 ### Phase 2: Scale (Post-Grant)
@@ -582,12 +611,14 @@ MIT License — see [LICENSE](LICENSE) for details.
 | **Documentation** | [GitHub Docs](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) |
 | **Tutorials (ES)** | [docs/tutorials](https://github.com/wilnowilx/aetheriusxapi/tree/main/docs/tutorials) |
 | **Twitter** | [@aetheriusxAPI](https://x.com/aetheriusxAPI) |
-| **Telegram** | [@aetheriusxAPI](https://t.me/aetheriusxAPI) |
+| **Telegram Channel** | [@aetherius_xAPI](https://t.me/aetherius_xAPI) |
+| **Telegram Global** | [@aetheriusxAPI_global](https://t.me/aetheriusxAPI_global) |
 | **YouTube** | [Demo video](https://youtu.be/TDzMALSe00A) |
 | **GitHub** | [wilnowilx/aetheriusxapi](https://github.com/wilnowilx/aetheriusxapi) |
 | **x402 Protocol** | [docs.x402.org](https://docs.x402.org) |
 | **Base** | [base.org](https://base.org) |
-| **Live API** | [api.aetheriusx.io](https://api.aetheriusx.io) |
+| **Live API** | [http://34.156.149.38/aetherapi](http://34.156.149.38/aetherapi) |
+| **Live API (TLS)** | [34-156-149-38.sslip.io](https://34-156-149-38.sslip.io/aetherapi) |
 
 ---
 
@@ -595,7 +626,9 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 **Built for the agent economy.**
 
-AETHERIUS — The infrastructure that lets AI agents pay for themselves.
+AETHERIUSxAPI — The API marketplace where AI agents pay for themselves with USDC on Base.
+
+The `x` means x402. Not "no API." All the APIs.
 
 [![Twitter](https://img.shields.io/badge/Follow-%40aetheriusxAPI-1DA1F2?style=for-the-badge&logo=twitter&labelColor=09090b)](https://x.com/aetheriusxAPI)
 [![GitHub](https://img.shields.io/badge/Star-wilnowilx-fff?style=for-the-badge&logo=github&labelColor=09090b)](https://github.com/wilnowilx/aetheriusxapi)
