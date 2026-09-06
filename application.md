@@ -13,11 +13,12 @@ Crypto-native API marketplace where **AI agents pay per request in USDC on Base 
 No accounts, no API keys, no credit cards — the wallet is the identity.
 
 **Live on Base Mainnet (not a deck — running code since Sep 5, 2026):**
-- 80 endpoints live: 60 paid + 20 FREE x402 Intelligence (on-chain analytics)
-- 8 categories: Maps ×5, Crypto ×13, Web ×7, Data ×14, DeFi ×10, Forex ×3, News ×6, x402 Intelligence ×4
+- 100+ endpoints live: 60 paid + 40 FREE (20 x402 Intelligence + 20 QuantumXBrain)
+- 8 categories: Maps ×5, Crypto ×13, Web ×7, Data ×14, DeFi ×10, Forex ×3, News ×6, x402 Intelligence ×4, QuantumXBrain ×20
 - E2E proven: real USDC payments settling on Base Mainnet
 - Interactive dashboard with API explorer: `/dashboard/`
-- x402 Intelligence: exclusive FREE on-chain analytics nobody else offers
+- **QuantumXBrain**: AI-powered intelligence layer combining on-chain data + CoinGecko + DefiLlama in real-time
+- AETHERIUS fingerprint on every response — verifiable, branded intelligence
 - Landing: https://wilnowilx.github.io/aetheriusxapi/
 - Live API: https://34-156-149-38.sslip.io/aetherapi/ (`/docs`, `/health`)
 - Repo: https://github.com/wilnowilx/aetheriusxapi
@@ -50,7 +51,8 @@ no bank account, no ID — only crypto wallet. Building everything solo with $5.
 3. x402 is Base-native; facilitator + Base Mainnet give a complete production loop.
 4. Base explicitly funds **payments** and **AI agents** (Ecosystem Fund categories).
 5. Every paid call is onchain activity: wallets, transactions, volume attributable to Base.
-6. x402 Intelligence reads Base Mainnet directly — exclusive analytics layer.
+6. x402 Intelligence + QuantumXBrain read Base Mainnet directly — exclusive analytics layer.
+7. QuantumXBrain combines on-chain + CoinGecko + DefiLlama — agents get intelligence in ONE call.
 
 ## TRACK A — Creator Grant ($4,000): builders documenting the agent economy
 
@@ -60,10 +62,10 @@ in English + Spanish (500M+ underserved developers).
 **Content series (8 pieces, 6 weeks):**
 1. An agent pays for its first API call (video + code, EN/ES)
 2. Inside an x402 round-trip: 402 → sign → settle (deep-dive)
-3. Operating 64 paid endpoints on <$50/mo GCP (cost transparency)
+3. Operating 60+ paid endpoints on <$50/mo GCP (cost transparency)
 4. When upstreams throttle datacenters: building a 5-source price chain (postmortem)
 5. Distributed telemetry with NATS: what each layer sees (video)
-6. x402 Intelligence: building the Bloomberg Terminal for agents (exclusive analytics)
+6. **QuantumXBrain: building AI-powered intelligence for agent commerce** (deep-dive)
 7. Agents + prediction markets: Polymarket bots that pay for data (case study)
 8. Deploy your own paid API on Base in 30 minutes (tutorial + template repo)
 
@@ -79,6 +81,7 @@ delivery (APIs) → intelligence (on-chain analytics) → observability (telemet
 **Three product lines:**
 - **Data APIs** (live): crypto, maps, weather, web, email — 60 paid endpoints.
 - **x402 Intelligence** (live, FREE): on-chain analytics nobody else offers — the "Bloomberg Terminal" for agent commerce.
+- **QuantumXBrain** (live, FREE): AI-powered intelligence layer — 20 enhanced endpoints combining Base RPC + CoinGecko + DefiLlama + contextual analysis. AETHERIUS fingerprint on every response.
 - **Infrastructure APIs** (Phase 2): telemetry health, storage-layout drift,
   latency proofs — observability other builders can consume per-call.
 
@@ -86,10 +89,9 @@ delivery (APIs) → intelligence (on-chain analytics) → observability (telemet
 - XPay: 5,000 publishers, 1,000+ tools → they are the marketplace
 - Stripe MPP: streaming payments → they are the payment rail
 - Google AP2: authorization → they are the auth layer
-- **AETHERIUS: on-chain intelligence → we are the analytics layer**
+- **AETHERIUS: on-chain intelligence + QuantumXBrain → we are the analytics + intelligence layer**
 
-Nobody else reads Base Mainnet to tell you WHO is paying, HOW MUCH, WHEN, and WHY.
-That's our unfair advantage.
+Nobody else reads Base Mainnet to tell you WHO is paying, HOW MUCH, WHEN, and WHY — and gives you BTC price, Fear&Greed, gas trends, and whale tracking in the SAME response. That's our unfair advantage.
 
 **Use of funds:** mainnet deployment + audit ($800) · 12-month infra ($2,400) ·
 provider onboarding + SDKs ($3,000) · security review ($1,500) · content/growth ($2,300).
