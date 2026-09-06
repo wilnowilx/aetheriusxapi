@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="AETHERIUS — AI Agent Commerce on Base">
-    <meta property="og:description" content="80 live APIs where AI agents pay per request in USDC on Base. 20 FREE on-chain analytics. No accounts. No subscriptions. Just code.">
+    <meta property="og:description" content="80 live APIs where AI agents pay per request in USDC on Base. 20 FREE QuantumXBrain intelligence endpoints. No accounts. No subscriptions. Just code.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://wilnowilx.github.io/aetheriusxapi/">
     <meta property="og:image" content="https://img.shields.io/badge/AETHERIUS-live_on_Base_Mainnet-8B5CF6?style=for-the-badge">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@aetheriusxAPI">
     <title>AETHERIUS — AI Agent Commerce Platform | x402 API Marketplace</title>
-    <meta name="description" content="80 live APIs where AI agents pay per request in USDC on Base. 20 FREE on-chain analytics endpoints. The operating system for machine-to-machine commerce. Built on x402 protocol.">
+    <meta name="description" content="80 live APIs where AI agents pay per request in USDC on Base. 20 FREE QuantumXBrain intelligence endpoints — on-chain analytics, sentiment, risk scoring. No accounts. No subscriptions. Just code.">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -248,16 +248,10 @@
         /* slide UI + hero scale (dots rail is the scrollbar now) */
         html{scrollbar-width:none}
         html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0}
-        #hero h1{
-            font-size: clamp(3.2rem, 6vw, 5.2rem) !important;
-            font-weight: 900;
-            letter-spacing: -0.06em;
-            margin-bottom: 28px;
-            opacity: 0; transform: translateY(50px);
-            animation: fadeUp 1s 0.4s forwards;
-            color: var(--text) !important;
+        nav.scrolled .brand {
+            font-size: 1.35rem;
+            letter-spacing: 0.1em;
         }
-        #mainNav .brand{font-size:1.6rem !important;letter-spacing:.1em !important}
 
         .mobile-toggle { display: none; background: none; border: none; color: var(--text); cursor: pointer; }
 
@@ -272,18 +266,6 @@
         @keyframes heroIn {
             from { opacity: 0; transform: translateY(36px); }
             to { opacity: 1; transform: none; }
-        }
-        .scroll-cue {
-            display: inline-flex;
-            margin-top: 44px;
-            color: var(--text-sec);
-            opacity: 0;
-            animation: heroIn 0.9s ease 0.8s forwards, cueBob 2.2s ease-in-out 1.8s infinite;
-            text-decoration: none;
-        }
-        @keyframes cueBob {
-            0%, 100% { transform: translateY(0); opacity: 0.7; }
-            50% { transform: translateY(10px); opacity: 1; }
         }
 
         /* ===== BUTTONS ===== */
@@ -453,8 +435,6 @@
             line-height: 0.95;
             letter-spacing: -0.06em;
             margin-bottom: 28px;
-            opacity: 0; transform: translateY(50px);
-            animation: fadeUp 1s 0.4s forwards;
             text-shadow: 0 2px 40px rgba(6,6,14,0.8), 0 0 80px rgba(6,6,14,0.5);
         }
 
@@ -577,63 +557,6 @@
           100%{opacity:0;transform:translateY(-8px) scale(0.96)}
         }
 
-        .hero-console {
-            max-width: 780px;
-            margin: 54px auto 0;
-            padding: 18px 22px 20px;
-            text-align: left;
-            background: rgba(10, 10, 20, 0.72);
-            border: 1px solid rgba(168, 85, 247, 0.28);
-            border-radius: 16px;
-            box-shadow: 0 20px 80px rgba(124, 58, 237, 0.16), inset 0 1px rgba(255,255,255,0.05);
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeUp 1s 1s forwards;
-        }
-
-        .hero-console-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-sec);
-            font: 0.68rem 'JetBrains Mono', monospace;
-            letter-spacing: 0.08em;
-        }
-
-        .hero-console-top a {
-            color: var(--purple-light);
-            letter-spacing: 0;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .hero-console-top a:hover { color: white; }
-        .hero-console-top a span { margin-left: 4px; }
-
-        .hero-console-dot {
-            display: inline-block;
-            width: 7px;
-            height: 7px;
-            margin-right: 6px;
-            border-radius: 50%;
-            background: var(--green);
-            box-shadow: 0 0 10px var(--green);
-        }
-
-        .hero-console-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-            padding-top: 20px;
-        }
-
-        .hero-console-grid div { display: flex; flex-direction: column; gap: 6px; }
-        .hero-console-grid strong { color: var(--text); font: 600 1.05rem 'JetBrains Mono', monospace; }
-        .hero-console-grid span { color: var(--text-muted); font-size: 0.68rem; }
-
         .telemetry-section { background: linear-gradient(180deg, rgba(168,85,247,0.04), transparent 55%); }
         .telemetry-section .sdesc { margin: 0 auto; text-align: center; }
         .telemetry-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 18px; align-items: stretch; max-width: 980px; margin: 64px auto 28px; }
@@ -652,8 +575,6 @@
         .spin { animation: spin 1s linear infinite; }
 
         /* ===== STATS ===== */
-        .stats-section { text-align: center; }
-
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -1957,6 +1878,7 @@
         <div class="sdot" data-s="12"></div>
         <div class="sdot" data-s="13"></div>
         <div class="sdot" data-s="14"></div>
+        <div class="sdot" data-s="15"></div>
     </div>
 
     <!-- Mobile Nav -->
@@ -2009,7 +1931,7 @@
                     </div>
                 </div>
                 <h1>The Infrastructure for<br><span class="grad">Agents That Pay</span></h1>
-                <p class="hero-sub">80 live APIs your agents can pay for in USDC on Base. No accounts, no subscriptions, no human friction. The operating system for machine-to-machine commerce.</p>
+                <p class="hero-sub">80 live APIs your agents can pay for in USDC on Base. 20 FREE QuantumXBrain intelligence endpoints. No accounts, no subscriptions. The operating system for machine-to-machine commerce.</p>
                 <div class="hero-actions">
                     <a href="#cta" class="btn btn-primary">
                         Start Building
@@ -2327,62 +2249,69 @@
     <section id="x402-intel" class="features-section" style="background: linear-gradient(180deg, rgba(168,85,247,0.08) 0%, transparent 100%);">
         <div class="inner">
             <div class="stag anim">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                EXCLUSIVE — x402 Intelligence
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                QUANTUMXBrain — FREE Intelligence Layer
             </div>
-            <h2 class="stitle anim">On-Chain Analytics Nobody Else Has</h2>
-            <p class="sdesc anim" style="margin: 0 auto;">We read Base Mainnet directly. Real-time USDC micropayment intelligence. No API keys needed.</p>
+            <h2 class="stitle anim">20 Free Endpoints. Real On-Chain Intelligence.</h2>
+            <p class="sdesc anim" style="margin: 0 auto;">We read Base Mainnet directly + CoinGecko + DefiLlama. No API keys. No accounts. The intelligence layer that NOBODY else offers — completely free.</p>
             
             <div class="features-grid" style="margin-top: 48px;">
-                <div class="feature-card anim ad1" style="border: 1px solid rgba(16,185,129,0.3);">
+                <div class="feature-card anim ad1" style="border: 1px solid rgba(168,85,247,0.3);">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(217,70,239,0.12));">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    </div>
+                    <h3 class="feature-title">Brain Recommender</h3>
+                    <p class="feature-desc">Tell it what you need — "defi", "wallet", "gas" — and it recommends the best endpoints. AI-powered routing.</p>
+                    <div style="margin-top: 16px; padding: 8px 12px; background: rgba(168,85,247,0.1); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--purple-light);">
+                        GET /v1/x402/brain?intent=defi
+                    </div>
+                </div>
+                
+                <div class="feature-card anim ad2" style="border: 1px solid rgba(168,85,247,0.3);">
                     <div class="feature-icon" style="background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,182,212,0.12));">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                     </div>
-                    <h3 class="feature-title">Payment Stream</h3>
-                    <p class="feature-desc">Recent USDC transfers on Base. See every micropayment in real-time. Volume, frequency, wallet patterns.</p>
+                    <h3 class="feature-title">Market Pulse</h3>
+                    <p class="feature-desc">Real-time Base conditions: gas, chain health, USDC activity, ETH price, bullish/bearish signal. One call.</p>
                     <div style="margin-top: 16px; padding: 8px 12px; background: rgba(16,185,129,0.1); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--green);">
-                        GET /v1/x402/payments/recent
+                        GET /v1/x402/market-pulse
                     </div>
                 </div>
                 
-                <div class="feature-card anim ad2" style="border: 1px solid rgba(16,185,129,0.3);">
-                    <div class="feature-icon" style="background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,182,212,0.12));">
+                <div class="feature-card anim ad3" style="border: 1px solid rgba(168,85,247,0.3);">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, rgba(236,72,153,0.12), rgba(168,85,247,0.12));">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     </div>
-                    <h3 class="feature-title">Agent Intelligence</h3>
-                    <p class="feature-desc">Wallet analytics. Spending patterns, unique counterparties, net flow. The "Google Analytics" for crypto wallets.</p>
-                    <div style="margin-top: 16px; padding: 8px 12px; background: rgba(16,185,129,0.1); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--green);">
-                        GET /v1/x402/agent/{address}
+                    <h3 class="feature-title">Wallet Intel</h3>
+                    <p class="feature-desc">Full wallet profile: USDC flow, risk score, counterparty analysis, ETH balance. Any address on Base.</p>
+                    <div style="margin-top: 16px; padding: 8px 12px; background: rgba(236,72,153,0.1); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--pink);">
+                        GET /v1/x402/wallet-intel/{address}
                     </div>
                 </div>
                 
-                <div class="feature-card anim ad3" style="border: 1px solid rgba(16,185,129,0.3);">
-                    <div class="feature-icon" style="background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,182,212,0.12));">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-                    </div>
-                    <h3 class="feature-title">Network Analytics</h3>
-                    <p class="feature-desc">Global health metrics. 24h/7d volume, active wallets, trends. Real-time network intelligence.</p>
-                    <div style="margin-top: 16px; padding: 8px 12px; background: rgba(16,185,129,0.1); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--green);">
-                        GET /v1/x402/analytics
-                    </div>
-                </div>
-                
-                <div class="feature-card anim ad4" style="border: 1px solid rgba(16,185,129,0.3);">
-                    <div class="feature-icon" style="background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,182,212,0.12));">
+                <div class="feature-card anim ad4" style="border: 1px solid rgba(168,85,247,0.3);">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(16,185,129,0.12));">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                     </div>
-                    <h3 class="feature-title">Top Agents Leaderboard</h3>
-                    <p class="feature-desc">Who's spending the most? Ranking by volume, transactions, unique counterparties. The x402 economy leaderboard.</p>
-                    <div style="margin-top: 16px; padding: 8px 12px; background: rgba(16,185,129,0.1); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--green);">
-                        GET /v1/x402/top-agents
+                    <h3 class="feature-title">Sentiment + Risk</h3>
+                    <p class="feature-desc">Fear & Greed Index + on-chain sentiment. Multi-factor risk scoring with detailed breakdown. Compliance indicators.</p>
+                    <div style="margin-top: 16px; padding: 8px 12px; background: rgba(6,182,212,0.1); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--cyan);">
+                        GET /v1/x402/sentiment · /risk-intel
                     </div>
                 </div>
             </div>
+
+            <div class="features-grid" style="margin-top: 24px;">
+                <div class="feature-card anim" style="border: 1px solid rgba(245,158,11,0.3); padding: 20px;">
+                    <h3 class="feature-title" style="font-size: 0.95rem;">+ 16 More Free Endpoints</h3>
+                    <p class="feature-desc" style="font-size: 0.82rem;">Gas Intelligence · Token Discovery · Whale Clustering · DeFi Yield · Tx Patterns · Wallet Compare · Leaderboard · Contract Intel · Velocity · History · Search · Network Health · Stablecoin Flow</p>
+                </div>
+            </div>
             
-            <div style="text-align: center; margin-top: 48px;">
-                <div style="display: inline-flex; align-items: center; gap: 12px; padding: 16px 24px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                    <span style="color: var(--green); font-weight: 600;">FREE — No payment required. Exclusive to aetheriusxAPI.</span>
+            <div style="text-align: center; margin-top: 40px;">
+                <div style="display: inline-flex; align-items: center; gap: 12px; padding: 16px 24px; background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.25); border-radius: 12px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple-light)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <span style="color: var(--purple-light); font-weight: 600;">20 endpoints · 100% FREE · X-AETHERIUS-Fingerprint header on every response</span>
                 </div>
             </div>
         </div>
@@ -2398,7 +2327,7 @@
             <div class="steps-flow">
                 <div class="step-card anim ad1"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span class="step-num">1</span></div><h3 class="step-title">Connect Wallet</h3><p class="step-desc">Your crypto wallet is your identity. No signup, no KYC.</p></div>
                 <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-                <div class="step-card anim ad2"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span class="step-num">2</span></div><h3 class="step-title">Choose API</h3><p class="step-desc">Browse 64 live endpoints. Pick what your agent needs.</p></div>
+                <div class="step-card anim ad2"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span class="step-num">2</span></div><h3 class="step-title">Choose API</h3><p class="step-desc">Browse 80 live endpoints. Pick what your agent needs.</p></div>
                 <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
                 <div class="step-card anim ad3"><div class="step-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span class="step-num">3</span></div><h3 class="step-title">Pay Per Request</h3><p class="step-desc">x402 handles payment. USDC on Base. Sub-cent fees.</p></div>
                 <div class="step-arrow anim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
@@ -2609,7 +2538,7 @@
                     <div class="hb-stats">
                         <div class="hb-stat"><div class="hb-stat-val green" id="hbUp">…</div><div class="hb-stat-label">Uptime</div></div>
                         <div class="hb-stat"><div class="hb-stat-val purple" id="hbLat">…</div><div class="hb-stat-label">Avg Latency</div></div>
-                        <div class="hb-stat"><div class="hb-stat-val green" id="hbErr">0</div><div class="hb-stat-label">Uptime</div></div>
+                        <div class="hb-stat"><div class="hb-stat-val green" id="hbErr">0</div><div class="hb-stat-label">Success Rate</div></div>
                     </div>
                 </div>
 
@@ -2741,7 +2670,7 @@
                 <div class="footer-brand"><a href="#hero" class="brand" style="opacity:1;transform:none;pointer-events:all;">AETHERIUS</a><p>The operating system for AI agent commerce. Infrastructure for machines that pay for themselves.</p></div>
                 <div class="footer-col"><h4>Product</h4><ul><li><a href="#categories">APIs</a></li><li><a href="https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md" target="_blank">Documentation</a></li><li><a href="#limits">Rate Limits</a></li><li><a href="#heartbeat">Status</a></li></ul></div>
                 <div class="footer-col"><h4>Developers</h4><ul><li><a href="https://docs.x402.org" target="_blank">x402 Docs</a></li><li><a href="https://github.com/wilnowilx/aetheriusxapi" target="_blank">GitHub</a></li><li><a href="https://github.com/wilnowilx/aetheriusxapi/tree/main/sdks" target="_blank">SDKs</a></li><li><a href="https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md" target="_blank">API Reference</a></li></ul></div>
-<div class="footer-col"><h4>Community</h4><ul><li><a href="https://x.com/aetheriusxAPI" target="_blank">X / Twitter</a></li><li><a href="https://t.me/aetheriusxAPI" target="_blank">Telegram</a></li></ul></div>
+<div class="footer-col"><h4>Community</h4><ul><li><a href="https://x.com/aetheriusxAPI" target="_blank">X / Twitter</a></li><li><a href="https://t.me/aetheriusxAPI_global" target="_blank">Telegram</a></li></ul></div>
                 <div class="footer-col"><h4>Company</h4><ul><li><a href="https://x.com/aetheriusxAPI" target="_blank">Twitter</a></li><li><a href="https://github.com/wilnowilx/aetheriusxapi/blob/main/README.md" target="_blank">Docs</a></li><li><a href="https://t.me/aetherius_xAPI" target="_blank">Telegram</a></li></ul></div>
             </div>
             <div class="footer-bottom">
@@ -2817,7 +2746,8 @@
         hbCanvas.style.width = rect.width + 'px';
         hbCanvas.style.height = rect.height + 'px';
         hbCtx.scale(2, 2);
-        for (let i = 0; i < HB_POINTS; i++) hbData.push(Math.random() * 15 + 5);
+        /* Seed with placeholder — replaced by live data on first fetch */
+        for (let i = 0; i < HB_POINTS; i++) hbData.push(10);
     }
 
     function drawHeartbeat() {
@@ -2858,11 +2788,25 @@
     }
 
     let hbTick = 0;
+    let hbLiveMs = 10; /* default latency until telemetry loads */
+    let hbLiveOk = true;
+
+    async function fetchHeartbeatData() {
+        try {
+            const t = await aexGet('/v1/telemetry');
+            if (t && t.totals) {
+                hbLiveMs = t.totals.avg_latency_ms || 10;
+                hbLiveOk = ((t.totals.ok_200 || 0) + (t.totals.n402 || 0) + (t.totals.errors || 0)) > 0;
+            }
+        } catch(e) { /* keep previous value */ }
+    }
+
     function updateHeartbeat() {
         hbTick++;
-        const base = 10 + Math.sin(hbTick * 0.05) * 5;
-        const spike = Math.random() > 0.85 ? Math.random() * 12 : 0;
-        hbData.push(base + spike + Math.random() * 3);
+        /* Use real average latency from telemetry, with gentle wave for visual life */
+        const base = hbLiveMs + Math.sin(hbTick * 0.05) * 2;
+        const jitter = (Math.random() - 0.5) * 3; /* ±1.5ms noise */
+        hbData.push(Math.max(1, base + jitter));
         if (hbData.length > HB_POINTS) hbData.shift();
         drawHeartbeat();
     }
@@ -2906,8 +2850,10 @@
     if (codeSection) codeObs.observe(codeSection);
 
     // Init
-    setInterval(updateHeartbeat, 200);
+    setInterval(updateHeartbeat, 1000); /* 1s — more natural than 200ms */
     setTimeout(initHeartbeat, 100);
+    fetchHeartbeatData(); /* initial fetch */
+    setInterval(fetchHeartbeatData, 15000); /* refresh every 15s */
     window.addEventListener('resize', initHeartbeat);
 
     // LIVE platform metrics: same-origin first, VM fallback. Honest numbers only.
@@ -2977,7 +2923,12 @@
         
         /* Dot navigation */
         document.querySelectorAll('.sdot').forEach(d => {
-            d.addEventListener('click', () => goTo(parseInt(d.dataset.s)));
+            d.addEventListener('click', () => {
+                var idx = parseInt(d.dataset.s);
+                if(idx >= 0 && idx < sections.length) {
+                    goTo(idx);
+                }
+            });
         });
     })();
 
@@ -3466,21 +3417,21 @@
       // === FLOATING DATA LABELS (real x402 metrics — 1s refresh) ===
       var labelsEl=document.getElementById('globeLabels');
       var liveData=[
-        {text:'$0.61 USDC settled',type:'price'},
-        {text:'Agent 0x7f3a... paid $0.005',type:'endpoint'},
-        {text:'Network: Healthy',type:'network'},
-        {text:'3 active agents',type:'protocol'},
-        {text:'12 payments today',type:'price'},
-        {text:'x402 micropayment',type:'protocol'},
-        {text:'Base Mainnet',type:'network'},
-        {text:'24h volume: $0.61',type:'price'},
-        {text:'Top agent: 0xD7bE...',type:'endpoint'},
-        {text:'USDC on-chain',type:'protocol'},
-        {text:'Gas fee: $0.00',type:'price'},
-        {text:'Unique wallets: 3',type:'network'},
-        {text:'Last: $0.005/call',type:'price'},
-        {text:'MCP ready',type:'protocol'},
         {text:'80 endpoints live',type:'network'},
+        {text:'x402 micropayments',type:'protocol'},
+        {text:'Base Mainnet (8453)',type:'network'},
+        {text:'USDC on-chain payments',type:'protocol'},
+        {text:'Gas: ~$0.0003/tx',type:'price'},
+        {text:'2s block time',type:'network'},
+        {text:'No signup required',type:'protocol'},
+        {text:'Open-source MIT',type:'network'},
+        {text:'Python SDK v2.0',type:'endpoint'},
+        {text:'Instant finality (L2)',type:'network'},
+        {text:'MCP ready',type:'protocol'},
+        {text:'20 FREE endpoints',type:'price'},
+        {text:'Agent-to-agent commerce',type:'protocol'},
+        {text:'Real USDC payments',type:'price'},
+        {text:'x402 protocol',type:'endpoint'},
       ];
       var positions=[
         {x:-5,y:5},{x:60,y:-5},{x:78,y:22},{x:-2,y:48},{x:58,y:62},
@@ -3505,31 +3456,36 @@
       showLabel();
       setInterval(showLabel,1800);
 
-      // Fetch real data every 1s
+      // Fetch real data and update dynamic labels
       var apiBase='https://34-156-149-38.sslip.io/aetherapi';
       function refreshData(){
         fetch(apiBase+'/api/v1/x402/analytics')
         .then(function(r){return r.json();}).then(function(d){
-          if(d){
-            var vol=d.volume_24h||d.settled||d.total_volume;
-            if(vol!=null){
-              var volStr=typeof vol==='number'?'$'+vol.toFixed(2):'$'+vol;
-              liveData[0]=volStr+' USDC settled';
-              liveData[7]='24h volume: '+volStr;
-            }
-            var agents=d.active_agents||d.unique_agents||d.agents;
-            if(agents!=null){liveData[3]=agents+' active agents';liveData[11]='Unique wallets: '+agents;}
-            var pays=d.payments_today||d.transactions_24h||d.total_payments;
-            if(pays!=null)liveData[4]=pays+' payments today';
-            var top=d.top_agent||d.last_agent;
-            if(top)liveData[9]='Top: '+top.substring(0,10)+'...';
-            var health=d.network_health||d.status;
-            if(health)liveData[2]='Network: '+health.charAt(0).toUpperCase()+health.slice(1);
+          if(!d)return;
+          var m=d.metrics_24h||{};
+          var nh=d.network_health||{};
+          // Update labels with real data when > 0
+          var vol=m.total_volume_usdc||0;
+          if(vol>0){liveData[4]='$'+vol.toFixed(2)+' USDC 24h';}
+          var agents=m.unique_wallets||0;
+          if(agents>0){liveData[10]=agents+' unique wallets';}
+          var txs=m.total_transactions||0;
+          if(txs>0){liveData[11]=txs+' txs today';}
+          var rpc=nh.rpc_status||'';
+          if(rpc){liveData[2]='Base: '+rpc.charAt(0).toUpperCase()+rpc.slice(1);}
+        }).catch(function(){});
+
+        // Also fetch gas (always has real data)
+        fetch(apiBase+'/v1/x402/gas')
+        .then(function(r){return r.json();}).then(function(d){
+          if(d&&d.current_gwei){
+            liveData[4]='Gas: '+d.current_gwei+' gwei';
+            if(d.cost_estimates){liveData[12]='$'+d.cost_estimates.simple_transfer_usd+'/tx';}
           }
         }).catch(function(){});
       }
       refreshData();
-      setInterval(refreshData,1000);
+      setInterval(refreshData,5000);
     })();
     </script>
 </body>

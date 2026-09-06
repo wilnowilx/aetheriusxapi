@@ -445,53 +445,63 @@ Live (mainnet): `https://wilnowilx.github.io/aetheriusxapi/#dashboard`
 
 ---
 
-## 🔬 x402 Intelligence — Exclusive On-Chain Analytics
+## 🔬 QuantumXBrain — FREE Intelligence Layer
 
-**20 FREE endpoints that read USDC transfers directly from Base Mainnet. No other API provider offers this.**
+**40 FREE endpoints combining on-chain data + CoinGecko + DefiLlama. No other API provider offers this.**
 
-### Core Intelligence
+Every response carries the `X-AETHERIUS-Fingerprint: quantumxbrain-v1` header.
+
+### 🧠 QuantumXBrain (NEW — Enhanced Intelligence)
 | Endpoint | What it does | Example |
 |----------|-------------|---------|
-| `GET /v1/x402/payments/recent` | Recent USDC transfers on Base | `/v1/x402/payments/recent?hours=1&min_amount=100` |
-| `GET /v1/x402/agent/{address}` | Wallet intelligence — spending patterns | `/v1/x402/agent/0x677B...7f61` |
-| `GET /v1/x402/analytics` | Network health — volume, trends | `/v1/x402/analytics` |
-| `GET /v1/x402/top-agents` | Top spenders leaderboard | `/v1/x402/top-agents?limit=10` |
+| `GET /v1/x402/brain` | AI endpoint recommender — tell it your intent | `?intent=defi` |
+| `GET /v1/x402/intelligence` | Aggregated intelligence — gas + transfers + market | `/intelligence` |
+| `GET /v1/x402/market-pulse` | Real-time Base market conditions + signal | `/market-pulse` |
+| `GET /v1/x402/wallet-intel/{addr}` | Full wallet profile + risk + spending | `/wallet-intel/0x677B...` |
+| `GET /v1/x402/sentiment` | Fear & Greed + BTC trend + composite score | `/sentiment` |
+| `GET /v1/x402/compliance` | KYC/AML compliance indicators | `?address=0x...` |
+| `GET /v1/x402/gas-intelligence` | Gas trends + optimal timing + cost estimates | `/gas-intelligence` |
+| `GET /v1/x402/token-discovery` | Find active contracts on Base | `/token-discovery` |
+| `GET /v1/x402/whale-intelligence` | Whale tracking + sender clustering | `?min_amount=5000` |
+| `GET /v1/x402/network-health` | Full Base network health dashboard | `/network-health` |
+| `GET /v1/x402/stablecoin-flow` | USDC flow analysis + large transfers | `/stablecoin-flow` |
+| `GET /v1/x402/defi-yield` | Top DeFi yield pools on Base (DefiLlama) | `/defi-yield` |
+| `GET /v1/x402/tx-patterns` | Transaction size distribution analysis | `/tx-patterns` |
+| `GET /v1/x402/wallet-compare` | Compare two wallets side by side | `?a=0x...&b=0x...` |
+| `GET /v1/x402/leaderboard` | Top USDC activity ranking | `?metric=volume` |
+| `GET /v1/x402/contract-intel/{addr}` | Contract verification + type detection | `/contract-intel/0x...` |
+| `GET /v1/x402/velocity-intel` | Transfer velocity with 12h trend | `/velocity-intel` |
+| `GET /v1/x402/history-intel/{addr}` | Enhanced transfer history + direction | `/history-intel/0x...` |
+| `GET /v1/x402/risk-intel/{addr}` | Multi-factor risk scoring + breakdown | `/risk-intel/0x...` |
+| `GET /v1/x402/search-intel` | Universal search — address, tx, domain | `?q=0x...` |
 
-### Chain & Gas
+### Core Intelligence (Original)
 | Endpoint | What it does | Example |
 |----------|-------------|---------|
-| `GET /v1/x402/base-stats` | Chain health snapshot | `/v1/x402/base-stats` |
-| `GET /v1/x402/gas` | Gas price analysis & cost estimates | `/v1/x402/gas` |
-| `GET /v1/x402/network` | Full network dashboard | `/v1/x402/network` |
+| `GET /v1/x402/payments/recent` | Recent USDC transfers on Base | `?hours=1&min_amount=100` |
+| `GET /v1/x402/agent/{address}` | Wallet intelligence — spending patterns | `/agent/0x677B...7f61` |
+| `GET /v1/x402/analytics` | Network health — volume, trends | `/analytics` |
+| `GET /v1/x402/top-agents` | Top spenders leaderboard | `?limit=10` |
+| `GET /v1/x402/base-stats` | Chain health snapshot | `/base-stats` |
+| `GET /v1/x402/gas` | Gas price analysis & cost estimates | `/gas` |
+| `GET /v1/x402/whales` | Large transfers (>$10K) | `?min_amount=50000` |
+| `GET /v1/x402/velocity` | Transfer frequency (24h) | `/velocity` |
+| `GET /v1/x402/hourly` | Hourly volume breakdown | `?hours=12` |
+| `GET /v1/x402/token/{address}` | ERC-20 token metadata | `/token/0x8335...2913` |
+| `GET /v1/x402/contracts` | Top USDC-receiving contracts | `?limit=10` |
+| `GET /v1/x402/search` | Address or tx lookup | `?q=0x677B...` |
+| `GET /v1/x402/history/{address}` | Transfer history | `/history/0x677B...7f61` |
+| `GET /v1/x402/compare` | Compare two wallets | `?a=0x...&b=0x...` |
+| `GET /v1/x402/risk/{address}` | Wallet risk score (0-100) | `/risk/0x677B...7f61` |
+| `GET /v1/x402/stablecoins` | All stablecoin activity | `/stablecoins` |
+| `GET /v1/x402/mint-burn` | USDC supply changes | `/mint-burn` |
+| `GET /v1/x402/bridge` | Cross-chain bridge flow | `/bridge` |
+| `GET /v1/x402/defi-pulse` | DeFi protocol activity | `/defi-pulse` |
+| `GET /v1/x402/network` | Full network dashboard | `/network` |
 
-### Activity Tracking
-| Endpoint | What it does | Example |
-|----------|-------------|---------|
-| `GET /v1/x402/whales` | Large transfers (>$10K) | `/v1/x402/whales?min_amount=50000` |
-| `GET /v1/x402/velocity` | Transfer frequency (24h) | `/v1/x402/velocity` |
-| `GET /v1/x402/hourly` | Hourly volume breakdown | `/v1/x402/hourly?hours=12` |
-| `GET /v1/x402/mint-burn` | USDC supply changes | `/v1/x402/mint-burn` |
-| `GET /v1/x402/bridge` | Cross-chain bridge flow | `/v1/x402/bridge` |
+**Why this matters:** Nobody else provides on-chain intelligence for the agent economy. AETHERIUS reads Base Mainnet directly + CoinGecko + DefiLlama — no API keys, no rate limits, no middlemen. The QuantumXBrain layer combines multiple sources into actionable intelligence.
 
-### Wallet Intelligence
-| Endpoint | What it does | Example |
-|----------|-------------|---------|
-| `GET /v1/x402/search` | Address or tx lookup | `/v1/x402/search?q=0x677B...` |
-| `GET /v1/x402/history/{address}` | Transfer history | `/v1/x402/history/0x677B...7f61` |
-| `GET /v1/x402/compare` | Compare two wallets | `/v1/x402/compare?a=0x...&b=0x...` |
-| `GET /v1/x402/risk/{address}` | Wallet risk score (0-100) | `/v1/x402/risk/0x677B...7f61` |
-
-### Market Intelligence
-| Endpoint | What it does | Example |
-|----------|-------------|---------|
-| `GET /v1/x402/token/{address}` | ERC-20 token metadata | `/v1/x402/token/0x8335...2913` |
-| `GET /v1/x402/contracts` | Top USDC-receiving contracts | `/v1/x402/contracts?limit=10` |
-| `GET /v1/x402/stablecoins` | All stablecoin activity | `/v1/x402/stablecoins` |
-| `GET /v1/x402/defi-pulse` | DeFi protocol activity | `/v1/x402/defi-pulse` |
-
-**Why this matters:** Nobody else is providing on-chain analytics for the agent economy. AETHERIUS reads Base Mainnet directly — no API keys, no rate limits, no middlemen. This is the intelligence layer that makes x402 payments transparent and actionable.
-
-**100% FREE** — no payment required. These endpoints are our gift to the community and proof of our on-chain intelligence capability.
+**100% FREE** — no payment required. The intelligence layer that makes x402 payments transparent and actionable.
 
 ---
 
@@ -509,7 +519,8 @@ Live (mainnet): `https://wilnowilx.github.io/aetheriusxapi/#dashboard`
 | **News** | 6 | Hacker News (stories, items, users, feeds), Reddit, Dev.to |
 | **Storage** | 1 | Cross-RPC slot drift |
 | **Crypto** | 5 | Market data, Fear & Greed, trending coins, OHLCV, dominance |
-| **x402 Intelligence** | 20 | USDC transfers, agent wallets, network analytics, whales, gas, DeFi pulse, stablecoins, risk scores (ALL FREE) |
+| **x402 Intelligence** | 20 | USDC transfers, agent wallets, network analytics, whales, gas, DeFi pulse, stablecoins, risk scores |
+| **QuantumXBrain** | 20 | Brain recommender, market pulse, wallet intel, sentiment, compliance, gas intel, token discovery, whale clustering, DeFi yield, tx patterns, leaderboard, risk scoring (ALL FREE) |
 
 ---
 

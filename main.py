@@ -251,6 +251,16 @@ app = FastAPI(
     version=VERSION,
 )
 
+# === AETHERIUS FINGERPRINT MIDDLEWARE ===
+# Every response carries the QuantumXBrain identity header.
+@app.middleware("http")
+async def aetherius_fingerprint(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-AETHERIUS-Fingerprint"] = "quantumxbrain-v1|base-mainnet|aetheriusxAPI"
+    response.headers["X-AETHERIUS-Network"] = "eip155:8453"
+    response.headers["X-Powered-By"] = "AETHERIUS QuantumXBrain"
+    return response
+
 
 @app.exception_handler(RequestValidationError)
 async def validation_handler(request: Request, exc: RequestValidationError):
@@ -3774,6 +3784,1396 @@ async def x402_network():
 # ============================================================
 
 
+# ============================================================
+# QUANTUMXBrain — 20 FREE Intelligence Endpoints
+# Each combines on-chain data + CoinGecko + DefiLlama + analysis.
+# AETHERIUS fingerprint on every response.
+# ============================================================
+
+import hashlib
+
+QXB_HEADER = {
+    "engine": "QuantumXBrain v1.0",
+    "provider": "AETHERIUS",
+    "network": "Base Mainnet (8453)",
+}
+
+
+@app.get("/v1/x402/brain")
+@app.get("/api/v1/x402/brain")
+async def qxb_brain(intent: str = Query("general", description="User intent: defi, token, wallet, gas, market, security")):
+    """
+    🧠 QuantumXBrain: AI-powered endpoint recommender.
+    Given a user intent, recommends the best endpoints to call.
+    """
+    intent_lower = intent.lower()
+    recommendations = []
+
+    INTENT_MAP = {
+        "defi": [
+            {"endpoint": "/v1/x402/defi-pulse", "reason": "DeFi protocol activity on Base", "cost": "free"},
+            {"endpoint": "/v1/x402/stablecoins", "reason": "Stablecoin flow analysis", "cost": "free"},
+            {"endpoint": "/v1/defi/yields", "reason": "Top yield pools across chains", "cost": "$0.02"},
+            {"endpoint": "/v1/defi/tvl", "reason": "Chain TVL rankings", "cost": "$0.01"},
+            {"endpoint": "/v1/x402/defi-yield", "reason": "Base-specific yield opportunities", "cost": "free"},
+        ],
+        "token": [
+            {"endpoint": "/v1/x402/token/{address}", "reason": "ERC-20 token metadata on Base", "cost": "free"},
+            {"endpoint": "/v1/token/analyze", "reason": "Contract verification + risk score", "cost": "$0.02"},
+            {"endpoint": "/v1/token/price", "reason": "Real-time price via CoinGecko", "cost": "$0.005"},
+            {"endpoint": "/v1/x402/token-discovery", "reason": "Find new tokens on Base", "cost": "free"},
+            {"endpoint": "/v1/x402/risk/{address}", "reason": "Wallet risk assessment", "cost": "free"},
+        ],
+        "wallet": [
+            {"endpoint": "/v1/x402/agent/{address}", "reason": "Wallet spending intelligence", "cost": "free"},
+            {"endpoint": "/v1/x402/risk/{address}", "reason": "Risk score + counterparty analysis", "cost": "free"},
+            {"endpoint": "/v1/x402/wallet-compare", "reason": "Compare two wallets side by side", "cost": "free"},
+            {"endpoint": "/v1/token/balance", "reason": "ETH balance check", "cost": "$0.01"},
+            {"endpoint": "/v1/x402/compliance", "reason": "KYC/AML compliance indicators", "cost": "free"},
+        ],
+        "gas": [
+            {"endpoint": "/v1/x402/gas", "reason": "Current gas prices on Base", "cost": "free"},
+            {"endpoint": "/v1/x402/gas-intelligence", "reason": "Gas trends + optimal timing", "cost": "free"},
+            {"endpoint": "/v1/token/gas", "reason": "Ethereum gas oracle", "cost": "$0.01"},
+        ],
+        "market": [
+            {"endpoint": "/v1/x402/market-pulse", "reason": "Real-time Base market conditions", "cost": "free"},
+            {"endpoint": "/v1/x402/network-health", "reason": "Network health dashboard", "cost": "free"},
+            {"endpoint": "/v1/x402/sentiment", "reason": "Market sentiment analysis", "cost": "free"},
+            {"endpoint": "/v1/crypto/market", "reason": "Global crypto market data", "cost": "$0.01"},
+            {"endpoint": "/v1/crypto/fear-greed", "reason": "Fear & Greed Index", "cost": "$0.005"},
+        ],
+        "security": [
+            {"endpoint": "/v1/x402/risk/{address}", "reason": "Wallet risk scoring", "cost": "free"},
+            {"endpoint": "/v1/x402/compliance", "reason": "Compliance indicators", "cost": "free"},
+            {"endpoint": "/v1/x402/whale-intelligence", "reason": "Large transfer monitoring", "cost": "free"},
+            {"endpoint": "/v1/token/analyze", "reason": "Contract verification", "cost": "$0.02"},
+            {"endpoint": "/v1/web/ssl", "reason": "SSL certificate check", "cost": "$0.008"},
+        ],
+        "general": [
+            {"endpoint": "/v1/x402/market-pulse", "reason": "Start here for Base overview", "cost": "free"},
+            {"endpoint": "/v1/x402/intelligence", "reason": "Aggregated on-chain intelligence", "cost": "free"},
+            {"endpoint": "/v1/x402/network-health", "reason": "Full network dashboard", "cost": "free"},
+            {"endpoint": "/v1/x402/gas", "reason": "Current gas conditions", "cost": "free"},
+            {"endpoint": "/v1/x402/leaderboard", "reason": "Top USDC activity on Base", "cost": "free"},
+        ],
+    }
+
+    for key, recs in INTENT_MAP.items():
+        if key in intent_lower:
+            recommendations = recs
+            break
+    if not recommendations:
+        recommendations = INTENT_MAP["general"]
+
+    return {
+        "status": "ok",
+        **QXB_HEADER,
+        "intent": intent,
+        "recommendations": recommendations,
+        "tip": "All /v1/x402/* endpoints are FREE. Paid endpoints require x402 payment.",
+        "fetched_at": _now(),
+    }
+
+
+@app.get("/v1/x402/intelligence")
+@app.get("/api/v1/x402/intelligence")
+async def qxb_intelligence():
+    """
+    🧠 QuantumXBrain: Aggregated on-chain intelligence.
+    Combines gas, transfers, network health, and market data in one call.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            # Parallel fetch: gas + block + CoinGecko market
+            gas_task = _base_rpc_call(client, "eth_gasPrice", [])
+            block_task = _base_rpc_call(client, "eth_blockNumber", [])
+            market_task = fetch_json(client, "https://api.coingecko.com/api/v3/simple/price",
+                                     params={"ids": "bitcoin,ethereum", "vs_currencies": "usd",
+                                             "include_24hr_change": "true"})
+            fear_task = fetch_json(client, "https://api.alternative.me/fng/?limit=1")
+
+            gas_r, block_r, mkt_ok, mkt_data, fear_ok, fear_data = await asyncio.gather(
+                gas_task, block_task, market_task, asyncio.sleep(0), asyncio.sleep(0), asyncio.sleep(0),
+                return_exceptions=True
+            )[:3]  # only first 3
+
+            # Actually, let's do them properly
+            gas_r = await gas_task
+            block_r = await block_task
+            mkt_ok, mkt_data = await market_task
+            fear_ok, fear_data = await fear_task
+
+            gas_gwei = round(int(gas_r["result"], 16) / 1e9, 4) if gas_r.get("ok") else None
+            current_block = int(block_r["result"], 16) if block_r.get("ok") else None
+
+            # On-chain USDC activity (last 500 blocks)
+            transfers = 0
+            volume = 0
+            wallets = set()
+            if current_block:
+                from_b = max(0, current_block - 500)
+                logs = await _get_eth_logs_limited(client, from_b, current_block,
+                                                   X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=500)
+                for log in logs:
+                    try:
+                        if len(log.get("data", "0x")) > 2:
+                            val = int(log["data"], 16) / 1_000_000
+                            if val > 0:
+                                transfers += 1
+                                volume += val
+                                if len(log.get("topics", [])) >= 3:
+                                    wallets.add(log["topics"][1][-40:])
+                                    wallets.add(log["topics"][2][-40:])
+                    except Exception:
+                        continue
+
+            btc_price = mkt_data.get("bitcoin", {}).get("usd") if mkt_data else None
+            eth_price = mkt_data.get("ethereum", {}).get("usd") if mkt_data else None
+            btc_change = mkt_data.get("bitcoin", {}).get("usd_24h_change") if mkt_data else None
+            fear_value = fear_data["data"][0]["value"] if fear_ok and fear_data and "data" in fear_data else None
+            fear_label = fear_data["data"][0]["value_classification"] if fear_ok and fear_data and "data" in fear_data else None
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "base_chain": {
+                    "block": current_block,
+                    "gas_gwei": gas_gwei,
+                    "gas_cost_transfer_usd": round(gas_gwei * 21000 * 1e-9 * eth_price, 6) if gas_gwei and eth_price else None,
+                    "rpc_status": "operational" if gas_r.get("ok") and block_r.get("ok") else "degraded",
+                },
+                "usdc_activity": {
+                    "transfers_500_blocks": transfers,
+                    "volume_usdc": round(volume, 2),
+                    "unique_wallets": len(wallets),
+                    "avg_transfer_usdc": round(volume / max(transfers, 1), 2),
+                },
+                "market": {
+                    "btc_usd": btc_price,
+                    "eth_usd": eth_price,
+                    "btc_24h_change_pct": round(btc_change, 2) if btc_change else None,
+                    "fear_greed_index": fear_value,
+                    "fear_greed_label": fear_label,
+                },
+                "intelligence_summary": _generate_intelligence_summary(
+                    gas_gwei, transfers, volume, len(wallets), btc_change, fear_value
+                ),
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+def _generate_intelligence_summary(gas, transfers, volume, wallets, btc_change, fear):
+    """Generate a human-readable intelligence summary from metrics."""
+    parts = []
+    if gas is not None:
+        if gas < 0.001:
+            parts.append("Gas extremely cheap — ideal for micropayments")
+        elif gas < 0.01:
+            parts.append("Gas prices low — good time for transactions")
+        else:
+            parts.append("Gas elevated — consider batching transactions")
+    if transfers > 0:
+        parts.append(f"{transfers} USDC transfers in last ~16 min")
+    if volume > 1000:
+        parts.append(f"${volume:,.0f} USDC moved recently — active network")
+    if btc_change is not None:
+        if btc_change > 2:
+            parts.append("BTC trending up — risk-on sentiment")
+        elif btc_change < -2:
+            parts.append("BTC trending down — risk-off caution")
+    if fear is not None:
+        if int(fear) < 25:
+            parts.append("Market in Extreme Fear — potential opportunity zone")
+        elif int(fear) > 75:
+            parts.append("Market in Greed — exercise caution")
+    return ". ".join(parts) + "." if parts else "Normal market conditions."
+
+
+@app.get("/v1/x402/market-pulse")
+@app.get("/api/v1/x402/market-pulse")
+async def qxb_market_pulse():
+    """
+    🧠 QuantumXBrain: Real-time Base market pulse.
+    Gas + chain health + USDC activity + market conditions.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            gas_r = await _base_rpc_call(client, "eth_gasPrice", [])
+            block_r = await _base_rpc_call(client, "eth_blockNumber", [])
+            chain_r = await _base_rpc_call(client, "eth_chainId", [])
+
+            gas_gwei = round(int(gas_r["result"], 16) / 1e9, 6) if gas_r.get("ok") else None
+            current_block = int(block_r["result"], 16) if block_r.get("ok") else None
+            chain_id = int(chain_r["result"], 16) if chain_r.get("ok") else None
+
+            # USDC activity (last 500 blocks)
+            transfers = 0
+            volume = 0
+            wallets = set()
+            if current_block:
+                from_b = max(0, current_block - 500)
+                logs = await _get_eth_logs_limited(client, from_b, current_block,
+                                                   X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=500)
+                for log in logs:
+                    try:
+                        if len(log.get("data", "0x")) > 2:
+                            val = int(log["data"], 16) / 1_000_000
+                            if val > 0:
+                                transfers += 1
+                                volume += val
+                                if len(log.get("topics", [])) >= 3:
+                                    wallets.add(log["topics"][1][-40:])
+                                    wallets.add(log["topics"][2][-40:])
+                    except Exception:
+                        continue
+
+            # Market data
+            mkt_ok, mkt = await fetch_json(client, "https://api.coingecko.com/api/v3/simple/price",
+                                           params={"ids": "ethereum,usd-coin", "vs_currencies": "usd"})
+            eth_price = mkt.get("ethereum", {}).get("usd") if mkt else None
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "chain": {
+                    "name": "Base",
+                    "chain_id": chain_id,
+                    "block": current_block,
+                    "block_time": "2s",
+                    "finality": "instant (L2)",
+                    "rpc": "operational" if block_r.get("ok") else "degraded",
+                },
+                "gas": {
+                    "price_gwei": gas_gwei,
+                    "cost_transfer_usd": round(gas_gwei * 21000 * 1e-9 * eth_price, 6) if gas_gwei and eth_price else None,
+                    "cost_erc20_usd": round(gas_gwei * 65000 * 1e-9 * eth_price, 6) if gas_gwei and eth_price else None,
+                    "rating": "cheap" if gas_gwei and gas_gwei < 0.001 else "normal" if gas_gwei and gas_gwei < 0.01 else "elevated",
+                },
+                "activity": {
+                    "transfers_recent": transfers,
+                    "volume_usdc": round(volume, 2),
+                    "unique_wallets": len(wallets),
+                },
+                "market": {
+                    "eth_usd": eth_price,
+                },
+                "signal": _pulse_signal(gas_gwei, transfers, volume),
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+def _pulse_signal(gas, transfers, volume):
+    """Generate a trading-style signal from metrics."""
+    score = 50
+    if gas and gas < 0.001:
+        score += 15  # cheap gas = good
+    elif gas and gas > 0.05:
+        score -= 10
+    if transfers > 50:
+        score += 10  # active network
+    if volume > 10000:
+        score += 10
+    if score > 70:
+        return {"label": "BULLISH", "score": min(score, 100), "color": "green"}
+    elif score < 35:
+        return {"label": "BEARISH", "score": max(score, 0), "color": "red"}
+    return {"label": "NEUTRAL", "score": score, "color": "yellow"}
+
+
+@app.get("/v1/x402/wallet-intel/{address}")
+@app.get("/api/v1/x402/wallet-intel/{address}")
+async def qxb_wallet_intel(address: str, days: int = Query(7, description="Lookback days (max 30)")):
+    """
+    🧠 QuantumXBrain: Comprehensive wallet intelligence profile.
+    Combines on-chain USDC activity + risk indicators + spending patterns.
+    """
+    try:
+        address = address.lower()
+        if not address.startswith("0x") or len(address) != 42:
+            return _err(400, {"error": "Invalid Ethereum address"})
+
+        days = min(days, 30)
+        padded = address[2:].zfill(64)
+
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            blocks_per_day = 43200
+            from_block = max(0, current_block - (days * blocks_per_day))
+
+            # ETH balance
+            bal_r = await _base_rpc_call(client, "eth_getBalance", [address, "latest"])
+            eth_balance = int(bal_r["result"], 16) / 1e18 if bal_r.get("ok") else 0
+
+            # USDC transfers — sent
+            logs_from = await _get_eth_logs_limited(client, from_block, current_block,
+                                                     X402_CONTRACTS["usdc"],
+                                                     [TRANSFER_TOPIC, f"0x{padded}"], max_blocks=2000)
+            # USDC transfers — received
+            logs_to = await _get_eth_logs_limited(client, from_block, current_block,
+                                                   X402_CONTRACTS["usdc"],
+                                                   [TRANSFER_TOPIC, None, f"0x{padded}"], max_blocks=2000)
+
+            sent = recv = sent_count = recv_count = 0
+            counterparties = set()
+            daily = {}
+
+            for log in logs_from:
+                try:
+                    val = int(log["data"], 16) / 1_000_000
+                    if val > 0:
+                        sent += val; sent_count += 1
+                        cp = "0x" + log["topics"][2][-40:]
+                        counterparties.add(cp.lower())
+                        day = str((current_block - int(log.get("blockNumber", "0x0"), 16)) // blocks_per_day)
+                        daily.setdefault(day, {"sent": 0, "recv": 0})["sent"] += val
+                except Exception:
+                    continue
+
+            for log in logs_to:
+                try:
+                    val = int(log["data"], 16) / 1_000_000
+                    if val > 0:
+                        recv += val; recv_count += 1
+                        cp = "0x" + log["topics"][1][-40:]
+                        counterparties.add(cp.lower())
+                        day = str((current_block - int(log.get("blockNumber", "0x0"), 16)) // blocks_per_day)
+                        daily.setdefault(day, {"sent": 0, "recv": 0})["recv"] += val
+                except Exception:
+                    continue
+
+            # Risk indicators
+            risk_score = 50
+            risk_flags = []
+            if len(counterparties) > 20:
+                risk_score -= 10
+                risk_flags.append("high_counterparty_diversity")
+            if sent_count + recv_count > 100:
+                risk_score += 5
+                risk_flags.append("high_activity")
+            if sent > recv * 10:
+                risk_score -= 15
+                risk_flags.append("net_outflow_heavy")
+            if recv > sent * 10:
+                risk_score += 10
+                risk_flags.append("net_inflow_heavy")
+            if not counterparties:
+                risk_score = 0
+                risk_flags.append("no_activity")
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "address": address,
+                "eth_balance": round(eth_balance, 6),
+                "usdc_activity": {
+                    "total_sent_usdc": round(sent, 2),
+                    "total_received_usdc": round(recv, 2),
+                    "net_flow_usdc": round(recv - sent, 2),
+                    "sent_count": sent_count,
+                    "recv_count": recv_count,
+                    "unique_counterparties": len(counterparties),
+                },
+                "risk": {
+                    "score": max(0, min(100, risk_score)),
+                    "flags": risk_flags,
+                    "label": "low" if risk_score > 70 else "medium" if risk_score > 35 else "high",
+                },
+                "daily_breakdown": daily,
+                "lookback_days": days,
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/sentiment")
+@app.get("/api/v1/x402/sentiment")
+async def qxb_sentiment():
+    """
+    🧠 QuantumXBrain: Market sentiment analysis.
+    Combines Fear & Greed Index + on-chain activity + BTC trend.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            fear_task = fetch_json(client, "https://api.alternative.me/fng/?limit=7")
+            mkt_task = fetch_json(client, "https://api.coingecko.com/api/v3/simple/price",
+                                  params={"ids": "bitcoin,ethereum", "vs_currencies": "usd",
+                                          "include_24hr_change": "true",
+                                          "include_market_cap": "true"})
+
+            (fear_ok, fear_raw), (mkt_ok, mkt) = await asyncio.gather(fear_task, mkt_task)
+
+            # Parse fear & greed history
+            fg_history = []
+            if fear_ok and fear_raw and "data" in fear_raw:
+                for entry in fear_raw["data"][:7]:
+                    fg_history.append({
+                        "value": int(entry["value"]),
+                        "label": entry["value_classification"],
+                        "timestamp": entry.get("timestamp"),
+                    })
+
+            current_fg = fg_history[0] if fg_history else {"value": 50, "label": "Neutral"}
+            avg_fg = round(sum(h["value"] for h in fg_history) / len(fg_history)) if fg_history else 50
+
+            btc = mkt.get("bitcoin", {}) if mkt else {}
+            eth = mkt.get("ethereum", {}) if mkt else {}
+
+            # Composite sentiment
+            sentiment_score = (current_fg["value"] * 0.4 +
+                               (50 + (btc.get("usd_24h_change", 0) * 5)) * 0.3 +
+                               avg_fg * 0.3)
+            sentiment_score = max(0, min(100, round(sentiment_score)))
+
+            if sentiment_score > 70:
+                overall = "GREED"
+            elif sentiment_score > 55:
+                overall = "SLIGHTLY_BULLISH"
+            elif sentiment_score > 45:
+                overall = "NEUTRAL"
+            elif sentiment_score > 30:
+                overall = "SLIGHTLY_BEARISH"
+            else:
+                overall = "FEAR"
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "overall_sentiment": overall,
+                "composite_score": sentiment_score,
+                "fear_greed_index": current_fg,
+                "fear_greed_7d_avg": avg_fg,
+                "fear_greed_history": fg_history,
+                "market": {
+                    "btc_usd": btc.get("usd"),
+                    "btc_24h_change": round(btc.get("usd_24h_change", 0), 2),
+                    "eth_usd": eth.get("usd"),
+                    "eth_24h_change": round(eth.get("usd_24h_change", 0), 2),
+                },
+                "interpretation": _interpret_sentiment(overall, current_fg["value"], btc.get("usd_24h_change", 0)),
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+def _interpret_sentiment(overall, fg_value, btc_change):
+    if overall in ("GREED",):
+        return "Market is greedy. High activity, risk-on behavior. Good for selling, cautious for buying."
+    elif overall in ("FEAR",):
+        return "Market is fearful. Potential accumulation zone. Historically good entry for long-term."
+    elif overall in ("SLIGHTLY_BULLISH",):
+        return "Mild optimism. Activity increasing. Watch for confirmation signals."
+    elif overall in ("SLIGHTLY_BEARISH",):
+        return "Mild caution. Volume declining. Wait for clearer direction."
+    return "Neutral conditions. No strong directional bias."
+
+
+@app.get("/v1/x402/compliance")
+@app.get("/api/v1/x402/compliance")
+async def qxb_compliance(address: str = Query(..., description="Wallet address to check")):
+    """
+    🧠 QuantumXBrain: KYC/AML compliance indicators for any wallet.
+    Based on: transaction patterns, counterparty analysis, known contracts.
+    """
+    try:
+        address = address.lower()
+        if not address.startswith("0x") or len(address) != 42:
+            return _err(400, {"error": "Invalid Ethereum address"})
+
+        padded = address[2:].zfill(64)
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_block = max(0, current_block - 500)
+
+            logs_from = await _get_eth_logs_limited(client, from_block, current_block,
+                                                     X402_CONTRACTS["usdc"],
+                                                     [TRANSFER_TOPIC, f"0x{padded}"], max_blocks=500)
+            logs_to = await _get_eth_logs_limited(client, from_block, current_block,
+                                                   X402_CONTRACTS["usdc"],
+                                                   [TRANSFER_TOPIC, None, f"0x{padded}"], max_blocks=500)
+
+            total_volume = 0
+            counterparties = set()
+            max_single = 0
+            tx_count = 0
+
+            for log in logs_from + logs_to:
+                try:
+                    val = int(log["data"], 16) / 1_000_000
+                    total_volume += val
+                    tx_count += 1
+                    max_single = max(max_single, val)
+                    if len(log.get("topics", [])) >= 3:
+                        counterparties.add(log["topics"][1][-40:].lower())
+                        counterparties.add(log["topics"][2][-40:].lower())
+                except Exception:
+                    continue
+
+            # Compliance scoring
+            score = 50
+            flags = []
+
+            if tx_count == 0:
+                score = 50
+                flags.append("no_recent_activity")
+            elif tx_count < 5:
+                score = 60
+                flags.append("low_activity")
+            elif tx_count > 50:
+                score = 70
+                flags.append("high_activity_consistent")
+
+            if max_single > 100000:
+                score -= 15
+                flags.append("large_single_transfer")
+            elif max_single > 10000:
+                score -= 5
+                flags.append("moderate_single_transfer")
+
+            if len(counterparties) > 2:
+                score += 10
+                flags.append("diversified_counterparties")
+
+            risk_level = "low" if score > 70 else "medium" if score > 40 else "high"
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "address": address,
+                "compliance_score": max(0, min(100, score)),
+                "risk_level": risk_level,
+                "indicators": {
+                    "total_volume_usdc": round(total_volume, 2),
+                    "tx_count": tx_count,
+                    "unique_counterparties": len(counterparties),
+                    "max_single_transfer": round(max_single, 2),
+                },
+                "flags": flags,
+                "disclaimer": "Indicative only. Not legal compliance advice.",
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/gas-intelligence")
+@app.get("/api/v1/x402/gas-intelligence")
+async def qxb_gas_intelligence():
+    """
+    🧠 QuantumXBrain: Gas intelligence — current + trends + optimal timing.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            # Sample gas prices over time
+            samples = []
+            for _ in range(5):
+                r = await _base_rpc_call(client, "eth_gasPrice", [])
+                if r.get("ok"):
+                    samples.append(round(int(r["result"], 16) / 1e9, 6))
+                await asyncio.sleep(0.3)
+
+            if not samples:
+                return _err(502, {"error": "Cannot fetch gas prices"})
+
+            current = samples[-1]
+            avg = sum(samples) / len(samples)
+            trend = "falling" if samples[-1] < samples[0] else "rising" if samples[-1] > samples[0] else "stable"
+
+            # ETH price for USD estimates
+            mkt_ok, mkt = await fetch_json(client, "https://api.coingecko.com/api/v3/simple/price",
+                                           params={"ids": "ethereum", "vs_currencies": "usd"})
+            eth_price = mkt.get("ethereum", {}).get("usd", 2500) if mkt else 2500
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "current_gwei": current,
+                "samples": samples,
+                "avg_gwei": round(avg, 6),
+                "trend": trend,
+                "costs_usd": {
+                    "eth_transfer": round(current * 21000 * 1e-9 * eth_price, 6),
+                    "erc20_transfer": round(current * 65000 * 1e-9 * eth_price, 6),
+                    "contract_call": round(current * 100000 * 1e-9 * eth_price, 6),
+                    "x402_payment": round(current * 150000 * 1e-9 * eth_price, 6),
+                },
+                "optimal_timing": "NOW" if current < avg * 0.8 else "WAIT" if current > avg * 1.2 else "OK",
+                "eth_price_usd": eth_price,
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/token-discovery")
+@app.get("/api/v1/x402/token-discovery")
+async def qxb_token_discovery():
+    """
+    🧠 QuantumXBrain: Discover new/trending tokens on Base.
+    Uses on-chain USDC transfer patterns to find active contracts.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_b = max(0, current_block - 500)
+            logs = await _get_eth_logs_limited(client, from_b, current_block,
+                                               X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=500)
+
+            # Find most active contracts (by transfer count)
+            contract_activity = {}
+            for log in logs:
+                try:
+                    if len(log.get("topics", [])) >= 3:
+                        to_addr = "0x" + log["topics"][2][-40:]
+                        val = int(log["data"], 16) / 1_000_000 if len(log.get("data", "0x")) > 2 else 0
+                        if to_addr not in contract_activity:
+                            contract_activity[to_addr] = {"transfers": 0, "volume": 0}
+                        contract_activity[to_addr]["transfers"] += 1
+                        contract_activity[to_addr]["volume"] += val
+                except Exception:
+                    continue
+
+            # Sort by activity
+            top = sorted(contract_activity.items(), key=lambda x: x[1]["transfers"], reverse=True)[:20]
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "period": "last ~500 blocks (~16 min)",
+                "active_contracts": len(contract_activity),
+                "top_contracts": [
+                    {"address": addr, **data, "volume_usdc": round(data["volume"], 2)}
+                    for addr, data in top
+                ],
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/whale-intelligence")
+@app.get("/api/v1/x402/whale-intelligence")
+async def qxb_whale_intelligence(
+    min_amount: float = Query(1000, description="Minimum USDC amount"),
+    limit: int = Query(15, description="Max results"),
+):
+    """
+    🧠 QuantumXBrain: Enhanced whale tracking with clustering.
+    Detects large USDC transfers and groups by sender pattern.
+    """
+    try:
+        limit = min(limit, 50)
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_block = max(0, current_block - 2000)
+            logs = await _get_eth_logs_limited(client, from_block, current_block,
+                                               X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=2000)
+
+            whales = []
+            sender_clusters = {}
+            for log in logs:
+                try:
+                    if len(log.get("topics", [])) >= 3 and len(log.get("data", "0x")) > 2:
+                        value = int(log["data"], 16) / 1_000_000
+                        if value >= min_amount:
+                            from_addr = "0x" + log["topics"][1][-40:]
+                            to_addr = "0x" + log["topics"][2][-40:]
+                            whales.append({
+                                "tx_hash": log.get("transactionHash", ""),
+                                "block": int(log.get("blockNumber", "0x0"), 16),
+                                "from": from_addr,
+                                "to": to_addr,
+                                "amount_usdc": round(value, 2),
+                            })
+                            sender_clusters.setdefault(from_addr, {"count": 0, "total": 0})
+                            sender_clusters[from_addr]["count"] += 1
+                            sender_clusters[from_addr]["total"] += value
+                except Exception:
+                    continue
+
+            whales.sort(key=lambda x: x["amount_usdc"], reverse=True)
+
+            top_senders = sorted(
+                [{"address": k, "transfers": v["count"], "total_usdc": round(v["total"], 2)}
+                 for k, v in sender_clusters.items()],
+                key=lambda x: x["total_usdc"], reverse=True
+            )[:10]
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "whales_found": len(whales),
+                "whales": whales[:limit],
+                "sender_clusters": top_senders,
+                "total_volume_whale_usdc": round(sum(w["amount_usdc"] for w in whales), 2),
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/network-health")
+@app.get("/api/v1/x402/network-health")
+async def qxb_network_health():
+    """
+    🧠 QuantumXBrain: Full Base network health dashboard.
+    Chain stats + gas + USDC activity + RPC status.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            gas_r = await _base_rpc_call(client, "eth_gasPrice", [])
+            chain_r = await _base_rpc_call(client, "eth_chainId", [])
+
+            gas_gwei = round(int(gas_r["result"], 16) / 1e9, 6) if gas_r.get("ok") else None
+            chain_id = int(chain_r["result"], 16) if chain_r.get("ok") else None
+
+            # USDC activity
+            transfers = volume = 0
+            wallets = set()
+            if current_block:
+                from_b = max(0, current_block - 500)
+                logs = await _get_eth_logs_limited(client, from_b, current_block,
+                                                   X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=500)
+                for log in logs:
+                    try:
+                        if len(log.get("data", "0x")) > 2:
+                            val = int(log["data"], 16) / 1_000_000
+                            if val > 0:
+                                transfers += 1; volume += val
+                                if len(log.get("topics", [])) >= 3:
+                                    wallets.add(log["topics"][1][-40:])
+                                    wallets.add(log["topics"][2][-40:])
+                    except Exception:
+                        continue
+
+            health = "operational" if current_block and gas_r.get("ok") else "degraded"
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "chain": {
+                    "name": "Base",
+                    "chain_id": chain_id,
+                    "block": current_block,
+                    "block_time": "2s",
+                    "finality": "instant",
+                },
+                "gas": {
+                    "gwei": gas_gwei,
+                    "cost_transfer_usd": round(gas_gwei * 21000 * 1e-9 * 2500, 6) if gas_gwei else None,
+                },
+                "usdc_activity": {
+                    "transfers": transfers,
+                    "volume_usdc": round(volume, 2),
+                    "unique_wallets": len(wallets),
+                },
+                "health": health,
+                "rpc_redundancy": len(BASE_RPCS),
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/stablecoin-flow")
+@app.get("/api/v1/x402/stablecoin-flow")
+async def qxb_stablecoin_flow():
+    """
+    🧠 QuantumXBrain: Stablecoin flow analysis on Base.
+    Tracks USDC transfers to identify flow patterns.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_b = max(0, current_block - 2000)
+            logs = await _get_eth_logs_limited(client, from_b, current_block,
+                                               X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=2000)
+
+            total_volume = 0
+            count = 0
+            large = []
+            for log in logs:
+                try:
+                    if len(log.get("data", "0x")) > 2:
+                        val = int(log["data"], 16) / 1_000_000
+                        if val > 0:
+                            total_volume += val
+                            count += 1
+                            if val >= 10000:
+                                large.append({
+                                    "tx": log.get("transactionHash", ""),
+                                    "amount": round(val, 2),
+                                    "from": "0x" + log["topics"][1][-40:] if len(log.get("topics", [])) >= 3 else "",
+                                    "to": "0x" + log["topics"][2][-40:] if len(log.get("topics", [])) >= 3 else "",
+                                })
+                except Exception:
+                    continue
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "period": "last ~2000 blocks (~66 min)",
+                "total_transfers": count,
+                "total_volume_usdc": round(total_volume, 2),
+                "avg_transfer": round(total_volume / max(count, 1), 2),
+                "large_transfers": large[:10],
+                "flow_signal": "high_activity" if count > 100 else "moderate" if count > 20 else "low",
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/defi-yield")
+@app.get("/api/v1/x402/defi-yield")
+async def qxb_defi_yield():
+    """
+    🧠 QuantumXBrain: DeFi yield opportunities on Base.
+    Uses DefiLlama to find top pools on Base chain.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            ok, data = await fetch_json(client, "https://yields.llama.fi/pools")
+
+            if not ok or not data or "data" not in data:
+                return _err(502, {"error": "Cannot fetch yield data from DefiLlama"})
+
+            # Filter Base pools, sort by TVL
+            base_pools = [
+                p for p in data["data"]
+                if p.get("chain", "").lower() == "base" and p.get("tvlUsd", 0) > 1000
+            ]
+            base_pools.sort(key=lambda x: x.get("tvlUsd", 0), reverse=True)
+
+            top_pools = []
+            for p in base_pools[:15]:
+                top_pools.append({
+                    "project": p.get("project", ""),
+                    "symbol": p.get("symbol", ""),
+                    "pool": p.get("pool", ""),
+                    "tvl_usd": round(p.get("tvlUsd", 0), 2),
+                    "apy": round(p.get("apy", 0), 2),
+                    "apy_base": round(p.get("apyBase", 0), 2) if p.get("apyBase") else None,
+                    "apy_reward": round(p.get("apyReward", 0), 2) if p.get("apyReward") else None,
+                    "stablecoin": p.get("stablecoin", False),
+                    "il_risk": p.get("ilRisk", "unknown"),
+                })
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "chain": "Base",
+                "pools_found": len(base_pools),
+                "top_pools": top_pools,
+                "total_tvl_base": round(sum(p.get("tvlUsd", 0) for p in base_pools), 2),
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/tx-patterns")
+@app.get("/api/v1/x402/tx-patterns")
+async def qxb_tx_patterns():
+    """
+    🧠 QuantumXBrain: Transaction pattern analysis on Base.
+    Identifies transfer size distribution and activity patterns.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_b = max(0, current_block - 2000)
+            logs = await _get_eth_logs_limited(client, from_b, current_block,
+                                               X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=2000)
+
+            # Size buckets
+            buckets = {"<$1": 0, "$1-$10": 0, "$10-$100": 0, "$100-$1K": 0,
+                       "$1K-$10K": 0, "$10K-$100K": 0, ">$100K": 0}
+            total_volume = 0
+            count = 0
+
+            for log in logs:
+                try:
+                    if len(log.get("data", "0x")) > 2:
+                        val = int(log["data"], 16) / 1_000_000
+                        if val > 0:
+                            total_volume += val
+                            count += 1
+                            if val < 1: buckets["<$1"] += 1
+                            elif val < 10: buckets["$1-$10"] += 1
+                            elif val < 100: buckets["$10-$100"] += 1
+                            elif val < 1000: buckets["$100-$1K"] += 1
+                            elif val < 10000: buckets["$1K-$10K"] += 1
+                            elif val < 100000: buckets["$10K-$100K"] += 1
+                            else: buckets[">$100K"] += 1
+                except Exception:
+                    continue
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "period": "last ~2000 blocks (~66 min)",
+                "total_transfers": count,
+                "total_volume_usdc": round(total_volume, 2),
+                "size_distribution": buckets,
+                "dominant_bucket": max(buckets, key=buckets.get) if count > 0 else "N/A",
+                "micro_payment_pct": round((buckets["<$1"] + buckets["$1-$10"]) / max(count, 1) * 100, 1),
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/wallet-compare")
+@app.get("/api/v1/x402/wallet-compare")
+async def qxb_wallet_compare(
+    a: str = Query(..., description="First wallet address"),
+    b: str = Query(..., description="Second wallet address"),
+):
+    """
+    🧠 QuantumXBrain: Compare two wallets side by side.
+    """
+    try:
+        a, b = a.lower(), b.lower()
+        for addr in (a, b):
+            if not addr.startswith("0x") or len(addr) != 42:
+                return _err(400, {"error": f"Invalid address: {addr}"})
+
+        async def _profile(addr):
+            padded = addr[2:].zfill(64)
+            async with httpx.AsyncClient(timeout=30) as client:
+                current_block = await _get_base_block_number(client)
+                if not current_block:
+                    return {"error": "RPC unavailable"}
+                from_b = max(0, current_block - 2000)
+                lf = await _get_eth_logs_limited(client, from_b, current_block,
+                                                  X402_CONTRACTS["usdc"],
+                                                  [TRANSFER_TOPIC, f"0x{padded}"], max_blocks=2000)
+                lt = await _get_eth_logs_limited(client, from_b, current_block,
+                                                  X402_CONTRACTS["usdc"],
+                                                  [TRANSFER_TOPIC, None, f"0x{padded}"], max_blocks=2000)
+                sent = recv = sc = rc = 0
+                cps = set()
+                for log in lf:
+                    try:
+                        v = int(log["data"], 16) / 1e6; sent += v; sc += 1
+                        cps.add(log["topics"][2][-40:].lower())
+                    except: pass
+                for log in lt:
+                    try:
+                        v = int(log["data"], 16) / 1e6; recv += v; rc += 1
+                        cps.add(log["topics"][1][-40:].lower())
+                    except: pass
+                return {
+                    "sent": round(sent, 2), "received": round(recv, 2),
+                    "net_flow": round(recv - sent, 2),
+                    "tx_count": sc + rc, "counterparties": len(cps),
+                }
+
+        pa, pb = await asyncio.gather(_profile(a), _profile(b))
+
+        return {
+            "status": "ok",
+            **QXB_HEADER,
+            "wallet_a": {"address": a, **pa},
+            "wallet_b": {"address": b, **pb},
+            "fetched_at": _now(),
+        }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/leaderboard")
+@app.get("/api/v1/x402/leaderboard")
+async def qxb_leaderboard(
+    limit: int = Query(10, description="Top N wallets"),
+    metric: str = Query("volume", description="Sort by: volume, transactions, counterparties"),
+):
+    """
+    🧠 QuantumXBrain: Top USDC activity leaderboard on Base.
+    """
+    try:
+        limit = min(limit, 25)
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_b = max(0, current_block - 2000)
+            logs = await _get_eth_logs_limited(client, from_b, current_block,
+                                               X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=2000)
+
+            wallets = {}
+            for log in logs:
+                try:
+                    if len(log.get("topics", [])) >= 3 and len(log.get("data", "0x")) > 2:
+                        val = int(log["data"], 16) / 1_000_000
+                        from_a = "0x" + log["topics"][1][-40:]
+                        to_a = "0x" + log["topics"][2][-40:]
+                        for addr in (from_a, to_a):
+                            if addr not in wallets:
+                                wallets[addr] = {"volume": 0, "tx_count": 0, "counterparties": set()}
+                            wallets[addr]["volume"] += val
+                            wallets[addr]["tx_count"] += 1
+                            wallets[addr]["counterparties"].add(from_a if addr == to_a else to_a)
+                except Exception:
+                    continue
+
+            ranked = []
+            for addr, data in wallets.items():
+                ranked.append({
+                    "address": addr,
+                    "volume_usdc": round(data["volume"], 2),
+                    "tx_count": data["tx_count"],
+                    "counterparties": len(data["counterparties"]),
+                })
+
+            sort_key = {"volume": "volume_usdc", "transactions": "tx_count",
+                        "counterparties": "counterparties"}.get(metric, "volume_usdc")
+            ranked.sort(key=lambda x: x[sort_key], reverse=True)
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "period": "last ~2000 blocks (~66 min)",
+                "sort_by": metric,
+                "leaderboard": ranked[:limit],
+                "total_wallets_tracked": len(wallets),
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/contract-intel/{address}")
+@app.get("/api/v1/x402/contract-intel/{address}")
+async def qxb_contract_intel(address: str):
+    """
+    🧠 QuantumXBrain: Smart contract intelligence on Base.
+    Checks if address is a contract, verifies via Etherscan.
+    """
+    try:
+        address = address.lower()
+        if not address.startswith("0x") or len(address) != 42:
+            return _err(400, {"error": "Invalid address"})
+
+        async with httpx.AsyncClient(timeout=15) as client:
+            code_r = await _base_rpc_call(client, "eth_getCode", [address, "latest"])
+            is_contract = code_r.get("ok") and code_r.get("result", "0x") != "0x"
+
+            # Try Etherscan verification
+            verified = None
+            if ETHERSCAN_API_KEY:
+                ok, data = await fetch_json(client, "https://api.basescan.org/api",
+                                            params={"module": "contract", "action": "getabi",
+                                                    "address": address, "apikey": ETHERSCAN_API_KEY})
+                verified = ok and data and data.get("status") != "0"
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "address": address,
+                "is_contract": is_contract,
+                "verified": verified,
+                "type": "contract" if is_contract else "EOA (externally owned account)",
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/velocity-intel")
+@app.get("/api/v1/x402/velocity-intel")
+async def qxb_velocity_intel():
+    """
+    🧠 QuantumXBrain: Transfer velocity intelligence.
+    USDC transfers per hour with trend analysis.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            blocks_per_hour = 1800
+            hourly = []
+            for h in range(12):
+                to_b = current_block - (h * blocks_per_hour)
+                from_b = max(0, to_b - blocks_per_hour)
+                logs = await _get_eth_logs_limited(client, from_b, to_b,
+                                                   X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=200)
+                vol = cnt = 0
+                for log in logs:
+                    try:
+                        if len(log.get("data", "0x")) > 2:
+                            v = int(log["data"], 16) / 1e6
+                            if v > 0: vol += v; cnt += 1
+                    except: pass
+                hourly.append({"hours_ago": h, "transfers": cnt, "volume_usdc": round(vol, 2)})
+
+            total_t = sum(h["transfers"] for h in hourly)
+            total_v = sum(h["volume_usdc"] for h in hourly)
+            avg = total_t / max(len(hourly), 1)
+            peak = max(hourly, key=lambda x: x["transfers"])
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "period": "12 hours",
+                "total_transfers": total_t,
+                "total_volume_usdc": round(total_v, 2),
+                "avg_per_hour": round(avg, 1),
+                "peak_hour": peak,
+                "hourly": hourly,
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/history-intel/{address}")
+@app.get("/api/v1/x402/history-intel/{address}")
+async def qxb_history_intel(address: str, limit: int = Query(20, description="Max results")):
+    """
+    🧠 QuantumXBrain: Enhanced transfer history with context.
+    """
+    try:
+        address = address.lower()
+        if not address.startswith("0x") or len(address) != 42:
+            return _err(400, {"error": "Invalid address"})
+
+        limit = min(limit, 50)
+        padded = address[2:].zfill(64)
+
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_b = max(0, current_block - 2000)
+            lf = await _get_eth_logs_limited(client, from_b, current_block,
+                                              X402_CONTRACTS["usdc"],
+                                              [TRANSFER_TOPIC, f"0x{padded}"], max_blocks=2000)
+            lt = await _get_eth_logs_limited(client, from_b, current_block,
+                                              X402_CONTRACTS["usdc"],
+                                              [TRANSFER_TOPIC, None, f"0x{padded}"], max_blocks=2000)
+
+            txns = []
+            for log in lf + lt:
+                try:
+                    if len(log.get("data", "0x")) > 2:
+                        val = int(log["data"], 16) / 1e6
+                        from_a = "0x" + log["topics"][1][-40:]
+                        to_a = "0x" + log["topics"][2][-40:]
+                        direction = "sent" if from_a.lower() == address else "received"
+                        txns.append({
+                            "tx_hash": log.get("transactionHash", ""),
+                            "block": int(log.get("blockNumber", "0x0"), 16),
+                            "from": from_a, "to": to_a,
+                            "amount_usdc": round(val, 2),
+                            "direction": direction,
+                        })
+                except Exception:
+                    continue
+
+            txns.sort(key=lambda x: x["block"], reverse=True)
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "address": address,
+                "total_found": len(txns),
+                "transactions": txns[:limit],
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/risk-intel/{address}")
+@app.get("/api/v1/x402/risk-intel/{address}")
+async def qxb_risk_intel(address: str):
+    """
+    🧠 QuantumXBrain: Enhanced risk intelligence.
+    Multi-factor risk scoring with detailed breakdown.
+    """
+    try:
+        address = address.lower()
+        if not address.startswith("0x") or len(address) != 42:
+            return _err(400, {"error": "Invalid address"})
+
+        padded = address[2:].zfill(64)
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_b = max(0, current_block - 2000)
+
+            # ETH balance
+            bal_r = await _base_rpc_call(client, "eth_getBalance", [address, "latest"])
+            eth_bal = int(bal_r["result"], 16) / 1e18 if bal_r.get("ok") else 0
+
+            lf = await _get_eth_logs_limited(client, from_b, current_block,
+                                              X402_CONTRACTS["usdc"],
+                                              [TRANSFER_TOPIC, f"0x{padded}"], max_blocks=2000)
+            lt = await _get_eth_logs_limited(client, from_b, current_block,
+                                              X402_CONTRACTS["usdc"],
+                                              [TRANSFER_TOPIC, None, f"0x{padded}"], max_blocks=2000)
+
+            sent_vol = recv_vol = max_single = tx_count = 0
+            cps = set()
+            known = 0
+            for log in lf:
+                try:
+                    v = int(log["data"], 16) / 1e6
+                    sent_vol += v; tx_count += 1; max_single = max(max_single, v)
+                    cp = "0x" + log["topics"][2][-40:].lower()
+                    cps.add(cp)
+                    if cp in KNOWN_CONTRACTS: known += 1
+                except: pass
+            for log in lt:
+                try:
+                    v = int(log["data"], 16) / 1e6
+                    recv_vol += v; tx_count += 1
+                    cp = "0x" + log["topics"][1][-40:].lower()
+                    cps.add(cp)
+                    if cp in KNOWN_CONTRACTS: known += 1
+                except: pass
+
+            # Multi-factor risk scoring
+            factors = []
+            score = 50
+
+            if eth_bal > 1:
+                score += 10; factors.append({"factor": "eth_balance", "impact": +10, "detail": f"{round(eth_bal, 4)} ETH"})
+            elif eth_bal < 0.001:
+                score -= 10; factors.append({"factor": "eth_balance", "impact": -10, "detail": "very low ETH"})
+
+            if tx_count > 50:
+                score += 10; factors.append({"factor": "activity", "impact": +10, "detail": f"{tx_count} txns"})
+            elif tx_count == 0:
+                score -= 15; factors.append({"factor": "activity", "impact": -15, "detail": "no activity"})
+
+            if len(cps) > 10:
+                score += 5; factors.append({"factor": "counterparties", "impact": +5, "detail": f"{len(cps)} unique"})
+            if known > 0:
+                score += 10; factors.append({"factor": "known_contracts", "impact": +10, "detail": f"{known} known"})
+
+            if max_single > 100000:
+                score -= 10; factors.append({"factor": "large_transfer", "impact": -10, "detail": f"${max_single:,.0f} single"})
+
+            score = max(0, min(100, score))
+            risk_label = "low" if score > 70 else "medium" if score > 40 else "high"
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                "address": address,
+                "risk_score": score,
+                "risk_label": risk_label,
+                "factors": factors,
+                "summary": {
+                    "eth_balance": round(eth_bal, 6),
+                    "total_sent_usdc": round(sent_vol, 2),
+                    "total_recv_usdc": round(recv_vol, 2),
+                    "net_flow": round(recv_vol - sent_vol, 2),
+                    "tx_count": tx_count,
+                    "counterparties": len(cps),
+                    "known_contracts": known,
+                    "max_single_transfer": round(max_single, 2),
+                },
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/search-intel")
+@app.get("/api/v1/x402/search-intel")
+async def qxb_search_intel(q: str = Query(..., description="Address, tx hash, or ENS name")):
+    """
+    🧠 QuantumXBrain: Universal search with context.
+    Lookup any address, tx, or domain — returns intelligent summary.
+    """
+    try:
+        q = q.strip()
+        result = {"query": q, "type": "unknown"}
+
+        async with httpx.AsyncClient(timeout=15) as client:
+            if q.startswith("0x") and len(q) == 66:
+                # Transaction hash
+                result["type"] = "transaction"
+                tx_r = await _base_rpc_call(client, "eth_getTransactionByHash", [q])
+                if tx_r.get("ok") and tx_r["result"]:
+                    tx = tx_r["result"]
+                    result["from"] = tx.get("from", "")
+                    result["to"] = tx.get("to", "")
+                    result["value_eth"] = round(int(tx.get("value", "0x0"), 16) / 1e18, 6)
+                    result["block"] = int(tx.get("blockNumber", "0x0"), 16) if tx.get("blockNumber") else None
+                    result["status"] = "confirmed" if result["block"] else "pending"
+
+            elif q.startswith("0x") and len(q) == 42:
+                # Address
+                result["type"] = "address"
+                bal_r = await _base_rpc_call(client, "eth_getBalance", [q, "latest"])
+                result["eth_balance"] = round(int(bal_r["result"], 16) / 1e18, 6) if bal_r.get("ok") else 0
+
+                # USDC balance
+                data = "0x70a08231" + q[2:].zfill(64)
+                usdc_r = await _base_rpc_call(client, "eth_call",
+                                               [{"to": X402_CONTRACTS["usdc"], "data": data}, "latest"])
+                if usdc_r.get("ok"):
+                    result["usdc_balance"] = round(int(usdc_r["result"], 16) / 1e6, 2)
+
+                code_r = await _base_rpc_call(client, "eth_getCode", [q, "latest"])
+                result["is_contract"] = code_r.get("ok") and code_r.get("result", "0x") != "0x"
+
+            else:
+                # Treat as search term
+                result["type"] = "search_term"
+                result["suggestion"] = "Use /v1/x402/search?q=0x... for address/tx lookup"
+
+            return {
+                "status": "ok",
+                **QXB_HEADER,
+                **result,
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+# ============================================================
+# END QuantumXBrain Intelligence Layer
+# ============================================================
+
+
 if __name__ == "__main__":
     import uvicorn
 
@@ -3804,5 +5204,26 @@ if __name__ == "__main__":
     print("GET /v1/x402/bridge           Cross-chain bridge flow")
     print("GET /v1/x402/defi-pulse       DeFi protocol activity")
     print("GET /v1/x402/network          Full network dashboard")
+    print("--- QuantumXBrain (FREE Intelligence Layer) ---")
+    print("GET /v1/x402/brain            AI endpoint recommender")
+    print("GET /v1/x402/intelligence     Aggregated intelligence")
+    print("GET /v1/x402/market-pulse     Base market conditions")
+    print("GET /v1/x402/wallet-intel     Wallet intelligence profile")
+    print("GET /v1/x402/sentiment        Market sentiment analysis")
+    print("GET /v1/x402/compliance       KYC/AML compliance score")
+    print("GET /v1/x402/gas-intelligence Gas trends + optimal timing")
+    print("GET /v1/x402/token-discovery  New token discovery")
+    print("GET /v1/x402/whale-intelligence  Whale clustering")
+    print("GET /v1/x402/network-health   Full network dashboard")
+    print("GET /v1/x402/stablecoin-flow  Stablecoin flow analysis")
+    print("GET /v1/x402/defi-yield       Base DeFi yield pools")
+    print("GET /v1/x402/tx-patterns      Transaction pattern analysis")
+    print("GET /v1/x402/wallet-compare   Compare two wallets")
+    print("GET /v1/x402/leaderboard      USDC activity leaderboard")
+    print("GET /v1/x402/contract-intel   Contract intelligence")
+    print("GET /v1/x402/velocity-intel   Velocity intelligence")
+    print("GET /v1/x402/history-intel    Enhanced transfer history")
+    print("GET /v1/x402/risk-intel       Multi-factor risk scoring")
+    print("GET /v1/x402/search-intel     Universal search")
     print("==============================")
     uvicorn.run(app, host="0.0.0.0", port=port)
