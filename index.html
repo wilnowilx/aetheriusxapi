@@ -16,6 +16,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
             --bg: #06060e;
@@ -55,6 +56,9 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
+
+        /* ===== THREE.JS GLOBE ===== */
+        #globe-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.6}
 
         /* ===== PLASMA BACKGROUND ===== */
         #plasma-bg {
@@ -1793,6 +1797,7 @@
     </style>
 </head>
 <body>
+    <canvas id="globe-canvas"></canvas>
     <!-- PLASMA BACKGROUND -->
     <div id="plasma-bg">
         <div class="plasma-blob"></div>
@@ -3021,5 +3026,239 @@
     </script>
     <script>window.AEX_FX = { n: 120, speed: 1.25, maxR: 2.6 };</script>
     <script src="fx.js?v=5"></script>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- THREE.JS: 3D GLOBE — AGENT SWARM + USDC FLOW      -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <script>
+    (function(){
+      var canvas=document.getElementById('globe-canvas');
+      if(!canvas||typeof THREE==='undefined')return;
+      var scene=new THREE.Scene();
+      var camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,1000);
+      var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
+      renderer.setSize(window.innerWidth,window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+
+      // === GLOBE WIREFRAME ===
+      var globeGeom=new THREE.IcosahedronGeometry(3,3);
+      var globeMat=new THREE.MeshBasicMaterial({color:0xa855f7,wireframe:true,transparent:true,opacity:0.06});
+      var globe=new THREE.Mesh(globeGeom,globeMat);
+      scene.add(globe);
+
+      // Inner glow sphere
+      var glowGeom=new THREE.SphereGeometry(2.8,32,32);
+      var glowMat=new THREE.ShaderMaterial({
+        uniforms:{time:{value:0}},
+        vertexShader:'varying vec3 vNormal;void main(){vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+        fragmentShader:'varying vec3 vNormal;uniform float time;void main(){float intensity=pow(0.65-dot(vNormal,vec3(0.0,0.0,1.0)),2.0);gl_FragColor=vec4(0.66,0.33,0.97,1.0)*intensity*0.4;}',
+        blending:THREE.AdditiveBlending,
+        side:THREE.BackSide,
+        transparent:true
+      });
+      var glow=new THREE.Mesh(glowGeom,glowMat);
+      scene.add(glow);
+
+      // === AGENT NODES (API Endpoints) ===
+      var NODE_COUNT=80; // 80 endpoints
+      var nodeGeom=new THREE.BufferGeometry();
+      var nodePositions=new Float32Array(NODE_COUNT*3);
+      var nodeColors=new Float32Array(NODE_COUNT*3);
+      var nodeSizes=new Float32Array(NODE_COUNT);
+
+      // Place nodes on globe surface
+      for(var i=0;i<NODE_COUNT;i++){
+        var phi=Math.acos(-1+(2*i/NODE_COUNT));
+        var theta=Math.sqrt(NODE_COUNT*Math.PI)*phi;
+        var r=3.1;
+        nodePositions[i*3]=r*Math.cos(theta)*Math.sin(phi);
+        nodePositions[i*3+1]=r*Math.sin(theta)*Math.sin(phi);
+        nodePositions[i*3+2]=r*Math.cos(phi);
+
+        // Color: purple for paid, green for free
+        var isFree=i>=60; // Last 20 are free x402 Intelligence
+        if(isFree){
+          nodeColors[i*3]=0.06;nodeColors[i*3+1]=0.72;nodeColors[i*3+2]=0.51; // green
+        }else{
+          var c=new THREE.Color().setHSL(0.75+Math.random()*0.1,0.7,0.6);
+          nodeColors[i*3]=c.r;nodeColors[i*3+1]=c.g;nodeColors[i*3+2]=c.b;
+        }
+        nodeSizes[i]=isFree?0.12:0.08;
+      }
+      nodeGeom.setAttribute('position',new THREE.BufferAttribute(nodePositions,3));
+      nodeGeom.setAttribute('color',new THREE.BufferAttribute(nodeColors,3));
+      nodeGeom.setAttribute('size',new THREE.BufferAttribute(nodeSizes,1));
+
+      var nodeMat=new THREE.ShaderMaterial({
+        uniforms:{time:{value:0}},
+        vertexShader:'attribute float size;attribute vec3 color;varying vec3 vColor;uniform float time;void main(){vColor=color;vec3 pos=position;pos+=normalize(position)*sin(time*2.0+position.x*3.0)*0.05;vec4 mv=modelViewMatrix*vec4(pos,1.0);gl_PointSize=size*(400.0/-mv.z);gl_Position=projectionMatrix*mv;}',
+        fragmentShader:'varying vec3 vColor;void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;float glow=1.0-d*2.0;glow=pow(glow,1.5);gl_FragColor=vec4(vColor,glow*0.9);}',
+        transparent:true,
+        blending:THREE.AdditiveBlending,
+        depthWrite:false
+      });
+      var nodes=new THREE.Points(nodeGeom,nodeMat);
+      scene.add(nodes);
+
+      // === USDC FLOW PARTICLES (Agent Swarm) ===
+      var SWARM_COUNT=300;
+      var swarmGeom=new THREE.BufferGeometry();
+      var swarmPos=new Float32Array(SWARM_COUNT*3);
+      var swarmVel=new Float32Array(SWARM_COUNT*3);
+      var swarmColors=new Float32Array(SWARM_COUNT*3);
+      var swarmSizes=new Float32Array(SWARM_COUNT);
+      var swarmTarget=new Float32Array(SWARM_COUNT*3);
+
+      for(var i=0;i<SWARM_COUNT;i++){
+        // Random position around globe
+        var angle=Math.random()*Math.PI*2;
+        var elevation=(Math.random()-0.5)*Math.PI;
+        var dist=3.2+Math.random()*1.5;
+        swarmPos[i*3]=dist*Math.cos(elevation)*Math.cos(angle);
+        swarmPos[i*3+1]=dist*Math.sin(elevation);
+        swarmPos[i*3+2]=dist*Math.cos(elevation)*Math.sin(angle);
+
+        // Velocity
+        swarmVel[i*3]=(Math.random()-0.5)*0.01;
+        swarmVel[i*3+1]=(Math.random()-0.5)*0.01;
+        swarmVel[i*3+2]=(Math.random()-0.5)*0.01;
+
+        // Random target node
+        var targetIdx=Math.floor(Math.random()*NODE_COUNT);
+        swarmTarget[i*3]=nodePositions[targetIdx*3];
+        swarmTarget[i*3+1]=nodePositions[targetIdx*3+1];
+        swarmTarget[i*3+2]=nodePositions[targetIdx*3+2];
+
+        // Colors: mix of purple, magenta, pink, cyan
+        var palette=[
+          new THREE.Color(0xa855f7),
+          new THREE.Color(0xd946ef),
+          new THREE.Color(0xec4899),
+          new THREE.Color(0x06b6d4)
+        ];
+        var pc=palette[Math.floor(Math.random()*palette.length)];
+        swarmColors[i*3]=pc.r;swarmColors[i*3+1]=pc.g;swarmColors[i*3+2]=pc.b;
+        swarmSizes[i]=0.03+Math.random()*0.04;
+      }
+      swarmGeom.setAttribute('position',new THREE.BufferAttribute(swarmPos,3));
+      swarmGeom.setAttribute('color',new THREE.BufferAttribute(swarmColors,3));
+      swarmGeom.setAttribute('size',new THREE.BufferAttribute(swarmSizes,1));
+
+      var swarmMat=new THREE.ShaderMaterial({
+        uniforms:{time:{value:0}},
+        vertexShader:'attribute float size;attribute vec3 color;varying vec3 vColor;varying float vAlpha;uniform float time;void main(){vColor=color;vec3 pos=position;pos.y+=sin(time*3.0+position.x*2.0)*0.02;vAlpha=0.5+0.5*sin(time*4.0+position.z*3.0);vec4 mv=modelViewMatrix*vec4(pos,1.0);gl_PointSize=size*(300.0/-mv.z);gl_Position=projectionMatrix*mv;}',
+        fragmentShader:'varying vec3 vColor;varying float vAlpha;void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;float glow=pow(1.0-d*2.0,2.0);gl_FragColor=vec4(vColor,vAlpha*glow*0.8);}',
+        transparent:true,
+        blending:THREE.AdditiveBlending,
+        depthWrite:false
+      });
+      var swarm=new THREE.Points(swarmGeom,swarmMat);
+      scene.add(swarm);
+
+      // === CONNECTION LINES (Payment Flows) ===
+      var lineGeom=new THREE.BufferGeometry();
+      var linePos=new Float32Array(150*6);
+      lineGeom.setAttribute('position',new THREE.BufferAttribute(linePos,3));
+      var lineMat=new THREE.LineBasicMaterial({color:0xa855f7,transparent:true,opacity:0.05,blending:THREE.AdditiveBlending});
+      var lines=new THREE.LineSegments(lineGeom,lineMat);
+      scene.add(lines);
+
+      // === ORBIT RINGS ===
+      for(var i=0;i<3;i++){
+        var ringGeom=new THREE.RingGeometry(3.8+i*0.5,3.82+i*0.5,64);
+        var ringMat=new THREE.MeshBasicMaterial({color:0xa855f7,transparent:true,opacity:0.03-i*0.008,side:THREE.DoubleSide});
+        var ring=new THREE.Mesh(ringGeom,ringMat);
+        ring.rotation.x=Math.PI/2+i*0.3;
+        ring.rotation.z=i*0.5;
+        scene.add(ring);
+      }
+
+      camera.position.z=7;
+      camera.position.y=1;
+
+      // Mouse
+      var mouse={x:0,y:0};
+      document.addEventListener('mousemove',function(e){
+        mouse.x=(e.clientX/window.innerWidth)*2-1;
+        mouse.y=-(e.clientY/window.innerHeight)*2+1;
+      });
+
+      // Scroll
+      var scrollY=0;
+      window.addEventListener('scroll',function(){scrollY=window.scrollY;});
+
+      // Animation
+      var clock=new THREE.Clock();
+      function animate(){
+        requestAnimationFrame(animate);
+        var t=clock.getElapsedTime();
+        var sp=swarmGeom.attributes.position.array;
+
+        // Rotate globe slowly
+        globe.rotation.y=t*0.05;
+        globe.rotation.x=Math.sin(t*0.1)*0.1;
+        nodes.rotation.y=t*0.05;
+        nodes.rotation.x=Math.sin(t*0.1)*0.1;
+
+        // Animate swarm particles toward targets
+        for(var i=0;i<SWARM_COUNT;i++){
+          var dx=swarmTarget[i*3]-sp[i*3];
+          var dy=swarmTarget[i*3+1]-sp[i*3+1];
+          var dz=swarmTarget[i*3+2]-sp[i*3+2];
+          var dist=Math.sqrt(dx*dx+dy*dy+dz*dz);
+
+          if(dist<0.2){
+            // Pick new random target
+            var ti=Math.floor(Math.random()*NODE_COUNT);
+            swarmTarget[i*3]=nodePositions[ti*3];
+            swarmTarget[i*3+1]=nodePositions[ti*3+1];
+            swarmTarget[i*3+2]=nodePositions[ti*3+2];
+          }
+
+          sp[i*3]+=dx*0.008+swarmVel[i*3];
+          sp[i*3+1]+=dy*0.008+swarmVel[i*3+1];
+          sp[i*3+2]+=dz*0.008+swarmVel[i*3+2];
+        }
+        swarmGeom.attributes.position.needsUpdate=true;
+
+        // Update connection lines
+        var li=0;
+        for(var i=0;i<SWARM_COUNT&&li<150;i++){
+          var ti=Math.floor(i/NODE_COUNT*NODE_COUNT);
+          var dx2=sp[i*3]-nodePositions[ti*3];
+          var dy2=sp[i*3+1]-nodePositions[ti*3+1];
+          var dz2=sp[i*3+2]-nodePositions[ti*3+2];
+          var d2=Math.sqrt(dx2*dx2+dy2*dy2+dz2*dz2);
+          if(d2<2.0){
+            linePos[li*6]=sp[i*3];linePos[li*6+1]=sp[i*3+1];linePos[li*6+2]=sp[i*3+2];
+            linePos[li*6+3]=nodePositions[ti*3];linePos[li*6+4]=nodePositions[ti*3+1];linePos[li*6+5]=nodePositions[ti*3+2];
+            li++;
+          }
+        }
+        for(var i=li*6;i<150*6;i++)linePos[i]=0;
+        lineGeom.attributes.position.needsUpdate=true;
+
+        // Update uniforms
+        nodeMat.uniforms.time.value=t;
+        swarmMat.uniforms.time.value=t;
+        glowMat.uniforms.time.value=t;
+
+        // Camera
+        camera.position.x=mouse.x*0.5;
+        camera.position.y=1+mouse.y*0.3-scrollY*0.001;
+        camera.lookAt(0,0,0);
+
+        renderer.render(scene,camera);
+      }
+      animate();
+
+      // Resize
+      window.addEventListener('resize',function(){
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth,window.innerHeight);
+      });
+    })();
+    </script>
 </body>
 </html>
