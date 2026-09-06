@@ -531,6 +531,41 @@ Live (mainnet): `https://wilnowilx.github.io/aetheriusxapi/#dashboard`
 
 ---
 
+## 💜 DonateX — Open-Source Donation Infrastructure
+
+**Part of the AETHERIUS ecosystem.** Accept USDC donations on Base in 5 minutes. Zero fees. Zero KYC. One line of code.
+
+### Quick Start
+
+```html
+<script
+  src="https://wilnowilx.github.io/aetheriusxapi/donatex/widget.js"
+  data-wallet="0xYOUR_WALLET_ADDRESS"
+  data-currency="USDC"
+  data-amounts="1,5,10,25"
+></script>
+```
+
+### Features
+
+- **3KB** — Smaller than most favicons
+- **0% Fees** — Stripe charges 2.9%, we charge nothing
+- **No KYC** — No identity verification, no bank accounts
+- **Instant Settlement** — USDC arrives in ~2 seconds
+- **QR Code** — Works with MetaMask, Coinbase Wallet, Rainbow
+- **Verification API** — Build dashboards and trust badges
+
+### Links
+
+| Resource | URL |
+|----------|-----|
+| **Demo** | [wilnowilx.github.io/aetheriusxapi/donatex](https://wilnowilx.github.io/aetheriusxapi/donatex/) |
+| **GitHub** | [donatex/](https://github.com/wilnowilx/aetheriusxapi/tree/main/donatex) |
+| **Widget.js** | [widget.js](https://wilnowilx.github.io/aetheriusxapi/donatex/widget.js) |
+| **Dev.to** | [Weekend Challenge Submission](https://dev.to/wilnowilx) |
+
+---
+
 ## 🛣️ Roadmap
 
 ### Phase 1: Foundation (Current)
@@ -597,6 +632,57 @@ We are building on Base with support from the ecosystem:
 - **Status:** Pending (LinkedIn required — can't create due to KYC)
 
 [Full application text](application.md) · [Base Builder Grants](https://www.base.org/ecosystem-fund/apply)
+
+---
+
+## 📢 Distribution Channels
+
+AETHERIUS is live and being promoted across multiple platforms:
+
+### Developer Communities
+
+| Platform | Status | Link |
+|----------|--------|------|
+| **Dev.to** | ✅ Article live | [dev.to/wilnowilx](https://dev.to/wilnowilx/i-built-an-api-marketplace-where-ai-agents-pay-per-request-in-usdc-80-endpoints-in-4-days-solo-15lc) |
+| **Hacker News** | 📝 Pending submission | news.ycombinator.com |
+| **Reddit** | ⚠️ New account (low karma) | r/webdev, r/cryptocurrency |
+| **Postman Network** | 📝 To publish | postman.com/publish |
+| **OSSDrop** | 📝 To submit | ossdrop.com |
+
+### API Marketplaces
+
+| Platform | Status | Notes |
+|----------|--------|-------|
+| **Postman API Network** | 📝 To publish | 40M+ developers reach |
+| **ApyHub** | 📝 To list | MCP-ready, 65K+ developers |
+| **API.market** | 📝 To list | 500+ APIs, managed gateway |
+| **MCP Registry** | 📝 To publish | Claude, Cursor, LangChain discovery |
+
+### Social & Content
+
+| Platform | Handle | Status |
+|----------|--------|--------|
+| **Twitter/X** | [@aetheriusxAPI](https://x.com/aetheriusxAPI) | 254 followers, 87 posts |
+| **Telegram Channel** | [@aetherius_xAPI](https://t.me/aetherius_xAPI) | Active |
+| **Telegram Group** | [@aetheriusxAPI_global](https://t.me/aetheriusxAPI_global) | Forum enabled |
+| **YouTube** | [AETHERIUS](https://www.youtube.com/channel/UCbbABFn4u74o2CLspSN0VcA) | Demo video live |
+| **Typefully** | Scheduled tweets | 35 premium tweets queued |
+
+### Builder Platforms
+
+| Platform | Status | Notes |
+|----------|--------|-------|
+| **Stackrift** | 📝 To submit | Self-promotion encouraged |
+| **Hatch Zone** | 📝 To submit | Investor-facing |
+| **Forg** | 📝 To publish | API founder stories |
+
+### Grant Applications
+
+| Grant | Amount | Status |
+|-------|--------|--------|
+| **Base Batches 004** | $100K + accelerator | ✅ Applied, result Sep 17 |
+| **Base Creator Grant** | $4K | ✅ Applied |
+| **Base Ecosystem Fund** | Variable | ⏳ Pending (LinkedIn blocked) |
 
 ---
 
