@@ -3,15 +3,12 @@ title: "I Built an API Marketplace Where AI Agents Pay Per Request in USDC — 8
 published: false
 description: "AETHERIUS is an open-source API marketplace where AI agents pay per request in USDC on Base. No accounts. No API keys. No subscriptions. Just wallets and code."
 tags: apis, crypto, ai,opensource
-canonical_url: https://wilnowilx.github.io/aetheriusxapi/
 series: "Building the Agent Economy"
 ---
 
 # I Built an API Marketplace Where AI Agents Pay Per Request in USDC — 80 Endpoints in 4 Days, Solo, With $5.80
 
-![AETHERIUS — The Agent Data Grid](https://img.shields.io/badge/AETHERIUS-80_endpoints LIVE-d946ef?style=for-the-badge&labelColor=09090b)
-![Base Mainnet](https://img.shields.io/badge/Base_Mainnet-Real_USDC-10B981?style=for-the-badge&labelColor=09090b)
-![Open Source](https://img.shields.io/badge/Open_Source-MIT-green?style=for-the-badge&labelColor=09090b)
+> **80 live APIs** · **Base Mainnet** · **Real USDC** · **Open Source MIT** · **Solo builder**
 
 **TL;DR:** I built [AETHERIUS](https://github.com/wilnowilx/aetheriusxapi) — an open-source API marketplace where AI agents pay per request in USDC on Base Mainnet. No accounts. No API keys. No subscriptions. 80 live endpoints. Python + JavaScript SDKs. All verifiable on-chain. Built solo in 4 days with $5.80 in ETH.
 
