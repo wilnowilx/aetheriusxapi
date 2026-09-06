@@ -64,6 +64,7 @@
         /* Prevent overflow */
         html,body{overflow-x:hidden;max-width:100vw}
         section{overflow:hidden}
+        #hero{overflow:visible}
         .inner{box-sizing:border-box}
 
         /* ===== PLASMA BACKGROUND ===== */
@@ -392,12 +393,23 @@
         }
         .hero-right:active { cursor: grabbing; }
 
-        /* Text readability: subtle backdrop for OTHER content sections only */
-        section:not(.hero) .inner {
+        /* Section backdrop — explicit per-ID to avoid hero */
+        #playground .inner, #categories .inner, #x402-intel .inner,
+        #how .inner, #features .inner, #code .inner,
+        #heartbeat .inner, #telemetry .inner, #docs .inner,
+        #limits .inner, #trusted .inner, #cta .inner, #waitlist .inner,
+        #social .inner, #founders .inner {
             background: rgba(6,6,14,0.5);
             border-radius: 20px;
             border: 1px solid rgba(168,85,247,0.06);
             padding: 48px 40px;
+        }
+        /* Hero: absolutely no background anywhere */
+        #hero, #hero .inner, #hero .hero-left, #hero .hero-right {
+            background: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
         }
 
         .hero-badges {
@@ -3169,56 +3181,46 @@
     <script>window.AEX_FX = { n: 120, speed: 1.25, maxR: 2.6 };</script>
     <script src="fx.js?v=5"></script>
 
-    <!-- LIVE STATS: pull real x402 data from API -->
+    <!-- LIVE STATS: real x402 data, no fallbacks -->
     <script>
     (function(){
       var base='https://34-156-149-38.sslip.io/aetherapi';
       function setEl(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
 
-      // Fetch real x402 metrics
-      fetch(base+'/api/v1/x402/analytics').then(function(r){return r.json();}).then(function(d){
-        if(d){
-          var vol=d.volume_24h||d.total_volume||d.settled||'0';
-          if(typeof vol==='number')vol='$'+vol.toFixed(2);
-          setEl('stat-volume',vol);
-          var agents=d.active_agents||d.unique_agents||d.agents||'—';
-          setEl('stat-agents',agents);
-          var pays=d.payments_today||d.transactions_24h||d.total_payments||'—';
-          setEl('stat-payments',pays);
-          var health=d.network_health||d.status||'healthy';
-          setEl('stat-health',health.charAt(0).toUpperCase()+health.slice(1));
-        }
-      }).catch(function(){
-        // Fallback: try health endpoint
-        fetch(base+'/api/v1/health').then(function(r){return r.json();}).then(function(h){
-          if(h){
-            setEl('stat-volume','$0.61');
-            setEl('stat-agents',h.agents||'3');
-            setEl('stat-payments',h.payments_today||'12');
-            setEl('stat-health','Healthy');
-          }
-        }).catch(function(){
-          setEl('stat-volume','$0.61');
-          setEl('stat-agents','3');
-          setEl('stat-payments','12');
-          setEl('stat-health','Healthy');
-        });
-      });
+      function parseStats(d){
+        if(!d)return null;
+        var m=d.metrics_24h||{};
+        var nh=d.network_health||{};
+        var vol=m.total_volume_usdc||0;
+        var agents=m.unique_wallets||0;
+        var txs=m.total_transactions||0;
+        var rpc=nh.rpc_status||'unknown';
+        return {
+          volume: vol>0?'$'+vol.toFixed(2):'—',
+          agents: agents>0?String(agents):'—',
+          payments: txs>0?String(txs):'—',
+          health: rpc==='operational'?'Operational':'—'
+        };
+      }
 
-      // Refresh every 30s
+      function applyStats(s){
+        setEl('stat-volume',s.volume);
+        setEl('stat-agents',s.agents);
+        setEl('stat-payments',s.payments);
+        setEl('stat-health',s.health);
+      }
+
+      // Initial fetch
+      fetch(base+'/api/v1/x402/analytics').then(function(r){return r.json();}).then(function(d){
+        var s=parseStats(d);if(s)applyStats(s);
+      }).catch(function(){});
+
+      // Refresh every 10s
       setInterval(function(){
         fetch(base+'/api/v1/x402/analytics').then(function(r){return r.json();}).then(function(d){
-          if(d){
-            var vol=d.volume_24h||d.total_volume||d.settled||'0';
-            if(typeof vol==='number')vol='$'+vol.toFixed(2);
-            setEl('stat-volume',vol);
-            var agents=d.active_agents||d.unique_agents||d.agents;
-            if(agents)setEl('stat-agents',agents);
-            var pays=d.payments_today||d.transactions_24h||d.total_payments;
-            if(pays)setEl('stat-payments',pays);
-          }
+          var s=parseStats(d);if(s)applyStats(s);
         }).catch(function(){});
-      },30000);
+      },10000);
     })();
     </script>
 
