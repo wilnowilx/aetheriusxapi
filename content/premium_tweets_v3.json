@@ -1,0 +1,292 @@
+{
+  "meta": {
+    "version": "3.0",
+    "description": "AETHERIUS premium marketing tweets v3.0 — 5/day for 7 days, mega-corp marketing level",
+    "strategy": "Hook → Proof → Engagement → Story → CTA",
+    "hashtags": "#x402 #Base #AIagents #BuildOnBase #Web3 #Crypto",
+    "mentions": ["@BuildOnBase", "@aaborowski", "@x402protocol", "@coinbase", "@defaborowski"],
+    "lastUpdated": "2026-09-06"
+  },
+  "tweets": [
+    {
+      "id": 1,
+      "day": 1,
+      "slot": 1,
+      "category": "hook",
+      "content": "An AI agent just paid USDC to call an API.\n\nNo API key. No signup. No human involved.\n\nWelcome to the agent economy.\n\n@aetheriusxAPI #x402 #Base #AIagents",
+      "scheduled_time": "14:00"
+    },
+    {
+      "id": 2,
+      "day": 1,
+      "slot": 2,
+      "category": "proof",
+      "content": "We built 80 APIs in 4 days.\n\n60 paid. 20 FREE on-chain analytics.\nAll live on Base Mainnet.\nAll accepting real USDC.\n\nSolo builder. No team. No VC. $5.80 ETH.\n\nThis is what shipping looks like. @BuildOnBase #BuildOnBase #IndieHacker",
+      "scheduled_time": "17:00"
+    },
+    {
+      "id": 3,
+      "day": 1,
+      "slot": 3,
+      "category": "education",
+      "content": "The old way to use an API:\n1. Sign up\n2. Get API key\n3. Manage billing\n4. Hit rate limits\n5. Cancel subscription\n\nThe x402 way:\n1. Agent sends USDC\n2. Gets data\n3. Done\n\n200ms. No humans. @x402protocol #x402 #Crypto",
+      "scheduled_time": "21:00"
+    },
+    {
+      "id": 4,
+      "day": 1,
+      "slot": 4,
+      "category": "social_proof",
+      "content": "80 endpoints. 60 tests passing. 2 SDKs. 1 dashboard.\n\nAll public on GitHub.\nAll verifiable on-chain.\n\nIf it's not open source, it's not infrastructure. 🟣\n\ngithub.com/wilnowilx/aetheriusxapi #OpenSource #Base #Web3",
+      "scheduled_time": "00:00"
+    },
+    {
+      "id": 5,
+      "day": 1,
+      "slot": 5,
+      "category": "story",
+      "content": "Venezuelan developer in Mexico.\nNo bank account. No PayPal. No LinkedIn. No ID.\nOnly a crypto wallet.\n\nBuilt 80 APIs that accept USDC payments on Base.\nApplied to Base Batches 004 ($100K).\n\nThe limit is not money. The limit is imagination. 🇻🇪 @BuildOnBase #LATAM #IndieHacker",
+      "scheduled_time": "03:00"
+    },
+    {
+      "id": 6,
+      "day": 2,
+      "slot": 1,
+      "category": "data",
+      "content": "📊 The agent economy in numbers:\n\n• 20 FREE on-chain analytics endpoints\n• Real USDC transfers tracked on Base Mainnet\n• Whale alerts (>$10K transfers)\n• Wallet risk scoring (0-100)\n• DeFi protocol activity\n\nNobody else has this. @aetheriusxAPI #DeFi #Base #Crypto",
+      "scheduled_time": "14:00"
+    },
+    {
+      "id": 7,
+      "day": 2,
+      "slot": 2,
+      "category": "hot_take",
+      "content": "Hot take: API keys are the fax machines of the internet.\n\nThey were designed for humans. In 2026, AI agents are the primary consumers of APIs.\n\nIf your API still requires human signup, you're building for the past.\n\nx402 is the future. @x402protocol #AI #x402 #Web3",
+      "scheduled_time": "17:00"
+    },
+    {
+      "id": 8,
+      "day": 2,
+      "slot": 3,
+      "category": "demo",
+      "content": "Try it right now. No signup needed.\n\n3 free endpoints:\n• /v1/x402/base-stats — chain health\n• /v1/x402/gas — gas prices\n• /v1/x402/whales — large transfers\n\nLive on Base Mainnet.\nhttp://34.156.149.38/aetherapi/docs\n\n@aetheriusxAPI #FreeAPI #Base",
+      "scheduled_time": "21:00"
+    },
+    {
+      "id": 9,
+      "day": 2,
+      "slot": 4,
+      "category": "comparison",
+      "content": "Stripe: human signs up → gets API key → manages billing → pays monthly.\n\nAETHERIUS: agent pays $0.005 USDC per request → gets data → done.\n\n200ms. No accounts. No subscriptions. No humans required.\n\nThis is the difference between Web2 and the agent economy. @BuildOnBase #x402",
+      "scheduled_time": "00:00"
+    },
+    {
+      "id": 10,
+      "day": 2,
+      "slot": 5,
+      "category": "question",
+      "content": "Question for builders:\n\nIf your API went live today and NO human ever signed up... but AI agents started paying for it automatically...\n\nWould you even notice? 🤔\n\nThat's what x402 enables. @x402protocol #AIagents #Web3 #Crypto",
+      "scheduled_time": "03:00"
+    },
+    {
+      "id": 11,
+      "day": 3,
+      "slot": 1,
+      "category": "milestone",
+      "content": "Day 4 since repo born.\n\n✅ 80 endpoints live\n✅ Real USDC payments on Base\n✅ Python SDK v2.0\n✅ JavaScript SDK\n✅ Dashboard + playground\n✅ 2 grant applications submitted\n✅ 60/60 tests passing\n\nAll by one person. @BuildOnBase #BuildOnBase",
+      "scheduled_time": "14:00"
+    },
+    {
+      "id": 12,
+      "day": 3,
+      "slot": 2,
+      "category": "education",
+      "content": "What is x402?\n\nIt's an HTTP status code repurposed for crypto payments.\n\n402 = Payment Required.\n\nWhen an agent hits an AETHERIUS API:\n1. Server returns 402 + USDC amount\n2. Agent pays on-chain\n3. Server verifies + returns data\n\nOpen protocol. Open source. Open economy. @x402protocol",
+      "scheduled_time": "17:00"
+    },
+    {
+      "id": 13,
+      "day": 3,
+      "slot": 3,
+      "category": "social_proof",
+      "content": "We're not competing with Stripe.\nWe're not competing with RapidAPI.\nWe're not competing with Postman.\n\nWe're building something they can't:\nAn API marketplace where AI agents are the customers.\n\n80 endpoints. USDC on Base. Open source.\n\n@aetheriusxAPI #x402 #AIagents",
+      "scheduled_time": "21:00"
+    },
+    {
+      "id": 14,
+      "day": 3,
+      "slot": 4,
+      "category": "data",
+      "content": "📊 What our FREE x402 Intelligence tracks:\n\n• USDC transfers on Base (all of them)\n• Whale movements (>$10K)\n• Gas prices in real-time\n• DeFi protocol activity\n• Wallet risk scores\n• Cross-chain bridge flows\n• Stablecoin supply changes\n\n100% free. 100% on-chain. @aetheriusxAPI #DeFi",
+      "scheduled_time": "00:00"
+    },
+    {
+      "id": 15,
+      "day": 3,
+      "slot": 5,
+      "category": "story",
+      "content": "The moment I knew this was real:\n\nDeployed to Base Mainnet.\nSent a request.\nGot back 402.\nPaid 0.005 USDC.\nGot data.\n\n200ms. Real money. Real data.\n\nThat's when the agent economy became tangible. 🟣\n\n@aetheriusxAPI #x402 #Base #Crypto",
+      "scheduled_time": "03:00"
+    },
+    {
+      "id": 16,
+      "day": 4,
+      "slot": 1,
+      "category": "technical",
+      "content": "The AETHERIUS stack:\n\n🖥️ FastAPI (Python) — async, fast\n💳 x402 middleware — USDC payments\n🏦 Coinbase CDP — payment verification\n🌐 Base Mainnet — L2 settlement\n📊 SQLite telemetry — real-time stats\n🧪 60 tests — 100% passing\n\nOpen source. Fork it. @BuildOnBase #BuildOnBase",
+      "scheduled_time": "14:00"
+    },
+    {
+      "id": 17,
+      "day": 4,
+      "slot": 2,
+      "category": "hot_take",
+      "content": "Unpopular opinion: The next billion-dollar API company won't have human customers.\n\nIt'll be an API marketplace where AI agents are the buyers.\n\nNo sales team. No marketing. No human support.\nJust agents paying per request.\n\n@aetheriusxAPI #x402 #AIagents #Crypto",
+      "scheduled_time": "17:00"
+    },
+    {
+      "id": 18,
+      "day": 4,
+      "slot": 3,
+      "category": "demo",
+      "content": "Python SDK in 3 lines:\n\n```python\nfrom aetheriusx import AetheriusXClient\nclient = AetheriusXClient()\nstats = client.x402.base_stats()\n```\n\n20 FREE endpoints. No API key needed.\n60 paid endpoints. Auto x402 payment.\n\npip install aetheriusx @aetheriusxAPI #Python #SDK #AI",
+      "scheduled_time": "21:00"
+    },
+    {
+      "id": 19,
+      "day": 4,
+      "slot": 4,
+      "category": "question",
+      "content": "What if every API call was a micro-transaction?\n\n$0.005 per weather query.\n$0.01 per token price.\n$0.005 per email validation.\n\nNo subscriptions. No commitments. No wasted money.\n\nPay only for what you use. That's x402. @x402protocol #Web3 #Crypto",
+      "scheduled_time": "00:00"
+    },
+    {
+      "id": 20,
+      "day": 4,
+      "slot": 5,
+      "category": "story",
+      "content": "3 days ago I had $5.80 in ETH.\n\nToday I have:\n• 80 live endpoints on Base Mainnet\n• Real USDC payments flowing\n• 2 grant applications pending\n• A Python SDK that agents can use\n• A dashboard showing live telemetry\n\nAll built. All shipped. All real. 🚀\n\n@BuildOnBase #IndieHacker",
+      "scheduled_time": "03:00"
+    },
+    {
+      "id": 21,
+      "day": 5,
+      "slot": 1,
+      "category": "hook",
+      "content": "AI agents don't need API keys.\n\nThey need wallets.\n\n80 APIs. USDC on Base. x402 protocol.\nNo accounts. No subscriptions. No humans.\n\nThe agent economy is here. 🟣\n\n@aetheriusxAPI #x402 #AIagents #Base",
+      "scheduled_time": "14:00"
+    },
+    {
+      "id": 22,
+      "day": 5,
+      "slot": 2,
+      "category": "data",
+      "content": "AETHERIUS by the numbers:\n\n• 80 endpoints (60 paid + 20 FREE)\n• 11 API categories\n• 20 FREE on-chain analytics\n• 2 SDKs (Python + JavaScript)\n• 60/60 tests passing\n• 4 days from zero to mainnet\n• $5.80 ETH total capital\n\n@BuildOnBase #BuildOnBase #x402",
+      "scheduled_time": "17:00"
+    },
+    {
+      "id": 23,
+      "day": 5,
+      "slot": 3,
+      "category": "education",
+      "content": "The 5 categories of x402 Intelligence (FREE):\n\n🔵 Core — USDC transfers, agent wallets, analytics\n🟢 Chain — Base stats, gas prices, network health\n🟡 Activity — whales, velocity, hourly volume\n🟣 Wallet — search, history, compare, risk\n🔴 Market — tokens, contracts, stablecoins, DeFi\n\n@aetheriusxAPI #DeFi #Base #Crypto",
+      "scheduled_time": "21:00"
+    },
+    {
+      "id": 24,
+      "day": 5,
+      "slot": 4,
+      "category": "social_proof",
+      "content": "Open source. MIT license. Every line public.\n\ngithub.com/wilnowilx/aetheriusxapi\n\n• 130+ commits\n• 80 endpoints\n• 2 SDKs\n• 10+ tutorials EN/ES\n• Docker ready\n• Grant applications\n\nIf you can't verify it, you can't trust it. 🟣\n\n@BuildOnBase #OpenSource",
+      "scheduled_time": "00:00"
+    },
+    {
+      "id": 25,
+      "day": 5,
+      "slot": 5,
+      "category": "vision",
+      "content": "2026: AI agents learn to pay for APIs.\n2027: The agent economy explodes.\n2028: 500M+ developers join from LATAM.\n\nAETHERIUS is building the infrastructure layer.\n\n80 endpoints today.\n120+ tomorrow.\nThe limit is infinity. 🚀\n\n@BuildOnBase #x402 #LATAM",
+      "scheduled_time": "03:00"
+    },
+    {
+      "id": 26,
+      "day": 6,
+      "slot": 1,
+      "category": "hot_take",
+      "content": "The biggest lie in tech: \"We need to raise money first.\"\n\nI built 80 APIs with $5.80.\nReal USDC payments. Live on mainnet.\n\nYou don't need permission. You don't need VC.\nYou need a wallet and an idea.\n\n@aetheriusxAPI #IndieHacker #Crypto #BuildOnBase",
+      "scheduled_time": "14:00"
+    },
+    {
+      "id": 27,
+      "day": 6,
+      "slot": 2,
+      "category": "technical",
+      "content": "How an AETHERIUS API call works:\n\n1. Agent: GET /v1/data/weather?lat=10.5&lon=-66.9\n2. Server: 402 Payment Required → $0.008 USDC\n3. Agent: Signs USDC transfer on Base\n4. Server: Verifies on-chain via Coinbase CDP\n5. Server: 200 OK → weather data\n\nTotal: 200ms. @x402protocol #x402 #Base",
+      "scheduled_time": "17:00"
+    },
+    {
+      "id": 28,
+      "day": 6,
+      "slot": 3,
+      "category": "demo",
+      "content": "Free API endpoints you can try RIGHT NOW:\n\n/v1/x402/base-stats → chain health\n/v1/x402/gas → current gas price\n/v1/x402/whales → large USDC transfers\n/v1/x402/network → full dashboard\n/v1/x402/top-agents → biggest spenders\n\nNo API key. No signup. Just call. @aetheriusxAPI",
+      "scheduled_time": "21:00"
+    },
+    {
+      "id": 29,
+      "day": 6,
+      "slot": 4,
+      "category": "comparison",
+      "content": "Traditional API marketplace:\n• Monthly subscriptions\n• API key management\n• Rate limits per plan\n• Human support tickets\n• Vendor lock-in\n\nAETHERIUS:\n• Pay per request\n• Wallet = identity\n• No limits\n• No support needed\n• Open source\n\nThe future is agent-first. @aetheriusxAPI #x402",
+      "scheduled_time": "00:00"
+    },
+    {
+      "id": 30,
+      "day": 6,
+      "slot": 5,
+      "category": "story",
+      "content": "I'm a Venezuelan developer without a bank account.\n\nI built an API marketplace on Base Mainnet.\nAI agents pay me in USDC.\nI receive payments in my crypto wallet.\n\nNo bank. No PayPal. No KYC. No problem.\n\nThat's the power of decentralized infrastructure. 🇻🇪 @BuildOnBase #LATAM #Crypto",
+      "scheduled_time": "03:00"
+    },
+    {
+      "id": 31,
+      "day": 7,
+      "slot": 1,
+      "category": "milestone",
+      "content": "Week 1 results:\n\n✅ 80 endpoints live on Base Mainnet\n✅ 20 FREE on-chain analytics\n✅ Python SDK v2.0 released\n✅ 2 grant applications submitted\n✅ 130+ commits pushed\n✅ 60/60 tests passing\n✅ 0 VC funding used\n\nThe agent economy has a new player. 🟣\n\n@BuildOnBase #BuildOnBase",
+      "scheduled_time": "14:00"
+    },
+    {
+      "id": 32,
+      "day": 7,
+      "slot": 2,
+      "category": "question",
+      "content": "What would you build if your API accepted USDC payments automatically?\n\n• A weather API for agricultural robots?\n• A price feed for trading bots?\n• A scraper for market research agents?\n\n80 endpoints. Open source. Fork it.\n\ngithub.com/wilnowilx/aetheriusxapi\n\n@BuildOnBase #BuildOnBase #Web3",
+      "scheduled_time": "17:00"
+    },
+    {
+      "id": 33,
+      "day": 7,
+      "slot": 3,
+      "category": "education",
+      "content": "Why USDC on Base?\n\n• Sub-cent transaction fees\n• Instant settlement\n• Coinbase backing (CDP integration)\n• Ethereum security\n• Growing ecosystem\n\nThe perfect payment rail for micro-transactions between AI agents.\n\n@aetheriusxAPI #x402 #Base #USDC #Crypto",
+      "scheduled_time": "21:00"
+    },
+    {
+      "id": 34,
+      "day": 7,
+      "slot": 4,
+      "category": "social_proof",
+      "content": "Every transaction is verifiable on-chain.\n\nEvery API call is tracked in real-time.\nEvery endpoint is documented.\nEvery line of code is public.\n\nThis is what infrastructure looks like when it's built for transparency.\n\n@aetheriusxAPI #x402 #Base #OpenSource",
+      "scheduled_time": "00:00"
+    },
+    {
+      "id": 35,
+      "day": 7,
+      "slot": 5,
+      "category": "call_to_action",
+      "content": "The agent economy needs infrastructure.\n\nWe built 80 endpoints.\nWe made 20 of them FREE.\nWe open-sourced everything.\n\nNow we need YOU.\n\n⭐ Star the repo\n🔧 Fork the code\n🚀 Build on top of it\n\ngithub.com/wilnowilx/aetheriusxapi\n\n@BuildOnBase #BuildOnBase #Web3 #x402",
+      "scheduled_time": "03:00"
+    }
+  ]
+}
