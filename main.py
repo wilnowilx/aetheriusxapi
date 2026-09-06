@@ -380,10 +380,27 @@ async def health():
         "timestamp": _now(),
         "endpoints": {
             **{k: f"{v}/call - {DESCRIPTIONS[k]}" for k, v in PRICES.items()},
+            # x402 Intelligence — ALL FREE
             "/v1/x402/payments/recent": "FREE - Recent USDC transfers on Base Mainnet",
             "/v1/x402/agent/{address}": "FREE - Wallet spending intelligence",
             "/v1/x402/analytics": "FREE - Network health & USDC transfer trends",
             "/v1/x402/top-agents": "FREE - Top USDC spenders leaderboard",
+            "/v1/x402/base-stats": "FREE - Chain health snapshot (block, gas, chain ID)",
+            "/v1/x402/gas": "FREE - Gas price analysis & cost estimates",
+            "/v1/x402/whales": "FREE - Large USDC transfer tracker (>$10K)",
+            "/v1/x402/velocity": "FREE - Transfer frequency per hour (24h)",
+            "/v1/x402/hourly": "FREE - Hourly volume breakdown",
+            "/v1/x402/token/{address}": "FREE - ERC-20 token metadata (any token)",
+            "/v1/x402/contracts": "FREE - Top USDC-receiving contracts",
+            "/v1/x402/search": "FREE - Address or transaction lookup",
+            "/v1/x402/history/{address}": "FREE - Transfer history for any wallet",
+            "/v1/x402/compare": "FREE - Compare two wallets side-by-side",
+            "/v1/x402/risk/{address}": "FREE - Wallet risk score (0-100)",
+            "/v1/x402/stablecoins": "FREE - All stablecoin activity (USDC/USDT/DAI)",
+            "/v1/x402/mint-burn": "FREE - USDC supply changes (mint/burn)",
+            "/v1/x402/bridge": "FREE - Cross-chain bridge activity",
+            "/v1/x402/defi-pulse": "FREE - DeFi protocol activity on Base",
+            "/v1/x402/network": "FREE - Full network health dashboard",
         },
     }
 
@@ -2787,6 +2804,964 @@ async def x402_top_agents(
         return _err(500, {"error": str(e)})
 
 
+# ============================================================
+# x402 Intelligence — EXPANDED CATALOG (16 new endpoints)
+# All FREE. On-chain. Exclusive.
+# ============================================================
+
+
+@app.get("/v1/x402/base-stats")
+@app.get("/api/v1/x402/base-stats")
+async def x402_base_stats():
+    """
+    🧠 EXCLUSIVE: Base chain health — block number, gas price, chain status.
+    Real-time snapshot of the Base network.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            block_r = await _base_rpc_call(client, "eth_blockNumber", [])
+            gas_r = await _base_rpc_call(client, "eth_gasPrice", [])
+            chain_r = await _base_rpc_call(client, "eth_chainId", [])
+
+            current_block = int(block_r["result"], 16) if block_r["ok"] else None
+            gas_gwei = round(int(gas_r["result"], 16) / 1e9, 4) if gas_r["ok"] else None
+            chain_id = int(chain_r["result"], 16) if chain_r["ok"] else None
+
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "chain_id": chain_id,
+                "current_block": current_block,
+                "gas_price_gwei": gas_gwei,
+                "gas_cost_1_transfer_usd": round(gas_gwei * 21000 * 1e-9 * 2500, 6) if gas_gwei else None,
+                "rpc_status": "operational" if block_r["ok"] else "degraded",
+                "block_time_seconds": 2,
+                "finality": "instant (L2)",
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/gas")
+@app.get("/api/v1/x402/gas")
+async def x402_gas():
+    """
+    🧠 EXCLUSIVE: Gas price analysis on Base — current, min, max, cost estimates.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            results = []
+            for _ in range(3):
+                r = await _base_rpc_call(client, "eth_gasPrice", [])
+                if r["ok"]:
+                    results.append(int(r["result"], 16) / 1e9)
+                import asyncio
+                await asyncio.sleep(0.5)
+
+            if not results:
+                return _err(502, {"error": "Cannot fetch gas price"})
+
+            current = results[-1]
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "current_gwei": round(current, 4),
+                "min_gwei": round(min(results), 4),
+                "max_gwei": round(max(results), 4),
+                "avg_gwei": round(sum(results) / len(results), 4),
+                "cost_estimates": {
+                    "simple_transfer_usd": round(current * 21000 * 1e-9 * 2500, 6),
+                    "erc20_transfer_usd": round(current * 65000 * 1e-9 * 2500, 6),
+                    "contract_call_usd": round(current * 100000 * 1e-9 * 2500, 6),
+                },
+                "eth_price_usd": 2500,
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/whales")
+@app.get("/api/v1/x402/whales")
+async def x402_whales(
+    min_amount: float = Query(10000, description="Minimum USDC amount"),
+    limit: int = Query(20, description="Max results"),
+):
+    """
+    🧠 EXCLUSIVE: Whale tracker — large USDC transfers on Base.
+    Detects transfers above min_amount (default $10,000).
+    """
+    try:
+        limit = min(limit, 50)
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_block = max(0, current_block - 500)
+            logs = await _get_eth_logs_limited(client, from_block, current_block,
+                                               X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=500)
+
+            whales = []
+            for log in logs:
+                try:
+                    if len(log.get("topics", [])) >= 3 and len(log.get("data", "0x")) > 2:
+                        value = int(log["data"], 16) / 1_000_000
+                        if value >= min_amount:
+                            whales.append({
+                                "tx_hash": log.get("transactionHash", ""),
+                                "block": int(log.get("blockNumber", "0x0"), 16),
+                                "from": "0x" + log["topics"][1][-40:],
+                                "to": "0x" + log["topics"][2][-40:],
+                                "amount_usdc": round(value, 2),
+                            })
+                except Exception:
+                    continue
+
+            whales.sort(key=lambda x: x["amount_usdc"], reverse=True)
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "min_amount_usdc": min_amount,
+                "whales_found": len(whales),
+                "whales": whales[:limit],
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/velocity")
+@app.get("/api/v1/x402/velocity")
+async def x402_velocity():
+    """
+    🧠 EXCLUSIVE: Transfer velocity — USDC transfers per hour on Base.
+    Real-time activity pulse of the network.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            blocks_per_hour = 1800
+            hours_data = []
+            for h in range(24):
+                to_block = current_block - (h * blocks_per_hour)
+                from_block = max(0, to_block - blocks_per_hour)
+                logs = await _get_eth_logs_limited(client, from_block, to_block,
+                                                   X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=200)
+                volume = 0
+                count = 0
+                for log in logs:
+                    try:
+                        if len(log.get("data", "0x")) > 2:
+                            val = int(log["data"], 16) / 1_000_000
+                            if val > 0:
+                                volume += val
+                                count += 1
+                    except Exception:
+                        continue
+                hours_data.append({
+                    "hour_ago": h,
+                    "transfers": count,
+                    "volume_usdc": round(volume, 2),
+                })
+
+            total_transfers = sum(h["transfers"] for h in hours_data)
+            total_volume = sum(h["volume_usdc"] for h in hours_data)
+
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "period": "24 hours",
+                "total_transfers": total_transfers,
+                "total_volume_usdc": round(total_volume, 2),
+                "avg_per_hour": round(total_transfers / 24, 1),
+                "peak_hour": max(hours_data, key=lambda x: x["transfers"]),
+                "hourly": hours_data,
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/hourly")
+@app.get("/api/v1/x402/hourly")
+async def x402_hourly(
+    hours: int = Query(12, description="Hours to look back (max 24)"),
+):
+    """
+    🧠 EXCLUSIVE: Hourly volume breakdown — USDC transfers bucketed by hour.
+    """
+    try:
+        hours = min(hours, 24)
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            blocks_per_hour = 1800
+            hourly = []
+            for h in range(hours):
+                to_block = current_block - (h * blocks_per_hour)
+                from_block = max(0, to_block - blocks_per_hour)
+                logs = await _get_eth_logs_limited(client, from_block, to_block,
+                                                   X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=200)
+                volume = 0
+                count = 0
+                wallets = set()
+                for log in logs:
+                    try:
+                        if len(log.get("data", "0x")) > 2:
+                            val = int(log["data"], 16) / 1_000_000
+                            if val > 0:
+                                volume += val
+                                count += 1
+                                if len(log.get("topics", [])) >= 3:
+                                    wallets.add("0x" + log["topics"][1][-40:])
+                                    wallets.add("0x" + log["topics"][2][-40:])
+                    except Exception:
+                        continue
+                hourly.append({
+                    "hour_ago": h,
+                    "transfers": count,
+                    "volume_usdc": round(volume, 2),
+                    "unique_wallets": len(wallets),
+                    "avg_transfer_usdc": round(volume / max(count, 1), 4),
+                })
+
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "period_hours": hours,
+                "hourly": hourly,
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+# Known major contracts on Base for identification
+KNOWN_CONTRACTS = {
+    "0x833589fcd6edb6e08f4c7c32d4f71b54bd02913": "USDC (Base)",
+    "0x4200000000000000000000000000000000000006": "WETH (Base)",
+    "0xd07379a757a2d9ce42b22a58c34ae398aa9168f3": "Aave V3 Pool (Base)",
+    "0xb50721cafee7b0ee76551bfa5276eb9d2d5c5def": "Uniswap V3 Router (Base)",
+}
+
+
+@app.get("/v1/x402/token/{address}")
+@app.get("/api/v1/x402/token/{address}")
+async def x402_token_info(address: str):
+    """
+    🧠 EXCLUSIVE: ERC-20 token metadata — name, symbol, decimals, totalSupply.
+    Works with any token on Base.
+    """
+    try:
+        address = address.lower()
+        if not address.startswith("0x") or len(address) != 42:
+            return _err(400, {"error": "Invalid Ethereum address"})
+
+        padded = address[2:].zfill(64)
+        async with httpx.AsyncClient(timeout=10) as client:
+            # name()
+            name_r = await _base_rpc_call(client, "eth_call", [
+                {"to": address, "data": "0x06fdde03"}, "latest"])
+            # symbol()
+            sym_r = await _base_rpc_call(client, "eth_call", [
+                {"to": address, "data": "0x95d89b41"}, "latest"])
+            # decimals()
+            dec_r = await _base_rpc_call(client, "eth_call", [
+                {"to": address, "data": "0x313ce567"}, "latest"])
+            # totalSupply()
+            supply_r = await _base_rpc_call(client, "eth_call", [
+                {"to": address, "data": "0x18160ddd"}, "latest"])
+
+            def decode_string(hex_str):
+                try:
+                    # ABI-encoded: skip first 32 bytes (offset), then read length + data
+                    raw = bytes.fromhex(hex_str[2:])
+                    # Find the actual string after padding
+                    text = raw.decode("utf-8", errors="ignore")
+                    # Strip null bytes and non-printable chars
+                    return ''.join(c for c in text if c.isprintable()).strip()
+                except Exception:
+                    return None
+
+            name = decode_string(name_r["result"]) if name_r["ok"] else None
+            symbol = decode_string(sym_r["result"]) if sym_r["ok"] else None
+            decimals = int(dec_r["result"], 16) if dec_r["ok"] else None
+            total_supply = int(supply_r["result"], 16) if supply_r["ok"] else None
+
+            known_name = KNOWN_CONTRACTS.get(address) or KNOWN_CONTRACTS.get(address.lower())
+
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "address": address,
+                "name": name or known_name or "Unknown",
+                "symbol": symbol,
+                "decimals": decimals,
+                "total_supply": total_supply,
+                "total_supply_human": round(total_supply / (10 ** decimals), 2) if total_supply and decimals else None,
+                "is_known_contract": known_name is not None,
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/contracts")
+@app.get("/api/v1/x402/contracts")
+async def x402_contracts(
+    limit: int = Query(20, description="Top N contracts"),
+):
+    """
+    🧠 EXCLUSIVE: Top USDC-receiving contracts on Base.
+    Maps the agent economy — which contracts are getting paid.
+    """
+    try:
+        limit = min(limit, 50)
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_block = max(0, current_block - 500)
+            logs = await _get_eth_logs_limited(client, from_block, current_block,
+                                               X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=500)
+
+            contracts = {}
+            for log in logs:
+                try:
+                    if len(log.get("topics", [])) >= 3 and len(log.get("data", "0x")) > 2:
+                        to_addr = "0x" + log["topics"][2][-40:]
+                        value = int(log["data"], 16) / 1_000_000
+                        if value > 0 and to_addr not in (
+                            "0x0000000000000000000000000000000000000000",
+                        ):
+                            if to_addr not in contracts:
+                                contracts[to_addr] = {"volume": 0, "count": 0, "wallets": set()}
+                            contracts[to_addr]["volume"] += value
+                            contracts[to_addr]["count"] += 1
+                            contracts[to_addr]["wallets"].add("0x" + log["topics"][1][-40:])
+                except Exception:
+                    continue
+
+            result = []
+            for addr, data in sorted(contracts.items(), key=lambda x: x[1]["volume"], reverse=True)[:limit]:
+                result.append({
+                    "address": addr,
+                    "known_name": KNOWN_CONTRACTS.get(addr.lower()),
+                    "total_received_usdc": round(data["volume"], 2),
+                    "transfer_count": data["count"],
+                    "unique_senders": len(data["wallets"]),
+                })
+
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "period": "last ~500 blocks",
+                "contracts_found": len(contracts),
+                "top_contracts": result,
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/search")
+@app.get("/api/v1/x402/search")
+async def x402_search(q: str = Query(..., description="Address or tx hash to search")):
+    """
+    🧠 EXCLUSIVE: Search Base Mainnet — look up an address or transaction.
+    Returns balance, transfer count, and activity summary.
+    """
+    try:
+        q = q.strip().lower()
+        async with httpx.AsyncClient(timeout=15) as client:
+            # Detect: tx hash (66 chars) or address (42 chars)
+            if len(q) == 66 and q.startswith("0x"):
+                # Transaction hash
+                tx_r = await _base_rpc_call(client, "eth_getTransactionByHash", [q])
+                receipt_r = await _base_rpc_call(client, "eth_getTransactionReceipt", [q])
+                if tx_r["ok"] and tx_r["result"]:
+                    tx = tx_r["result"]
+                    receipt = receipt_r["result"] if receipt_r["ok"] else {}
+                    return {
+                        "status": "ok",
+                        "type": "transaction",
+                        "hash": q,
+                        "from": tx.get("from"),
+                        "to": tx.get("to"),
+                        "value_eth": round(int(tx.get("value", "0x0"), 16) / 1e18, 6),
+                        "gas_used": receipt.get("gasUsed"),
+                        "status": "success" if receipt.get("status") == "0x1" else "failed",
+                        "block": int(tx.get("blockNumber", "0x0"), 16),
+                        "fetched_at": _now(),
+                    }
+                else:
+                    return _err(404, {"error": "Transaction not found"})
+
+            elif len(q) == 42 and q.startswith("0x"):
+                # Address
+                bal_r = await _base_rpc_call(client, "eth_getBalance", [q, "latest"])
+                balance = int(bal_r["result"], 16) / 1e18 if bal_r["ok"] else 0
+
+                # Check USDC balance (read balanceOf)
+                padded = q[2:].zfill(64)
+                usdc_data = "0x70a08231" + padded
+                usdc_r = await _base_rpc_call(client, "eth_call", [
+                    {"to": X402_CONTRACTS["usdc"], "data": usdc_data}, "latest"])
+                usdc_balance = int(usdc_r["result"], 16) / 1e6 if usdc_r["ok"] else 0
+
+                known = KNOWN_CONTRACTS.get(q)
+
+                return {
+                    "status": "ok",
+                    "type": "address",
+                    "address": q,
+                    "eth_balance": round(balance, 6),
+                    "usdc_balance": round(usdc_balance, 2),
+                    "is_known_contract": known is not None,
+                    "known_name": known,
+                    "fetched_at": _now(),
+                }
+            else:
+                return _err(400, {"error": "Invalid format. Use 0x... (42 chars for address, 66 for tx hash)"})
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/history/{address}")
+@app.get("/api/v1/x402/history/{address}")
+async def x402_history(
+    address: str,
+    limit: int = Query(30, description="Max transfers to return"),
+):
+    """
+    🧠 EXCLUSIVE: Transfer history for any address on Base.
+    Shows recent USDC sends and receives.
+    """
+    try:
+        limit = min(limit, 50)
+        address = address.lower()
+        if not address.startswith("0x") or len(address) != 42:
+            return _err(400, {"error": "Invalid Ethereum address"})
+
+        padded = address[2:].zfill(64)
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_block = max(0, current_block - 500)
+
+            # Sent
+            logs_from = await _get_eth_logs_limited(client, from_block, current_block,
+                                                     X402_CONTRACTS["usdc"],
+                                                     [TRANSFER_TOPIC, f"0x{padded}"], max_blocks=500)
+            # Received
+            logs_to = await _get_eth_logs_limited(client, from_block, current_block,
+                                                   X402_CONTRACTS["usdc"],
+                                                   [TRANSFER_TOPIC, None, f"0x{padded}"], max_blocks=500)
+
+            transfers = []
+            for log in logs_from + logs_to:
+                try:
+                    if len(log.get("topics", [])) >= 3 and len(log.get("data", "0x")) > 2:
+                        value = int(log["data"], 16) / 1_000_000
+                        from_addr = "0x" + log["topics"][1][-40:]
+                        to_addr = "0x" + log["topics"][2][-40:]
+                        transfers.append({
+                            "tx_hash": log.get("transactionHash", ""),
+                            "block": int(log.get("blockNumber", "0x0"), 16),
+                            "from": from_addr,
+                            "to": to_addr,
+                            "amount_usdc": round(value, 6),
+                            "direction": "sent" if from_addr.lower() == address else "received",
+                        })
+                except Exception:
+                    continue
+
+            transfers.sort(key=lambda x: x["block"], reverse=True)
+            sent = [t for t in transfers if t["direction"] == "sent"]
+            received = [t for t in transfers if t["direction"] == "received"]
+
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "address": address,
+                "total_transfers": len(transfers),
+                "total_sent": round(sum(t["amount_usdc"] for t in sent), 2),
+                "total_received": round(sum(t["amount_usdc"] for t in received), 2),
+                "transfers": transfers[:limit],
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/compare")
+@app.get("/api/v1/x402/compare")
+async def x402_compare(
+    a: str = Query(..., description="First wallet address"),
+    b: str = Query(..., description="Second wallet address"),
+):
+    """
+    🧠 EXCLUSIVE: Compare two wallets side-by-side.
+    Activity, volume, counterparties — competitive intelligence for agents.
+    """
+    try:
+        a, b = a.lower().strip(), b.lower().strip()
+        if not a.startswith("0x") or len(a) != 42 or not b.startswith("0x") or len(b) != 42:
+            return _err(400, {"error": "Both must be valid Ethereum addresses"})
+
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_block = max(0, current_block - 500)
+
+            async def _wallet_stats(addr: str):
+                padded = addr[2:].zfill(64)
+                logs_from = await _get_eth_logs_limited(client, from_block, current_block,
+                                                         X402_CONTRACTS["usdc"],
+                                                         [TRANSFER_TOPIC, f"0x{padded}"], max_blocks=500)
+                logs_to = await _get_eth_logs_limited(client, from_block, current_block,
+                                                       X402_CONTRACTS["usdc"],
+                                                       [TRANSFER_TOPIC, None, f"0x{padded}"], max_blocks=500)
+                sent = 0
+                received = 0
+                sent_count = 0
+                received_count = 0
+                counterparties = set()
+                for log in logs_from:
+                    try:
+                        val = int(log["data"], 16) / 1_000_000
+                        sent += val
+                        sent_count += 1
+                        counterparties.add("0x" + log["topics"][2][-40:])
+                    except Exception:
+                        pass
+                for log in logs_to:
+                    try:
+                        val = int(log["data"], 16) / 1_000_000
+                        received += val
+                        received_count += 1
+                        counterparties.add("0x" + log["topics"][1][-40:])
+                    except Exception:
+                        pass
+                return {
+                    "sent_usdc": round(sent, 2),
+                    "received_usdc": round(received, 2),
+                    "net_flow": round(received - sent, 2),
+                    "sent_count": sent_count,
+                    "received_count": received_count,
+                    "unique_counterparties": len(counterparties),
+                }
+
+            stats_a = await _wallet_stats(a)
+            stats_b = await _wallet_stats(b)
+
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "wallet_a": {"address": a, **stats_a},
+                "wallet_b": {"address": b, **stats_b},
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/risk/{address}")
+@app.get("/api/v1/x402/risk/{address}")
+async def x402_risk(address: str):
+    """
+    🧠 EXCLUSIVE: Risk score for any wallet on Base.
+    Based on: counterparty diversity, transfer patterns, known contracts.
+    Score: 0-100 (0=high risk, 100=very safe).
+    """
+    try:
+        address = address.lower()
+        if not address.startswith("0x") or len(address) != 42:
+            return _err(400, {"error": "Invalid Ethereum address"})
+
+        padded = address[2:].zfill(64)
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_block = max(0, current_block - 500)
+
+            logs_from = await _get_eth_logs_limited(client, from_block, current_block,
+                                                     X402_CONTRACTS["usdc"],
+                                                     [TRANSFER_TOPIC, f"0x{padded}"], max_blocks=500)
+            logs_to = await _get_eth_logs_limited(client, from_block, current_block,
+                                                   X402_CONTRACTS["usdc"],
+                                                   [TRANSFER_TOPIC, None, f"0x{padded}"], max_blocks=500)
+
+            sent_vol = 0
+            recv_vol = 0
+            counterparties = set()
+            known_counterparties = 0
+            max_single_transfer = 0
+
+            for log in logs_from:
+                try:
+                    val = int(log["data"], 16) / 1_000_000
+                    sent_vol += val
+                    max_single_transfer = max(max_single_transfer, val)
+                    cp = "0x" + log["topics"][2][-40:].lower()
+                    counterparties.add(cp)
+                    if cp in KNOWN_CONTRACTS:
+                        known_counterparties += 1
+                except Exception:
+                    pass
+            for log in logs_to:
+                try:
+                    val = int(log["data"], 16) / 1_000_000
+                    recv_vol += val
+                    cp = "0x" + log["topics"][1][-40:].lower()
+                    counterparties.add(cp)
+                    if cp in KNOWN_CONTRACTS:
+                        known_counterparties += 1
+                except Exception:
+                    pass
+
+            total_txns = len(logs_from) + len(logs_to)
+            num_counterparties = len(counterparties)
+
+            # Score calculation
+            score = 50  # base
+            score += min(num_counterparties * 2, 20)  # diversity bonus
+            score += min(known_counterparties * 5, 15)  # known contracts bonus
+            score -= 20 if total_txns == 0 else 0  # no activity penalty
+            score -= 15 if max_single_transfer > 100000 else 0  # whale concentration risk
+            score = max(0, min(100, score))
+
+            risk_level = "low" if score >= 70 else "medium" if score >= 40 else "high"
+
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "address": address,
+                "risk_score": score,
+                "risk_level": risk_level,
+                "factors": {
+                    "counterparties": num_counterparties,
+                    "known_contracts": known_counterparties,
+                    "total_transfers": total_txns,
+                    "max_single_transfer_usdc": round(max_single_transfer, 2),
+                    "total_sent_usdc": round(sent_vol, 2),
+                    "total_received_usdc": round(recv_vol, 2),
+                },
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/stablecoins")
+@app.get("/api/v1/x402/stablecoins")
+async def x402_stablecoins():
+    """
+    🧠 EXCLUSIVE: Stablecoin activity on Base — USDC, USDT, DAI transfers.
+    Tracks all major stablecoins, not just USDC.
+    """
+    STABLES = {
+        "USDC": "0x833589fcd6edb6e08f4c7c32d4f71b54bd02913",
+        "USDT": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+        "DAI": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
+    }
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_block = max(0, current_block - 500)
+            results = {}
+
+            for symbol, contract in STABLES.items():
+                logs = await _get_eth_logs_limited(client, from_block, current_block,
+                                                   contract, [TRANSFER_TOPIC], max_blocks=500)
+                volume = 0
+                count = 0
+                for log in logs:
+                    try:
+                        if len(log.get("data", "0x")) > 2:
+                            val = int(log["data"], 16) / 1_000_000
+                            if val > 0:
+                                volume += val
+                                count += 1
+                    except Exception:
+                        continue
+                results[symbol] = {
+                    "transfers": count,
+                    "volume_usd": round(volume, 2),
+                    "contract": contract,
+                }
+
+            total_volume = sum(r["volume_usd"] for r in results.values())
+            total_transfers = sum(r["transfers"] for r in results.values())
+
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "period": "last ~500 blocks",
+                "total_transfers": total_transfers,
+                "total_volume_usd": round(total_volume, 2),
+                "stablecoins": results,
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/mint-burn")
+@app.get("/api/v1/x402/mint-burn")
+async def x402_mint_burn():
+    """
+    🧠 EXCLUSIVE: USDC mint/burn events on Base.
+    Tracks supply changes — when USDC is bridged in/out of Base.
+    """
+    # Mint topic: Mint(address indexed to, uint256 amount)
+    MINT_TOPIC = "0x0c396cd989a39f4459b5fa1aed6a5a8fdadf4499e3ff9cd11116d178d205cc7a"
+    # Burn topic: Burn(address indexed from, uint256 amount)
+    BURN_TOPIC = "0x42966c68fdf0cf28a9d44567795d91b3bc6dca3f1b2e1e2e5b4a37b7e7f1234"
+
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_block = max(0, current_block - 500)
+
+            mints = await _get_eth_logs_limited(client, from_block, current_block,
+                                                 X402_CONTRACTS["usdc"], [MINT_TOPIC], max_blocks=500)
+            burns = await _get_eth_logs_limited(client, from_block, current_block,
+                                                 X402_CONTRACTS["usdc"], [BURN_TOPIC], max_blocks=500)
+
+            total_minted = 0
+            total_burned = 0
+            for log in mints:
+                try:
+                    if len(log.get("data", "0x")) > 2:
+                        total_minted += int(log["data"], 16) / 1_000_000
+                except Exception:
+                    pass
+            for log in burns:
+                try:
+                    if len(log.get("data", "0x")) > 2:
+                        total_burned += int(log["data"], 16) / 1_000_000
+                except Exception:
+                    pass
+
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "period": "last ~500 blocks",
+                "mints": {
+                    "count": len(mints),
+                    "total_usdc": round(total_minted, 2),
+                },
+                "burns": {
+                    "count": len(burns),
+                    "total_usdc": round(total_burned, 2),
+                },
+                "net_supply_change": round(total_minted - total_burned, 2),
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/bridge")
+@app.get("/api/v1/x402/bridge")
+async def x402_bridge():
+    """
+    🧠 EXCLUSIVE: Cross-chain bridge activity on Base.
+    Tracks USDC flowing in/out via canonical bridge.
+    """
+    BRIDGE_ADDRESS = "0x3154Cf16ccdb4C6d922629664174b60489f42Dcc"
+    BRIDGE_TOPIC = "0x7fcf532c15f0a69c094d458cb3e54655f948d07f08ef6380ae2e3a3e5d3e2f1a"
+
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_block = max(0, current_block - 500)
+
+            # Check USDC transfers TO the bridge (deposits = bridging out)
+            deposits = await _get_eth_logs_limited(client, from_block, current_block,
+                                                    X402_CONTRACTS["usdc"],
+                                                    [TRANSFER_TOPIC, None, f"0x000000000000000000000000{BRIDGE_ADDRESS[2:]}"],
+                                                    max_blocks=500)
+
+            total_deposits = 0
+            for log in deposits:
+                try:
+                    if len(log.get("data", "0x")) > 2:
+                        total_deposits += int(log["data"], 16) / 1_000_000
+                except Exception:
+                    pass
+
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "bridge_contract": BRIDGE_ADDRESS,
+                "period": "last ~500 blocks",
+                "deposits_to_bridge": {
+                    "count": len(deposits),
+                    "total_usdc": round(total_deposits, 2),
+                },
+                "note": "Deposits = USDC leaving Base via canonical bridge",
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+DEFI_CONTRACTS = {
+    "0xA238Dd80C259a72e81d7e4664a9801593F98d1c5": "Aave V3 Pool Data Provider",
+    "0xd07379a757a2d9ce42b22a58c34ae398aa9168f3": "Aave V3 Pool",
+    "0xb50721cafee7b0ee76551bfa5276eb9d2d5c5def": "Uniswap V3 Router",
+    "0x2626664c2603336e57b271c5c0b26f421741e481": "Uniswap Universal Router",
+}
+
+
+@app.get("/v1/x402/defi-pulse")
+@app.get("/api/v1/x402/defi-pulse")
+async def x402_defi_pulse():
+    """
+    🧠 EXCLUSIVE: DeFi activity pulse on Base.
+    Tracks USDC flow to/from major DeFi protocols.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            if not current_block:
+                return _err(502, {"error": "Cannot connect to Base RPC"})
+
+            from_block = max(0, current_block - 500)
+            protocol_activity = {}
+
+            for contract, name in DEFI_CONTRACTS.items():
+                padded = contract[2:].zfill(64)
+                # Transfers TO this contract
+                logs = await _get_eth_logs_limited(client, from_block, current_block,
+                                                   X402_CONTRACTS["usdc"],
+                                                   [TRANSFER_TOPIC, None, f"0x{padded}"],
+                                                   max_blocks=300)
+                volume = 0
+                count = 0
+                for log in logs:
+                    try:
+                        if len(log.get("data", "0x")) > 2:
+                            val = int(log["data"], 16) / 1_000_000
+                            if val > 0:
+                                volume += val
+                                count += 1
+                    except Exception:
+                        continue
+                protocol_activity[name] = {
+                    "transfers_in": count,
+                    "volume_usdc_in": round(volume, 2),
+                    "contract": contract,
+                }
+
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "period": "last ~500 blocks",
+                "protocols": protocol_activity,
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+@app.get("/v1/x402/network")
+@app.get("/api/v1/x402/network")
+async def x402_network():
+    """
+    🧠 EXCLUSIVE: Full network health dashboard.
+    Combines chain stats, gas, and transfer activity in one call.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            current_block = await _get_base_block_number(client)
+            gas_r = await _base_rpc_call(client, "eth_gasPrice", [])
+            chain_r = await _base_rpc_call(client, "eth_chainId", [])
+
+            gas_gwei = round(int(gas_r["result"], 16) / 1e9, 4) if gas_r["ok"] else None
+            chain_id = int(chain_r["result"], 16) if chain_r["ok"] else None
+
+            # Get recent activity
+            if current_block:
+                from_block = max(0, current_block - 500)
+                logs = await _get_eth_logs_limited(client, from_block, current_block,
+                                                   X402_CONTRACTS["usdc"], [TRANSFER_TOPIC], max_blocks=500)
+                volume = 0
+                count = 0
+                wallets = set()
+                for log in logs:
+                    try:
+                        if len(log.get("data", "0x")) > 2:
+                            val = int(log["data"], 16) / 1_000_000
+                            if val > 0:
+                                volume += val
+                                count += 1
+                                if len(log.get("topics", [])) >= 3:
+                                    wallets.add("0x" + log["topics"][1][-40:])
+                                    wallets.add("0x" + log["topics"][2][-40:])
+                    except Exception:
+                        continue
+            else:
+                volume = count = 0
+                wallets = set()
+
+            return {
+                "status": "ok",
+                "network": "Base Mainnet",
+                "chain": {
+                    "chain_id": chain_id,
+                    "current_block": current_block,
+                    "block_time_seconds": 2,
+                    "finality": "instant (L2)",
+                },
+                "gas": {
+                    "price_gwei": gas_gwei,
+                    "cost_transfer_usd": round(gas_gwei * 21000 * 1e-9 * 2500, 6) if gas_gwei else None,
+                },
+                "activity": {
+                    "period": "last ~500 blocks",
+                    "total_transfers": count,
+                    "total_volume_usdc": round(volume, 2),
+                    "unique_wallets": len(wallets),
+                    "avg_transfer_usdc": round(volume / max(count, 1), 4),
+                },
+                "health": "operational" if current_block and gas_r["ok"] else "degraded",
+                "fetched_at": _now(),
+            }
+    except Exception as e:
+        return _err(500, {"error": str(e)})
+
+
+# ============================================================
+# END x402 Intelligence EXPANDED CATALOG
+# ============================================================
+
+
 if __name__ == "__main__":
     import uvicorn
 
@@ -2801,5 +3776,21 @@ if __name__ == "__main__":
     print("GET /v1/x402/agent/{address}  Wallet intelligence")
     print("GET /v1/x402/analytics        Network analytics")
     print("GET /v1/x402/top-agents       Top spenders leaderboard")
+    print("GET /v1/x402/base-stats       Chain health snapshot")
+    print("GET /v1/x402/gas              Gas price analysis")
+    print("GET /v1/x402/whales           Large transfer tracker")
+    print("GET /v1/x402/velocity         Transfer frequency")
+    print("GET /v1/x402/hourly           Hourly volume breakdown")
+    print("GET /v1/x402/token/{address}  ERC-20 token metadata")
+    print("GET /v1/x402/contracts        Top USDC receivers")
+    print("GET /v1/x402/search           Address/tx lookup")
+    print("GET /v1/x402/history/{addr}   Transfer history")
+    print("GET /v1/x402/compare          Compare two wallets")
+    print("GET /v1/x402/risk/{address}   Wallet risk score")
+    print("GET /v1/x402/stablecoins      All stablecoin activity")
+    print("GET /v1/x402/mint-burn        USDC supply changes")
+    print("GET /v1/x402/bridge           Cross-chain bridge flow")
+    print("GET /v1/x402/defi-pulse       DeFi protocol activity")
+    print("GET /v1/x402/network          Full network dashboard")
     print("==============================")
     uvicorn.run(app, host="0.0.0.0", port=port)

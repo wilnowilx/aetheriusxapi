@@ -430,7 +430,7 @@ Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 | `GET /v1/x402/analytics` | Network health — volume, unique wallets, trends | `/v1/x402/analytics` |
 | `GET /v1/x402/top-agents` | Top spenders leaderboard — who's spending the most | `/v1/x402/top-agents?limit=10` |
 
-**Why this matters:** While XPay, Coinbase, and Stripe build payment infrastructure, nobody is providing the analytics layer. AETHERIUS reads the chain directly — no API keys, no rate limits, no middlemen. This is the "Bloomberg Terminal" for the agent economy.
+**Why this matters:** Nobody else is providing on-chain analytics for the agent economy. AETHERIUS reads Base Mainnet directly — no API keys, no rate limits, no middlemen. This is the intelligence layer that makes x402 payments transparent and actionable.
 
 **100% FREE** — no payment required. These endpoints are our gift to the community and proof of our on-chain intelligence capability.
 
