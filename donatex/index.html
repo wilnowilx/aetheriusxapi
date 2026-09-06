@@ -1,764 +1,502 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DonateX — Accept USDC Donations in 5 Minutes</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💜</text></svg>">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DonateX — Accept USDC Donations in 5 Minutes</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💜</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#09090b;--purple:#a855f7;--magenta:#d946ef;--pink:#ec4899;--green:#10b981;--orange:#f59e0b;--text:#f0f0f5;--sec:#8a8a9a;--surface:#0e0e18;--border:rgba(168,85,247,.3)}
+::-webkit-scrollbar{display:none}*{margin:0;padding:0;box-sizing:border-box;scrollbar-width:none}
+html{overflow-x:hidden}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #09090b;
-      color: #e2e8f0;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+/* === PLASMA BG === */
+#plasma-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
+.plasma-blob{position:absolute;border-radius:42% 58% 63% 37%/45% 42% 58% 55%;filter:blur(90px);mix-blend-mode:screen;animation:plasmaFloat 14s ease-in-out infinite alternate,auroraMorph 19s ease-in-out infinite alternate}
+.plasma-blob:nth-child(1){width:560px;height:560px;background:radial-gradient(circle,rgba(168,85,247,.5) 0%,transparent 70%);top:-12%;left:-8%;animation-duration:16s}
+.plasma-blob:nth-child(2){width:480px;height:480px;background:radial-gradient(circle,rgba(217,70,239,.45) 0%,transparent 70%);top:35%;right:-10%;animation-duration:13s;animation-delay:-5s}
+.plasma-blob:nth-child(3){width:420px;height:420px;background:radial-gradient(circle,rgba(236,72,153,.4) 0%,transparent 70%);bottom:-8%;left:25%;animation-duration:15s;animation-delay:-9s}
+@keyframes plasmaFloat{0%{transform:translate(0,0) scale(1)}25%{transform:translate(80px,-55px) scale(1.14)}50%{transform:translate(-45px,70px) scale(.94)}75%{transform:translate(60px,25px) scale(1.06)}100%{transform:translate(-30px,-45px) scale(1)}}
+@keyframes auroraMorph{0%,100%{border-radius:42% 58% 63% 37%/45% 42% 58% 55%}33%{border-radius:63% 37% 42% 58%/55% 58% 42% 45%}66%{border-radius:37% 63% 55% 45%/42% 55% 45% 58%}}
 
-    /* ── NAV ─────────────────────────────────────────── */
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 40px;
-      border-bottom: 1px solid rgba(168,85,247,0.1);
-      position: sticky;
-      top: 0;
-      background: rgba(9,9,11,0.9);
-      backdrop-filter: blur(12px);
-      z-index: 100;
-    }
-    .nav-brand {
-      font-size: 20px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #a855f7, #ec4899);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .nav-links { display: flex; gap: 24px; align-items: center; }
-    .nav-links a {
-      color: #94a3b8;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: #a855f7; }
-    .nav-cta {
-      background: linear-gradient(135deg, #a855f7, #d946ef) !important;
-      color: white !important;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-weight: 600 !important;
-    }
+/* === FADE UP === */
+.fade-up{opacity:0;transform:translateY(40px);transition:all .8s cubic-bezier(.16,1,.3,1)}
+.fade-up.visible{opacity:1;transform:translateY(0)}
 
-    /* ── HERO ────────────────────────────────────────── */
-    .hero {
-      text-align: center;
-      padding: 100px 20px 80px;
-      max-width: 900px;
-      margin: 0 auto;
-      position: relative;
-    }
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -200px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(168,85,247,0.12);
-      border: 1px solid rgba(168,85,247,0.25);
-      border-radius: 50px;
-      padding: 8px 20px;
-      font-size: 13px;
-      color: #a855f7;
-      font-weight: 600;
-      margin-bottom: 28px;
-    }
-    .hero h1 {
-      font-size: 60px;
-      font-weight: 800;
-      line-height: 1.08;
-      margin-bottom: 24px;
-      letter-spacing: -1.5px;
-    }
-    .hero h1 span {
-      background: linear-gradient(135deg, #a855f7, #d946ef, #ec4899);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .hero p {
-      font-size: 19px;
-      color: #94a3b8;
-      line-height: 1.6;
-      max-width: 620px;
-      margin: 0 auto 36px;
-    }
-    .hero-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-    .btn-primary {
-      background: linear-gradient(135deg, #a855f7, #d946ef);
-      color: white;
-      padding: 16px 36px;
-      border-radius: 14px;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 16px;
-      transition: all 0.3s;
-      border: none;
-      cursor: pointer;
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(168,85,247,0.4); }
-    .btn-secondary {
-      background: rgba(168,85,247,0.08);
-      border: 1px solid rgba(168,85,247,0.2);
-      color: #a855f7;
-      padding: 16px 36px;
-      border-radius: 14px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 16px;
-      transition: all 0.3s;
-    }
-    .btn-secondary:hover { background: rgba(168,85,247,0.15); }
+/* === NAV === */
+nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:18px 40px;background:rgba(9,9,11,.85);backdrop-filter:blur(16px);border-bottom:1px solid rgba(168,85,247,.08);z-index:1000;transition:all .3s}
+nav.scrolled{padding:12px 40px;background:rgba(9,9,11,.95)}
+.brand{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:24px;align-items:center}
+.nav-links a{color:var(--sec);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--purple)}
+.nav-cta{background:linear-gradient(135deg,var(--purple),var(--magenta))!important;color:#fff!important;padding:10px 22px!important;border-radius:10px;font-weight:600!important;transition:all .3s!important}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(168,85,247,.4)}
 
-    /* ── STATS ───────────────────────────────────────── */
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 56px;
-      padding: 48px 20px;
-      border-top: 1px solid rgba(168,85,247,0.08);
-      border-bottom: 1px solid rgba(168,85,247,0.08);
-      max-width: 750px;
-      margin: 0 auto;
-    }
-    .stat { text-align: center; }
-    .stat-value {
-      font-size: 36px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #a855f7, #ec4899);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .stat-label {
-      font-size: 12px;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      margin-top: 4px;
-    }
+/* === HERO === */
+.hero{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 20px 80px}
+.hero-inner{max-width:900px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);border-radius:50px;padding:8px 22px;font-size:13px;color:var(--purple);font-weight:600;margin-bottom:28px;animation:badgePulse 3s ease-in-out infinite}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(168,85,247,0)}50%{box-shadow:0 0 0 8px rgba(168,85,247,.1)}}
+.hero h1{font-size:64px;font-weight:900;line-height:1.05;margin-bottom:24px;letter-spacing:-2px}
+.hero h1 span{background:linear-gradient(135deg,var(--purple),var(--magenta),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% 200%;animation:gradShift 4s ease-in-out infinite alternate}
+@keyframes gradShift{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+.hero p{font-size:19px;color:var(--sec);line-height:1.65;max-width:620px;margin:0 auto 40px}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{padding:16px 36px;border-radius:14px;font-weight:700;font-size:16px;text-decoration:none;transition:all .3s;border:none;cursor:pointer;position:relative;overflow:hidden}
+.btn-fill{background:linear-gradient(135deg,var(--purple),var(--magenta));color:#fff}
+.btn-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .5s}
+.btn-fill:hover::after{transform:translateX(100%)}
+.btn-fill:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(168,85,247,.45)}
+.btn-ghost{background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);color:var(--purple)}
+.btn-ghost:hover{background:rgba(168,85,247,.15);transform:translateY(-1px)}
 
-    /* ── WIDGET PREVIEW ──────────────────────────────── */
-    .preview-section {
-      max-width: 1000px;
-      margin: 100px auto;
-      padding: 0 20px;
-      text-align: center;
-    }
-    .preview-section h2 {
-      font-size: 38px;
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
-    .preview-section .subtitle {
-      color: #94a3b8;
-      font-size: 17px;
-      margin-bottom: 48px;
-    }
-    .preview-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 32px;
-      text-align: left;
-    }
-    .preview-card {
-      background: #0f0f14;
-      border: 1px solid rgba(168,85,247,0.15);
-      border-radius: 20px;
-      padding: 32px;
-      position: relative;
-      overflow: hidden;
-    }
-    .preview-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #a855f7, #d946ef, #ec4899);
-    }
-    .preview-card h3 {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .preview-card p {
-      font-size: 14px;
-      color: #94a3b8;
-      line-height: 1.6;
-      margin-bottom: 16px;
-    }
-    .preview-mockup {
-      background: #16161d;
-      border: 1px solid rgba(168,85,247,0.1);
-      border-radius: 14px;
-      padding: 20px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      line-height: 1.7;
-      color: #e2e8f0;
-      overflow-x: auto;
-    }
-    .preview-mockup .comment { color: #64748b; }
-    .preview-mockup .tag { color: #ec4899; }
-    .preview-mockup .attr { color: #a855f7; }
-    .preview-mockup .val { color: #22c55e; }
+/* === STATS === */
+.stats{position:relative;z-index:1;display:flex;justify-content:center;gap:56px;padding:48px 20px;border-top:1px solid rgba(168,85,247,.08);border-bottom:1px solid rgba(168,85,247,.08);max-width:750px;margin:0 auto}
+.stat{text-align:center}
+.stat-val{font-size:36px;font-weight:800;background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-lbl{font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:1.2px;margin-top:4px}
 
-    /* ── HOW IT WORKS ────────────────────────────────── */
-    .how {
-      max-width: 900px;
-      margin: 100px auto;
-      padding: 0 20px;
-    }
-    .how h2 {
-      text-align: center;
-      font-size: 38px;
-      font-weight: 800;
-      margin-bottom: 16px;
-    }
-    .how .subtitle {
-      text-align: center;
-      color: #94a3b8;
-      margin-bottom: 56px;
-      font-size: 17px;
-    }
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 28px;
-    }
-    .step {
-      background: rgba(168,85,247,0.04);
-      border: 1px solid rgba(168,85,247,0.12);
-      border-radius: 18px;
-      padding: 36px 28px;
-      text-align: center;
-      transition: all 0.3s;
-    }
-    .step:hover {
-      border-color: rgba(168,85,247,0.3);
-      transform: translateY(-4px);
-    }
-    .step-num {
-      width: 52px;
-      height: 52px;
-      background: linear-gradient(135deg, #a855f7, #d946ef);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 18px;
-      font-size: 22px;
-      font-weight: 800;
-    }
-    .step h3 { font-size: 18px; margin-bottom: 10px; }
-    .step p { font-size: 14px; color: #94a3b8; line-height: 1.6; }
+/* === TERMINAL === */
+.term-section{position:relative;z-index:1;max-width:1000px;margin:100px auto;padding:0 20px}
+.term-section h2{text-align:center;font-size:38px;font-weight:800;margin-bottom:12px}
+.term-section .sub{text-align:center;color:var(--sec);margin-bottom:40px;font-size:17px}
+.term-wrap{background:#0c0c10;border:1px solid rgba(168,85,247,.4);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.term-chrome{display:flex;align-items:center;gap:8px;padding:12px 18px;background:#111116;border-bottom:1px solid rgba(168,85,247,.1);font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec)}
+.term-chrome .title{flex:1;text-align:center;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.term-chrome .dots{display:flex;gap:6px}
+.term-chrome .dot{width:12px;height:12px;border-radius:50%}
+.dot.r{background:#ef4444}.dot.y{background:#eab308}.dot.g{background:#22c55e}
+.progress-bar{height:3px;background:rgba(255,255,255,.06);border-left:1px solid rgba(168,85,247,.4);border-right:1px solid rgba(168,85,247,.4)}
+.progress-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--magenta),var(--pink));transition:width .3s}
+.term{font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1.7;padding:24px;min-height:400px;max-height:560px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;position:relative;scrollbar-width:none}
+.term::-webkit-scrollbar{display:none}
+.term .banner{color:var(--purple);font-weight:700}
+.term .ok{color:var(--green)}.term .warn{color:var(--orange)}.term .dim{color:var(--sec)}.term .key{color:var(--purple)}.term .val{color:var(--pink)}.term .num{color:var(--orange)}.term .str{color:var(--green)}
+.cursor{display:inline-block;width:9px;height:17px;background:var(--purple);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.term-controls{display:flex;gap:12px;justify-content:center;padding:16px;background:#111116;border-top:1px solid rgba(168,85,247,.1)}
+.term-controls button{background:linear-gradient(90deg,var(--purple),var(--magenta));color:#fff;border:none;border-radius:9px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.term-controls button:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(168,85,247,.4)}
+.term-controls button.ghost{background:transparent;border:1px solid rgba(255,255,255,.2)}
 
-    /* ── CODE SECTION ────────────────────────────────── */
-    .code-section {
-      max-width: 800px;
-      margin: 100px auto;
-      padding: 0 20px;
-    }
-    .code-section h2 {
-      text-align: center;
-      font-size: 38px;
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
-    .code-section .subtitle {
-      text-align: center;
-      color: #94a3b8;
-      margin-bottom: 36px;
-      font-size: 17px;
-    }
-    .code-block {
-      background: #0f0f14;
-      border: 1px solid rgba(168,85,247,0.15);
-      border-radius: 18px;
-      padding: 28px;
-      overflow-x: auto;
-      position: relative;
-      margin-bottom: 20px;
-    }
-    .code-block .label {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      font-size: 11px;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-family: 'Inter', sans-serif;
-    }
-    .code-block pre {
-      margin: 0;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
-      line-height: 1.75;
-      color: #e2e8f0;
-    }
-    .code-block .c { color: #64748b; }
-    .code-block .k { color: #a855f7; }
-    .code-block .s { color: #22c55e; }
-    .code-block .a { color: #ec4899; }
-    .copy-btn {
-      position: absolute;
-      bottom: 16px;
-      right: 16px;
-      background: rgba(168,85,247,0.12);
-      border: 1px solid rgba(168,85,247,0.25);
-      border-radius: 10px;
-      color: #a855f7;
-      padding: 8px 16px;
-      font-size: 13px;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-    .copy-btn:hover { background: rgba(168,85,247,0.22); }
+/* === WIKI TOOLTIPS === */
+.wiki{position:fixed;z-index:9999;max-width:360px;min-width:240px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.55;color:var(--text);box-shadow:0 12px 48px rgba(0,0,0,.6),0 0 24px rgba(168,85,247,.15);pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .35s,transform .35s}
+.wiki.show{opacity:1;transform:translateY(0)}
+.wiki .wk{color:var(--purple);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.wiki .wt{font-weight:600;margin-bottom:4px}
+.wiki .wd{color:var(--sec)}
 
-    /* ── FEATURES ────────────────────────────────────── */
-    .features {
-      max-width: 900px;
-      margin: 100px auto;
-      padding: 0 20px;
-    }
-    .features h2 {
-      text-align: center;
-      font-size: 38px;
-      font-weight: 800;
-      margin-bottom: 56px;
-    }
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-    .feature {
-      background: rgba(168,85,247,0.04);
-      border: 1px solid rgba(168,85,247,0.1);
-      border-radius: 18px;
-      padding: 32px 24px;
-      transition: all 0.3s;
-    }
-    .feature:hover {
-      border-color: rgba(168,85,247,0.25);
-      transform: translateY(-2px);
-    }
-    .feature-icon {
-      font-size: 32px;
-      margin-bottom: 14px;
-    }
-    .feature h3 {
-      font-size: 16px;
-      margin-bottom: 8px;
-      font-weight: 700;
-    }
-    .feature p {
-      font-size: 13px;
-      color: #94a3b8;
-      line-height: 1.6;
-    }
+/* === FEATURES === */
+.features{position:relative;z-index:1;max-width:1000px;margin:100px auto;padding:0 20px}
+.features h2{text-align:center;font-size:38px;font-weight:800;margin-bottom:56px}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat{background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.1);border-radius:18px;padding:32px 24px;transition:all .3s}
+.feat:hover{border-color:rgba(168,85,247,.3);transform:translateY(-4px)}
+.feat-icon{font-size:32px;margin-bottom:14px}
+.feat h3{font-size:16px;margin-bottom:8px;font-weight:700}
+.feat p{font-size:13px;color:var(--sec);line-height:1.6}
 
-    /* ── COMPARISON TABLE ────────────────────────────── */
-    .compare {
-      max-width: 800px;
-      margin: 100px auto;
-      padding: 0 20px;
-    }
-    .compare h2 {
-      text-align: center;
-      font-size: 38px;
-      font-weight: 800;
-      margin-bottom: 16px;
-    }
-    .compare .subtitle {
-      text-align: center;
-      color: #94a3b8;
-      margin-bottom: 40px;
-      font-size: 17px;
-    }
-    .compare-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      background: #0f0f14;
-      border: 1px solid rgba(168,85,247,0.15);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    .compare-table th {
-      background: rgba(168,85,247,0.1);
-      padding: 16px 20px;
-      text-align: left;
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #a855f7;
-    }
-    .compare-table td {
-      padding: 14px 20px;
-      font-size: 14px;
-      border-top: 1px solid rgba(168,85,247,0.06);
-    }
-    .compare-table tr:hover td {
-      background: rgba(168,85,247,0.03);
-    }
-    .compare-table .win { color: #22c55e; font-weight: 600; }
-    .compare-table .lose { color: #ef4444; }
+/* === COMPARE TABLE === */
+.compare{position:relative;z-index:1;max-width:800px;margin:100px auto;padding:0 20px}
+.compare h2{text-align:center;font-size:38px;font-weight:800;margin-bottom:16px}
+.compare .sub{text-align:center;color:var(--sec);margin-bottom:40px;font-size:17px}
+.compare table{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid rgba(168,85,247,.15);border-radius:16px;overflow:hidden}
+.compare th{background:rgba(168,85,247,.1);padding:16px 20px;text-align:left;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--purple)}
+.compare td{padding:14px 20px;font-size:14px;border-top:1px solid rgba(168,85,247,.06)}
+.compare tr:hover td{background:rgba(168,85,247,.03)}
+.compare .win{color:var(--green);font-weight:600}.compare .lose{color:#ef4444}
 
-    /* ── CTA ─────────────────────────────────────────── */
-    .cta {
-      text-align: center;
-      padding: 100px 20px;
-      background: linear-gradient(180deg, transparent, rgba(168,85,247,0.05), transparent);
-    }
-    .cta h2 {
-      font-size: 42px;
-      font-weight: 800;
-      margin-bottom: 16px;
-    }
-    .cta p {
-      color: #94a3b8;
-      font-size: 18px;
-      margin-bottom: 36px;
-    }
+/* === DOCS === */
+.docs{position:relative;z-index:1;max-width:900px;margin:100px auto;padding:0 20px}
+.docs h2{text-align:center;font-size:38px;font-weight:800;margin-bottom:16px}
+.docs .sub{text-align:center;color:var(--sec);margin-bottom:40px;font-size:17px}
+.doc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.doc-card{background:var(--surface);border:1px solid rgba(168,85,247,.12);border-radius:16px;padding:28px;transition:all .3s}
+.doc-card:hover{border-color:rgba(168,85,247,.3);transform:translateY(-2px)}
+.doc-card h3{font-size:16px;margin-bottom:8px;font-weight:700;display:flex;align-items:center;gap:8px}
+.doc-card p{font-size:13px;color:var(--sec);line-height:1.6}
+.doc-card pre{background:#16161d;border:1px solid rgba(168,85,247,.1);border-radius:10px;padding:14px;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;color:var(--text);overflow-x:auto}
+.doc-card pre .c{color:#475569}.doc-card pre .k{color:var(--purple)}.doc-card pre .s{color:var(--green)}.doc-card pre .a{color:var(--pink)}
 
-    /* ── FOOTER ──────────────────────────────────────── */
-    .footer {
-      text-align: center;
-      padding: 40px 20px;
-      border-top: 1px solid rgba(168,85,247,0.08);
-      color: #475569;
-      font-size: 13px;
-    }
-    .footer a {
-      color: #a855f7;
-      text-decoration: none;
-    }
+/* === LIVE VERIFY === */
+.verify{position:relative;z-index:1;max-width:700px;margin:100px auto;padding:0 20px;text-align:center}
+.verify h2{font-size:38px;font-weight:800;margin-bottom:12px}
+.verify .sub{color:var(--sec);margin-bottom:40px;font-size:17px}
+.verify-box{background:var(--surface);border:1px solid rgba(168,85,247,.15);border-radius:18px;padding:32px;text-align:left}
+.verify-row{display:flex;gap:12px;margin-bottom:16px}
+.verify-input{flex:1;background:#16161d;border:1px solid rgba(168,85,247,.2);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;transition:border-color .2s}
+.verify-input:focus{border-color:var(--purple)}
+.verify-input::placeholder{color:#475569}
+.verify-btn{background:linear-gradient(90deg,var(--purple),var(--magenta));color:#fff;border:none;border-radius:10px;padding:12px 24px;font-weight:700;cursor:pointer;transition:all .2s}
+.verify-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(168,85,247,.4)}
+.verify-result{background:#16161d;border:1px solid rgba(168,85,247,.1);border-radius:12px;padding:20px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;min-height:80px;color:var(--sec)}
 
-    /* ── RESPONSIVE ──────────────────────────────────── */
-    @media (max-width: 768px) {
-      .hero h1 { font-size: 38px; }
-      .steps { grid-template-columns: 1fr; }
-      .feature-grid { grid-template-columns: 1fr; }
-      .preview-grid { grid-template-columns: 1fr; }
-      .stats { gap: 28px; flex-wrap: wrap; }
-      .stat-value { font-size: 28px; }
-      .nav { padding: 16px 20px; }
-      .nav-links { gap: 16px; }
-    }
-  </style>
+/* === CTA === */
+.cta{position:relative;z-index:1;text-align:center;padding:100px 20px;background:linear-gradient(180deg,transparent,rgba(168,85,247,.05),transparent)}
+.cta h2{font-size:42px;font-weight:800;margin-bottom:16px}
+.cta p{color:var(--sec);font-size:18px;margin-bottom:36px}
+
+/* === FOOTER === */
+footer{position:relative;z-index:1;text-align:center;padding:40px 20px;border-top:1px solid rgba(168,85,247,.08);color:#475569;font-size:13px}
+footer a{color:var(--purple);text-decoration:none}
+
+@media(max-width:768px){.hero h1{font-size:36px}.feat-grid{grid-template-columns:1fr}.doc-grid{grid-template-columns:1fr}.stats{gap:28px;flex-wrap:wrap}.stat-val{font-size:28px}nav{padding:14px 20px}.nav-links{gap:14px}}
+</style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav class="nav">
-    <div class="nav-brand">💜 DonateX</div>
-    <div class="nav-links">
-      <a href="#how">How It Works</a>
-      <a href="#code">Get Code</a>
-      <a href="#features">Features</a>
-      <a href="https://github.com/wilnowilx/aetheriusxapi/tree/main/donatex" target="_blank" class="nav-cta">View on GitHub</a>
-    </div>
-  </nav>
+<div id="plasma-bg"><div class="plasma-blob"></div><div class="plasma-blob"></div><div class="plasma-blob"></div></div>
 
-  <!-- HERO -->
-  <section class="hero">
+<nav id="nav">
+  <div class="brand">💜 DonateX</div>
+  <div class="nav-links">
+    <a href="#terminal">Live Demo</a>
+    <a href="#features">Features</a>
+    <a href="#docs">Docs</a>
+    <a href="https://github.com/wilnowilx/aetheriusxapi/tree/main/donatex" target="_blank" class="nav-cta">GitHub</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
     <div class="hero-badge">⚡ Open Source · No KYC · Base Network · $0 Gas</div>
     <h1>Accept <span>USDC Donations</span><br>With One Line of Code</h1>
-    <p>Give your open-source project a donation button that works everywhere. No Stripe. No PayPal. No bank accounts. Just a wallet address and 3KB of JavaScript.</p>
-    <div class="hero-buttons">
-      <a href="#code" class="btn-primary">Get the Widget →</a>
-      <a href="#preview" class="btn-secondary">See How It Looks</a>
-    </div>
-  </section>
-
-  <!-- STATS -->
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-value">0%</div>
-      <div class="stat-label">Platform Fees</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">0</div>
-      <div class="stat-label">Sign-ups Required</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">3KB</div>
-      <div class="stat-label">Widget Size</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">$0.001</div>
-      <div class="stat-label">Gas on Base</div>
+    <p>A donation button that works everywhere. No Stripe. No PayPal. No bank accounts. Just a wallet address and 3KB of JavaScript.</p>
+    <div class="hero-btns">
+      <a href="#terminal" class="btn btn-fill">Watch Live Demo</a>
+      <a href="#code" class="btn btn-ghost">Get the Code</a>
     </div>
   </div>
+</section>
 
-  <!-- WIDGET PREVIEW -->
-  <section class="preview-section" id="preview">
-    <h2>What It Looks Like</h2>
-    <p class="subtitle">A beautiful donation experience for your contributors.</p>
-    <div class="preview-grid">
-      <div class="preview-card">
-        <h3>💜 Heart Button</h3>
-        <p>A floating purple heart appears in the corner. Click to open the donation modal.</p>
-        <div class="preview-mockup">
-          <span class="c">// Bottom-right corner of your site</span><br>
-          <span class="tag">&lt;button</span> <span class="a">class</span>=<span class="s">"donatex-fab"</span><span class="tag">&gt;</span><br>
-          &nbsp;&nbsp;💜 Donate USDC<br>
-          <span class="tag">&lt;/button&gt;</span>
-        </div>
-      </div>
-      <div class="preview-card">
-        <h3>📱 QR Code Modal</h3>
-        <p>Click the heart → modal with QR code, preset amounts, and wallet connect.</p>
-        <div class="preview-mockup">
-          <span class="c">// Modal opens with:</span><br>
-          <span class="k">→</span> Preset amounts: $1, $5, $10, $25<br>
-          <span class="k">→</span> QR code for mobile wallets<br>
-          <span class="k">→</span> "Connect Wallet" for MetaMask<br>
-          <span class="k">→</span> Custom amount input
-        </div>
-      </div>
-      <div class="preview-card">
-        <h3>🦊 One-Click Payment</h3>
-        <p>Connect MetaMask → confirm → done. USDC transfers directly to your wallet.</p>
-        <div class="preview-mockup">
-          <span class="c">// Payment flow:</span><br>
-          <span class="k">1.</span> User clicks "Connect Wallet"<br>
-          <span class="k">2.</span> MetaMask popup appears<br>
-          <span class="k">3.</span> User confirms USDC transfer<br>
-          <span class="k">4.</span> Widget waits for confirmation
-        </div>
-      </div>
-      <div class="preview-card">
-        <h3>✅ On-Chain Confirmation</h3>
-        <p>Transaction confirmed. Donation recorded on Base. Transparent and verifiable.</p>
-        <div class="preview-mockup">
-          <span class="c">// After confirmation:</span><br>
-          <span class="s">✅</span> Donation confirmed!<br>
-          <span class="k">→</span> Tx: 0x7a3f...b2c1<br>
-          <span class="k">→</span> Amount: $10.00 USDC<br>
-          <span class="k">→</span> Block: 12,345,678
-        </div>
-      </div>
+<!-- STATS -->
+<div class="stats fade-up">
+  <div class="stat"><div class="stat-val">0%</div><div class="stat-lbl">Platform Fees</div></div>
+  <div class="stat"><div class="stat-val">0</div><div class="stat-lbl">Sign-ups</div></div>
+  <div class="stat"><div class="stat-val">3KB</div><div class="stat-lbl">Widget Size</div></div>
+  <div class="stat"><div class="stat-val">$0.001</div><div class="stat-lbl">Gas on Base</div></div>
+</div>
+
+<!-- TERMINAL DEMO -->
+<section class="term-section fade-up" id="terminal">
+  <h2>See It In Action</h2>
+  <p class="sub">Interactive terminal replay. Click Play to watch the full flow — from adding the widget to receiving a donation.</p>
+  <div class="term-wrap">
+    <div class="term-chrome">
+      <div class="dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+      <span class="title">donatex — build + deploy.cast</span>
     </div>
-  </section>
-
-  <!-- HOW IT WORKS -->
-  <section class="how" id="how">
-    <h2>Three Steps. That's It.</h2>
-    <p class="subtitle">No npm install. No build step. No config files.</p>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h3>Copy the Widget</h3>
-        <p>Download widget.js or clone the repo. One file, 3KB, zero dependencies.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h3>Add Your Wallet</h3>
-        <p>Paste the script tag. Replace the address with your Base wallet. Done.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <h3>Receive Donations</h3>
-        <p>USDC arrives directly in your wallet. No middleman. No fees. Instant.</p>
-      </div>
+    <div class="progress-bar"><i id="pbar"></i></div>
+    <div class="term" id="term"></div>
+    <div class="term-controls">
+      <button id="btnPlay">▶ Play</button>
+      <button id="btnReplay" class="ghost">↻ Replay</button>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- CODE -->
-  <section class="code-section" id="code">
-    <h2>One Line. Zero Dependencies.</h2>
-    <p class="subtitle">Copy this into your HTML. Replace the wallet address. Your project accepts donations.</p>
+<!-- WIKI TOOLTIP -->
+<div class="wiki" id="wiki"></div>
 
-    <div class="code-block">
-      <span class="label">HTML</span>
-      <button class="copy-btn" onclick="copyCode('code1')">📋 Copy</button>
-<pre id="code1"><span class="c">&lt;!-- DonateX — Accept USDC donations on Base --&gt;</span>
+<!-- FEATURES -->
+<section class="features fade-up" id="features">
+  <h2>Why DonateX?</h2>
+  <div class="feat-grid">
+    <div class="feat"><div class="feat-icon">🔓</div><h3>No KYC Required</h3><p>Just a wallet address. No identity verification, no bank accounts. Works for anyone, anywhere.</p></div>
+    <div class="feat"><div class="feat-icon">⛽</div><h3>$0.001 Gas</h3><p>Built on Base (Coinbase L2). Transactions cost less than a penny. Donors keep 99.9%.</p></div>
+    <div class="feat"><div class="feat-icon">🔍</div><h3>Fully Transparent</h3><p>Every donation on-chain. Your community can verify exactly where funds go.</p></div>
+    <div class="feat"><div class="feat-icon">🌍</div><h3>Works Everywhere</h3><p>Any website, any framework, any platform. If it has a script tag, it works.</p></div>
+    <div class="feat"><div class="feat-icon">🦊</div><h3>Wallet Connect</h3><p>MetaMask, Rabby, or any Base wallet. One click, done.</p></div>
+    <div class="feat"><div class="feat-icon">📦</div><h3>Zero Dependencies</h3><p>Vanilla JavaScript. No React, no Vue, no build tools. Just 3KB.</p></div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="compare fade-up">
+  <h2>Honest Comparison</h2>
+  <p class="sub">The numbers speak for themselves.</p>
+  <table>
+    <thead><tr><th>Feature</th><th>DonateX</th><th>Stripe</th><th>PayPal</th></tr></thead>
+    <tbody>
+      <tr><td>Fees</td><td class="win">0%</td><td class="lose">2.9% + $0.30</td><td class="lose">3.49% + $0.49</td></tr>
+      <tr><td>KYC</td><td class="win">No</td><td class="lose">Yes</td><td class="lose">Yes</td></tr>
+      <tr><td>Bank Account</td><td class="win">No</td><td class="lose">Yes</td><td class="lose">Yes</td></tr>
+      <tr><td>Settlement</td><td class="win">Instant</td><td class="lose">2-7 days</td><td class="lose">1-3 days</td></tr>
+      <tr><td>Global</td><td class="win">Everyone</td><td class="lose">Limited</td><td class="lose">Limited</td></tr>
+      <tr><td>$1 Donation</td><td class="win">$0.999</td><td class="lose">$0.67</td><td class="lose">$0.47</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- DOCS -->
+<section class="docs fade-up" id="docs">
+  <h2>Quick Reference</h2>
+  <p class="sub">Everything you need to integrate DonateX.</p>
+  <div class="doc-grid">
+    <div class="doc-card">
+      <h3>📋 Script Tag</h3>
+      <p>Add to any HTML page. Only data-wallet is required.</p>
+      <pre><span class="c">&lt;!-- Minimal --&gt;</span>
 <span class="k">&lt;script</span>
   <span class="a">src</span>=<span class="s">"widget.js"</span>
-  <span class="a">data-wallet</span>=<span class="s">"0xYOUR_WALLET_ADDRESS"</span>
+  <span class="a">data-wallet</span>=<span class="s">"0xYOUR_ADDRESS"</span>
+<span class="k">&gt;&lt;/script&gt;</span>
+
+<span class="c">&lt;!-- Full options --&gt;</span>
+<span class="k">&lt;script</span>
+  <span class="a">src</span>=<span class="s">"widget.js"</span>
+  <span class="a">data-wallet</span>=<span class="s">"0xYOUR_ADDRESS"</span>
   <span class="a">data-currency</span>=<span class="s">"USDC"</span>
   <span class="a">data-amounts</span>=<span class="s">"1,5,10,25"</span>
+  <span class="a">data-position</span>=<span class="s">"bottom-right"</span>
+  <span class="a">data-label</span>=<span class="s">"Donate"</span>
 <span class="k">&gt;&lt;/script&gt;</span></pre>
     </div>
+    <div class="doc-card">
+      <h3>🔍 Verification API</h3>
+      <p>Verify donations on-chain. Build dashboards and badges.</p>
+      <pre><span class="c"># Verify a transaction</span>
+<span class="k">GET</span> <span class="s">/donatex/api/verify</span>
+    ?tx=0x...
+    &wallet=0x...
 
-    <div class="code-block">
-      <span class="label">CONFIGURATION</span>
-      <button class="copy-btn" onclick="copyCode('code2')">📋 Copy</button>
-<pre id="code2"><span class="c">/* All options — only data-wallet is required */</span>
-<span class="k">&lt;script</span>
-  <span class="a">src</span>=<span class="s">"widget.js"</span>
-  <span class="a">data-wallet</span>=<span class="s">"0xYOUR_ADDRESS"</span>      <span class="c">// Required</span>
-  <span class="a">data-currency</span>=<span class="s">"USDC"</span>              <span class="c">// Token to accept</span>
-  <span class="a">data-amounts</span>=<span class="s">"1,5,10,25"</span>          <span class="c">// Preset buttons</span>
-  <span class="a">data-position</span>=<span class="s">"bottom-right"</span>       <span class="c">// Button position</span>
-  <span class="a">data-label</span>=<span class="s">"Donate"</span>               <span class="c">// Button text</span>
-<span class="k">&gt;&lt;/script&gt;</span></pre>
+<span class="c"># Recent donations</span>
+<span class="k">GET</span> <span class="s">/donatex/api/recent</span>
+    ?wallet=0x...
+    &limit=10
+
+<span class="c"># Donation stats</span>
+<span class="k">GET</span> <span class="s">/donatex/api/stats</span>
+    ?wallet=0x...</pre>
     </div>
-
-    <div class="code-block">
-      <span class="label">GIT</span>
-      <button class="copy-btn" onclick="copyCode('code3')">📋 Copy</button>
-<pre id="code3"><span class="c"># Clone and copy</span>
+    <div class="doc-card">
+      <h3>⚙️ Configuration</h3>
+      <p>All data attributes. Only wallet is required.</p>
+      <pre><span class="a">data-wallet</span>     <span class="c">Your Base address</span>  <span class="s">required</span>
+<span class="a">data-currency</span>   <span class="c">Token to accept</span>    <span class="s">"USDC"</span>
+<span class="a">data-amounts</span>    <span class="c">Preset buttons</span>     <span class="s">"1,5,10,25"</span>
+<span class="a">data-position</span>   <span class="c">Button location</span>    <span class="s">"bottom-right"</span>
+<span class="a">data-label</span>      <span class="c">Button text</span>        <span class="s">"Donate"</span></pre>
+    </div>
+    <div class="doc-card">
+      <h3>📥 Install</h3>
+      <p>Clone, copy, or download. Zero build step.</p>
+      <pre><span class="c"># Clone the repo</span>
 <span class="k">git</span> clone https://github.com/wilnowilx/aetheriusxapi.git
 <span class="k">cp</span> aetheriusxapi/donatex/widget.js ./your-project/
 
-<span class="c"># Or download just the widget</span>
-<span class="k">curl</span> -O https://raw.githubusercontent.com/wilnowilx/aetheriusxapi/main/donatex/widget.js</pre>
+<span class="c"># Or download directly</span>
+<span class="k">curl</span> -O https://raw.githubusercontent.com/.../widget.js</pre>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FEATURES -->
-  <section class="features" id="features">
-    <h2>Why DonateX?</h2>
-    <div class="feature-grid">
-      <div class="feature">
-        <div class="feature-icon">🔓</div>
-        <h3>No KYC Required</h3>
-        <p>Just a wallet address. No identity verification, no bank accounts, no paperwork. Works for anyone, anywhere.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">⛽</div>
-        <h3>$0.001 Gas Fees</h3>
-        <p>Built on Base (Coinbase L2). Transactions cost less than a penny. Your donors keep 99.9% of their contribution.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🔍</div>
-        <h3>Fully Transparent</h3>
-        <p>Every donation is recorded on-chain. Your community can verify exactly where funds go. No black boxes.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🌍</div>
-        <h3>Works Everywhere</h3>
-        <p>Any website, any framework, any platform. If it has a script tag, DonateX works.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🦊</div>
-        <h3>Wallet Connect</h3>
-        <p>Supporters pay from MetaMask, Rabby, or any Base-compatible wallet. One click, done.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">📦</div>
-        <h3>Zero Dependencies</h3>
-        <p>Vanilla JavaScript. No React, no Vue, no build tools. Just 3KB that works everywhere.</p>
-      </div>
+<!-- LIVE VERIFY -->
+<section class="verify fade-up" id="verify">
+  <h2>Verify a Donation</h2>
+  <p class="sub">Paste a transaction hash to verify it on-chain.</p>
+  <div class="verify-box">
+    <div class="verify-row">
+      <input class="verify-input" id="verifyTx" placeholder="0x... transaction hash">
+      <button class="verify-btn" id="verifyBtn">Verify</button>
     </div>
-  </section>
+    <div class="verify-result" id="verifyResult">Paste a Base transaction hash above and click Verify.</div>
+  </div>
+</section>
 
-  <!-- COMPARISON -->
-  <section class="compare">
-    <h2>Why Not Stripe or PayPal?</h2>
-    <p class="subtitle">The honest comparison.</p>
-    <table class="compare-table">
-      <thead>
-        <tr>
-          <th>Feature</th>
-          <th>DonateX</th>
-          <th>Stripe</th>
-          <th>PayPal</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Platform Fees</td>
-          <td class="win">0%</td>
-          <td class="lose">2.9% + $0.30</td>
-          <td class="lose">3.49% + $0.49</td>
-        </tr>
-        <tr>
-          <td>KYC Required</td>
-          <td class="win">No</td>
-          <td class="lose">Yes</td>
-          <td class="lose">Yes</td>
-        </tr>
-        <tr>
-          <td>Bank Account</td>
-          <td class="win">No</td>
-          <td class="lose">Yes</td>
-          <td class="lose">Yes</td>
-        </tr>
-        <tr>
-          <td>Settlement</td>
-          <td class="win">Instant</td>
-          <td class="lose">2-7 days</td>
-          <td class="lose">1-3 days</td>
-        </tr>
-        <tr>
-          <td>Global Access</td>
-          <td class="win">Everyone</td>
-          <td class="lose">Limited</td>
-          <td class="lose">Limited</td>
-        </tr>
-        <tr>
-          <td>$1 Donation</td>
-          <td class="win">$0.999</td>
-          <td class="lose">$0.67</td>
-          <td class="lose">$0.47</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
+<!-- CTA -->
+<section class="cta fade-up">
+  <h2>Start Receiving Donations Today</h2>
+  <p>One line of code. Zero fees. Global access.</p>
+  <a href="#code" class="btn btn-fill">Get the Widget →</a>
+</section>
 
-  <!-- CTA -->
-  <section class="cta">
-    <h2>Start Receiving Donations Today</h2>
-    <p>One line of code. Zero fees. Global access.</p>
-    <a href="#code" class="btn-primary">Get the Widget →</a>
-  </section>
+<footer>
+  <p>Built by <a href="https://github.com/wilnowilx/aetheriusxapi" target="_blank">AETHERIUS x402</a> · MIT License · <a href="https://github.com/wilnowilx/aetheriusxapi/tree/main/donatex" target="_blank">View Source</a></p>
+</footer>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <p>Built by <a href="https://github.com/wilnowilx/aetheriusxapi" target="_blank">AETHERIUS x402</a> · MIT License · <a href="https://github.com/wilnowilx/aetheriusxapi/tree/main/donatex" target="_blank">View Source</a></p>
-  </footer>
+<!-- DONATEX WIDGET LIVE -->
+<script src="widget.js" data-wallet="0x677B483128D0399bCD0A5AB36eE990C246d7f61" data-currency="USDC" data-amounts="1,5,10,25" data-position="bottom-right" data-label="Donate USDC"></script>
 
-  <!-- DONATEX WIDGET — LIVE -->
-  <script src="widget.js" data-wallet="0x677B483128D0399bCD0A5AB36eE990C246d7f61" data-currency="USDC" data-amounts="1,5,10,25" data-position="bottom-right" data-label="Donate USDC"></script>
+<script>
+// ═══════════════════════════════════════════════════
+// NAV SCROLL
+// ═══════════════════════════════════════════════════
+window.addEventListener('scroll', function(){
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+});
 
-  <script>
-    function copyCode(id) {
-      const el = document.getElementById(id);
-      const text = el.innerText;
-      navigator.clipboard.writeText(text);
-      const btn = el.parentElement.querySelector('.copy-btn');
-      btn.textContent = '✅ Copied!';
-      setTimeout(() => btn.textContent = '📋 Copy', 2000);
+// ═══════════════════════════════════════════════════
+// FADE-UP ON SCROLL
+// ═══════════════════════════════════════════════════
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// ═══════════════════════════════════════════════════
+// TERMINAL REPLAYER (from AETHERIUS player.html)
+// ═══════════════════════════════════════════════════
+(function(){
+var term = document.getElementById('term');
+var pbar = document.getElementById('pbar');
+var btnPlay = document.getElementById('btnPlay');
+var btnReplay = document.getElementById('btnReplay');
+var wiki = document.getElementById('wiki');
+
+var WIKI = {
+  setup:   {k:'SETUP',    t:'One file, 3KB',             d:'No npm, no build, no framework. Copy widget.js into your project and add a script tag. That\'s the entire installation.'},
+  config:  {k:'CONFIG',   t:'Your wallet address',       d:'The data-wallet attribute sets where USDC donations arrive. Use any Base wallet address. No account creation needed.'},
+  qr:      {k:'QR CODE',  t:'Mobile-first donations',    d:'The widget generates a QR code using the Base EIP-681 URI standard. Any mobile wallet that scans it knows it\'s a USDC transfer on Base.'},
+  wallet:  {k:'WALLET',   t:'One-click MetaMask',        d:'Supporters click "Connect Wallet" → MetaMask pops up → confirm → done. The widget handles chain switching and USDC transfer calldata.'},
+  tx:      {k:'TRANSFER', t:'ERC-20 USDC transfer',      d:'The widget builds the transfer(address,uint256) calldata directly. No web3.js, no ethers.js — just raw JSON-RPC to window.ethereum.'},
+  confirm: {k:'CONFIRM',  t:'On-chain verification',     d:'The widget polls eth_getTransactionReceipt until status=0x1. Once confirmed, the donation is irreversible and verifiable on BaseScan.'},
+  verify:  {k:'VERIFY',   t:'Public transparency',       d:'Every donation can be verified via the /donatex/api/verify endpoint or directly on BaseScan. No black boxes.'},
+  deploy:  {k:'DEPLOY',   t:'Works anywhere',            d:'GitHub Pages, Vercel, Netlify, your own server — if it serves HTML, DonateX works. No server-side code needed.'},
+  live:    {k:'LIVE API', t:'Real verification',         d:'This calls the live DonateX verification API on Base Mainnet. The response is real — no simulation.'}
+};
+
+var wikiHTML = function(k){ var w=WIKI[k]; if(!w) return null; return '<div class="wk">'+w.k+'</div><div class="wt">'+w.t+'</div><div class="wd">'+w.d+'</div>'; };
+var autoWiki = false;
+function showWiki(k){
+  var h=wikiHTML(k); if(!h) return;
+  wiki.innerHTML=h; wiki.classList.add('show');
+  var tr=term.getBoundingClientRect(), ww=Math.min(360,window.innerWidth-32), wx=tr.right+16;
+  if(wx+ww+16>window.innerWidth) wx=window.innerWidth-ww-16;
+  if(wx<16) wx=16;
+  var wy=tr.top+24; if(wy+230>window.innerHeight) wy=Math.max(8,window.innerHeight-240);
+  wiki.style.left=wx+'px'; wiki.style.top=wy+'px';
+}
+function hideWiki(){ wiki.classList.remove('show'); autoWiki=false; }
+
+var EQ='══════════════════════════════════════════════════════════';
+function B(t){return '<div class="banner">'+EQ+'</div><div class="banner">'+t+'</div><div class="banner">'+EQ+'</div>';}
+
+var S=[
+  {h:B('  STEP 1/6  COPY THE WIDGET'), g:600, wiki:'setup'},
+  {t:'$ mkdir my-project && cd my-project', g:300},
+  {t:'$ curl -O https://raw.githubusercontent.com/wilnowilx/aetheriusxapi/main/donatex/widget.js', g:400},
+  {t:'✓ widget.js downloaded (3KB)', c:'ok', g:600},
+  {h:B('  STEP 2/6  CONFIGURE YOUR WALLET'), g:600, wiki:'config'},
+  {t:'// Add to your HTML:', g:300},
+  {t:'<script src="widget.js" data-wallet="0xYOUR_ADDRESS"><\/script>', g:500, wiki:'config'},
+  {t:'✓ One line. That\'s the entire setup.', c:'ok', g:800},
+  {h:B('  STEP 3/6  OPEN IN BROWSER'), g:600},
+  {t:'$ open index.html', g:300},
+  {t:'→ Purple heart button appears in bottom-right corner', g:400},
+  {t:'→ Click it → modal with QR code + wallet connect', g:400, wiki:'qr'},
+  {t:'→ Preset amounts: $1 · $5 · $10 · $25', g:800},
+  {h:B('  STEP 4/6  DONOR CONNECTS WALLET'), g:600, wiki:'wallet'},
+  {t:'→ Donor clicks "Connect Wallet"', g:300},
+  {t:'→ MetaMask popup: "Connect to Base Network"', g:400},
+  {t:'→ Donor confirms USDC transfer: $10.00', g:400, wiki:'tx'},
+  {t:'→ Transaction hash: 0x7a3f...b2c1', g:600},
+  {h:B('  STEP 5/6  ON-CHAIN CONFIRMATION'), g:600, wiki:'confirm'},
+  {t:'→ Polling eth_getTransactionReceipt...', g:400},
+  {t:'→ status: 0x1 ✓  blockNumber: 12345678', c:'ok', g:400},
+  {t:'✓ Donation confirmed! $10.00 USDC received.', c:'ok', g:400},
+  {t:'→ Verified on BaseScan: basescan.org/tx/0x7a3f...', c:'dim', g:800},
+  {h:B('  STEP 6/6  VERIFY VIA API — LIVE CALL'), g:600, wiki:'live'},
+  {t:'$ curl https://34-156-149-38.sslip.io/aetherapi/donatex/api/stats?wallet=0x677B...', g:500},
+];
+
+var timers=[],playing=false,total=S.length,done=0;
+function scroll(){term.scrollTop=term.scrollHeight;}
+function prog(){pbar.style.width=Math.round(done/total*100)+'%';}
+var PCHAR=12;
+var cur=document.createElement('span'); cur.className='cursor';
+
+function runStep(idx){
+  if(!playing||idx>=S.length){playing=false;btnPlay.textContent='▶ Play';hideWiki();return;}
+  if(autoWiki) hideWiki();
+  autoWiki=false;
+  var s=S[idx];
+  function advance(){
+    done=idx+1;prog();term.appendChild(cur);
+    timers.push(setTimeout(function(){runStep(idx+1);},s.g||850));
+  }
+  if(s.h){
+    var html=s.h;
+    if(s.wiki) html='<span style="cursor:help;border-bottom:1px dashed rgba(168,85,247,.3)" data-wk="'+s.wiki+'">'+html+'</span>';
+    term.insertAdjacentHTML('beforeend',html);
+    if(s.wiki&&playing){autoWiki=true;showWiki(s.wiki);}
+    scroll();advance();
+  } else {
+    var d=document.createElement('div');
+    if(s.c)d.className=s.c;
+    if(s.wiki){d.style.cursor='help';d.style.borderBottom='1px dashed rgba(168,85,247,.3)';d.setAttribute('data-wk',s.wiki);}
+    d.appendChild(cur);term.appendChild(d);
+    if(s.wiki&&playing){autoWiki=true;showWiki(s.wiki);}
+    var full=s.t,i=0;
+    (function type(){
+      if(!playing)return;
+      cur.before(document.createTextNode(full[i]));scroll();i++;
+      if(i<full.length) timers.push(setTimeout(type,PCHAR));
+      else advance();
+    })();
+  }
+}
+
+function clear(){timers.forEach(clearTimeout);timers=[];}
+function play(){
+  clear();term.innerHTML='';done=0;prog();
+  playing=true;btnPlay.textContent='⏸ Pause';runStep(0);
+}
+function renderAll(){
+  clear();term.innerHTML='';done=total;prog();
+  S.forEach(function(s){
+    if(s.h){var html=s.h;if(s.wiki)html='<span style="cursor:help;border-bottom:1px dashed rgba(168,85,247,.3)" data-wk="'+s.wiki+'">'+html+'</span>';term.innerHTML+=html;}
+    else{var c=s.c||'';if(s.wiki)c+=' wiki';term.innerHTML+='<div class="'+c.trim()+'"'+(s.wiki?' data-wk="'+s.wiki+'"':'')+'>'+s.t.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</div>';}
+  });playing=false;btnPlay.textContent='▶ Play';
+}
+
+btnPlay.onclick=function(){if(playing){clear();playing=false;btnPlay.textContent='▶ Play';hideWiki();}else{play();}};
+btnReplay.onclick=function(){play();};
+
+term.addEventListener('mouseover',function(e){var z=e.target.closest('[data-wk]');if(z){var k=z.getAttribute('data-wk'),h=wikiHTML(k);if(!h)return;wiki.innerHTML=h;var r=e.target.getBoundingClientRect(),wx=r.right+14;if(wx+380>window.innerWidth)wx=r.left-380;if(wx<8)wx=8;var wy=r.top-20;if(wy+180>window.innerHeight)wy=window.innerHeight-200;if(wy<8)wy=8;wiki.style.left=wx+'px';wiki.style.top=wy+'px';wiki.classList.add('show');}});
+term.addEventListener('mouseout',function(e){var z=e.target.closest('[data-wk]');if(z&&!z.contains(e.relatedTarget))hideWiki();});
+
+// Auto-play on scroll into view
+var played=false;
+var termObs=new IntersectionObserver(function(entries){
+  if(entries[0].isIntersecting&&!played){played=true;play();}
+},{threshold:0.3});
+termObs.observe(document.querySelector('.term-section'));
+
+// Render all if reduced motion
+try{if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)renderAll();}catch(e){}
+})();
+
+// ═══════════════════════════════════════════════════
+// LIVE VERIFY
+// ═══════════════════════════════════════════════════
+document.getElementById('verifyBtn').onclick = async function(){
+  var tx = document.getElementById('verifyTx').value.trim();
+  var result = document.getElementById('verifyResult');
+  if(!tx){result.innerHTML='<span style="color:var(--orange)">Enter a transaction hash</span>';return;}
+  result.innerHTML='<span style="color:var(--purple)">⏳ Verifying on Base...</span>';
+  try{
+    var resp = await fetch('https://34-156-149-38.sslip.io/aetherapi/donatex/api/verify?tx='+tx);
+    var data = await resp.json();
+    if(data.verified){
+      result.innerHTML='<span style="color:var(--green)">✅ Verified!</span>\n\n'+
+        '<span class="key">From:</span>    <span class="val">'+data.from+'</span>\n'+
+        '<span class="key">To:</span>      <span class="val">'+data.to+'</span>\n'+
+        '<span class="key">Amount:</span>   <span class="num">$'+data.amount_usdc+' USDC</span>\n'+
+        '<span class="key">Block:</span>    <span class="num">'+data.block+'</span>\n'+
+        '<span class="key">Chain:</span>    <span class="str">'+data.chain+'</span>';
+    } else {
+      result.innerHTML='<span style="color:var(--orange)">⚠️ '+data.error+'</span>';
     }
-  </script>
-
+  }catch(e){
+    result.innerHTML='<span style="color:#ef4444">Error: '+e.message+'</span>';
+  }
+};
+</script>
 </body>
 </html>
