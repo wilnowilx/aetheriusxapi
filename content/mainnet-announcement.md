@@ -37,7 +37,7 @@ All open source MIT.
 The journey:
 • May-Aug: Research, VM stabilization, x402 study
 • Sep 2: Repo born
-• Sep 3: 40 endpoints, real USDC testnet
+• Sep 3: 40 endpoints, real USDC mainnet
 • Sep 5: 64 endpoints, MAINNET DEPLOY 🚀
 
 Built solo, no funding, no team. Just code and persistence.
