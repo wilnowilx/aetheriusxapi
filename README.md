@@ -513,6 +513,10 @@ Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 We are building on Base with support from the ecosystem:
 
+### 📋 Our Full Pitch Deck
+
+> **[→ Read the complete application deck](application.md)** — company overview, thesis, use of funds, 90-day targets, and verifiable metrics. Everything a grant reviewer needs in one document.
+
 ### Base Batches 004 — Applied ✅
 - **Amount:** $100K + accelerator
 - **Status:** Submitted. Result: **Sep 17, 2026**
@@ -523,11 +527,11 @@ We are building on Base with support from the ecosystem:
 - **Status:** Submitted
 - **Use of funds:** Spanish tutorials, content creation, documentation
 
-### Base Ecosystem Fund — Not yet applied
+### Base Ecosystem Fund — Next
 - **Amount:** Variable
-- **Status:** Next
+- **Status:** Pending (LinkedIn required — can't create due to KYC)
 
-[Application text](application.md) · [Base Builder Grants](https://www.base.org/ecosystem-fund/apply)
+[Full application text](application.md) · [Base Builder Grants](https://www.base.org/ecosystem-fund/apply)
 
 ---
 
