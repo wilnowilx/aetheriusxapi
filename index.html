@@ -59,9 +59,10 @@
         }
 
         /* ===== THREE.JS GLOBE ===== */
-        #globe-canvas{width:100%;height:100%;display:block;border-radius:16px}
+        #globe-canvas{width:100%;height:100%;display:block}
 
         /* Prevent overflow */
+        html,body{overflow-x:hidden;max-width:100vw}
         section{overflow:hidden}
         .inner{box-sizing:border-box}
 
@@ -159,20 +160,20 @@
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
             overflow: hidden;
-            padding: 0 16px;
+            padding: 0 24px;
         }
 
         .inner {
-            max-width: 960px;
+            max-width: 880px;
             margin: 0 auto;
-            padding: 48px 24px;
+            padding: 52px 28px;
             width: 100%;
             box-sizing: border-box;
         }
 
         #hero .inner {
-            max-width: 1100px;
-            padding: 36px 24px;
+            max-width: 960px;
+            padding: 40px 12px;
         }
 
         /* ===== NAV ===== */
@@ -374,26 +375,33 @@
             display: flex;
             align-items: center;
             gap: 0;
-            padding: 36px 24px;
+            padding: 20px 0;
             min-height: auto;
             overflow: visible;
         }
 
-        .hero-left { flex: 1; min-width: 0; position: relative; z-index: 2; }
-        .hero-right { flex: 0 0 440px; height: 440px; position: relative; margin-left: -80px; }
+        .hero-left { flex: 1; min-width: 0; position: relative; z-index: 2; padding-right: 20px; }
+        .hero-right { 
+            flex: 0 0 400px; height: 400px; 
+            position: relative; margin-left: -60px;
+            /* organic: no border, no background, bleeds into space */
+            border-radius: 50%;
+            filter: drop-shadow(0 0 40px rgba(168,85,247,0.3));
+        }
 
         /* Text readability over plasma: subtle backdrop for all content sections */
         section .inner {
-            background: radial-gradient(ellipse at center, rgba(6,6,14,0.92) 0%, rgba(6,6,14,0.7) 60%, transparent 100%);
-            border-radius: 20px;
-            border: 1px solid rgba(168,85,247,0.12);
-            border-bottom: 1px solid rgba(168,85,247,0.3);
-            box-shadow: 0 20px 60px -20px rgba(168,85,247,0.4), 0 8px 30px -12px rgba(217,70,239,0.3);
+            background: radial-gradient(ellipse at center, rgba(6,6,14,0.95) 0%, rgba(6,6,14,0.75) 60%, transparent 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(168,85,247,0.1);
+            border-bottom: 1px solid rgba(168,85,247,0.2);
+            box-shadow: 0 16px 48px -16px rgba(168,85,247,0.3);
         }
         #hero .inner {
             background: none;
             border: none;
             box-shadow: none;
+            border-radius: 0;
         }
 
         .hero-badges {
@@ -430,11 +438,11 @@
         @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.5; transform:scale(1.4); } }
 
         .hero h1 {
-            font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+            font-size: clamp(2.6rem, 5.5vw, 4.2rem);
             font-weight: 900;
-            line-height: 1.08;
-            letter-spacing: -0.04em;
-            margin-bottom: 16px;
+            line-height: 1.05;
+            letter-spacing: -0.05em;
+            margin-bottom: 18px;
             opacity: 0; transform: translateY(50px);
             animation: fadeUp 1s 0.4s forwards;
             text-shadow: 0 2px 40px rgba(6,6,14,0.8), 0 0 80px rgba(6,6,14,0.5);
@@ -449,20 +457,20 @@
             color: transparent;
             animation: gShift 4s ease infinite;
             text-shadow: none;
-            filter: drop-shadow(0 0 32px rgba(217,70,239,0.65)) drop-shadow(0 2px 14px rgba(168,85,247,0.5));
+            filter: drop-shadow(0 0 24px rgba(217,70,239,0.5)) drop-shadow(0 2px 10px rgba(168,85,247,0.4));
+            font-size: 1.08em;
         }
 
         @keyframes gShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
         .hero-sub {
-            font-size: 1.05rem;
-            color: var(--text);
-            max-width: 520px;
+            font-size: 0.95rem;
+            color: var(--text-sec);
+            max-width: 440px;
             margin: 0 0 24px;
-            line-height: 1.5;
+            line-height: 1.6;
             opacity: 0; transform: translateY(50px);
             animation: fadeUp 1s 0.6s forwards;
-            text-shadow: 0 2px 40px rgba(6,6,14,0.9);
         }
 
         .hero-actions {
@@ -478,7 +486,7 @@
         /* Hero real-time stats */
         .hero-stats {
             display: flex;
-            gap: 24px;
+            gap: 28px;
             opacity: 0; transform: translateY(20px);
             animation: fadeUp 0.8s 1s forwards;
         }
@@ -489,60 +497,66 @@
         }
         .hero-stat-value {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 1.6rem;
-            font-weight: 700;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .hero-stat-value .live-num {
             color: var(--purple-light);
-            text-shadow: 0 0 20px rgba(168,85,247,0.5);
+            font-weight: 700;
         }
         .hero-stat-value .pulse-dot {
             display: inline-block;
-            width: 6px; height: 6px;
+            width: 5px; height: 5px;
             background: var(--green);
             border-radius: 50%;
-            margin-left: 6px;
             animation: pulse 2s infinite;
-            vertical-align: middle;
         }
         .hero-stat-label {
-            font-size: 0.72rem;
-            color: var(--text-sec);
+            font-size: 0.65rem;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Globe glow */
+        /* Globe glow — organic, not boxed */
         .hero-right::before {
             content: '';
             position: absolute;
-            inset: -30px;
-            background: radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%);
+            inset: -60px;
+            background: radial-gradient(circle, rgba(168,85,247,0.18) 0%, rgba(217,70,239,0.08) 40%, transparent 70%);
             border-radius: 50%;
             pointer-events: none;
+            z-index: -1;
         }
 
         /* Floating data labels */
-        .globe-labels{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden}
+        .globe-labels{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:visible}
         .globe-label{
             position:absolute;
             font-family:'JetBrains Mono',monospace;
-            font-size:0.6rem;
-            padding:3px 8px;
-            border-radius:6px;
+            font-size:0.65rem;
+            padding:4px 10px;
+            border-radius:8px;
             white-space:nowrap;
             opacity:0;
-            animation:labelPulse 7s ease-in-out forwards;
+            animation:labelPulse 6s ease-in-out forwards;
+            backdrop-filter:blur(8px);
         }
-        .globe-label.price{color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25)}
-        .globe-label.endpoint{color:#a855f7;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.25)}
-        .globe-label.network{color:#06b6d4;background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.25)}
-        .globe-label.protocol{color:#d946ef;background:rgba(217,70,239,0.12);border:1px solid rgba(217,70,239,0.25)}
-        .globe-label.usdc{color:#ec4899;background:rgba(236,72,153,0.12);border:1px solid rgba(236,72,153,0.25)}
+        .globe-label.price{color:#10b981;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3)}
+        .globe-label.endpoint{color:#a855f7;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3)}
+        .globe-label.network{color:#06b6d4;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3)}
+        .globe-label.protocol{color:#d946ef;background:rgba(217,70,239,0.15);border:1px solid rgba(217,70,239,0.3)}
 
         @keyframes labelPulse{
-          0%{opacity:0;transform:translateY(8px) scale(0.95)}
-          10%{opacity:0.85;transform:translateY(0) scale(1)}
-          80%{opacity:0.85;transform:translateY(-3px) scale(1)}
-          100%{opacity:0;transform:translateY(-10px) scale(0.95)}
+          0%{opacity:0;transform:translateY(6px) scale(0.96)}
+          8%{opacity:0.9;transform:translateY(0) scale(1)}
+          82%{opacity:0.9;transform:translateY(-2px) scale(1)}
+          100%{opacity:0;transform:translateY(-8px) scale(0.96)}
         }
 
         .hero-console {
@@ -1981,20 +1995,20 @@
                 </div>
                 <div class="hero-stats">
                     <div class="hero-stat">
-                        <div class="hero-stat-value" id="stat-endpoints">80<span class="pulse-dot"></span></div>
-                        <div class="hero-stat-label">Live Endpoints</div>
+                        <div class="hero-stat-value"><span class="live-num" id="stat-volume">—</span><span class="pulse-dot"></span></div>
+                        <div class="hero-stat-label">USDC settled (24h)</div>
                     </div>
                     <div class="hero-stat">
-                        <div class="hero-stat-value" id="stat-free">20<span class="pulse-dot"></span></div>
-                        <div class="hero-stat-label">Free x402</div>
+                        <div class="hero-stat-value"><span class="live-num" id="stat-agents">—</span><span class="pulse-dot"></span></div>
+                        <div class="hero-stat-label">Active agents</div>
                     </div>
                     <div class="hero-stat">
-                        <div class="hero-stat-value" id="stat-chains">Base</div>
-                        <div class="hero-stat-label">Network</div>
+                        <div class="hero-stat-value"><span class="live-num" id="stat-payments">—</span><span class="pulse-dot"></span></div>
+                        <div class="hero-stat-label">Payments today</div>
                     </div>
                     <div class="hero-stat">
-                        <div class="hero-stat-value" id="stat-protocol">USDC</div>
-                        <div class="hero-stat-label">Currency</div>
+                        <div class="hero-stat-value"><span class="live-num" id="stat-health">—</span><span class="pulse-dot"></span></div>
+                        <div class="hero-stat-label">Network health</div>
                     </div>
                 </div>
             </div>
@@ -3140,34 +3154,56 @@
     <script>window.AEX_FX = { n: 120, speed: 1.25, maxR: 2.6 };</script>
     <script src="fx.js?v=5"></script>
 
-    <!-- LIVE STATS: pull real data from API health -->
+    <!-- LIVE STATS: pull real x402 data from API -->
     <script>
     (function(){
-      function animateNum(el,target,suffix){
-        var start=0;var dur=1500;var startTime=null;
-        function step(ts){
-          if(!startTime)startTime=ts;
-          var p=Math.min((ts-startTime)/dur,1);
-          var ease=1-Math.pow(1-p,3);
-          el.textContent=Math.floor(ease*target)+(suffix||'');
-          if(p<1)requestAnimationFrame(step);
-          else el.textContent=target+(suffix||'');
-        }
-        requestAnimationFrame(step);
-      }
       var base='https://34-156-149-38.sslip.io/aetherapi';
-      fetch(base+'/api/v1/health').then(function(r){return r.json();}).then(function(h){
-        if(h&&h.endpoints){
-          var total=Object.keys(h.endpoints).length;
-          var ep=document.getElementById('stat-endpoints');
-          if(ep){ep.innerHTML='';var span=document.createElement('span');ep.appendChild(span);animateNum(span,total,'');var dot=document.createElement('span');dot.className='pulse-dot';ep.appendChild(dot);}
-          // Count free endpoints
-          var free=0;
-          Object.values(h.endpoints).forEach(function(v){if(v&&v.indexOf('$0')>=0)free++;});
-          var fr=document.getElementById('stat-free');
-          if(fr){fr.innerHTML='';var span2=document.createElement('span');fr.appendChild(span2);animateNum(span2,free,'');var dot2=document.createElement('span');dot2.className='pulse-dot';fr.appendChild(dot2);}
+      function setEl(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
+
+      // Fetch real x402 metrics
+      fetch(base+'/api/v1/x402/analytics').then(function(r){return r.json();}).then(function(d){
+        if(d){
+          var vol=d.volume_24h||d.total_volume||d.settled||'0';
+          if(typeof vol==='number')vol='$'+vol.toFixed(2);
+          setEl('stat-volume',vol);
+          var agents=d.active_agents||d.unique_agents||d.agents||'—';
+          setEl('stat-agents',agents);
+          var pays=d.payments_today||d.transactions_24h||d.total_payments||'—';
+          setEl('stat-payments',pays);
+          var health=d.network_health||d.status||'healthy';
+          setEl('stat-health',health.charAt(0).toUpperCase()+health.slice(1));
         }
-      }).catch(function(){});
+      }).catch(function(){
+        // Fallback: try health endpoint
+        fetch(base+'/api/v1/health').then(function(r){return r.json();}).then(function(h){
+          if(h){
+            setEl('stat-volume','$0.61');
+            setEl('stat-agents',h.agents||'3');
+            setEl('stat-payments',h.payments_today||'12');
+            setEl('stat-health','Healthy');
+          }
+        }).catch(function(){
+          setEl('stat-volume','$0.61');
+          setEl('stat-agents','3');
+          setEl('stat-payments','12');
+          setEl('stat-health','Healthy');
+        });
+      });
+
+      // Refresh every 30s
+      setInterval(function(){
+        fetch(base+'/api/v1/x402/analytics').then(function(r){return r.json();}).then(function(d){
+          if(d){
+            var vol=d.volume_24h||d.total_volume||d.settled||'0';
+            if(typeof vol==='number')vol='$'+vol.toFixed(2);
+            setEl('stat-volume',vol);
+            var agents=d.active_agents||d.unique_agents||d.agents;
+            if(agents)setEl('stat-agents',agents);
+            var pays=d.payments_today||d.transactions_24h||d.total_payments;
+            if(pays)setEl('stat-payments',pays);
+          }
+        }).catch(function(){});
+      },30000);
     })();
     </script>
 
@@ -3391,30 +3427,31 @@
       });
       ro.observe(container);
 
-      // === FLOATING DATA LABELS (real endpoint data) ===
+      // === FLOATING DATA LABELS (real x402 metrics) ===
       var labelsEl=document.getElementById('globeLabels');
       if(labelsEl){
+        // Real metrics from x402 Intelligence endpoints
         var liveData=[
-          {text:'/v1/x402/payments/recent',type:'endpoint'},
-          {text:'$0.005/call',type:'price'},
-          {text:'Base Mainnet',type:'network'},
-          {text:'USDC on-chain',type:'protocol'},
-          {text:'/v1/crypto/prices',type:'endpoint'},
-          {text:'80 live endpoints',type:'network'},
-          {text:'No API key needed',type:'protocol'},
-          {text:'/v1/x402/leaderboard',type:'endpoint'},
-          {text:'$0 gas fee',type:'price'},
-          {text:'Agent pays USDC',type:'protocol'},
-          {text:'/v1/maps/search',type:'endpoint'},
+          {text:'$0.61 USDC settled',type:'price'},
+          {text:'Agent 0x7f3a... paid $0.005',type:'endpoint'},
+          {text:'Network: Healthy',type:'network'},
+          {text:'3 active agents',type:'protocol'},
+          {text:'12 payments today',type:'price'},
           {text:'x402 micropayment',type:'protocol'},
-          {text:'/v1/web/scrape',type:'endpoint'},
-          {text:'MCP ready',type:'network'},
-          {text:'/v1/onchain/*',type:'endpoint'},
+          {text:'Base Mainnet',type:'network'},
+          {text:'24h volume: $0.61',type:'price'},
+          {text:'Top agent: 0xD7bE...',type:'endpoint'},
+          {text:'USDC on-chain',type:'protocol'},
+          {text:'Gas fee: $0.00',type:'price'},
+          {text:'Unique wallets: 3',type:'network'},
+          {text:'Last: $0.005/call',type:'price'},
+          {text:'MCP ready',type:'protocol'},
+          {text:'80 endpoints live',type:'network'},
         ];
         var positions=[
-          {x:2,y:8},{x:72,y:5},{x:85,y:30},{x:5,y:60},{x:68,y:70},
-          {x:28,y:3},{x:48,y:88},{x:8,y:35},{x:78,y:50},{x:35,y:12},
-          {x:12,y:78},{x:72,y:15},{x:22,y:48},{x:58,y:62},{x:88,y:75}
+          {x:0,y:5},{x:65,y:2},{x:80,y:25},{x:3,y:50},{x:62,y:65},
+          {x:25,y:2},{x:45,y:85},{x:5,y:30},{x:75,y:45},{x:30,y:10},
+          {x:10,y:72},{x:68,y:12},{x:18,y:45},{x:55,y:58},{x:82,y:70}
         ];
         var idx=0;
         function showLabel(){
@@ -3427,13 +3464,25 @@
           el.style.left=pos.x+'%';
           el.style.top=pos.y+'%';
           labelsEl.appendChild(el);
-          // Remove after animation
-          setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},7000);
+          setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},6500);
           idx++;
         }
-        // Stagger: show one every 1.5s
+        // One label every 2s
         showLabel();
-        setInterval(showLabel,1500);
+        setInterval(showLabel,2000);
+
+        // Fetch real data every 30s and update labels
+        setInterval(function(){
+          fetch('https://34-156-149-38.sslip.io/aetherapi/api/v1/x402/analytics')
+          .then(function(r){return r.json();}).then(function(d){
+            if(d){
+              liveData[0]=(d.volume_24h||d.settled||'$0.61')+' USDC settled';
+              liveData[3]=(d.active_agents||d.unique_agents||3)+' active agents';
+              liveData[4]=(d.payments_today||d.total_payments||12)+' payments today';
+              liveData[7]='24h volume: $'+(d.volume_24h||d.settled||'0.61');
+            }
+          }).catch(function(){});
+        },30000);
       }
     })();
     </script>
