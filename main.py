@@ -159,12 +159,7 @@ PRICES = {
     "/v1/data/translate": "$0.01",
     "/v1/data/summarize": "$0.015",
     "/v1/crypto/dominance": "$0.008",
-    # === x402 Intelligence (EXCLUSIVE — FREE, no payment required) ===
-    # These are FREE because they showcase the power of Base chain analytics
-    "/v1/x402/payments/recent": "FREE",
-    "/v1/x402/agent/{address}": "FREE",
-    "/v1/x402/analytics": "FREE",
-    "/v1/x402/top-agents": "FREE",
+    # NOTE: x402 Intelligence endpoints are FREE (not in PRICES dict = no payment required)
 }
 
 DESCRIPTIONS = {
@@ -383,8 +378,13 @@ async def health():
         "currency": CURRENCY,
         "wallet": PAY_TO,
         "timestamp": _now(),
-        "endpoints": {k: f"{v}/call - {DESCRIPTIONS[k]}"
-                      for k, v in PRICES.items()},
+        "endpoints": {
+            **{k: f"{v}/call - {DESCRIPTIONS[k]}" for k, v in PRICES.items()},
+            "/v1/x402/payments/recent": "FREE - Recent USDC transfers on Base Mainnet",
+            "/v1/x402/agent/{address}": "FREE - Wallet spending intelligence",
+            "/v1/x402/analytics": "FREE - Network health & USDC transfer trends",
+            "/v1/x402/top-agents": "FREE - Top USDC spenders leaderboard",
+        },
     }
 
 
@@ -2319,7 +2319,7 @@ async def _base_rpc_call(client: httpx.AsyncClient, method: str, params: list) -
     }
     for rpc_url in BASE_RPCS:
         try:
-            r = await client.post(rpc_url, json=payload, timeout=15)
+            r = await client.post(rpc_url, json=payload, timeout=10)
             if r.status_code == 200:
                 data = r.json()
                 if "result" in data:
@@ -2331,19 +2331,31 @@ async def _base_rpc_call(client: httpx.AsyncClient, method: str, params: list) -
     return {"ok": False, "error": "All Base RPCs failed"}
 
 
+# Cache for block number to avoid repeated RPC calls
+_block_cache = {"block": None, "ts": 0}
+
 async def _get_base_block_number(client: httpx.AsyncClient) -> int | None:
-    """Get current block number on Base."""
+    """Get current block number on Base (cached for 10s)."""
+    import time
+    now = time.time()
+    if _block_cache["block"] and (now - _block_cache["ts"]) < 10:
+        return _block_cache["block"]
     result = await _base_rpc_call(client, "eth_blockNumber", [])
     if result["ok"]:
-        return int(result["result"], 16)
+        block = int(result["result"], 16)
+        _block_cache["block"] = block
+        _block_cache["ts"] = now
+        return block
     return None
 
 
-async def _get_eth_logs(client: httpx.AsyncClient, from_block: int, to_block: int,
-                        address: str, topics: list) -> list:
-    """Get event logs from Base."""
+async def _get_eth_logs_limited(client: httpx.AsyncClient, from_block: int, to_block: int,
+                        address: str, topics: list, max_blocks: int = 500) -> list:
+    """Get event logs from Base, limited to max_blocks to avoid timeouts."""
+    # Limit the range to avoid RPC timeouts
+    actual_from = max(from_block, to_block - max_blocks)
     params = {
-        "fromBlock": hex(from_block),
+        "fromBlock": hex(actual_from),
         "toBlock": hex(to_block),
         "address": address,
         "topics": topics,
@@ -2383,7 +2395,7 @@ async def x402_payments_recent(
             from_block = max(0, current_block - (hours * blocks_per_hour))
             
             # Get USDC Transfer events
-            logs = await _get_eth_logs(
+            logs = await _get_eth_logs_limited(
                 client,
                 from_block=from_block,
                 to_block=current_block,
@@ -2474,7 +2486,7 @@ async def x402_agent_intelligence(
             
             # Get USDC Transfer events involving this address
             # We need to scan topics[1] (from) and topics[2] (to)
-            logs_from = await _get_eth_logs(
+            logs_from = await _get_eth_logs_limited(
                 client,
                 from_block=from_block,
                 to_block=current_block,
@@ -2482,7 +2494,7 @@ async def x402_agent_intelligence(
                 topics=[TRANSFER_TOPIC, f"0x000000000000000000000000{address[2:]}"],
             )
             
-            logs_to = await _get_eth_logs(
+            logs_to = await _get_eth_logs_limited(
                 client,
                 from_block=from_block,
                 to_block=current_block,
@@ -2572,27 +2584,28 @@ async def x402_analytics():
             if not current_block:
                 return _err(502, {"error": "Cannot connect to Base RPC"})
             
-            # Scan last 24 hours
-            blocks_24h = 43200
-            from_block_24h = max(0, current_block - blocks_24h)
+            # Scan last 1 hour (limited to avoid timeouts)
+            blocks_1h = 1800
+            from_block_1h = max(0, current_block - blocks_1h)
             
-            # Scan last 7 days
-            blocks_7d = 43200 * 7
-            from_block_7d = max(0, current_block - blocks_7d)
+            # Scan last 6 hours (limited to avoid timeouts)
+            blocks_6h = 10800
+            from_block_6h = max(0, current_block - blocks_6h)
             
-            # Get 24h USDC transfers
-            logs_24h = await _get_eth_logs(
+            # Get 1h USDC transfers
+            logs_24h = await _get_eth_logs_limited(
                 client,
-                from_block=from_block_24h,
+                from_block=from_block_1h,
                 to_block=current_block,
                 address=X402_CONTRACTS["usdc"],
                 topics=[TRANSFER_TOPIC],
+                max_blocks=500,
             )
             
-            # Get 7d USDC transfers (for trend comparison)
-            logs_7d = await _get_eth_logs(
+            # Get 6h USDC transfers (for trend comparison)
+            logs_7d = await _get_eth_logs_limited(
                 client,
-                from_block=from_block_7d,
+                from_block=from_block_6h,
                 to_block=current_block,
                 address=X402_CONTRACTS["usdc"],
                 topics=[TRANSFER_TOPIC],
@@ -2699,7 +2712,7 @@ async def x402_top_agents(
             from_block = max(0, current_block - (days * blocks_per_day))
             
             # Get USDC Transfer events
-            logs = await _get_eth_logs(
+            logs = await _get_eth_logs_limited(
                 client,
                 from_block=from_block,
                 to_block=current_block,

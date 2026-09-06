@@ -4,7 +4,7 @@
 ![Mainnet](https://img.shields.io/badge/Base_Mainnet-LIVE-10B981?style=for-the-badge&labelColor=09090b)
 ![x402](https://img.shields.io/badge/x402-Protocol-10B981?style=for-the-badge&labelColor=09090b)
 ![USDC](https://img.shields.io/badge/USDC-Payments-2775CA?style=for-the-badge&labelColor=09090b)
-![Endpoints](https://img.shields.io/badge/Endpoints-68-d946ef?style=for-the-badge&labelColor=09090b)
+![Endpoints](https://img.shields.io/badge/Endpoints-64-d946ef?style=for-the-badge&labelColor=09090b)
 ![Tests](https://img.shields.io/badge/Tests-60_passing-brightgreen?style=for-the-badge&labelColor=09090b)
 ![Dashboard](https://img.shields.io/badge/Dashboard-Live-ec4899?style=for-the-badge&labelColor=09090b)
 ![SDK](https://img.shields.io/badge/Python_SDK-ready-3776AB?style=for-the-badge&labelColor=09090b)
@@ -23,7 +23,7 @@
 
 ### The Operating System for AI Agent Commerce
 
-**68 live APIs (120+ on the roadmap) where autonomous AI agents pay per request in USDC on Base.**
+**64 live APIs (120+ on the roadmap) where autonomous AI agents pay per request in USDC on Base.**
 **No accounts. No API keys. No subscriptions. Just your wallet and code.**
 
 > **What does "xAPI" mean?** The `x` stands for **x402** — the HTTP payment protocol that makes this possible. AETHERIUS is an API marketplace powered by x402 crypto payments. We have APIs. We're just different: agents pay per request with USDC instead of signing up for monthly subscriptions.
@@ -109,7 +109,7 @@ timeline
 
 **Total commits:** 100+ and counting (`git log --oneline | wc -l` — velocity is public).
 
-**Build velocity:** 68 endpoints (64 paid + 4 free x402 Intelligence) + 60 tests + 2 SDKs + dashboard + landing + playground + demo + 2 grant submissions in **56 hours**.
+**Build velocity:** 64 endpoints (60 paid + 4 free x402 Intelligence) + 60 tests + 2 SDKs + dashboard + landing + playground + demo + 2 grant submissions in **56 hours**.
 If one person builds this in 55 hours, imagine what funded builders ship on Base.
 
 ---
@@ -154,7 +154,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 **Mission:** Become the default API layer for autonomous agents — the Stripe of the agent economy.
 
 **Strategy:**
-1. **Live now:** 8 categories, 68 endpoints (64 paid + 4 free x402 Intelligence) verified with real USDC on Base Mainnet
+1. **Live now:** 8 categories, 64 endpoints (60 paid + 4 free x402 Intelligence) verified with real USDC on Base Mainnet
 2. **Next:** expand depth per category + more on-chain analytics
 3. **Scale** to 120+ with grant funding, then 500+
 4. **Become** the infrastructure that AI agents depend on
@@ -208,7 +208,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | Playground | [`/`](https://wilnowilx.github.io/aetheriusxapi/) — interactive endpoint testing |
 | Dashboard | [`/dashboard/`](https://wilnowilx.github.io/aetheriusxapi/dashboard/) + backend bar |
 | Live API | `http://34.156.149.38/aetherapi` · TLS `https://34-156-149-38.sslip.io/aetherapi` |
-| Version | v2.1.0 · 68 endpoints (64 paid + 4 free x402 Intelligence) · 60/60 tests green |
+| Version | v2.1.0 · 64 endpoints (60 paid + 4 free x402 Intelligence) · 60/60 tests green |
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 mainnet USDC |
 
 🚀 **Sep 5, 2026:** Deployed to Base Mainnet! Real USDC payments now live.
@@ -334,7 +334,7 @@ uvicorn main:app --reload --port 4020
 # open http://127.0.0.1:4020/dashboard/
 ```
 
-- **API Catalog** — all 68 endpoints with live prices from `/health`
+- **API Catalog** — all 64 endpoints with live prices from `/health`
 - **Explorer** — param forms, one-click paid calls, `Show 402` renders the payment challenge
 - **Live Metrics** — REAL server telemetry (`/v1/telemetry`): uptime, totals, settled USDC volume, wallets seen, latency bars, event feed. Zero simulated numbers.
 - **Wallet** — memory-only demo connect (real x402 signing in production client)
@@ -474,7 +474,7 @@ Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 ### Phase 1: Foundation (Current)
 - [x] Core API server with x402 middleware (simulated + real modes)
-- [x] 68 endpoints (64 paid + 4 free x402 Intelligence), verified live with real USDC payments
+- [x] 64 endpoints (60 paid + 4 free x402 Intelligence), verified live with real USDC payments
 - [x] E2E payment flow proven on mainnet (6/6 → 200, real USDC settled)
 - [x] Upstream resilience (Overpass mirrors, 5-source price chain, Nominatim fallbacks)
 - [x] Interactive dashboard (`/dashboard/`) with API explorer
