@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DonateX — Open-Source Donation Infrastructure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #09090b;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ─────────────────────────────────────────── */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid rgba(168,85,247,0.1);
+    }
+    .nav-brand {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a855f7, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #a855f7; }
+
+    /* ── HERO ────────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 100px 20px 80px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(168,85,247,0.15);
+      border: 1px solid rgba(168,85,247,0.3);
+      border-radius: 50px;
+      padding: 8px 20px;
+      font-size: 13px;
+      color: #a855f7;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: 56px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, #a855f7, #d946ef, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 18px;
+      color: #94a3b8;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+
+    /* ── STATS ───────────────────────────────────────── */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      padding: 40px 20px;
+      border-top: 1px solid rgba(168,85,247,0.1);
+      border-bottom: 1px solid rgba(168,85,247,0.1);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .stat { text-align: center; }
+    .stat-value {
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a855f7, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    /* ── HOW IT WORKS ────────────────────────────────── */
+    .how {
+      max-width: 900px;
+      margin: 80px auto;
+      padding: 0 20px;
+    }
+    .how h2 {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 48px;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+    .step {
+      background: rgba(168,85,247,0.05);
+      border: 1px solid rgba(168,85,247,0.15);
+      border-radius: 16px;
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .step-num {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #a855f7, #d946ef);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .step h3 { font-size: 18px; margin-bottom: 8px; }
+    .step p { font-size: 14px; color: #94a3b8; line-height: 1.5; }
+
+    /* ── CODE SECTION ────────────────────────────────── */
+    .code-section {
+      max-width: 800px;
+      margin: 80px auto;
+      padding: 0 20px;
+    }
+    .code-section h2 {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .code-section .subtitle {
+      text-align: center;
+      color: #94a3b8;
+      margin-bottom: 32px;
+      font-size: 16px;
+    }
+    .code-block {
+      background: #0f0f14;
+      border: 1px solid rgba(168,85,247,0.2);
+      border-radius: 16px;
+      padding: 24px;
+      overflow-x: auto;
+      position: relative;
+    }
+    .code-block pre {
+      margin: 0;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #e2e8f0;
+    }
+    .code-block .comment { color: #64748b; }
+    .code-block .keyword { color: #a855f7; }
+    .code-block .string { color: #22c55e; }
+    .code-block .attr { color: #ec4899; }
+    .copy-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(168,85,247,0.15);
+      border: 1px solid rgba(168,85,247,0.3);
+      border-radius: 8px;
+      color: #a855f7;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover {
+      background: rgba(168,85,247,0.25);
+    }
+
+    /* ── FEATURES ────────────────────────────────────── */
+    .features {
+      max-width: 900px;
+      margin: 80px auto;
+      padding: 0 20px;
+    }
+    .features h2 {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 48px;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    .feature {
+      background: rgba(168,85,247,0.05);
+      border: 1px solid rgba(168,85,247,0.12);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .feature-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+    .feature h3 {
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+    .feature p {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    /* ── LIVE DEMO ───────────────────────────────────── */
+    .demo-section {
+      max-width: 600px;
+      margin: 80px auto;
+      padding: 0 20px;
+      text-align: center;
+    }
+    .demo-section h2 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .demo-section p {
+      color: #94a3b8;
+      margin-bottom: 32px;
+      font-size: 16px;
+    }
+
+    /* ── FOOTER ──────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      border-top: 1px solid rgba(168,85,247,0.1);
+      color: #475569;
+      font-size: 13px;
+    }
+    .footer a {
+      color: #a855f7;
+      text-decoration: none;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────────── */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 36px; }
+      .steps { grid-template-columns: 1fr; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .stats { gap: 24px; }
+      .stat-value { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-brand">💜 DonateX</div>
+    <div class="nav-links">
+      <a href="#how">How It Works</a>
+      <a href="#code">Get Code</a>
+      <a href="#features">Features</a>
+      <a href="https://github.com/wilnowilx/aetheriusxapi" target="_blank">GitHub</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">Open Source · No KYC · Base Network</div>
+    <h1>Accept <span>USDC Donations</span><br>in 5 Minutes</h1>
+    <p>Give your open-source project a donation button that works with just a wallet address. No Stripe. No PayPal. No accounts. Just code.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="#code" style="background:linear-gradient(135deg,#a855f7,#d946ef);color:#fff;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:600;font-size:15px;transition:all 0.2s">Get the Widget</a>
+      <a href="#demo" style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);color:#a855f7;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:600;font-size:15px;transition:all 0.2s">See Demo</a>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value">0%</div>
+      <div class="stat-label">Fees</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">0</div>
+      <div class="stat-label">Sign-ups</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">1</div>
+      <div class="stat-label">Line of Code</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">$0.001</div>
+      <div class="stat-label">Base Gas</div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how">
+    <h2>How It Works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Add the Script</h3>
+        <p>Paste one line of HTML. That's it. No npm install, no build step, no config files.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Set Your Wallet</h3>
+        <p>Replace the address with your Base wallet. USDC arrives directly — no middleman.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Receive Donations</h3>
+        <p>Supporters scan a QR code or connect MetaMask. USDC on Base, instantly.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CODE -->
+  <section class="code-section" id="code">
+    <h2>One Line. That's It.</h2>
+    <p class="subtitle">Copy this into your HTML. Replace the wallet address. Done.</p>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode()">📋 Copy</button>
+<pre><span class="comment">&lt;!-- DonateX — Accept USDC donations on Base --&gt;</span>
+<span class="keyword">&lt;script</span>
+  <span class="attr">src</span>=<span class="string">"https://donatex.aetheriusxapi.com/widget.js"</span>
+  <span class="attr">data-wallet</span>=<span class="string">"0xYOUR_WALLET_ADDRESS"</span>
+  <span class="attr">data-currency</span>=<span class="string">"USDC"</span>
+  <span class="attr">data-amounts</span>=<span class="string">"1,5,10,25"</span>
+<span class="keyword">&gt;&lt;/script&gt;</span></pre>
+    </div>
+
+    <div style="margin-top:24px">
+      <p class="subtitle">Want to self-host? Download the files:</p>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode2()">📋 Copy</button>
+<pre><span class="comment"># Clone and copy just the widget files</span>
+git clone https://github.com/wilnowilx/aetheriusxapi.git
+cp -r aetheriusxapi/donatex/widget.js ./your-project/
+cp -r aetheriusxapi/donatex/widget.css ./your-project/
+
+<span class="comment">&lt;!-- Then in your HTML --&gt;</span>
+<span class="keyword">&lt;script</span>
+  <span class="attr">src</span>=<span class="string">"widget.js"</span>
+  <span class="attr">data-wallet</span>=<span class="string">"0xYOUR_WALLET_ADDRESS"</span>
+<span class="keyword">&gt;&lt;/script&gt;</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <h2>Why DonateX?</h2>
+    <div class="feature-grid">
+      <div class="feature">
+        <div class="feature-icon">🔓</div>
+        <h3>No KYC Required</h3>
+        <p>Just a wallet address. No identity verification, no bank accounts, no paperwork. Works for anyone, anywhere in the world.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">⛽</div>
+        <h3>$0.001 Gas Fees</h3>
+        <p>Built on Base (Coinbase L2). Transactions cost less than a penny. Your donors keep 99.9% of their contribution.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔍</div>
+        <h3>Transparent by Default</h3>
+        <p>Every donation is recorded on-chain. Your community can verify exactly where funds go. No black boxes.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🌍</div>
+        <h3>Works Everywhere</h3>
+        <p>Any website, any framework, any platform. HTML, React, Vue, static sites, blogs — if it has a script tag, it works.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🦊</div>
+        <h3>Wallet Connect</h3>
+        <p>Supporters can pay directly from MetaMask, Rabby, or any Base-compatible wallet. One click, done.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📦</div>
+        <h3>Zero Dependencies</h3>
+        <p>Vanilla JavaScript. No React, no Vue, no build tools. Just a 3KB script that works everywhere.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE DEMO -->
+  <section class="demo-section" id="demo">
+    <h2>Try It Live</h2>
+    <p>Click the purple button below to see DonateX in action.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>Built by <a href="https://aetheriusxapi.com" target="_blank">AETHERIUS x402 API Marketplace</a> · Open Source MIT · <a href="https://github.com/wilnowilx/aetheriusxapi/tree/main/donatex" target="_blank">View on GitHub</a></p>
+  </footer>
+
+  <!-- DONATEX WIDGET DEMO -->
+  <script src="widget.js" data-wallet="0x677B483128D0399bCD0A5AB36eE990C246d7f61" data-currency="USDC" data-amounts="1,5,10,25" data-position="bottom-right" data-label="Donate USDC"></script>
+
+  <script>
+    function copyCode() {
+      const code = `<script src="https://donatex.aetheriusxapi.com/widget.js" data-wallet="0xYOUR_WALLET_ADDRESS" data-currency="USDC" data-amounts="1,5,10,25"><\/script>`;
+      navigator.clipboard.writeText(code);
+      document.querySelector('.copy-btn').textContent = '✅ Copied!';
+      setTimeout(() => document.querySelector('.copy-btn').textContent = '📋 Copy', 2000);
+    }
+    function copyCode2() {
+      const code = `git clone https://github.com/wilnowilx/aetheriusxapi.git\ncp -r aetheriusxapi/donatex/widget.js ./your-project/\n\n<script src="widget.js" data-wallet="0xYOUR_WALLET_ADDRESS"><\/script>`;
+      navigator.clipboard.writeText(code);
+      document.querySelectorAll('.copy-btn')[1].textContent = '✅ Copied!';
+      setTimeout(() => document.querySelectorAll('.copy-btn')[1].textContent = '📋 Copy', 2000);
+    }
+  </script>
+
+</body>
+</html>

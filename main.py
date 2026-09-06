@@ -429,6 +429,18 @@ if os.path.isdir(os.path.join(os.path.dirname(__file__), "dashboard")):
               name="dashboard")
 
 
+# === DONATEX — Open-Source Donation Infrastructure ===
+from donatex.api.verify import router as donatex_router
+app.include_router(donatex_router)
+
+# Serve donatex widget files and demo page
+if os.path.isdir(os.path.join(os.path.dirname(__file__), "donatex")):
+    app.mount("/donatex",
+              StaticFiles(directory=os.path.join(os.path.dirname(__file__),
+                                                 "donatex"), html=True),
+              name="donatex")
+
+
 # === MAPS (OpenStreetMap: Nominatim + Overpass, no key) ===
 
 async def _geocode(client: httpx.AsyncClient, location: str):
