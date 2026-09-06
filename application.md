@@ -19,7 +19,7 @@ No accounts, no API keys, no credit cards — the wallet is the identity.
 - Interactive dashboard with API explorer: `/dashboard/`
 - x402 Intelligence: exclusive FREE on-chain analytics nobody else offers
 - Landing: https://wilnowilx.github.io/aetheriusxapi/
-- Live API: http://34.156.149.38/aetherapi/ (`/docs`, `/health`)
+- Live API: https://34-156-149-38.sslip.io/aetherapi/ (`/docs`, `/health`)
 - Repo: https://github.com/wilnowilx/aetheriusxapi
 
 ## Website URL

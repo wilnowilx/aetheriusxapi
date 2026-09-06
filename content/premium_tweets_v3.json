@@ -69,7 +69,7 @@
       "day": 2,
       "slot": 3,
       "category": "demo",
-      "content": "Try it right now. No signup needed.\n\n3 free endpoints:\n• /v1/x402/base-stats — chain health\n• /v1/x402/gas — gas prices\n• /v1/x402/whales — large transfers\n\nLive on Base Mainnet.\nhttp://34.156.149.38/aetherapi/docs\n\n@aetheriusxAPI #FreeAPI #Base",
+      "content": "Try it right now. No signup needed.\n\n3 free endpoints:\n• /v1/x402/base-stats — chain health\n• /v1/x402/gas — gas prices\n• /v1/x402/whales — large transfers\n\nLive on Base Mainnet.\nhttps://34-156-149-38.sslip.io/aetherapi/docs\n\n@aetheriusxAPI #FreeAPI #Base",
       "scheduled_time": "21:00"
     },
     {

@@ -26,7 +26,7 @@ from web3 import Web3
 
 from aetheriusx import AetheriusXClient
 
-BASE = "http://34.156.149.38/aetherapi"
+BASE = "https://34-156-149-38.sslip.io/aetherapi"
 NETWORK = "eip155:84532"
 KEY = os.getenv("AETHERIUS_DEMO_KEY", "")
 if len(KEY) < 32:

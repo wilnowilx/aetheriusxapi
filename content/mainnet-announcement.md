@@ -55,7 +55,7 @@ Base is becoming the settlement layer for machine-to-machine payments.
 ## Tweet 6 (Call to action)
 
 Try it now:
-• API: http://34.156.149.38/aetherapi/health
+• API: https://34-156-149-38.sslip.io/aetherapi/health
 • Dashboard: https://wilnowilx.github.io/aetheriusxapi/dashboard/
 • GitHub: https://github.com/wilnowilx/aetheriusxapi
 
@@ -83,6 +83,6 @@ Built by a Venezuelan dev with $5 and a dream.
 
 No accounts. No API keys. Just code.
 
-Try: http://34.156.149.38/aetherapi/health
+Try: https://34-156-149-38.sslip.io/aetherapi/health
 
 #Base #x402 #AI #BuildOnBase

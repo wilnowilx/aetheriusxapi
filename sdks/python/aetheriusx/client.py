@@ -17,6 +17,7 @@ Quick start:
 from __future__ import annotations
 
 import logging
+import os
 from typing import Any, Mapping, Optional
 
 import httpx
@@ -27,7 +28,7 @@ logger = logging.getLogger("aetheriusx")
 
 # ─── Defaults ──────────────────────────────────────────────────────────────────
 
-MAINNET_URL = "http://34.156.149.38/aetherapi"
+MAINNET_URL = os.environ.get("AETHERIUS_API_URL", "https://34-156-149-38.sslip.io/aetherapi")
 LOCAL_URL = "http://127.0.0.1:4020"
 
 

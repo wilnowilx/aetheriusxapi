@@ -2862,7 +2862,7 @@
 
         try {
             // Try to hit the real API
-            const apiBase = 'http://34.156.149.38/aetherapi';
+            const apiBase = 'https://34-156-149-38.sslip.io/aetherapi';
             const params = JSON.parse(document.getElementById('pgParams').textContent || '{}');
             const queryString = new URLSearchParams(params).toString();
             const url = `${apiBase}${selectedEndpoint}${queryString ? '?' + queryString : ''}`;

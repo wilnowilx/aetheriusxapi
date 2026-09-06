@@ -41,7 +41,7 @@ Avoid using `*` when credentials or wallet-related headers are involved. Keep th
 
 ## Why mixed content matters
 
-GitHub Pages is HTTPS. A browser will block requests from that page to an HTTP API such as `http://34.156.149.38/aetherapi`. This is mixed content: a secure page trying to load an insecure resource.
+GitHub Pages is HTTPS. A browser will block requests from that page to an HTTP API such as `http://34.156.149.38/aetherapi`. Use the HTTPS endpoint instead: `https://34-156-149-38.sslip.io/aetherapi`.
 
 Use the HTTPS URL with the `sslip.io` hostname:
 

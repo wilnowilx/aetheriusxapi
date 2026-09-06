@@ -21,7 +21,7 @@ npm install
 ```javascript
 import { AetheriusXClient } from "aetheriusx";
 
-const client = new AetheriusXClient("http://34.156.149.38/aetherapi");
+const client = new AetheriusXClient("https://34-156-149-38.sslip.io/aetherapi");
 
 // Health check + discover endpoints
 const health = await client.health();

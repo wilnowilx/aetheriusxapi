@@ -12,7 +12,7 @@ series: "Building the Agent Economy"
 
 **TL;DR:** I built [AETHERIUS](https://github.com/wilnowilx/aetheriusxapi) — an open-source API marketplace where AI agents pay per request in USDC on Base Mainnet. No accounts. No API keys. No subscriptions. 80 live endpoints. Python + JavaScript SDKs. All verifiable on-chain. Built solo in 4 days with $5.80 in ETH.
 
-**🚀 Try it now:** `curl http://34.156.149.38/aetherapi/v1/x402/base-stats`
+**🚀 Try it now:** `curl https://34-156-149-38.sslip.io/aetherapi/v1/x402/base-stats`
 
 ---
 
@@ -65,7 +65,7 @@ But they *can* send crypto.
 Business search, nearby places, reverse geocode — all via OpenStreetMap.
 
 ```bash
-curl "http://34.156.149.38/aetherapi/v1/maps/search?q=coffee+shop+CDMX&limit=5" \
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/maps/search?q=coffee+shop+CDMX&limit=5" \
   -H "X-PAYMENT: anything"
 ```
 
@@ -73,7 +73,7 @@ curl "http://34.156.149.38/aetherapi/v1/maps/search?q=coffee+shop+CDMX&limit=5" 
 Real-time prices, token analysis, gas oracle, NFT metadata, wallet balances.
 
 ```bash
-curl "http://34.156.149.38/aetherapi/v1/token/price?token=bitcoin" \
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/token/price?token=bitcoin" \
   -H "X-PAYMENT: anything"
 ```
 
@@ -81,7 +81,7 @@ curl "http://34.156.149.38/aetherapi/v1/token/price?token=bitcoin" \
 Scraper, screenshots, DNS, WHOIS, SSL checks, IP geolocation.
 
 ```bash
-curl "http://34.156.149.38/aetherapi/v1/web/ssl?domain=github.com" \
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/web/ssl?domain=github.com" \
   -H "X-PAYMENT: anything"
 ```
 
@@ -89,7 +89,7 @@ curl "http://34.156.149.38/aetherapi/v1/web/ssl?domain=github.com" \
 Weather, forecasts, air quality, translations, text summarizer, QR codes.
 
 ```bash
-curl "http://34.156.149.38/aetherapi/v1/data/weather?lat=40.71&lon=-74.01" \
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/data/weather?lat=40.71&lon=-74.01" \
   -H "X-PAYMENT: anything"
 ```
 
@@ -97,7 +97,7 @@ curl "http://34.156.149.38/aetherapi/v1/data/weather?lat=40.71&lon=-74.01" \
 Yield pools, TVL, stablecoin data, DEX volumes, impermanent loss calculator.
 
 ```bash
-curl "http://34.156.149.38/aetherapi/v1/defi/yields" \
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/defi/yields" \
   -H "X-PAYMENT: anything"
 ```
 
@@ -116,56 +116,56 @@ The **x402 Intelligence** endpoints read USDC transfers directly from Base Mainn
 
 ```bash
 # Recent USDC transfers
-curl "http://34.156.149.38/aetherapi/v1/x402/payments/recent"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/payments/recent"
 
 # Top USDC spenders leaderboard
-curl "http://34.156.149.38/aetherapi/v1/x402/top-agents"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/top-agents"
 
 # Network health & trends
-curl "http://34.156.149.38/aetherapi/v1/x402/analytics"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/analytics"
 ```
 
 ### Chain & Gas
 
 ```bash
 # Chain health snapshot (block, gas, chain ID)
-curl "http://34.156.149.38/aetherapi/v1/x402/base-stats"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/base-stats"
 
 # Gas price analysis
-curl "http://34.156.149.38/aetherapi/v1/x402/gas"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/gas"
 ```
 
 ### Activity Tracking
 
 ```bash
 # Whale alerts (>$10K transfers)
-curl "http://34.156.149.38/aetherapi/v1/x402/whales"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/whales"
 
 # Hourly volume breakdown
-curl "http://34.156.149.38/aetherapi/v1/x402/hourly"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/hourly"
 
 # USDC mint/burn activity
-curl "http://34.156.149.38/aetherapi/v1/x402/mint-burn"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/mint-burn"
 ```
 
 ### Wallet Intelligence
 
 ```bash
 # Wallet risk score (0-100)
-curl "http://34.156.149.38/aetherapi/v1/x402/risk/0x677B483128D0399bCD0A5AB36eE990C0246d7f61"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/risk/0x677B483128D0399bCD0A5AB36eE990C0246d7f61"
 
 # Compare two wallets
-curl "http://34.156.149.38/aetherapi/v1/x402/compare?a=0x677B...&b=0xAc7d..."
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/compare?a=0x677B...&b=0xAc7d..."
 ```
 
 ### Market Intelligence
 
 ```bash
 # Top USDC-receiving contracts
-curl "http://34.156.149.38/aetherapi/v1/x402/contracts"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/contracts"
 
 # DeFi protocol activity
-curl "http://34.156.149.38/aetherapi/v1/x402/defi-pulse"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/defi-pulse"
 ```
 
 **100% free.** No signup. No API key. Just call.
@@ -285,10 +285,10 @@ I spent 4 days building 80 endpoints. I should have spent 2 days building and 2 
 
 ```bash
 # Free endpoints — no API key needed
-curl "http://34.156.149.38/aetherapi/v1/x402/base-stats"
-curl "http://34.156.149.38/aetherapi/v1/x402/gas"
-curl "http://34.156.149.38/aetherapi/v1/x402/whales"
-curl "http://34.156.149.38/aetherapi/v1/x402/top-agents"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/base-stats"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/gas"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/whales"
+curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/top-agents"
 ```
 
 **Interactive playground:** [wilnowilx.github.io/aetheriusxapi/](https://wilnowilx.github.io/aetheriusxapi/)
@@ -312,7 +312,7 @@ curl "http://34.156.149.38/aetherapi/v1/x402/top-agents"
 | Resource | URL |
 |----------|-----|
 | GitHub | [github.com/wilnowilx/aetheriusxapi](https://github.com/wilnowilx/aetheriusxapi) |
-| Live API | [34.156.149.38/aetherapi](http://34.156.149.38/aetherapi) |
+| Live API | [34.156.149.38/aetherapi](https://34-156-149-38.sslip.io/aetherapi) |
 | Dashboard | [wilnowilx.github.io/aetheriusxapi/dashboard/](https://wilnowilx.github.io/aetheriusxapi/dashboard/) |
 | Twitter | [@aetheriusxAPI](https://x.com/aetheriusxAPI) |
 | Telegram | [@aetherius_xAPI](https://t.me/aetherius_xAPI) |

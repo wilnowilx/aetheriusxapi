@@ -12,7 +12,7 @@ Add this to your HTML:
 
 ```html
 <script
-  src="https://donatex.aetheriusxapi.com/widget.js"
+  src="https://34-156-149-38.sslip.io/aetherapi/donatex/widget.js"
   data-wallet="0xYOUR_WALLET_ADDRESS"
   data-currency="USDC"
   data-amounts="1,5,10,25"

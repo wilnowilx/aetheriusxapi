@@ -5,7 +5,7 @@
 
 import { AetheriusXClient } from "./src/index.js";
 
-const API = process.env.AETHERIUS_API || "http://34.156.149.38/aetherapi";
+const API = process.env.AETHERIUS_API || "https://34-156-149-38.sslip.io/aetherapi";
 
 async function main() {
   const client = new AetheriusXClient(API);

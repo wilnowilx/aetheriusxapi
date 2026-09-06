@@ -11,7 +11,7 @@ Este tutorial muestra el flujo x402 más pequeño y útil. Harás una petición 
 uvicorn main:app --port 4020
 ```
 
-La testnet en vivo está en `http://34.156.149.38/aetherapi`. El servidor local es simulado: cualquier valor no vacío de `X-PAYMENT` se acepta en local. La testnet en vivo requiere firma x402 real en USDC; consulta `docs/API.md`.
+La testnet en vivo está en `https://34-156-149-38.sslip.io/aetherapi`. El servidor local es simulado: cualquier valor no vacío de `X-PAYMENT` se acepta en local. La testnet en vivo requiere firma x402 real en USDC; consulta `docs/API.md`.
 
 ## Paso 1: Pide sin pago
 
@@ -22,7 +22,7 @@ GET /v1/email/validate?email=user@example.com
 ```
 
 ```bash
-curl -i "http://34.156.149.38/aetherapi/v1/email/validate?email=user@example.com"
+curl -i "https://34-156-149-38.sslip.io/aetherapi/v1/email/validate?email=user@example.com"
 ```
 
 Salida observada el 2026-09-03:

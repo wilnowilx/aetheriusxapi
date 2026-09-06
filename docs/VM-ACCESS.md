@@ -10,10 +10,10 @@ Everything observable is already public HTTP — no credentials needed:
 
 | What | URL |
 |------|-----|
-| Live API docs (OpenAPI/Swagger) | `http://34.156.149.38/aetherapi/docs` |
-| Health (version, mode, prices) | `http://34.156.149.38/aetherapi/api/v1/health` |
-| Real telemetry (uptime, volume, events) | `http://34.156.149.38/aetherapi/v1/telemetry` |
-| Dashboard | `http://34.156.149.38/aetherapi/dashboard/` |
+| Live API docs (OpenAPI/Swagger) | `https://34-156-149-38.sslip.io/aetherapi/docs` |
+| Health (version, mode, prices) | `https://34-156-149-38.sslip.io/aetherapi/api/v1/health` |
+| Real telemetry (uptime, volume, events) | `https://34-156-149-38.sslip.io/aetherapi/v1/telemetry` |
+| Dashboard | `https://34-156-149-38.sslip.io/aetherapi/dashboard/` |
 | Landing | https://wilnowilx.github.io/aetheriusxapi/ |
 
 ## HTTPS (for GitHub Pages → VM live calls)

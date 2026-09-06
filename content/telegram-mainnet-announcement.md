@@ -12,7 +12,7 @@ Building on Base just got easier.
 Built by a solo developer from Venezuela with $5 and a dream.
 
 Try it:
-• API: http://34.156.149.38/aetherapi/health
+• API: https://34-156-149-38.sslip.io/aetherapi/health
 • Dashboard: https://wilnowilx.github.io/aetheriusxapi/dashboard/
 • GitHub: https://github.com/wilnowilx/aetheriusxapi
 

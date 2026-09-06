@@ -8,7 +8,7 @@ I built AETHERIUS — an open-source AI agent API marketplace on Base with 64 en
 
 Think Stripe for AI agents, but crypto-native. Agents pay per-request, no accounts needed.
 
-🔗 Live API: http://34.156.149.38/aetherapi/
+🔗 Live API: https://34-156-149-38.sslip.io/aetherapi/
 🔗 GitHub: https://github.com/wilnowilx/aetheriusxapi
 🔗 Landing: https://wilnowilx.github.io/aetheriusxapi/
 🔗 Dashboard: https://wilnowilx.github.io/aetheriusxapi/dashboard/
@@ -29,7 +29,7 @@ Built something I think you'll find interesting: AETHERIUS — 64 API endpoints 
 
 Open source, MIT license. No accounts, no API keys for agents. Just pay and go.
 
-🔗 Live: http://34.156.149.38/aetherapi/
+🔗 Live: https://34-156-149-38.sslip.io/aetherapi/
 🔗 GitHub: https://github.com/wilnowilx/aetheriusxapi
 
 Applied to Batches 004 and Creator Grant. Running on testnet, need ~$5 to go live on mainnet.
@@ -46,7 +46,7 @@ Hey Coinbase team! 👋
 
 Built AETHERIUS — open-source AI agent API marketplace on Base with 64 endpoints and x402 USDC payments.
 
-🔗 Live API: http://34.156.149.38/aetherapi/
+🔗 Live API: https://34-156-149-38.sslip.io/aetherapi/
 🔗 GitHub: https://github.com/wilnowilx/aetheriusxapi
 
 Applied to Batches 004 and Creator Grant. Need ~$5 USDC to deploy fully on mainnet.

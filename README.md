@@ -113,7 +113,7 @@ timeline
 | **Sep 4** — 7th deploy | Interactive playground (live API testing), waitlist, Docker, JS SDK, grant submissions, YouTube demo, 60/60 tests | **t+55h** | `git log -1 --format=%H` |
 | **Sep 5** — 8th deploy | 64→80 endpoints (+16): crypto market, web tools, data utils, news, DeFi tools, NFT | **t+55h+** | `git log -1 --format=%H` |
 | **Sep 5** — 9th deploy | x402 Intelligence expanded to 20 FREE endpoints, mainnet live | **t+56h+** | `git log -1 --format=%H` |
-| **Sep 5** — 10th deploy | Mainnet deploy — real x402 USDC payments on Base Mainnet | **t+72h** | `curl http://34.156.149.38/aetherapi/health` |
+| **Sep 5** — 10th deploy | Mainnet deploy — real x402 USDC payments on Base Mainnet | **t+72h** | `curl https://34-156-149-38.sslip.io/aetherapi/health` |
 | **Sep 5** — 11th deploy | Purple heart favicon on all 3 sites, README v2.2, pitch deck link | **t+73h** | `git log --oneline` |
 | **Sep 6** — 12th deploy | Landing page polish (80 endpoints, uptime %, footer links), bot welcome handler, channel-only updates | **t+96h** | `git log --oneline` |
 | **Sep 6** — 13th deploy | Python SDK v2.0 — typed sub-clients for all 80 endpoints including 20 x402 Intelligence | **t+97h** | `pip install -e ./sdks/python` |
@@ -218,7 +218,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | Telemetry | `GET /v1/telemetry` (free): uptime, per-endpoint stats, settled USDC volume |
 | Playground | [`/`](https://wilnowilx.github.io/aetheriusxapi/) — interactive endpoint testing |
 | Dashboard | [`/dashboard/`](https://wilnowilx.github.io/aetheriusxapi/dashboard/) + backend bar |
-| Live API | `http://34.156.149.38/aetherapi` · TLS `https://34-156-149-38.sslip.io/aetherapi` |
+| Live API | `https://34-156-149-38.sslip.io/aetherapi` |
 | Version | v2.3.0 · 80 endpoints (60 paid + 20 free x402 Intelligence) · 60/60 tests green · Python SDK v2.0 |
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 mainnet USDC |
 
@@ -367,7 +367,7 @@ uvicorn main:app --reload --port 4020
 - **Storage Drift** — probes `/v1/storage/drift`, shows planned payload until Phase 2
 - **Activity** — client-side call log
 
-Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
+Live (mainnet): `https://wilnowilx.github.io/aetheriusxapi/#dashboard`
 
 ---
 
@@ -686,7 +686,7 @@ MIT License — see [LICENSE](LICENSE) for details.
 | **GitHub** | [wilnowilx/aetheriusxapi](https://github.com/wilnowilx/aetheriusxapi) |
 | **x402 Protocol** | [docs.x402.org](https://docs.x402.org) |
 | **Base** | [base.org](https://base.org) |
-| **Live API** | [http://34.156.149.38/aetherapi](http://34.156.149.38/aetherapi) |
+| **Live API** | [https://34-156-149-38.sslip.io/aetherapi](https://34-156-149-38.sslip.io/aetherapi) |
 | **Live API (TLS)** | [34-156-149-38.sslip.io](https://34-156-149-38.sslip.io/aetherapi) |
 
 ---
