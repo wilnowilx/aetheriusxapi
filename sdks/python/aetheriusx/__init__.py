@@ -1,5 +1,7 @@
-"""Python client for AetheriusX API."""
+"""AetheriusX Python SDK — 80 APIs where agents pay per request in USDC on Base."""
 
 from .client import AetheriusXClient
+from .catalog import Catalog
 
-__all__ = ["AetheriusXClient"]
+__version__ = "2.0.0"
+__all__ = ["AetheriusXClient", "Catalog"]

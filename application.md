@@ -13,7 +13,7 @@ Crypto-native API marketplace where **AI agents pay per request in USDC on Base 
 No accounts, no API keys, no credit cards — the wallet is the identity.
 
 **Live on Base Mainnet (not a deck — running code since Sep 5, 2026):**
-- 64 endpoints live: 60 paid + 4 FREE x402 Intelligence (on-chain analytics)
+- 80 endpoints live: 60 paid + 20 FREE x402 Intelligence (on-chain analytics)
 - 8 categories: Maps ×5, Crypto ×13, Web ×7, Data ×14, DeFi ×10, Forex ×3, News ×6, x402 Intelligence ×4
 - E2E proven: real USDC payments settling on Base Mainnet
 - Interactive dashboard with API explorer: `/dashboard/`
@@ -100,7 +100,7 @@ Python/JS/Go SDKs · 100 paying agent-wallets · public status page with uptime/
 ## Metrics (verifiable today)
 
 - **Network:** Base Mainnet (`eip155:8453`), wallet `0x677B…7f61`
-- **Live:** 64 endpoints (60 paid + 4 free x402 Intelligence)
+- **Live:** 80 endpoints (60 paid + 20 free x402 Intelligence)
 - **E2E:** real USDC payments settling on Base Mainnet
 - **Tests:** 60/60 green (`pytest -q`), incl. telemetry accounting tests
 - **Public telemetry:** `GET /v1/telemetry` (free) — uptime, per-endpoint stats,
@@ -108,5 +108,5 @@ Python/JS/Go SDKs · 100 paying agent-wallets · public status page with uptime/
 - **x402 Intelligence:** 4 FREE exclusive endpoints reading on-chain data
 - **Uptime:** systemd + auto-restart, Nginx reverse proxy
 - **Cost:** single GCP VM (Europe), full stack under $50/mo
-- **Build velocity:** 64 endpoints in 56 hours, solo builder, $5.80 ETH capital
+- **Build velocity:** 80 endpoints in 96 hours, solo builder, $5.80 ETH capital
 - **Honesty policy:** key-gated endpoints return 501 with setup instructions, never fake data

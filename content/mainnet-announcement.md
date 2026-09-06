@@ -4,7 +4,7 @@
 
 🔴 LIVE on Base Mainnet.
 
-aetheriusxAPI — 64 endpoints where AI agents pay per request in USDC via x402.
+aetheriusxAPI — 80 endpoints where AI agents pay per request in USDC via x402.
 
 No accounts. No API keys. Just code.
 
@@ -38,7 +38,7 @@ The journey:
 • May-Aug: Research, VM stabilization, x402 study
 • Sep 2: Repo born
 • Sep 3: 40 endpoints, real USDC mainnet
-• Sep 5: 64 endpoints, MAINNET DEPLOY 🚀
+• Sep 5: 80 endpoints, MAINNET DEPLOY 🚀
 
 Built solo, no funding, no team. Just code and persistence.
 
@@ -77,7 +77,7 @@ The infrastructure is ready. Now we need builders.
 
 🔴 LIVE: aetheriusxAPI on Base Mainnet
 
-64 endpoints. AI agents pay per request in USDC via x402.
+80 endpoints. AI agents pay per request in USDC via x402.
 
 Built by a Venezuelan dev with $5 and a dream.
 

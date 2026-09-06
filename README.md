@@ -7,7 +7,7 @@
 ![Endpoints](https://img.shields.io/badge/Endpoints-80-d946ef?style=for-the-badge&labelColor=09090b)
 ![Tests](https://img.shields.io/badge/Tests-60_passing-brightgreen?style=for-the-badge&labelColor=09090b)
 ![Dashboard](https://img.shields.io/badge/Dashboard-Live-ec4899?style=for-the-badge&labelColor=09090b)
-![SDK](https://img.shields.io/badge/Python_SDK-ready-3776AB?style=for-the-badge&labelColor=09090b)
+![SDK](https://img.shields.io/badge/Python_SDK_v2.0-ready-3776AB?style=for-the-badge&labelColor=09090b)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge&labelColor=09090b)
 ![YouTube](https://img.shields.io/badge/YouTube-Demo-red?style=for-the-badge&labelColor=09090b)
 ![Stars](https://img.shields.io/github/stars/wilnowilx/aetheriusxapi?style=for-the-badge&labelColor=09090b&color=8B5CF6)
@@ -68,7 +68,7 @@
 
 <div align="center">
 
-![Days](https://img.shields.io/badge/🕐_days_since_repo_born-3-blueviolet?style=for-the-badge&labelColor=09090b&cacheSeconds=3600)
+![Days](https://img.shields.io/badge/🕐_days_since_repo_born-4-blueviolet?style=for-the-badge&labelColor=09090b&cacheSeconds=3600)
 
 > **Repo born:** Sep 2, 2026 — `3a6aeb6` "Initial commit"
 > **Mainnet deploy:** Sep 5, 2026 — Real x402 payments on Base Mainnet 🚀
@@ -85,13 +85,20 @@
 
 ```mermaid
 timeline
-    title AETHERIUS journey (repo Sep 2026, project ~4 months earlier)
+    title AETHERIUS journey (Sep 2-6, 2026 — 4 days)
     Research : x402 study : market mapping : VM stabilization
     Sep 2 : Repo born : landing + docs : Python SDK : persistent telemetry
-    Sep 3 : Backend v2 + dashboard + HTTPS : 40 endpoints : JS SDK : demo + player
-    Sep 5 : 64 endpoints : crypto, web, data, news, defi, token categories
-    Sep 5 : x402 Intelligence : 4 exclusive FREE endpoints : on-chain analytics
-    Sep 4 : Player v2 + wiki tooltips : Dashboard catalog fix : README rewrite
+    Sep 2+47min : Backend v2.0 : 40 endpoints : real USDC on Base
+    Sep 3 : Dashboard + HTTPS : 60 endpoints : JS SDK : demo player : 10 tutorials
+    Sep 3 : README brutal : release v2.0.0 : player v2 : wiki tooltips
+    Sep 4 : Interactive playground : Docker : YouTube demo : 60 tests passing
+    Sep 5 : Mainnet deploy : real x402 payments on Base Mainnet
+    Sep 5 : x402 Intelligence : 4 exclusive FREE on-chain analytics endpoints
+    Sep 5 : 80 endpoints : crypto, web, data, news, defi, token, maps
+    Sep 5 : x402 Intelligence expanded to 20 FREE endpoints
+    Sep 5 : Favicon : purple heart on all 3 sites
+    Sep 6 : SDK v2.0 : typed sub-clients for all 20 x402 Intelligence endpoints
+    Sep 6 : Bot welcome handler : channel-only updates : landing page polish
 ```
 
 | Phase | Work | Time | Verify |
@@ -99,18 +106,22 @@ timeline
 | May–Aug 2026 | Research, x402 study, VM stabilization — an idea this size needs study before it can be visualized | ~4 months | workspace history |
 | **Sep 2** — 1st deploy | Repo born, landing page, docs, Python SDK, persistent SQLite telemetry | **t+0 min** | `git log --oneline 3a6aeb6` |
 | **Sep 2** — 2nd deploy | Backend v2.0, 40 endpoints, real USDC on Base Mainnet, 5-source price chain | **t+47 min** | `git log --oneline --since="2026-09-02" --until="2026-09-03"` |
-| **Sep 5** — 8th deploy | 64 endpoints (+24): crypto market, web tools, data utils, news, DeFi tools, NFT | **t+55h+** | `git log -1 --format=%H` |
-| **Sep 5** — 9th deploy | x402 Intelligence: 4 exclusive FREE on-chain analytics endpoints, mainnet live | **t+56h+** | `git log -1 --format=%H` |
 | **Sep 3** — 3rd deploy | Dashboard OS mode, HTTPS (Let's Encrypt), CORS, JS SDK, 60/60 tests | **t+18h 23min** | `git log --oneline --since="2026-09-03"` |
 | **Sep 3** — 4th deploy | Demo player, cast replay, typewriter, 10+ tutorials EN/ES | **t+22h 41min** | same |
 | **Sep 3** — 5th deploy | README brutal (7 SVG diagrams), release v2.0.0, 15 GitHub topics | **t+23h 15min** | `git tag -l` |
 | **Sep 3** — 6th deploy | Player v2 (wiki tooltips, SVG icons, right-aligned), dashboard catalog fix | **t+48h 06min** | `git log -1 --format=%H` |
 | **Sep 4** — 7th deploy | Interactive playground (live API testing), waitlist, Docker, JS SDK, grant submissions, YouTube demo, 60/60 tests | **t+55h** | `git log -1 --format=%H` |
+| **Sep 5** — 8th deploy | 64→80 endpoints (+16): crypto market, web tools, data utils, news, DeFi tools, NFT | **t+55h+** | `git log -1 --format=%H` |
+| **Sep 5** — 9th deploy | x402 Intelligence expanded to 20 FREE endpoints, mainnet live | **t+56h+** | `git log -1 --format=%H` |
+| **Sep 5** — 10th deploy | Mainnet deploy — real x402 USDC payments on Base Mainnet | **t+72h** | `curl http://34.156.149.38/aetherapi/health` |
+| **Sep 5** — 11th deploy | Purple heart favicon on all 3 sites, README v2.2, pitch deck link | **t+73h** | `git log --oneline` |
+| **Sep 6** — 12th deploy | Landing page polish (80 endpoints, uptime %, footer links), bot welcome handler, channel-only updates | **t+96h** | `git log --oneline` |
+| **Sep 6** — 13th deploy | Python SDK v2.0 — typed sub-clients for all 80 endpoints including 20 x402 Intelligence | **t+97h** | `pip install -e ./sdks/python` |
 
-**Total commits:** 100+ and counting (`git log --oneline | wc -l` — velocity is public).
+**Total commits:** 130+ and counting (`git log --oneline | wc -l` — velocity is public).
 
-**Build velocity:** 80 endpoints (60 paid + 20 free x402 Intelligence) + 60 tests + 2 SDKs + dashboard + landing + playground + demo + 2 grant submissions in **56 hours**.
-If one person builds this in 55 hours, imagine what funded builders ship on Base.
+**Build velocity:** 80 endpoints (60 paid + 20 free x402 Intelligence) + 60 tests + 2 SDKs (v2.0) + dashboard + landing + playground + demo + 2 grant submissions + Telegram bot + GitHub Actions in **4 days**.
+If one person builds this in 96 hours, imagine what funded builders ship on Base.
 
 ---
 
@@ -154,7 +165,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 **Mission:** Become the default API layer for autonomous agents — the Stripe of the agent economy.
 
 **Strategy:**
-1. **Live now:** 8 categories, 80 endpoints (60 paid + 20 free x402 Intelligence) verified with real USDC on Base Mainnet
+1. **Live now:** 11 categories, 80 endpoints (60 paid + 20 free x402 Intelligence) verified with real USDC on Base Mainnet
 2. **Next:** expand depth per category + more on-chain analytics
 3. **Scale** to 120+ with grant funding, then 500+
 4. **Become** the infrastructure that AI agents depend on
@@ -208,7 +219,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | Playground | [`/`](https://wilnowilx.github.io/aetheriusxapi/) — interactive endpoint testing |
 | Dashboard | [`/dashboard/`](https://wilnowilx.github.io/aetheriusxapi/dashboard/) + backend bar |
 | Live API | `http://34.156.149.38/aetherapi` · TLS `https://34-156-149-38.sslip.io/aetherapi` |
-| Version | v2.2.0 · 80 endpoints (60 paid + 20 free x402 Intelligence) · 60/60 tests green |
+| Version | v2.3.0 · 80 endpoints (60 paid + 20 free x402 Intelligence) · 60/60 tests green · Python SDK v2.0 |
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 mainnet USDC |
 
 🚀 **Sep 5, 2026:** Deployed to Base Mainnet! Real USDC payments now live.
@@ -231,7 +242,7 @@ The replay shows the full x402 loop — discovery, payment challenge, settlement
 
 ## 🐍 SDKs
 
-### Python (`sdks/python/`)
+### Python (`sdks/python/`) — v2.0
 
 ```bash
 pip install -e ./sdks/python
@@ -240,15 +251,30 @@ pip install -e ./sdks/python
 ```python
 from aetheriusx import AetheriusXClient
 
-with AetheriusXClient() as client:  # default: http://127.0.0.1:4020
-    print(client.health()["version"])
-    route, price = client.discover_cheapest()  # cheapest paid endpoint
-    res = client.paid_get(route, {"email": "user@example.com"}, payment="anything")
-    print(res.status_code, res.json())
-```
+# Connects to mainnet by default
+client = AetheriusXClient()
 
-`payment` is caller-supplied: any string works in local simulated mode,
-live mainnet needs a real x402 USDC proof. The client never touches private keys.
+# ── FREE x402 Intelligence (20 endpoints, no payment needed) ──────────
+
+stats = client.x402.base_stats()       # Chain health snapshot
+gas = client.x402.gas()                 # Gas price analysis
+whales = client.x402.whales()           # Large transfers (>$10K)
+top = client.x402.top_agents()          # Top USDC spenders
+risk = client.x402.risk("0x677B...")    # Wallet risk score (0-100)
+history = client.x402.history("0x...")  # Transfer history
+
+# ── Paid endpoints (auto-handles 402 challenge) ───────────────────────
+
+weather = client.data.weather(lat=10.5, lon=-66.9)
+price = client.token.price(token="bitcoin")
+email_ok = client.email.validate(email="user@example.com")
+
+# ── Catalog browsing ──────────────────────────────────────────────────
+
+print(client.catalog.summary())           # Full catalog
+cheapest = client.discover_cheapest()     # (route, price)
+free = client.discover_free()             # All 20 free routes
+```
 
 ### JavaScript (`sdks/javascript/`)
 
@@ -259,7 +285,7 @@ npm install aetheriusx
 ```javascript
 import { AetheriusXClient } from "aetheriusx";
 
-const client = new AetheriusXClient(); // default: http://127.0.0.1:4020
+const client = new AetheriusXClient();
 const health = await client.health();
 console.log(health.version);
 
@@ -278,22 +304,22 @@ Runnable flows: [`examples/`](examples/)
 
 ```bash
 # Install the SDK
-pip install aetheriusx
+pip install -e ./sdks/python
 ```
 
 ```python
-from aetheriusx import Client
+from aetheriusx import AetheriusXClient
 
-# Initialize with your wallet
-client = Client("0xYourWalletAddress")
+# Connects to mainnet by default
+client = AetheriusXClient()
 
-# Call any API — payment is automatic
-response = client.get("/v1/crypto/price",
-    params={"token": "ETH"})
+# Free x402 Intelligence — no payment needed
+stats = client.x402.base_stats()
+print(stats)
 
-print(response.data)
-# {"price": 2384.50, "change": 2.3}
-# That's it. Payment handled via x402.
+# Paid endpoint — auto-handles 402 challenge
+weather = client.data.weather(lat=10.5, lon=-66.9)
+print(weather)
 ```
 
 ### For API Providers (Sellers)
@@ -334,7 +360,7 @@ uvicorn main:app --reload --port 4020
 # open http://127.0.0.1:4020/dashboard/
 ```
 
-- **API Catalog** — all 64 endpoints with live prices from `/health`
+- **API Catalog** — all 80 endpoints with live prices from `/health`
 - **Explorer** — param forms, one-click paid calls, `Show 402` renders the payment challenge
 - **Live Metrics** — REAL server telemetry (`/v1/telemetry`): uptime, totals, settled USDC volume, wallets seen, latency bars, event feed. Zero simulated numbers.
 - **Wallet** — memory-only demo connect (real x402 signing in production client)
@@ -415,7 +441,7 @@ Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 | `GET /v1/x402/analytics` | Network health & trends | FREE | ~3s |
 | `GET /v1/x402/top-agents` | Top spenders leaderboard | FREE | ~3s |
 
-> **Note:** 64 paid endpoints + 4 FREE x402 Intelligence endpoints = **68 total**. With grant funding, we'll expand to **120+ endpoints across 12 categories.**
+> **60 paid endpoints + 20 FREE x402 Intelligence endpoints = 80 total.** With grant funding, we'll expand to **120+ endpoints across 12 categories.**
 
 ---
 
@@ -473,15 +499,17 @@ Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 
 | Category | APIs | Examples |
 |----------|------|----------|
-| **Maps & Location** | 5 | Geocoding, business search, nearby places, reverse geocode |
-| **Crypto & Tokens** | 13 | Price feeds, token analysis, holder tracking, gas oracle, market data, Fear & Greed, OHLCV, dominance, NFT metadata |
-| **Web & Scraping** | 7 | Web scraper, screenshots, DNS, IP geolocation, WHOIS, headers, SSL |
-| **Email & Data** | 14 | Email validation, weather, forecasts, definitions, elevation, hash, UUID, QR code, translate, summarize |
-| **DeFi & Finance** | 10 | Yields, TVL, stablecoins, DEX volumes, protocol fees, impermanent loss, staking APY |
+| **Maps & Location** | 5 | Geocoding, business search, nearby places, reverse geocode, place lookup |
+| **Token & Crypto** | 13 | Price feeds, token analysis, holder tracking, gas oracle, balance, tx history, NFT metadata, global stats |
+| **Web** | 7 | Web scraper, screenshots, DNS, WHOIS, headers, SSL, IP geolocation |
+| **Data** | 12 | Weather, forecasts, air quality, definitions, elevation, words, IP, User-Agent, hash, UUID, QR code, translate, summarize |
+| **Email** | 1 | Email validation (syntax, MX, disposable check) |
+| **DeFi** | 10 | Yields, TVL, stablecoins, DEX volumes, protocol fees, impermanent loss, staking APY |
 | **Forex** | 3 | Live rates, historical data, currency conversion |
-| **News & Media** | 6 | Hacker News, Reddit, Dev.to |
-| **Storage & infra** | 2 | Cross-RPC drift, on-chain verification |
-| **x402 Intelligence** | 20 | USDC payments, agent wallets, network analytics, whales, gas, DeFi, stablecoins, risk scores (ALL FREE) |
+| **News** | 6 | Hacker News (stories, items, users, feeds), Reddit, Dev.to |
+| **Storage** | 1 | Cross-RPC slot drift |
+| **Crypto** | 5 | Market data, Fear & Greed, trending coins, OHLCV, dominance |
+| **x402 Intelligence** | 20 | USDC transfers, agent wallets, network analytics, whales, gas, DeFi pulse, stablecoins, risk scores (ALL FREE) |
 
 ---
 
@@ -522,7 +550,11 @@ Live (mainnet): `http://34.156.149.38/aetherapi/dashboard/`
 - [x] Waitlist with email + wallet capture
 - [x] Dockerfile + docker-compose for local dev
 - [x] **Mainnet deployment** ✅ Live on Base Mainnet since Sep 5, 2026
-- [x] x402 Intelligence: 4 exclusive FREE on-chain analytics endpoints
+- [x] x402 Intelligence: 20 FREE on-chain analytics endpoints (Core, Chain, Activity, Wallet, Market)
+- [x] Python SDK v2.0 with typed sub-clients for all 80 endpoints
+- [x] Purple heart favicon on all 3 sites
+- [x] Landing page polish (80 endpoints, uptime %, fixed timeline)
+- [x] Telegram bot: welcome handler, channel-only updates
 - [ ] Base Ecosystem Fund application
 
 ### Phase 2: Scale (Post-Grant)

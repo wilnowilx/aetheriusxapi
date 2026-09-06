@@ -49,7 +49,7 @@ python content/telegram_bot_runner.py
 | `/start` | Welcome message |
 | `/help` | List all commands |
 | `/status` | System status |
-| `/apis` | List 40 endpoints |
+| `/apis` | List 80 endpoints |
 | `/x402` | How x402 works |
 | `/price` | Endpoint prices |
 | `/grant` | Grant status |

@@ -107,21 +107,21 @@ KNOWLEDGE_BASE = {
 RESPONSES = {
     "greeting": [
         "Hey! 🚀 I'm AETHERIUS — the brain behind the agent economy. What do you want to know?",
-        "Welcome to AETHERIUS! 🧠 40 APIs live on Base. Ask me anything.",
+        "Welcome to AETHERIUS! 🧠 80 APIs live on Base Mainnet. Ask me anything.",
         "Hey builder! 👋 I'm AETHERIUS. Ready to explore the agent economy?",
         "What's up! 🚀 I'm AETHERIUS — infrastructure for agents that pay. What can I help with?"
     ],
     "status": [
         "📊 AETHERIUS Status:\n\n🟢 Network: Base Sepolia\n🔌 Endpoints: 40 live\n🧪 Tests: 60/60 green\n💰 Currency: USDC on Base\n⏱️ Uptime: 99.9%\n\nAll systems operational. The agent economy is running.",
-        "🟢 AETHERIUS is LIVE.\n\n40 APIs. 60 tests. 2 SDKs. All green.\nThe infrastructure for agents that pay is operational."
+        "🟢 AETHERIUS is LIVE.\n\n80 APIs. 60 tests. 2 SDKs. All green.\nThe infrastructure for agents that pay is operational."
     ],
     "what_is": [
         "AETHERIUS is the operating system for AI agent commerce.\n\n🤖 AI agents discover APIs\n💳 They pay per request in USDC on Base\n📊 Results delivered instantly\n\nNo accounts. No subscriptions. No human friction. Just code.\n\nThink Stripe, but for AI agents.",
-        "We're building infrastructure for autonomous AI agents to pay for services.\n\n40 APIs live. x402 protocol. USDC on Base.\nThe future of machine-to-machine commerce."
+        "We're building infrastructure for autonomous AI agents to pay for services.\n\n80 APIs live. x402 protocol. USDC on Base.\nThe future of machine-to-machine commerce."
     ],
     "endpoints": [
         "🔌 40 Live Endpoints:\n\n🗺️ Maps (5): geocoding, search, reviews\n💰 Crypto (8): prices, analysis, gas\n🌐 Web (4): scraping, screenshots\n📧 Data (6): weather, forecasts, definitions\n📈 DeFi (8): yields, TVL, protocols\n💱 Forex (3): rates, conversion\n📰 News (4): Hacker News feed\n🏗️ Infra (2): drift, elevation\n\nAll payable in USDC on Base.",
-        "We have 40 APIs across 8 categories.\n\nFrom maps to crypto, DeFi to news.\nAll accessible via x402 payment protocol.\n\nTry the playground: wilnowilx.github.io/aetheriusxapi"
+        "We have 80 APIs across 11 categories.\n\nFrom maps to crypto, DeFi to news.\nAll accessible via x402 payment protocol.\n\nTry the playground: wilnowilx.github.io/aetheriusxapi"
     ],
     "x402": [
         "x402 is the payment protocol for AI agents.\n\nHow it works:\n1️⃣ Agent calls API\n2️⃣ API says: '402 — pay $0.01'\n3️⃣ Agent signs USDC payment\n4️⃣ API verifies on-chain\n5️⃣ Agent gets data\n\nTotal time: ~200ms\n\nNo accounts. No subscriptions. Just crypto.",
@@ -136,7 +136,7 @@ RESPONSES = {
         "We've applied to Base grants:\n\n• Batches 004: $100K + accelerator\n• Creator Grant: $4K\n\nResult Sep 17. Building in the meantime."
     ],
     "vision": [
-        "🎯 The Vision:\n\n2026: AI agents learn to pay\n2027: The agent economy explodes\n\nAETHERIUS is building the infrastructure layer.\n\n40 APIs today. 120+ tomorrow.\n500M+ Spanish-speaking developers included.",
+        "🎯 The Vision:\n\n2026: AI agents learn to pay\n2027: The agent economy explodes\n\nAETHERIUS is building the infrastructure layer.\n\n80 APIs today. 120+ tomorrow.\n500M+ Spanish-speaking developers included.",
         "We're building the Stripe of the agent economy.\n\nAutonomous AI agents discover, pay for, and consume APIs.\nNo human friction. Just code and crypto."
     ],
     "help": [
@@ -152,7 +152,7 @@ RESPONSES = {
     ],
     "twitter": [
         "🐦 Follow us:\n\n@aetheriusxAPI\n\nBuild updates, milestones, and the agent economy vision.\n\nLet's build the future together.",
-        "Stay updated:\n\n@aetheriusxAPI on Twitter\n\n40 APIs. Real USDC. Open-source. Solo builder."
+        "Stay updated:\n\n@aetheriusxAPI on Twitter\n\n80 APIs. Real USDC. Open-source. Solo builder."
     ],
     "thanks": [
         "You're welcome! 🚀 Happy building.",
@@ -160,7 +160,7 @@ RESPONSES = {
         "That's what I'm here for! 🧠"
     ],
     "default": [
-        "Interesting question! 🤔 I'm AETHERIUS — the infrastructure for agents that pay. Ask me about:\n\n• Our 40 APIs\n• x402 protocol\n• Base grants\n• The agent economy vision\n\nOr try /help for commands.",
+        "Interesting question! 🤔 I'm AETHERIUS — the infrastructure for agents that pay. Ask me about:\n\n• Our 80 APIs\n• x402 protocol\n• Base grants\n• The agent economy vision\n\nOr try /help for commands.",
         "I'm not sure I understand, but I'm AETHERIUS — the brain behind the agent economy. Ask me about our APIs, x402, or our vision!",
         "Hmm, let me think about that... 🧠\n\nI'm best at talking about AETHERIUS, x402, and the agent economy. Try /help for commands!"
     ]
@@ -180,7 +180,7 @@ MEMES = [
         "tags": "#x402 #AIAgents"
     },
     {
-        "template": "Average crypto project: \"Trust us, our token will moon\"\n\nAETHERIUS: *40 APIs live, 60 tests green, real USDC payments*\n\nShow, don't tell. 🚀",
+        "template": "Average crypto project: \"Trust us, our token will moon\"\n\nAETHERIUS: *80 APIs live, 60 tests green, real USDC payments*\n\nShow, don't tell. 🚀",
         "tags": "#BuildOnBase #RealDev"
     },
     {
@@ -196,7 +196,7 @@ MEMES = [
         "tags": "#AIAgents #x402"
     },
     {
-        "template": "Developer Monday morning:\n- Coffee: ✅\n- AETHERIUS dashboard: ✅\n- 40 APIs ready: ✅\n- Agents paying in USDC: ✅\n\nThe agent economy doesn't sleep. Neither do we. 🔥",
+        "template": "Developer Monday morning:\n- Coffee: ✅\n- AETHERIUS dashboard: ✅\n- 80 APIs ready: ✅\n- Agents paying in USDC: ✅\n\nThe agent economy doesn't sleep. Neither do we. 🔥",
         "tags": "#MondayMotivation #BuildOnBase"
     },
     {
@@ -216,7 +216,7 @@ MEMES = [
         "tags": "#DevHumor #x402"
     },
     {
-        "template": "Elon: \"I'll buy Twitter for $44B\"\n\nWilmer: \"I'll build an agent economy for $0 and a laptop\"\n\nAETHERIUS: 40 APIs. Real USDC. Open-source. Solo builder. 🔥",
+        "template": "Elon: \"I'll buy Twitter for $44B\"\n\nWilmer: \"I'll build an agent economy for $0 and a laptop\"\n\nAETHERIUS: 80 APIs. Real USDC. Open-source. Solo builder. 🔥",
         "tags": "#SoloBuilder #AETHERIUS"
     },
     {
@@ -248,7 +248,7 @@ MEMES = [
         "tags": "#CryptoEvolution #x402"
     },
     {
-        "template": "When someone asks \"What's your business model?\":\n\nAETHERIUS: *40 APIs × $0.01 average × millions of agent calls*\n\nThe math is simple.\nThe infrastructure is real.\nThe agent economy is here. 💰",
+        "template": "When someone asks \"What's your business model?\":\n\nAETHERIUS: *80 APIs × $0.01 average × millions of agent calls*\n\nThe math is simple.\nThe infrastructure is real.\nThe agent economy is here. 💰",
         "tags": "#Startup #x402"
     }
 ]
@@ -469,7 +469,7 @@ ALPHA_DROPS = [
     },
     {
         "category": "🚀 Solo Builder Advantage",
-        "insight": "Solo builders can move 10x faster than teams. AETHERIUS proves this — 40 APIs, 2 SDKs, dashboard, all built by one person. The agent economy rewards speed.",
+        "insight": "Solo builders can move 10x faster than teams. AETHERIUS proves this — 80 APIs, 2 SDKs, dashboard, all built by one person. The agent economy rewards speed.",
         "signal": "BULLISH"
     },
     {
@@ -501,7 +501,7 @@ HYPE_LEVELS = {
     ]},
     2: {"name": "Picking Up Speed! 🚄", "messages": [
         "We're moving! Agent economy loading...",
-        "40 APIs and counting! The train is rolling!",
+        "80 APIs and counting! The train is rolling!",
         "Community energy rising! Keep building!"
     ]},
     3: {"name": "Full Speed! 🚅", "messages": [
@@ -866,7 +866,7 @@ class ContentGenerator:
                 "templates": [
                     "🚀 {milestone}! {detail}\n\nTotal: {total}\n\n#AETHERIUS #Base #x402",
                     "🎉 {milestone}!\n\n{detail}\n\nThe agent economy grows.\n\n#BuildOnBase",
-                    "⚡ {milestone}\n\n{detail}\n\n40 APIs. Real USDC. Open-source.\n\n#x402 #Crypto"
+                    "⚡ {milestone}\n\n{detail}\n\n80 APIs. Real USDC. Open-source.\n\n#x402 #Crypto"
                 ]
             },
             {
@@ -900,8 +900,8 @@ class ContentGenerator:
 
     def _generate_default_post(self) -> str:
         defaults = [
-            "🚀 AETHERIUS: Building the agent economy.\n\n40 APIs live on Base.\nReal USDC. Open-source.\n\nLet's build the future.\n\n#x402 #Base",
-            "🧠 The agent economy is here.\n\nAETHERIUS: Infrastructure for agents that pay.\n\n40 APIs. 60 tests. All green.\n\n#AIAgents #x402",
+            "🚀 AETHERIUS: Building the agent economy.\n\n80 APIs live on Base.\nReal USDC. Open-source.\n\nLet's build the future.\n\n#x402 #Base",
+            "🧠 The agent economy is here.\n\nAETHERIUS: Infrastructure for agents that pay.\n\n80 APIs. 60 tests. All green.\n\n#AIAgents #x402",
             "⚡ Machine-to-machine commerce.\n\nAI agents pay per request in USDC.\nNo accounts. No subscriptions.\n\nThat's AETHERIUS.\n\n#x402 #Crypto"
         ]
         return random.choice(defaults)
@@ -922,10 +922,10 @@ class ContentGenerator:
             return self.generate_post("milestone", {
                 "milestone": "40 Live Endpoints",
                 "detail": "Maps, Crypto, Web, Data, DeFi, Forex, News, Infra\nAll payable in USDC on Base",
-                "total": "40 APIs · 60 tests · 2 SDKs"
+                "total": "80 APIs · 60 tests · 2 SDKs"
             })
         elif day == 5:
-            return "📊 Weekly recap:\n\n✅ 40 APIs live\n✅ 60 tests green\n✅ 2 SDKs ready\n✅ Dashboard operational\n✅ Grants applied\n\nVelocity is public. Check the git log.\n\n#BuildOnBase"
+            return "📊 Weekly recap:\n\n✅ 80 APIs live\n✅ 60 tests green\n✅ 2 SDKs ready\n✅ Dashboard operational\n✅ Grants applied\n\nVelocity is public. Check the git log.\n\n#BuildOnBase"
         elif day == 6:
             return "🎮 Fun fact:\n\nThe HTTP 402 status code was created in 1997 for this exact purpose.\n\nIt took 29 years for crypto to catch up.\n\nx402 makes HTTP 402 actually work.\n\n#History #x402"
         else:
@@ -1271,9 +1271,9 @@ class AetheriusBrain:
     def _handle_generate_post(self, args: List[str], user_id: str = "") -> str:
         post_type = args[0] if args else "vision"
         context = {
-            "milestone": "40 APIs live",
+            "milestone": "80 APIs live",
             "detail": "Real USDC on Base. Open-source. Solo builder.",
-            "total": "40 APIs · 60 tests",
+                "total": "80 APIs · 60 tests",
             "fact": "x402 uses HTTP 402 for crypto payments. Agent pays → Agent gets data.",
             "vision": "A world where AI agents pay for services autonomously."
         }
@@ -1282,7 +1282,7 @@ class AetheriusBrain:
 
     def _handle_learn(self, args: List[str], user_id: str = "") -> str:
         if not args:
-            return "Usage: /learn [fact]\n\nExample: /learn AETHERIUS has 40 endpoints"
+            return "Usage: /learn [fact]\n\nExample: /learn AETHERIUS has 80 endpoints"
         fact = " ".join(args)
         if self.memory.learn_fact(fact):
             self.mood.boost(0.15)

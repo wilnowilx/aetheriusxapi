@@ -2,7 +2,7 @@
 
 Building on Base just got easier.
 
-64 endpoints where AI agents pay per request in USDC via x402 protocol.
+80 endpoints where AI agents pay per request in USDC via x402 protocol.
 
 ✅ No accounts
 ✅ No API keys  

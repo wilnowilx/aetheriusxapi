@@ -132,7 +132,7 @@ var wiki = document.getElementById('wiki');
 var autoWikiVisible = false;
 var WIKI = {
   hook:     {k:'HOOK',       t:'Why x402 matters',         d:'AI agents can\'t hold credit cards. x402 lets them pay per API call in USDC — no accounts, no invoices, no humans in the loop. This is the fundamental problem AETHERIUS solves.'},
-  discovery:{k:'DISCOVERY',  t:'SDK discovers live APIs',   d:'The AETHERIUS SDK queries the service catalog in real-time. It shows all 40 endpoints, pricing, and chain info. Agents don\'t need hardcoded URLs — they discover what\'s available.'},
+  discovery:{k:'DISCOVERY',  t:'SDK discovers live APIs',   d:'The AETHERIUS SDK queries the service catalog in real-time. It shows all 80 endpoints, pricing, and chain info. Agents don\'t need hardcoded URLs — they discover what\'s available.'},
   challenge:{k:'CHALLENGE',  t:'402 — Payment required',    d:'HTTP 402 is the "Payment Required" status. Without a valid x402 payment proof in the headers, the API refuses to respond. This is enforcement — not a suggestion.'},
   settle:   {k:'SETTLEMENT', t:'Real USDC moves on-chain',  d:'The agent\'s wallet pays USDC directly to the service wallet on Base Sepolia. The transaction is verifiable on-chain. The balance change is the proof.'},
   proof:    {k:'PROOF',      t:'Balance delta = proof',      d:'Before: 20.0 USDC. After: 20.0 USDC (spent: $0.0000 with volume discount). The tiny deduction IS the cryptographic proof that real money moved. No simulation.'},
