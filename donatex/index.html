@@ -82,11 +82,13 @@ nav.scrolled{padding:12px 40px;background:rgba(9,9,11,.95)}
 .term-controls button.ghost{background:transparent;border:1px solid rgba(255,255,255,.2)}
 
 /* === WIKI TOOLTIPS === */
-.wiki{position:fixed;z-index:9999;max-width:360px;min-width:240px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.55;color:var(--text);box-shadow:0 12px 48px rgba(0,0,0,.6),0 0 24px rgba(168,85,247,.15);pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .35s,transform .35s}
-.wiki.show{opacity:1;transform:translateY(0)}
+.wiki{position:fixed;z-index:9999;max-width:380px;min-width:260px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.55;color:var(--text);box-shadow:0 12px 48px rgba(0,0,0,.6),0 0 24px rgba(168,85,247,.15);pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .25s,transform .25s}
+.wiki.show{opacity:1;transform:translateY(0);pointer-events:auto}
 .wiki .wk{color:var(--purple);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
-.wiki .wt{font-weight:600;margin-bottom:4px}
-.wiki .wd{color:var(--sec)}
+.wiki .wt{font-weight:600;margin-bottom:6px;font-size:14px}
+.wiki .wd{color:var(--sec);font-size:13px;line-height:1.6}
+.wiki .wd code{background:rgba(168,85,247,.12);color:var(--purple);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12px}
+.wiki .wd strong{color:var(--text);font-weight:600}
 
 /* === FEATURES === */
 .features{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:60px 20px;scroll-snap-align:start}
@@ -362,7 +364,7 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
 // ═══════════════════════════════════════════════════
-// TERMINAL REPLAYER (from AETHERIUS player.html)
+// TERMINAL REPLAYER + INTERACTIVE WIKI
 // ═══════════════════════════════════════════════════
 (function(){
 var term = document.getElementById('term');
@@ -371,27 +373,109 @@ var btnPlay = document.getElementById('btnPlay');
 var btnReplay = document.getElementById('btnReplay');
 var wiki = document.getElementById('wiki');
 
+// Rich wiki content with HTML support
 var WIKI = {
-  setup:   {k:'SETUP',    t:'One file, 3KB',             d:'No npm, no build, no framework. Copy widget.js into your project and add a script tag. That\'s the entire installation. Works with any static site or framework.'},
-  config:  {k:'CONFIG',   t:'Your wallet address',       d:'The data-wallet attribute sets where USDC donations arrive. Use any Base wallet address. No account creation, no KYC, no bank. Just paste your 0x address.'},
-  qr:      {k:'QR CODE',  t:'Mobile-first donations',    d:'The widget generates a QR code using the Base EIP-681 URI standard. Any mobile wallet that scans it knows it\'s a USDC transfer on Base. Works with Coinbase Wallet, Rainbow, and more.'},
-  wallet:  {k:'WALLET',   t:'One-click MetaMask',        d:'Supporters click "Connect Wallet" → MetaMask pops up → confirm → done. The widget handles chain switching to Base and builds the USDC transfer calldata automatically.'},
-  tx:      {k:'TRANSFER', t:'ERC-20 USDC transfer',      d:'The widget builds the transfer(address,uint256) calldata directly. No web3.js, no ethers.js — just raw JSON-RPC to window.ethereum. Gas costs ~$0.001 on Base.'},
-  confirm: {k:'CONFIRM',  t:'On-chain verification',     d:'The widget polls eth_getTransactionReceipt until status=0x1. Once confirmed, the donation is irreversible and permanently verifiable on BaseScan. No middleman.'},
-  verify:  {k:'VERIFY',   t:'Public transparency',       d:'Every donation can be verified via the /donatex/api/verify endpoint or directly on BaseScan. Build trust badges, leaderboards, or dashboards — all from public data.'},
-  deploy:  {k:'DEPLOY',   t:'Works anywhere',            d:'GitHub Pages, Vercel, Netlify, your own server — if it serves HTML, DonateX works. No server-side code needed. No accounts to manage.'},
-  live:    {k:'LIVE API', t:'Real verification',         d:'This calls the live DonateX verification API on Base Mainnet. The response is real — no simulation. You can try it yourself right now.'}
+  setup: {
+    k:'SETUP', t:'One file · 3KB · Zero dependencies',
+    d:'Copy <code>widget.js</code> into your project. No npm, no build, no framework. It\'s a single vanilla JS file that works with any static site, React, Vue, Next.js, or plain HTML.',
+    code:'curl -O widget.js',
+    link:{text:'View on GitHub', url:'https://github.com/wilnowilx/aetheriusxapi/tree/main/donatex'},
+    tags:['vanilla-js','3kb','zero-deps']
+  },
+  config: {
+    k:'CONFIG', t:'Your wallet address',
+    d:'Set <code>data-wallet="0xYOUR_ADDRESS"</code> in the script tag. That\'s the only required attribute. Donations arrive directly to this address on Base Mainnet. No intermediaries.',
+    code:'data-wallet="0x677B...7f61"',
+    tags:['base-mainnet','no-kyc','direct']
+  },
+  amounts: {
+    k:'PRESETS', t:'Customizable donation tiers',
+    d:'The <code>data-amounts</code> attribute defines preset buttons. Default: 1,5,10,25 USDC. Donors can also type any custom amount. All values are in USDC (1:1 with USD).',
+    code:'data-amounts="1,5,10,25,50,100"',
+    tags:['usdc','custom-amount','flexible']
+  },
+  qr: {
+    k:'QR CODE', t:'Mobile-first donations',
+    d:'Generates a QR code using <strong>EIP-681 URI standard</strong>. Any mobile wallet that scans it (Coinbase Wallet, Rainbow, Trust Wallet) recognizes it as a USDC transfer on Base.',
+    tags:['eip-681','mobile','coinbase-wallet']
+  },
+  wallet: {
+    k:'WALLET', t:'One-click MetaMask connect',
+    d:'Supporters click → MetaMask pops up → confirm → done. The widget handles <strong>chain switching to Base</strong> automatically. If they\'re on Ethereum, it prompts to switch.',
+    tags:['metamask','chain-switch','one-click']
+  },
+  tx: {
+    k:'TRANSFER', t:'ERC-20 USDC transfer',
+    d:'Builds <code>transfer(address,uint256)</code> calldata directly. No web3.js, no ethers.js. Just raw <strong>JSON-RPC to window.ethereum</strong>. Gas on Base: ~$0.001.',
+    code:'eth_sendTransaction → USDC.transfer()',
+    tags:['erc-20','raw-rpc','gas-optimized']
+  },
+  confirm: {
+    k:'CONFIRM', t:'On-chain verification',
+    d:'Polls <code>eth_getTransactionReceipt</code> until <code>status=0x1</code>. Once confirmed, the donation is <strong>irreversible</strong> and permanently verifiable on BaseScan. No middleman can block it.',
+    tags:['irreversible','basescan','receipt']
+  },
+  verify: {
+    k:'VERIFY', t:'Public transparency',
+    d:'Every donation is verifiable via the <code>/donatex/api/verify</code> endpoint or directly on BaseScan. Build <strong>trust badges, leaderboards, or dashboards</strong> — all from public on-chain data.',
+    code:'GET /donatex/api/verify?tx=0x...',
+    tags:['transparency','api','public']
+  },
+  deploy: {
+    k:'DEPLOY', t:'Works anywhere',
+    d:'GitHub Pages, Vercel, Netlify, Cloudflare Pages, your own server — if it serves HTML, DonateX works. <strong>No server-side code needed.</strong> No accounts to manage.',
+    tags:['static','hosting','universal']
+  },
+  live: {
+    k:'LIVE API', t:'Real Base Mainnet verification',
+    d:'This calls the live verification API on Base Mainnet. The response is <strong>real data, no simulation</strong>. You can try it yourself right now with any Base transaction hash.',
+    tags:['mainnet','real','try-it']
+  },
+  chain: {
+    k:'BASE NETWORK', t:'Coinbase L2 · $0.001 gas',
+    d:'Base is an Ethereum L2 built by Coinbase. Transactions settle in <strong>~2 seconds</strong> with gas fees under a penny. It inherits Ethereum security while being 100x cheaper.',
+    tags:['l2','coinbase','ethereum']
+  },
+  erc20: {
+    k:'ERC-20', t:'USDC standard transfer',
+    d:'USDC follows the ERC-20 standard. The widget calls <code>transfer(recipient, amount)</code> directly. Each USDC = $1.00 USD, backed 1:1 by reserves.',
+    tags:['standard','stablecoin','1:1']
+  },
+  websocket: {
+    k:'REAL-TIME', t:'WebSocket confirmation',
+    d:'After sending the transaction, the widget subscribes to <strong>pending transactions</strong> via WebSocket. This gives instant confirmation instead of polling.',
+    tags:['websocket','instant','sub-second']
+  },
+  mobile: {
+    k:'MOBILE', t:'WalletConnect + deep links',
+    d:'On mobile, DonateX uses <strong>WalletConnect v2</strong> and EIP-681 deep links. Works with any mobile wallet — Coinbase Wallet, Rainbow, Trust Wallet, and more.',
+    tags:['walletconnect','deep-links','mobile-first']
+  },
+  fallback: {
+    k:'FALLBACK', t:'QR code for any wallet',
+    d:'If no wallet is detected, DonateX shows a <strong>QR code</strong> that any wallet can scan. This covers hardware wallets, mobile wallets, and desktop wallets that don\'t inject window.ethereum.',
+    tags:['qr','hardware-wallet','universal']
+  }
 };
 
-var wikiHTML = function(k){ var w=WIKI[k]; if(!w) return null; return '<div class="wk">'+w.k+'</div><div class="wt">'+w.t+'</div><div class="wd">'+w.d+'</div>'; };
+// Build rich wiki HTML
+function wikiHTML(k){
+  var w=WIKI[k]; if(!w) return null;
+  var h='<div class="wk">'+w.k+'</div><div class="wt">'+w.t+'</div><div class="wd">'+w.d+'</div>';
+  if(w.code) h+='<div style="background:#16161d;border:1px solid rgba(168,85,247,.15);border-radius:8px;padding:10px 14px;margin-top:10px;font-family:\'JetBrains Mono\',monospace;font-size:12px;color:var(--purple)">'+w.code+'</div>';
+  if(w.link) h+='<a href="'+w.link.url+'" target="_blank" style="display:inline-block;margin-top:10px;color:var(--magenta);font-size:12px;font-weight:600;text-decoration:none">'+w.link.text+' →</a>';
+  if(w.tags) h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">'+w.tags.map(function(t){return '<span style="background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.15);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--sec)">'+t+'</span>';}).join('')+'</div>';
+  return h;
+}
+
 var autoWiki = false;
 function showWiki(k){
   var h=wikiHTML(k); if(!h) return;
   wiki.innerHTML=h; wiki.classList.add('show');
-  var tr=term.getBoundingClientRect(), ww=Math.min(360,window.innerWidth-32), wx=tr.right+16;
+  var tr=term.getBoundingClientRect(), ww=Math.min(380,window.innerWidth-32), wx=tr.right+16;
   if(wx+ww+16>window.innerWidth) wx=window.innerWidth-ww-16;
   if(wx<16) wx=16;
-  var wy=tr.top+24; if(wy+230>window.innerHeight) wy=Math.max(8,window.innerHeight-240);
+  var wy=tr.top+24; if(wy+260>window.innerHeight) wy=Math.max(8,window.innerHeight-270);
   wiki.style.left=wx+'px'; wiki.style.top=wy+'px';
 }
 function hideWiki(){ wiki.classList.remove('show'); autoWiki=false; }
@@ -399,32 +483,57 @@ function hideWiki(){ wiki.classList.remove('show'); autoWiki=false; }
 var EQ='══════════════════════════════════════════════════════════';
 function B(t){return '<div class="banner">'+EQ+'</div><div class="banner">'+t+'</div><div class="banner">'+EQ+'</div>';}
 
+// Terminal steps — each line can trigger a wiki
 var S=[
   {h:B('  STEP 1/6  COPY THE WIDGET'), g:600, wiki:'setup'},
   {t:'$ mkdir my-project && cd my-project', g:300},
-  {t:'$ curl -O https://raw.githubusercontent.com/wilnowilx/aetheriusxapi/main/donatex/widget.js', g:400},
+  {t:'$ curl -O https://raw.githubusercontent.com/.../widget.js', g:400, wiki:'setup'},
   {t:'✓ widget.js downloaded (3KB)', c:'ok', g:600},
+  {t:'  └─ No npm install. No package.json. Just one file.', c:'dim', g:400},
+
   {h:B('  STEP 2/6  CONFIGURE YOUR WALLET'), g:600, wiki:'config'},
   {t:'// Add to your HTML:', g:300},
-  {t:'<script src="widget.js" data-wallet="0xYOUR_ADDRESS"><\/script>', g:500},
-  {t:'✓ One line. That\'s the entire setup.', c:'ok', g:800},
-  {h:B('  STEP 3/6  OPEN IN BROWSER'), g:600},
+  {t:'<script src="widget.js" data-wallet="0xYOUR_ADDRESS"><\/script>', g:500, wiki:'config'},
+  {t:'  └─ That\'s the ENTIRE setup. One line.', c:'dim', g:400},
+  {t:'  └─ Optional: data-amounts="1,5,10,25"', c:'dim', g:400, wiki:'amounts'},
+  {t:'✓ Done. Your site now accepts crypto donations.', c:'ok', g:800},
+
+  {h:B('  STEP 3/6  OPEN IN BROWSER'), g:600, wiki:'deploy'},
   {t:'$ open index.html', g:300},
-  {t:'→ Purple heart button appears in bottom-right corner', g:400},
-  {t:'→ Click it → modal with QR code + wallet connect', g:400, wiki:'qr'},
-  {t:'→ Preset amounts: $1 · $5 · $10 · $25', g:800},
+  {t:'→ 💜 heart button appears in bottom-right', g:400, wiki:'deploy'},
+  {t:'→ Click it → modal opens with QR code', g:400, wiki:'qr'},
+  {t:'  └─ QR follows EIP-681 standard for Base USDC', c:'dim', g:400},
+  {t:'→ Preset buttons: $1 · $5 · $10 · $25', g:400, wiki:'amounts'},
+  {t:'→ Or type any custom amount', g:600},
+
   {h:B('  STEP 4/6  DONOR CONNECTS WALLET'), g:600, wiki:'wallet'},
-  {t:'→ Donor clicks "Connect Wallet"', g:300},
-  {t:'→ MetaMask popup: "Connect to Base Network"', g:400},
-  {t:'→ Donor confirms USDC transfer: $10.00', g:400, wiki:'tx'},
-  {t:'→ Transaction hash: 0x7a3f...b2c1', g:600},
+  {t:'→ Donor clicks "💜 Donate"', g:300},
+  {t:'→ Modal shows: QR code + "Connect Wallet" button', g:400},
+  {t:'→ Donor clicks Connect → MetaMask popup', g:400, wiki:'wallet'},
+  {t:'  └─ Auto-switches to Base Network if needed', c:'dim', g:400, wiki:'chain'},
+  {t:'→ Donor selects $10 USDC → Confirm', g:400},
+  {t:'→ Widget builds ERC-20 transfer calldata', g:400, wiki:'tx'},
+  {t:'  └─ transfer(0x677B...7f61, 10.00 * 10^6)', c:'dim', g:400, wiki:'erc20'},
+  {t:'→ Transaction sent: 0x7a3f...b2c1', g:600},
+
   {h:B('  STEP 5/6  ON-CHAIN CONFIRMATION'), g:600, wiki:'confirm'},
-  {t:'→ Polling eth_getTransactionReceipt...', g:400},
+  {t:'→ Subscribing to pending transactions...', g:400, wiki:'websocket'},
+  {t:'→ eth_getTransactionReceipt polling...', g:400},
   {t:'→ status: 0x1 ✓  blockNumber: 12345678', c:'ok', g:400},
-  {t:'✓ Donation confirmed! $10.00 USDC received.', c:'ok', g:400},
-  {t:'→ Verified on BaseScan: basescan.org/tx/0x7a3f...', c:'dim', g:800},
+  {t:'✓ CONFIRMED! $10.00 USDC received.', c:'ok', g:400},
+  {t:'  └─ Irreversible. Permanent. Verifiable.', c:'dim', g:400},
+  {t:'→ BaseScan: basescan.org/tx/0x7a3f...b2c1', c:'dim', g:600, wiki:'verify'},
+
   {h:B('  STEP 6/6  VERIFY VIA API — LIVE CALL'), g:600, wiki:'live'},
-  {t:'$ curl https://34-156-149-38.sslip.io/aetherapi/donatex/api/stats?wallet=0x677B...', g:500},
+  {t:'$ curl https://34-156-149-38.sslip.io/aetherapi/donatex/api/verify?tx=0x7a3f...', g:500, wiki:'verify'},
+  {t:'{', g:200},
+  {t:'  "verified": true,', c:'ok', g:200},
+  {t:'  "from": "0xDonor...",', g:200},
+  {t:'  "to": "0x677B...7f61",', g:200},
+  {t:'  "amount_usdc": "10.00",', g:200},
+  {t:'  "chain": "Base Mainnet"', g:200},
+  {t:'}', g:200},
+  {t:'✓ Done. Donation verified on-chain in ~2 seconds.', c:'ok', g:800},
 ];
 
 var timers=[],playing=false,total=S.length,done=0;
@@ -480,8 +589,26 @@ function renderAll(){
 btnPlay.onclick=function(){if(playing){clear();playing=false;btnPlay.textContent='▶ Play';hideWiki();}else{play();}};
 btnReplay.onclick=function(){play();};
 
-term.addEventListener('mouseover',function(e){var z=e.target.closest('[data-wk]');if(z){var k=z.getAttribute('data-wk'),h=wikiHTML(k);if(!h)return;wiki.innerHTML=h;var r=e.target.getBoundingClientRect(),wx=r.right+14;if(wx+380>window.innerWidth)wx=r.left-380;if(wx<8)wx=8;var wy=r.top-20;if(wy+180>window.innerHeight)wy=window.innerHeight-200;if(wy<8)wy=8;wiki.style.left=wx+'px';wiki.style.top=wy+'px';wiki.classList.add('show');}});
-term.addEventListener('mouseout',function(e){var z=e.target.closest('[data-wk]');if(z&&!z.contains(e.relatedTarget))hideWiki();});
+// Hover wikis — works on ALL lines, during and after playback
+term.addEventListener('mouseover',function(e){
+  var z=e.target.closest('[data-wk]');
+  if(z){
+    var k=z.getAttribute('data-wk'),h=wikiHTML(k);
+    if(!h)return;
+    wiki.innerHTML=h;
+    var r=e.target.getBoundingClientRect(),wx=r.right+14;
+    if(wx+400>window.innerWidth)wx=r.left-400;
+    if(wx<8)wx=8;
+    var wy=r.top-20;if(wy+280>window.innerHeight)wy=window.innerHeight-290;
+    if(wy<8)wy=8;
+    wiki.style.left=wx+'px';wiki.style.top=wy+'px';
+    wiki.classList.add('show');
+  }
+});
+term.addEventListener('mouseout',function(e){
+  var z=e.target.closest('[data-wk]');
+  if(z&&!z.contains(e.relatedTarget))hideWiki();
+});
 
 // Auto-play on scroll into view
 var played=false;
