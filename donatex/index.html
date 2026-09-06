@@ -37,7 +37,7 @@ nav.scrolled{padding:12px 40px;background:rgba(9,9,11,.95)}
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(168,85,247,.4)}
 
 /* === HERO === */
-.hero{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 20px 80px;scroll-snap-align:start}
+.hero{position:relative;z-index:1;min-height:auto;display:flex;align-items:center;justify-content:center;text-align:center;padding:140px 20px 60px;scroll-snap-align:start}
 .hero-inner{max-width:900px}
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);border-radius:50px;padding:8px 22px;font-size:13px;color:var(--purple);font-weight:600;margin-bottom:28px;animation:badgePulse 3s ease-in-out infinite}
 @keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(168,85,247,0)}50%{box-shadow:0 0 0 8px rgba(168,85,247,.1)}}
@@ -59,7 +59,7 @@ nav.scrolled{padding:12px 40px;background:rgba(9,9,11,.95)}
 .stat-lbl{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1.2px;margin-top:2px}
 
 /* === TERMINAL === */
-.term-section{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:60px 20px;scroll-snap-align:start;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+.term-section{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:80px 20px;scroll-snap-align:start}
 .term-section h2{text-align:center;font-size:38px;font-weight:800;margin-bottom:12px}
 .term-section .sub{text-align:center;color:var(--sec);margin-bottom:40px;font-size:17px}
 .term-wrap{background:#0c0c10;border:1px solid rgba(168,85,247,.4);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);height:480px;display:flex;flex-direction:column}
@@ -372,15 +372,15 @@ var btnReplay = document.getElementById('btnReplay');
 var wiki = document.getElementById('wiki');
 
 var WIKI = {
-  setup:   {k:'SETUP',    t:'One file, 3KB',             d:'No npm, no build, no framework. Copy widget.js into your project and add a script tag. That\'s the entire installation.'},
-  config:  {k:'CONFIG',   t:'Your wallet address',       d:'The data-wallet attribute sets where USDC donations arrive. Use any Base wallet address. No account creation needed.'},
-  qr:      {k:'QR CODE',  t:'Mobile-first donations',    d:'The widget generates a QR code using the Base EIP-681 URI standard. Any mobile wallet that scans it knows it\'s a USDC transfer on Base.'},
-  wallet:  {k:'WALLET',   t:'One-click MetaMask',        d:'Supporters click "Connect Wallet" → MetaMask pops up → confirm → done. The widget handles chain switching and USDC transfer calldata.'},
-  tx:      {k:'TRANSFER', t:'ERC-20 USDC transfer',      d:'The widget builds the transfer(address,uint256) calldata directly. No web3.js, no ethers.js — just raw JSON-RPC to window.ethereum.'},
-  confirm: {k:'CONFIRM',  t:'On-chain verification',     d:'The widget polls eth_getTransactionReceipt until status=0x1. Once confirmed, the donation is irreversible and verifiable on BaseScan.'},
-  verify:  {k:'VERIFY',   t:'Public transparency',       d:'Every donation can be verified via the /donatex/api/verify endpoint or directly on BaseScan. No black boxes.'},
-  deploy:  {k:'DEPLOY',   t:'Works anywhere',            d:'GitHub Pages, Vercel, Netlify, your own server — if it serves HTML, DonateX works. No server-side code needed.'},
-  live:    {k:'LIVE API', t:'Real verification',         d:'This calls the live DonateX verification API on Base Mainnet. The response is real — no simulation.'}
+  setup:   {k:'SETUP',    t:'One file, 3KB',             d:'No npm, no build, no framework. Copy widget.js into your project and add a script tag. That\'s the entire installation. Works with any static site or framework.'},
+  config:  {k:'CONFIG',   t:'Your wallet address',       d:'The data-wallet attribute sets where USDC donations arrive. Use any Base wallet address. No account creation, no KYC, no bank. Just paste your 0x address.'},
+  qr:      {k:'QR CODE',  t:'Mobile-first donations',    d:'The widget generates a QR code using the Base EIP-681 URI standard. Any mobile wallet that scans it knows it\'s a USDC transfer on Base. Works with Coinbase Wallet, Rainbow, and more.'},
+  wallet:  {k:'WALLET',   t:'One-click MetaMask',        d:'Supporters click "Connect Wallet" → MetaMask pops up → confirm → done. The widget handles chain switching to Base and builds the USDC transfer calldata automatically.'},
+  tx:      {k:'TRANSFER', t:'ERC-20 USDC transfer',      d:'The widget builds the transfer(address,uint256) calldata directly. No web3.js, no ethers.js — just raw JSON-RPC to window.ethereum. Gas costs ~$0.001 on Base.'},
+  confirm: {k:'CONFIRM',  t:'On-chain verification',     d:'The widget polls eth_getTransactionReceipt until status=0x1. Once confirmed, the donation is irreversible and permanently verifiable on BaseScan. No middleman.'},
+  verify:  {k:'VERIFY',   t:'Public transparency',       d:'Every donation can be verified via the /donatex/api/verify endpoint or directly on BaseScan. Build trust badges, leaderboards, or dashboards — all from public data.'},
+  deploy:  {k:'DEPLOY',   t:'Works anywhere',            d:'GitHub Pages, Vercel, Netlify, your own server — if it serves HTML, DonateX works. No server-side code needed. No accounts to manage.'},
+  live:    {k:'LIVE API', t:'Real verification',         d:'This calls the live DonateX verification API on Base Mainnet. The response is real — no simulation. You can try it yourself right now.'}
 };
 
 var wikiHTML = function(k){ var w=WIKI[k]; if(!w) return null; return '<div class="wk">'+w.k+'</div><div class="wt">'+w.t+'</div><div class="wd">'+w.d+'</div>'; };
@@ -406,7 +406,7 @@ var S=[
   {t:'✓ widget.js downloaded (3KB)', c:'ok', g:600},
   {h:B('  STEP 2/6  CONFIGURE YOUR WALLET'), g:600, wiki:'config'},
   {t:'// Add to your HTML:', g:300},
-  {t:'<script src="widget.js" data-wallet="0xYOUR_ADDRESS"><\/script>', g:500, wiki:'config'},
+  {t:'<script src="widget.js" data-wallet="0xYOUR_ADDRESS"><\/script>', g:500},
   {t:'✓ One line. That\'s the entire setup.', c:'ok', g:800},
   {h:B('  STEP 3/6  OPEN IN BROWSER'), g:600},
   {t:'$ open index.html', g:300},

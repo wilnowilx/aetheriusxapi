@@ -312,7 +312,7 @@ curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/top-agents"
 | Resource | URL |
 |----------|-----|
 | GitHub | [github.com/wilnowilx/aetheriusxapi](https://github.com/wilnowilx/aetheriusxapi) |
-| Live API | [34.156.149.38/aetherapi](https://34-156-149-38.sslip.io/aetherapi) |
+| Live API | [aetherapi.aetheriusx.com](https://34-156-149-38.sslip.io/aetherapi) |
 | Dashboard | [wilnowilx.github.io/aetheriusxapi/dashboard/](https://wilnowilx.github.io/aetheriusxapi/dashboard/) |
 | Twitter | [@aetheriusxAPI](https://x.com/aetheriusxAPI) |
 | Telegram | [@aetherius_xAPI](https://t.me/aetherius_xAPI) |
