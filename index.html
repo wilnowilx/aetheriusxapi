@@ -55,10 +55,15 @@
             line-height: 1.6;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            max-width: 100vw;
         }
 
         /* ===== THREE.JS GLOBE ===== */
         #globe-canvas{width:100%;height:100%;display:block;border-radius:16px}
+
+        /* Prevent overflow */
+        section{overflow:hidden}
+        .inner{box-sizing:border-box}
 
         /* ===== PLASMA BACKGROUND ===== */
         #plasma-bg {
@@ -159,15 +164,16 @@
         }
 
         .inner {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 60px 40px;
+            padding: 48px 32px;
             width: 100%;
+            box-sizing: border-box;
         }
 
         #hero .inner {
-            max-width: 1280px;
-            padding: 56px 56px 72px;
+            max-width: 1100px;
+            padding: 40px 32px;
         }
 
         /* ===== NAV ===== */
@@ -368,13 +374,14 @@
         .hero .inner {
             display: flex;
             align-items: center;
-            gap: 48px;
-            padding: 48px 40px;
+            gap: 32px;
+            padding: 36px 32px;
             min-height: auto;
+            overflow: hidden;
         }
 
         .hero-left { flex: 1; min-width: 0; }
-        .hero-right { flex: 0 0 420px; height: 420px; position: relative; }
+        .hero-right { flex: 0 0 380px; height: 380px; position: relative; }
 
         /* Text readability over plasma: subtle backdrop for all content sections */
         section .inner {
@@ -507,6 +514,31 @@
             background: radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%);
             border-radius: 50%;
             pointer-events: none;
+        }
+
+        /* Floating data labels */
+        .globe-labels{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden}
+        .globe-label{
+            position:absolute;
+            font-family:'JetBrains Mono',monospace;
+            font-size:0.62rem;
+            padding:3px 8px;
+            border-radius:6px;
+            white-space:nowrap;
+            opacity:0;
+            animation:labelFloat 8s ease-in-out infinite;
+        }
+        .globe-label.price{color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25)}
+        .globe-label.endpoint{color:#a855f7;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.25)}
+        .globe-label.network{color:#06b6d4;background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.25)}
+        .globe-label.protocol{color:#d946ef;background:rgba(217,70,239,0.12);border:1px solid rgba(217,70,239,0.25)}
+        .globe-label.usdc{color:#ec4899;background:rgba(236,72,153,0.12);border:1px solid rgba(236,72,153,0.25)}
+
+        @keyframes labelFloat{
+          0%{opacity:0;transform:translateY(10px)}
+          8%{opacity:0.8;transform:translateY(0)}
+          85%{opacity:0.8;transform:translateY(-5px)}
+          100%{opacity:0;transform:translateY(-15px)}
         }
 
         .hero-console {
@@ -1964,6 +1996,7 @@
             </div>
             <div class="hero-right">
                 <canvas id="globe-canvas"></canvas>
+                <div class="globe-labels" id="globeLabels"></div>
             </div>
         </div>
     </section>
@@ -3308,13 +3341,61 @@
 
       // Resize
       var ro=new ResizeObserver(function(){
-        var nw=container.clientWidth||420;
-        var nh=container.clientHeight||420;
+        var nw=container.clientWidth||380;
+        var nh=container.clientHeight||380;
         camera.aspect=nw/nh;
         camera.updateProjectionMatrix();
         renderer.setSize(nw,nh);
       });
       ro.observe(container);
+
+      // === FLOATING DATA LABELS ===
+      var labelsEl=document.getElementById('globeLabels');
+      if(labelsEl){
+        var labelData=[
+          {text:'/v1/maps/search',type:'endpoint',delay:0},
+          {text:'$0.005/call',type:'price',delay:1.2},
+          {text:'Base Network',type:'network',delay:0.6},
+          {text:'x402 Protocol',type:'protocol',delay:2.0},
+          {text:'USDC on-chain',type:'usdc',delay:3.5},
+          {text:'/v1/crypto/prices',type:'endpoint',delay:1.8},
+          {text:'$0.01/call',type:'price',delay:4.2},
+          {text:'No API key',type:'network',delay:2.8},
+          {text:'80 endpoints',type:'endpoint',delay:5.0},
+          {text:'$0 gas fee',type:'price',delay:0.3},
+          {text:'/v1/web/scrape',type:'endpoint',delay:6.0},
+          {text:'Agent pays USDC',type:'protocol',delay:3.0},
+          {text:'FREE: /v1/onchain/*',type:'endpoint',delay:4.8},
+          {text:'0x402...',type:'usdc',delay:1.5},
+          {text:'MCP ready',type:'network',delay:5.5},
+        ];
+        var positions=[
+          {x:5,y:12},{x:65,y:8},{x:85,y:35},{x:10,y:65},{x:70,y:72},
+          {x:30,y:5},{x:50,y:85},{x:5,y:40},{x:80,y:55},{x:40,y:15},
+          {x:15,y:80},{x:75,y:18},{x:25,y:50},{x:60,y:60},{x:90,y:78}
+        ];
+        labelData.forEach(function(ld,idx){
+          var el=document.createElement('div');
+          el.className='globe-label '+ld.type;
+          el.textContent=ld.text;
+          var pos=positions[idx%positions.length];
+          el.style.left=pos.x+'%';
+          el.style.top=pos.y+'%';
+          el.style.animationDelay=ld.delay+'s';
+          el.style.animationDuration=(6+Math.random()*4)+'s';
+          labelsEl.appendChild(el);
+        });
+
+        // Refresh labels every 10s
+        setInterval(function(){
+          var els=labelsEl.querySelectorAll('.globe-label');
+          els.forEach(function(el){
+            el.style.animation='none';
+            el.offsetHeight;
+            el.style.animation='';
+          });
+        },10000);
+      }
     })();
     </script>
 </body>
