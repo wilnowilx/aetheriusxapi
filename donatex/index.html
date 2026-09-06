@@ -500,9 +500,12 @@ var S=[
 
   {h:B('  STEP 3/6  OPEN IN BROWSER'), g:600, wiki:'deploy'},
   {t:'$ open index.html', g:300},
-  {t:'→ 💜 heart button appears in bottom-right', g:400, wiki:'deploy'},
-  {t:'→ Click it → modal opens with QR code', g:400, wiki:'qr'},
-  {t:'  └─ QR follows EIP-681 standard for Base USDC', c:'dim', g:400},
+  {t:'→ Browser loads... widget injects itself', g:400, wiki:'deploy'},
+  {t:'→ DOM ready: button created at position fixed', g:400},
+  {t:'→ Style applied: background gradient purple→magenta', g:400},
+  {t:'  └─ CSS: bottom-right, z-index 9999, border-radius 50%', c:'dim', g:400},
+  {t:'→ Widget ready. Click to open donation modal.', g:400, wiki:'qr'},
+  {t:'  └─ Modal renders: QR code + "Connect Wallet" button', c:'dim', g:400},
   {t:'→ Preset buttons: $1 · $5 · $10 · $25', g:400, wiki:'amounts'},
   {t:'→ Or type any custom amount', g:600},
 
