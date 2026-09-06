@@ -3417,7 +3417,7 @@
       // === FLOATING DATA LABELS (real x402 metrics — 1s refresh) ===
       var labelsEl=document.getElementById('globeLabels');
       var liveData=[
-        {text:'80 endpoints live',type:'network'},
+        {text:'100+ endpoints live',type:'network'},
         {text:'x402 micropayments',type:'protocol'},
         {text:'Base Mainnet (8453)',type:'network'},
         {text:'USDC on-chain payments',type:'protocol'},
@@ -3427,11 +3427,11 @@
         {text:'Open-source MIT',type:'network'},
         {text:'Python SDK v2.0',type:'endpoint'},
         {text:'Instant finality (L2)',type:'network'},
-        {text:'MCP ready',type:'protocol'},
-        {text:'20 FREE endpoints',type:'price'},
+        {text:'40 FREE endpoints',type:'price'},
         {text:'Agent-to-agent commerce',type:'protocol'},
         {text:'Real USDC payments',type:'price'},
         {text:'x402 protocol',type:'endpoint'},
+        {text:'QuantumXBrain AI',type:'endpoint'},
       ];
       var positions=[
         {x:-5,y:5},{x:60,y:-5},{x:78,y:22},{x:-2,y:48},{x:58,y:62},
@@ -3482,6 +3482,24 @@
             liveData[4]='Gas: '+d.current_gwei+' gwei';
             if(d.cost_estimates){liveData[12]='$'+d.cost_estimates.simple_transfer_usd+'/tx';}
           }
+        }).catch(function(){});
+
+        // QuantumXBrain: market pulse + sentiment
+        fetch(apiBase+'/v1/x402/market-pulse')
+        .then(function(r){return r.json();}).then(function(d){
+          if(d&&d.signal){
+            liveData[1]='Signal: '+d.signal.label;
+            if(d.market&&d.market.eth_usd){liveData[3]='ETH $'+Math.round(d.market.eth_usd);}
+          }
+          if(d&&d.chain){liveData[5]='Block #'+(d.chain.block||'').toLocaleString();}
+        }).catch(function(){});
+
+        fetch(apiBase+'/v1/x402/sentiment')
+        .then(function(r){return r.json();}).then(function(d){
+          if(d&&d.fear_greed_index){
+            liveData[13]='F&G: '+d.fear_greed_index.value+' '+d.fear_greed_index.label;
+          }
+          if(d&&d.market&&d.market.btc_usd){liveData[14]='BTC $'+Math.round(d.market.btc_usd).toLocaleString();}
         }).catch(function(){});
       }
       refreshData();
