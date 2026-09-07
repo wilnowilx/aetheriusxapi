@@ -71,6 +71,30 @@
       "domain": "web-animation",
       "rule": "Lenis smooth scroll coexists with slideshow wheel snap. Lenis smooths the scroll, slideshow does scrollIntoView({behavior:'smooth'}) for section snapping. They don't conflict.",
       "confidence": 0.85
+    },
+    {
+      "id": "r3f-canvas-sizing",
+      "domain": "web-3d",
+      "rule": "R3F Canvas MUST use position:absolute + inset:0 inside a position:relative parent. Fixed height divs cause square box artifacts. Parent needs aspect-ratio:1 for square globe. Add overflow:visible for glow bleed.",
+      "confidence": 0.95
+    },
+    {
+      "id": "threejs-umd-dead",
+      "domain": "web-3d",
+      "rule": "Three.js >0.160.0 has NO UMD build (build/three.min.js). Last UMD version is 0.160.0. After that, ES modules only. For vanilla HTML script tags, use 0.160.0 max. For React/R3F, any version works.",
+      "confidence": 0.98
+    },
+    {
+      "id": "r3f-parallel-subagents",
+      "domain": "web-dev",
+      "rule": "For complex frontend rebuilds, use 3 parallel sub-agents: (1) fix critical bugs, (2) port content/sections, (3) add animations/interactivity. Each works on separate files, merge after.",
+      "confidence": 0.9
+    },
+    {
+      "id": "r3f-bloom-postprocessing",
+      "domain": "web-3d",
+      "rule": "R3F bloom: import {EffectComposer} from '@react-three/postprocessing' and {Bloom} from '@react-three/postprocessing'. Wrap scene in <EffectComposer><Bloom intensity={1.2} radius={0.8} /></EffectComposer>.",
+      "confidence": 0.9
     }
   ],
   "mappings": [
