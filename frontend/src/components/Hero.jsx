@@ -50,10 +50,10 @@ const liveLabels = [
 ]
 
 const labelPositions = [
-  { x: -5, y: 5 }, { x: 60, y: -5 }, { x: 78, y: 22 }, { x: -2, y: 48 },
-  { x: 58, y: 62 }, { x: 22, y: -2 }, { x: 42, y: 82 }, { x: 2, y: 28 },
-  { x: 72, y: 42 }, { x: 28, y: 8 }, { x: 8, y: 68 }, { x: 65, y: 10 },
-  { x: 15, y: 42 }, { x: 52, y: 55 }, { x: 80, y: 68 },
+  { x: 2, y: 5 }, { x: 55, y: -5 }, { x: 66, y: 22 }, { x: 2, y: 48 },
+  { x: 55, y: 62 }, { x: 22, y: -2 }, { x: 40, y: 82 }, { x: 2, y: 28 },
+  { x: 64, y: 42 }, { x: 28, y: 8 }, { x: 8, y: 68 }, { x: 60, y: 10 },
+  { x: 15, y: 42 }, { x: 50, y: 55 }, { x: 62, y: 68 },
 ]
 
 function Hero() {
@@ -94,7 +94,7 @@ function Hero() {
     <section id="hero" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', position: 'relative', overflow: 'visible', paddingTop: '120px', isolation: 'isolate', zIndex: 0 }}>
       <div className="inner" style={{ width: '100%', overflow: 'visible' }}>
         {/* Top: badges + GIANT headline, full width */}
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', justifyContent: 'flex-start', alignItems: 'center' }}>
           <div className="section-label" style={{ fontSize: '0.78rem', padding: '6px 14px', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 9999, background: 'rgba(16,185,129,0.08)' }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
             Base Mainnet LIVE
@@ -105,7 +105,7 @@ function Hero() {
           </div>
         </div>
 
-        <h1 className="section-title" style={{ fontSize: 'clamp(3.2rem, 8.5vw, 7rem)', lineHeight: 1.0, letterSpacing: '-0.03em', margin: '0 0 8px' }}>
+        <h1 className="section-title" style={{ fontSize: 'clamp(3.5rem, 9vw, 8rem)', lineHeight: 1.0, letterSpacing: '-0.03em', margin: '0 0 8px' }}>
           The Infrastructure<br />
           <span className="grad-flow">for Agents That Pay</span>
         </h1>
