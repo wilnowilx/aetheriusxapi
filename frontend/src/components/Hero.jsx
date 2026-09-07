@@ -91,7 +91,7 @@ function Hero() {
   }, [])
 
   return (
-    <section id="hero" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', position: 'relative', overflow: 'visible', paddingTop: '120px' }}>
+    <section id="hero" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', position: 'relative', overflow: 'visible', paddingTop: '120px', isolation: 'isolate', zIndex: 0 }}>
       <div className="inner" style={{ width: '100%', overflow: 'visible' }}>
         {/* Top: badges + GIANT headline, full width */}
         <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
@@ -149,7 +149,7 @@ function Hero() {
         </div>
 
         {/* Right: 3D Globe */}
-        <div style={{ flex: '1 1 50%', position: 'relative', overflow: 'visible', aspectRatio: '1', maxHeight: '600px', background: 'transparent', border: 'none', outline: 'none' }}>
+        <div style={{ flex: '1 1 50%', position: 'relative', overflow: 'visible', aspectRatio: '1', maxHeight: '600px', background: 'transparent', border: 'none', outline: 'none', zIndex: 1, isolation: 'isolate' }}>
           {/* Globe glow */}
           <div style={{
             position: 'absolute', inset: '-120px',
