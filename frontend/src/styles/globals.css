@@ -278,14 +278,8 @@ nav.scrolled {
   .inner { padding: 0 20px; }
 }
 
-/* GSAP initial states */
-[data-animate] .section-label,
-[data-animate] .section-title,
-[data-animate] .section-desc,
-[data-animate] [data-animate-card] {
-  opacity: 0;
-  will-change: transform, opacity;
-}
+/* NOTE: never hide content in CSS for GSAP — gsap.from() handles
+   initial states via JS. opacity:0 here + from({opacity:0}) = invisible forever. */
 
 /* R3F Canvas transparency */
 canvas {

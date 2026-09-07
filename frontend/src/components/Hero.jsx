@@ -1,5 +1,31 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import GlobeScene from './GlobeScene'
+
+// Local boundary: a WebGL/globe crash must never kill the hero text
+class GlobeBoundary extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { crashed: false }
+  }
+  static getDerivedStateFromError() {
+    return { crashed: true }
+  }
+  componentDidCatch(err) {
+    if (typeof console !== 'undefined') console.error('[AETHERIUS] globe crashed:', err)
+  }
+  render() {
+    if (this.state.crashed) {
+      return (
+        <div style={{
+          position: 'absolute', inset: '10%',
+          background: 'radial-gradient(circle, rgba(168,85,247,0.5) 0%, rgba(217,70,239,0.2) 45%, transparent 70%)',
+          borderRadius: '50%'
+        }} />
+      )
+    }
+    return this.props.children
+  }
+}
 
 const API_BASE = 'https://34-156-149-38.sslip.io/aetherapi'
 
@@ -128,7 +154,11 @@ function Hero() {
             animation: 'globeGlow 5s ease-in-out infinite alternate'
           }} />
 
-          <GlobeScene />
+          <GlobeBoundary>
+            <Suspense fallback={<div style={{ position: 'absolute', inset: 0 }} />}>
+              <GlobeScene />
+            </Suspense>
+          </GlobeBoundary>
 
           {/* Floating labels */}
           <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2 }}>

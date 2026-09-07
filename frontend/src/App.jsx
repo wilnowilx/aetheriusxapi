@@ -27,7 +27,7 @@ function Nav() {
             <a href="#how">How It Works</a>
             <a href="#heartbeat">Status</a>
             <a href="#telemetry">Telemetry</a>
-            <a href="/dashboard/">Dashboard</a>
+            <a href="dashboard/">Dashboard</a>
             <a href="#cta" className="btn-nav">Get Started</a>
           </div>
           <button className="mobile-toggle" onClick={() => setMobileOpen(true)}>
@@ -1035,6 +1035,26 @@ function Footer() {
   )
 }
 
+// === ERROR BOUNDARY (a crashing section must never blank the page) ===
+class SectionBoundary extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { crashed: false }
+  }
+  static getDerivedStateFromError() {
+    return { crashed: true }
+  }
+  componentDidCatch(err) {
+    if (typeof console !== 'undefined') console.error('[AETHERIUS] section crashed:', err)
+  }
+  render() {
+    if (this.state.crashed) {
+      return this.props.fallback || null
+    }
+    return this.props.children
+  }
+}
+
 // === APP ===
 function App() {
   const appRef = useRef(null)
@@ -1045,23 +1065,25 @@ function App() {
     <div ref={appRef}>
       <PlasmaBg />
       <Nav />
-      <Hero />
-      <Playground />
-      <Categories />
-      <X402Intelligence />
-      <HowItWorks />
-      <Features />
-      <CodeSection />
-      <Waitlist />
-      <SocialProof />
-      <Heartbeat />
-      <Telemetry />
-      <Docs />
-      <Limits />
-      <Founders />
-      <CTA />
-      <TrustedBy />
-      <DonateX />
+      <SectionBoundary fallback={<div style={{ minHeight: '60vh' }} />}>
+        <Hero />
+      </SectionBoundary>
+      <SectionBoundary><Playground /></SectionBoundary>
+      <SectionBoundary><Categories /></SectionBoundary>
+      <SectionBoundary><X402Intelligence /></SectionBoundary>
+      <SectionBoundary><HowItWorks /></SectionBoundary>
+      <SectionBoundary><Features /></SectionBoundary>
+      <SectionBoundary><CodeSection /></SectionBoundary>
+      <SectionBoundary><Waitlist /></SectionBoundary>
+      <SectionBoundary><SocialProof /></SectionBoundary>
+      <SectionBoundary><Heartbeat /></SectionBoundary>
+      <SectionBoundary><Telemetry /></SectionBoundary>
+      <SectionBoundary><Docs /></SectionBoundary>
+      <SectionBoundary><Limits /></SectionBoundary>
+      <SectionBoundary><Founders /></SectionBoundary>
+      <SectionBoundary><CTA /></SectionBoundary>
+      <SectionBoundary><TrustedBy /></SectionBoundary>
+      <SectionBoundary><DonateX /></SectionBoundary>
       <Footer />
     </div>
   )

@@ -1,6 +1,6 @@
-import React, { useRef, useMemo } from 'react'
+import React, { useRef, useMemo, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Float, Stars } from '@react-three/drei'
+import { Stars } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
@@ -149,25 +149,25 @@ function AgentNodes() {
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={NODE_COUNT} array={positions} itemSize={3} />
-        <bufferAttribute attach="attributes-color" count={NODE_COUNT} array={colors} itemSize={3} />
-        <bufferAttribute attach="attributes-size" count={NODE_COUNT} array={sizes} itemSize={1} />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-aColor" args={[colors, 3]} />
+        <bufferAttribute attach="attributes-aSize" args={[sizes, 1]} />
       </bufferGeometry>
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={`
-          attribute float size;
-          attribute vec3 color;
+          attribute float aSize;
+          attribute vec3 aColor;
           varying vec3 vColor;
           varying float vAlpha;
           uniform float time;
           void main() {
-            vColor = color;
+            vColor = aColor;
             vec3 pos = position;
             pos += normalize(position) * sin(time * 2.0 + position.x * 3.0) * 0.03;
             vAlpha = 0.6 + 0.4 * sin(time * 3.0 + position.y * 2.0);
             vec4 mv = modelViewMatrix * vec4(pos, 1.0);
-            gl_PointSize = size * (380.0 / -mv.z);
+            gl_PointSize = aSize * (380.0 / -mv.z);
             gl_Position = projectionMatrix * mv;
           }
         `}
