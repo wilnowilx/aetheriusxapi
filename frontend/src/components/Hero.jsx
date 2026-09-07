@@ -75,12 +75,12 @@ function Hero() {
         const r = await fetch(`${API_BASE}/v1/telemetry`)
         const t = await r.json()
         if (t && t.totals) {
-          const total = (t.totals.ok_200 || 0) + (t.totals.n402 || 0) + (t.totals.errors || 0)
+          const calls = t.totals.calls || 0
           setStats({
-            volume: t.totals.avg_latency_ms ? t.totals.avg_latency_ms.toFixed(1) + 'ms' : '—',
-            agents: total > 0 ? ((t.totals.ok_200 || 0) / total * 100).toFixed(1) + '%' : '—',
-            payments: t.wallets_seen ? Math.min(10, t.wallets_seen) + '' : '—',
-            health: '99.9%'
+            volume: t.totals.volume_usdc != null ? '$' + t.totals.volume_usdc.toFixed(2) : '—',
+            agents: calls > 0 ? ((t.totals.ok_200 || 0) / calls * 100).toFixed(1) + '%' : '—',
+            payments: t.wallets_seen != null ? String(t.wallets_seen) : '—',
+            health: t.totals.avg_latency_ms != null ? t.totals.avg_latency_ms.toFixed(0) + 'ms' : '—'
           })
         }
       } catch (e) { /* offline */ }
@@ -130,10 +130,10 @@ function Hero() {
           {/* Stats */}
           <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
             {[
-              { value: stats.volume, label: 'USDC settled (24h)' },
+              { value: stats.volume, label: 'USDC settled' },
               { value: stats.agents, label: 'Success rate' },
               { value: stats.payments, label: 'Wallets seen' },
-              { value: stats.health, label: 'Network health' },
+              { value: stats.health, label: 'Avg latency' },
             ].map((stat, i) => (
               <div key={i}>
                 <div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>

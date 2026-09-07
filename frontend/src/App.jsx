@@ -655,20 +655,26 @@ function Heartbeat() {
     resize()
     window.addEventListener('resize', resize)
 
-    let lastDataTime = 0
+    // Seed + refresh from REAL server latency (no fake random data)
+    const seed = async () => {
+      try {
+        const r = await fetch('https://34-156-149-38.sslip.io/aetherapi/v1/telemetry')
+        const t = await r.json()
+        const arr = t && Array.isArray(t.recent_latency_ms) ? t.recent_latency_ms : []
+        if (arr.length && running) {
+          const pad = Array(Math.max(0, 60 - arr.length)).fill(arr[0])
+          dataRef.current = pad.concat(arr).slice(-60)
+        }
+      } catch (e) { /* keep last data when offline */ }
+    }
+    seed()
+    const seedTimer = setInterval(seed, 15000)
 
-    const draw = (timestamp) => {
+    const draw = () => {
       if (!running) return
       const w = canvas.width / 2
       const h = canvas.height / 2
       ctx.clearRect(0, 0, w, h)
-
-      // Push data once per second
-      if (timestamp - lastDataTime >= 1000) {
-        dataRef.current.push(Math.random() * 40 + 10)
-        if (dataRef.current.length > 60) dataRef.current.shift()
-        lastDataTime = timestamp
-      }
 
       // Draw grid lines
       ctx.strokeStyle = 'rgba(255,255,255,0.04)'
@@ -677,15 +683,16 @@ function Heartbeat() {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke()
       }
 
-      // Draw line
+      // Draw line (dynamic scale from real ms values)
       const data = dataRef.current
+      const max = Math.max(100, ...data)
       const step = w / (data.length - 1)
       ctx.beginPath()
       ctx.strokeStyle = '#a855f7'
       ctx.lineWidth = 2
       data.forEach((v, i) => {
         const x = i * step
-        const y = h - (v / 60) * h
+        const y = h - (v / max) * h * 0.9 - h * 0.05
         i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
       })
       ctx.stroke()
@@ -709,6 +716,7 @@ function Heartbeat() {
 
     return () => {
       running = false
+      clearInterval(seedTimer)
       cancelAnimationFrame(animRef.current)
       window.removeEventListener('resize', resize)
     }
