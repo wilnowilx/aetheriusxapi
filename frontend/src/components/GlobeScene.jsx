@@ -1,6 +1,7 @@
 import React, { useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, Stars } from '@react-three/drei'
+import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
 // === ATMOSPHERIC GLOW SHADER ===
@@ -242,7 +243,7 @@ function GlobeScene() {
     <Canvas
       camera={{ position: [0, 0.3, 5.2], fov: 40 }}
       gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
-      style={{ width: '100%', height: '100%' }}
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
       dpr={[1, 2]}
     >
       <ambientLight intensity={0.1} />
@@ -253,6 +254,14 @@ function GlobeScene() {
       <X402Center />
       <OrbitRings />
       <Stars radius={8} depth={20} count={500} factor={2} saturation={0.5} fade speed={0.5} />
+      <EffectComposer>
+        <Bloom
+          intensity={1.2}
+          luminanceThreshold={0.1}
+          luminanceSmoothing={0.9}
+          radius={0.8}
+        />
+      </EffectComposer>
     </Canvas>
   )
 }

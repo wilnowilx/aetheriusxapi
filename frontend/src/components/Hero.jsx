@@ -64,7 +64,7 @@ function Hero() {
 
   return (
     <section id="hero" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', position: 'relative', overflow: 'visible' }}>
-      <div className="inner" style={{ display: 'flex', alignItems: 'center', gap: '60px', width: '100%' }}>
+      <div className="inner" style={{ display: 'flex', alignItems: 'center', gap: '60px', width: '100%', overflow: 'visible' }}>
         {/* Left: Content */}
         <div style={{ flex: '1 1 50%', zIndex: 2 }}>
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
@@ -119,7 +119,7 @@ function Hero() {
         </div>
 
         {/* Right: 3D Globe */}
-        <div style={{ flex: '1 1 50%', height: '450px', position: 'relative' }}>
+        <div style={{ flex: '1 1 50%', position: 'relative', overflow: 'visible', aspectRatio: '1', maxHeight: '600px' }}>
           {/* Globe glow */}
           <div style={{
             position: 'absolute', inset: '-120px',
@@ -185,7 +185,7 @@ function Hero() {
         @media (max-width: 768px) {
           #hero .inner { flex-direction: column !important; }
           #hero .inner > div:first-child { flex: none !important; }
-          #hero .inner > div:last-child { flex: none !important; width: 100% !important; height: 300px !important; }
+          #hero .inner > div:last-child { flex: none !important; width: 100% !important; aspect-ratio: 1 !important; max-height: 350px !important; }
         }
       `}</style>
     </section>
