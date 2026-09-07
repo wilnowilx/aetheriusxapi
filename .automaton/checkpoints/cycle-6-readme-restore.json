@@ -1,0 +1,7 @@
+{
+  "timestamp": "2026-09-07T05:30:00Z",
+  "status": "readme_restored",
+  "summary": "Sub-agent stripped README 805->284 lines, destroying doctrine/timeline/vision/roadmap. Restored original intact + surgical updates only (badge, counts, timeline Sep 6-7, tech stack landing row). Lesson: never delegate wholesale rewrites of soul files.",
+  "commit": "7ddd11d",
+  "lesson": "Sub-agents get precise scoped tasks, never 'rewrite README'. Soul files (README, application.md) are append/surgical-edit only."
+}
