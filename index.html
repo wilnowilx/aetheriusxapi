@@ -16,7 +16,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Three.js r183 (WebGPU-ready, modern) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.183.0/build/three.min.js"></script>
+    <!-- GSAP + ScrollTrigger (scroll-driven animations) -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+    <!-- Lenis smooth scroll -->
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.2.3/dist/lenis.min.js"></script>
     <style>
         :root {
             --bg: #06060e;
@@ -516,20 +522,39 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Globe glow — organic, bleeds into space */
+        /* Globe glow — organic, bleeds into space (enhanced for r183) */
         .hero-right::before {
             content: '';
             position: absolute;
-            inset: -100px;
-            background: radial-gradient(circle, rgba(168,85,247,0.25) 0%, rgba(217,70,239,0.12) 30%, rgba(236,72,153,0.06) 50%, transparent 70%);
+            inset: -120px;
+            background: radial-gradient(circle,
+                rgba(168,85,247,0.3) 0%,
+                rgba(217,70,239,0.15) 25%,
+                rgba(236,72,153,0.08) 45%,
+                rgba(6,182,212,0.04) 60%,
+                transparent 75%);
             border-radius: 50%;
             pointer-events: none;
             z-index: -1;
-            animation: globeGlow 4s ease-in-out infinite alternate;
+            animation: globeGlow 5s ease-in-out infinite alternate;
+            filter: blur(2px);
+        }
+        .hero-right::after {
+            content: '';
+            position: absolute;
+            inset: -60px;
+            background: radial-gradient(circle,
+                rgba(168,85,247,0.15) 0%,
+                rgba(217,70,239,0.08) 40%,
+                transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            animation: globeGlow 3.5s ease-in-out infinite alternate-reverse;
         }
         @keyframes globeGlow {
-            0% { opacity: 0.6; transform: scale(0.92); }
-            100% { opacity: 1; transform: scale(1.08); }
+            0% { opacity: 0.5; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1.1); }
         }
 
         /* Floating data labels */
@@ -3176,7 +3201,7 @@
     </script>
 
     <!-- ═══════════════════════════════════════════════════ -->
-    <!-- THREE.JS: 3D GLOBE — INTERACTIVE + LIVE DATA       -->
+    <!-- THREE.JS r183: 3D GLOBE — ATMOSPHERIC + BLOOM      -->
     <!-- ═══════════════════════════════════════════════════ -->
     <script>
     (function(){
@@ -3188,53 +3213,102 @@
 
       var scene=new THREE.Scene();
       var camera=new THREE.PerspectiveCamera(40,w/h,0.1,1000);
-      var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
+      var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true,powerPreference:'high-performance'});
       renderer.setSize(w,h);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+      renderer.toneMapping=THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure=1.2;
 
       var globeGroup=new THREE.Group();
       scene.add(globeGroup);
 
-      // === GLOBE WIREFRAME (SphereGeometry — proper poles) ===
-      var globeGeom=new THREE.SphereGeometry(2.2,36,28);
-      var globeMat=new THREE.MeshBasicMaterial({color:0xa855f7,wireframe:true,transparent:true,opacity:0.07});
+      // === GLOBE WIREFRAME — Enhanced grid (lat/lon lines) ===
+      var globeGeom=new THREE.SphereGeometry(2.2,48,32);
+      var globeMat=new THREE.MeshBasicMaterial({color:0xa855f7,wireframe:true,transparent:true,opacity:0.055});
       var globe=new THREE.Mesh(globeGeom,globeMat);
       globeGroup.add(globe);
 
-      // Inner glow
-      var glowGeom=new THREE.SphereGeometry(2.15,32,32);
+      // === ATMOSPHERIC GLOW — Fresnel-based (backface glow) ===
+      var glowGeom=new THREE.SphereGeometry(2.35,48,48);
       var glowMat=new THREE.ShaderMaterial({
-        uniforms:{time:{value:0}},
-        vertexShader:'varying vec3 vNormal;void main(){vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
-        fragmentShader:'varying vec3 vNormal;uniform float time;void main(){float intensity=pow(0.6-dot(vNormal,vec3(0.0,0.0,1.0)),2.0);gl_FragColor=vec4(0.66,0.33,0.97,1.0)*intensity*0.5;}',
-        blending:THREE.AdditiveBlending,side:THREE.BackSide,transparent:true
+        uniforms:{
+          time:{value:0},
+          glowColor:{value:new THREE.Color(0xa855f7)},
+          accentColor:{value:new THREE.Color(0xd946ef)}
+        },
+        vertexShader:[
+          'varying vec3 vNormal;',
+          'varying vec3 vWorldPos;',
+          'void main(){',
+          '  vNormal=normalize(normalMatrix*normal);',
+          '  vWorldPos=(modelMatrix*vec4(position,1.0)).xyz;',
+          '  gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);',
+          '}'
+        ].join('\n'),
+        fragmentShader:[
+          'varying vec3 vNormal;',
+          'varying vec3 vWorldPos;',
+          'uniform float time;',
+          'uniform vec3 glowColor;',
+          'uniform vec3 accentColor;',
+          'void main(){',
+          '  float fresnel=pow(1.0-abs(dot(vNormal,vec3(0.0,0.0,1.0))),2.5);',
+          '  float pulse=0.8+0.2*sin(time*1.2+vWorldPos.y*2.0);',
+          '  float wave=0.5+0.5*sin(time*0.8+vWorldPos.x*3.0+vWorldPos.z*2.0);',
+          '  vec3 col=mix(glowColor,accentColor,wave*0.4);',
+          '  float alpha=fresnel*pulse*0.65;',
+          '  gl_FragColor=vec4(col,alpha);',
+          '}'
+        ].join('\n'),
+        blending:THREE.AdditiveBlending,side:THREE.BackSide,transparent:true,depthWrite:false
       });
       var glow=new THREE.Mesh(glowGeom,glowMat);
       globeGroup.add(glow);
 
+      // === INNER CORE — Soft center glow ===
+      var coreGeom=new THREE.SphereGeometry(1.8,32,32);
+      var coreMat=new THREE.ShaderMaterial({
+        uniforms:{time:{value:0}},
+        vertexShader:'varying vec3 vNormal;void main(){vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+        fragmentShader:[
+          'varying vec3 vNormal;uniform float time;',
+          'void main(){',
+          '  float rim=pow(1.0-abs(dot(vNormal,vec3(0,0,1))),3.0);',
+          '  float pulse=0.7+0.3*sin(time*0.6);',
+          '  vec3 col=vec3(0.44,0.21,0.73);',
+          '  gl_FragColor=vec4(col,rim*pulse*0.25);',
+          '}'
+        ].join('\n'),
+        blending:THREE.AdditiveBlending,side:THREE.FrontSide,transparent:true,depthWrite:false
+      });
+      var core=new THREE.Mesh(coreGeom,coreMat);
+      globeGroup.add(core);
+
       // === x402 CENTRAL TEXT ===
       var x402Canvas=document.createElement('canvas');
-      x402Canvas.width=256;x402Canvas.height=128;
+      x402Canvas.width=512;x402Canvas.height=256;
       var x402Ctx=x402Canvas.getContext('2d');
-      x402Ctx.clearRect(0,0,256,128);
-      x402Ctx.font='bold 72px monospace';
+      x402Ctx.clearRect(0,0,512,256);
+      x402Ctx.font='bold 120px monospace';
       x402Ctx.textAlign='center';x402Ctx.textBaseline='middle';
-      x402Ctx.fillStyle='#d946ef';x402Ctx.shadowColor='#d946ef';x402Ctx.shadowBlur=20;
-      x402Ctx.fillText('x402',128,50);
-      x402Ctx.font='18px sans-serif';x402Ctx.fillStyle='#a855f7';x402Ctx.shadowBlur=10;
-      x402Ctx.fillText('Protocol',128,95);
+      x402Ctx.fillStyle='#d946ef';x402Ctx.shadowColor='#d946ef';x402Ctx.shadowBlur=40;
+      x402Ctx.fillText('x402',256,100);
+      x402Ctx.font='32px sans-serif';x402Ctx.fillStyle='#a855f7';x402Ctx.shadowBlur=20;
+      x402Ctx.fillText('Protocol',256,180);
       var x402Tex=new THREE.CanvasTexture(x402Canvas);
-      var x402Mat=new THREE.SpriteMaterial({map:x402Tex,transparent:true,blending:THREE.AdditiveBlending,opacity:0.9});
+      x402Tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
+      var x402Mat=new THREE.SpriteMaterial({map:x402Tex,transparent:true,blending:THREE.AdditiveBlending,opacity:0.85});
       var x402Sprite=new THREE.Sprite(x402Mat);
-      x402Sprite.scale.set(1.4,0.7,1);x402Sprite.position.set(0,0,0);
+      x402Sprite.scale.set(1.6,0.8,1);x402Sprite.position.set(0,0,0);
       globeGroup.add(x402Sprite);
 
-      // === AGENT NODES (80 endpoints) ===
-      var NODE_COUNT=80;
+      // === AGENT NODES (100 endpoints — 60 paid + 40 free) ===
+      var NODE_COUNT=100;
       var nodeGeom=new THREE.BufferGeometry();
       var nodePos=new Float32Array(NODE_COUNT*3);
       var nodeCol=new Float32Array(NODE_COUNT*3);
       var nodeSz=new Float32Array(NODE_COUNT);
+      var nodePhase=new Float32Array(NODE_COUNT);
 
       for(var i=0;i<NODE_COUNT;i++){
         var phi=Math.acos(-1+(2*i/NODE_COUNT));
@@ -3246,7 +3320,8 @@
         var isFree=i>=60;
         if(isFree){nodeCol[i*3]=0.06;nodeCol[i*3+1]=0.72;nodeCol[i*3+2]=0.51;}
         else{var c=new THREE.Color().setHSL(0.75+Math.random()*0.1,0.7,0.6);nodeCol[i*3]=c.r;nodeCol[i*3+1]=c.g;nodeCol[i*3+2]=c.b;}
-        nodeSz[i]=isFree?0.09:0.055;
+        nodeSz[i]=isFree?0.1:0.06;
+        nodePhase[i]=Math.random()*Math.PI*2;
       }
       nodeGeom.setAttribute('position',new THREE.BufferAttribute(nodePos,3));
       nodeGeom.setAttribute('color',new THREE.BufferAttribute(nodeCol,3));
@@ -3254,15 +3329,37 @@
 
       var nodeMat=new THREE.ShaderMaterial({
         uniforms:{time:{value:0}},
-        vertexShader:'attribute float size;attribute vec3 color;varying vec3 vColor;uniform float time;void main(){vColor=color;vec3 pos=position;pos+=normalize(position)*sin(time*2.0+position.x*3.0)*0.03;vec4 mv=modelViewMatrix*vec4(pos,1.0);gl_PointSize=size*(350.0/-mv.z);gl_Position=projectionMatrix*mv;}',
-        fragmentShader:'varying vec3 vColor;void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;float glow=1.0-d*2.0;glow=pow(glow,1.5);gl_FragColor=vec4(vColor,glow*0.9);}',
+        vertexShader:[
+          'attribute float size;attribute vec3 color;',
+          'varying vec3 vColor;varying float vAlpha;',
+          'uniform float time;',
+          'void main(){',
+          '  vColor=color;',
+          '  vec3 pos=position;',
+          '  pos+=normalize(position)*sin(time*2.0+position.x*3.0)*0.03;',
+          '  vAlpha=0.6+0.4*sin(time*3.0+position.y*2.0);',
+          '  vec4 mv=modelViewMatrix*vec4(pos,1.0);',
+          '  gl_PointSize=size*(380.0/-mv.z);',
+          '  gl_Position=projectionMatrix*mv;',
+          '}'
+        ].join('\n'),
+        fragmentShader:[
+          'varying vec3 vColor;varying float vAlpha;',
+          'void main(){',
+          '  float d=length(gl_PointCoord-vec2(0.5));',
+          '  if(d>0.5)discard;',
+          '  float glow=1.0-d*2.0;',
+          '  glow=pow(glow,1.8);',
+          '  gl_FragColor=vec4(vColor,glow*vAlpha*0.9);',
+          '}'
+        ].join('\n'),
         transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
       });
       var nodes=new THREE.Points(nodeGeom,nodeMat);
       globeGroup.add(nodes);
 
-      // === SWARM (150 USDC particles) ===
-      var SWARM=150;
+      // === SWARM (200 USDC payment particles) ===
+      var SWARM=200;
       var sGeom=new THREE.BufferGeometry();
       var sPos=new Float32Array(SWARM*3);
       var sVel=new Float32Array(SWARM*3);
@@ -3279,7 +3376,7 @@
         sTgt[i*3]=nodePos[ti*3];sTgt[i*3+1]=nodePos[ti*3+1];sTgt[i*3+2]=nodePos[ti*3+2];
         var pc=palette[Math.floor(Math.random()*palette.length)];
         sCol[i*3]=pc.r;sCol[i*3+1]=pc.g;sCol[i*3+2]=pc.b;
-        sSz[i]=0.02+Math.random()*0.03;
+        sSz[i]=0.015+Math.random()*0.035;
       }
       sGeom.setAttribute('position',new THREE.BufferAttribute(sPos,3));
       sGeom.setAttribute('color',new THREE.BufferAttribute(sCol,3));
@@ -3287,29 +3384,82 @@
 
       var sMat=new THREE.ShaderMaterial({
         uniforms:{time:{value:0}},
-        vertexShader:'attribute float size;attribute vec3 color;varying vec3 vColor;varying float vAlpha;uniform float time;void main(){vColor=color;vec3 pos=position;pos.y+=sin(time*3.0+position.x*2.0)*0.012;vAlpha=0.5+0.5*sin(time*4.0+position.z*3.0);vec4 mv=modelViewMatrix*vec4(pos,1.0);gl_PointSize=size*(280.0/-mv.z);gl_Position=projectionMatrix*mv;}',
-        fragmentShader:'varying vec3 vColor;varying float vAlpha;void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;float glow=pow(1.0-d*2.0,2.0);gl_FragColor=vec4(vColor,vAlpha*glow*0.8);}',
+        vertexShader:[
+          'attribute float size;attribute vec3 color;',
+          'varying vec3 vColor;varying float vAlpha;',
+          'uniform float time;',
+          'void main(){',
+          '  vColor=color;',
+          '  vec3 pos=position;',
+          '  pos.y+=sin(time*3.0+position.x*2.0)*0.012;',
+          '  vAlpha=0.4+0.6*sin(time*4.0+position.z*3.0);',
+          '  vec4 mv=modelViewMatrix*vec4(pos,1.0);',
+          '  gl_PointSize=size*(300.0/-mv.z);',
+          '  gl_Position=projectionMatrix*mv;',
+          '}'
+        ].join('\n'),
+        fragmentShader:[
+          'varying vec3 vColor;varying float vAlpha;',
+          'void main(){',
+          '  float d=length(gl_PointCoord-vec2(0.5));',
+          '  if(d>0.5)discard;',
+          '  float glow=pow(1.0-d*2.0,2.5);',
+          '  gl_FragColor=vec4(vColor,vAlpha*glow*0.8);',
+          '}'
+        ].join('\n'),
         transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
       });
       var swarm=new THREE.Points(sGeom,sMat);
       globeGroup.add(swarm);
 
-      // === CONNECTION LINES ===
+      // === CONNECTION LINES (pulsing) ===
       var lGeom=new THREE.BufferGeometry();
       var lPos=new Float32Array(80*6);
+      var lAlpha=new Float32Array(80);
       lGeom.setAttribute('position',new THREE.BufferAttribute(lPos,3));
-      var lMat=new THREE.LineBasicMaterial({color:0xa855f7,transparent:true,opacity:0.06,blending:THREE.AdditiveBlending});
+      var lMat=new THREE.ShaderMaterial({
+        uniforms:{time:{value:0}},
+        vertexShader:'attribute float alpha;varying float vAlpha;uniform float time;void main(){vAlpha=alpha;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+        fragmentShader:'varying float vAlpha;void main(){gl_FragColor=vec4(0.66,0.33,0.97,vAlpha*0.12);}',
+        transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
+      });
+      for(var i=0;i<80;i++)lAlpha[i]=0;
+      lGeom.setAttribute('alpha',new THREE.BufferAttribute(lAlpha,1));
       var lines=new THREE.LineSegments(lGeom,lMat);
       globeGroup.add(lines);
 
-      // === ORBIT RINGS ===
+      // === ORBIT RINGS (3 animated rings) ===
+      var rings=[];
       for(var i=0;i<3;i++){
-        var rGeom=new THREE.RingGeometry(2.8+i*0.35,2.82+i*0.35,64);
-        var rMat=new THREE.MeshBasicMaterial({color:0xa855f7,transparent:true,opacity:0.035-i*0.008,side:THREE.DoubleSide});
+        var rGeom=new THREE.TorusGeometry(2.8+i*0.35,0.008,8,128);
+        var rMat=new THREE.MeshBasicMaterial({color:0xa855f7,transparent:true,opacity:0.12-i*0.03});
         var ring=new THREE.Mesh(rGeom,rMat);
         ring.rotation.x=Math.PI/2+i*0.2;ring.rotation.z=i*0.35;
         globeGroup.add(ring);
+        rings.push(ring);
       }
+
+      // === AMBIENT PARTICLES (500 tiny dust) ===
+      var DUST=500;
+      var dGeom=new THREE.BufferGeometry();
+      var dPos=new Float32Array(DUST*3);
+      var dSz=new Float32Array(DUST);
+      for(var i=0;i<DUST;i++){
+        dPos[i*3]=(Math.random()-0.5)*12;
+        dPos[i*3+1]=(Math.random()-0.5)*12;
+        dPos[i*3+2]=(Math.random()-0.5)*12;
+        dSz[i]=0.01+Math.random()*0.02;
+      }
+      dGeom.setAttribute('position',new THREE.BufferAttribute(dPos,3));
+      dGeom.setAttribute('size',new THREE.BufferAttribute(dSz,1));
+      var dMat=new THREE.ShaderMaterial({
+        uniforms:{time:{value:0}},
+        vertexShader:'attribute float size;uniform float time;varying float vAlpha;void main(){vAlpha=0.3+0.3*sin(time+position.x*5.0);vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=size*(200.0/-mv.z);gl_Position=projectionMatrix*mv;}',
+        fragmentShader:'varying float vAlpha;void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;gl_FragColor=vec4(0.66,0.33,0.97,vAlpha*(1.0-d*2.0)*0.5);}',
+        transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
+      });
+      var dust=new THREE.Points(dGeom,dMat);
+      scene.add(dust);
 
       camera.position.z=5.2;
       camera.position.y=0.3;
@@ -3318,7 +3468,6 @@
       var isDragging=false;
       var prevMouse={x:0,y:0};
       var rotVel={x:0,y:0};
-      var targetRot={x:0,y:0};
       var mouse={x:0,y:0};
 
       canvas.addEventListener('mousedown',function(e){isDragging=true;prevMouse={x:e.clientX,y:e.clientY};});
@@ -3335,7 +3484,6 @@
           prevMouse={x:e.clientX,y:e.clientY};
         }
       });
-      // Touch support
       canvas.addEventListener('touchstart',function(e){isDragging=true;prevMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};},{passive:true});
       canvas.addEventListener('touchend',function(){isDragging=false;},{passive:true});
       canvas.addEventListener('touchmove',function(e){
@@ -3348,7 +3496,6 @@
         }
       },{passive:true});
 
-      // Hover: speed up rotation
       var hoverSpeed=1;
 
       // === ANIMATE ===
@@ -3358,12 +3505,10 @@
         var t=clock.getElapsedTime();
         var sp=sGeom.attributes.position.array;
 
-        // Apply drag velocity with damping
         globeGroup.rotation.y+=rotVel.y;
         globeGroup.rotation.x+=rotVel.x;
         rotVel.x*=0.92;rotVel.y*=0.92;
 
-        // Auto-rotate (slower when dragging)
         if(!isDragging){
           globeGroup.rotation.y+=0.003*hoverSpeed;
           globeGroup.rotation.x=Math.sin(t*0.12)*0.06;
@@ -3371,6 +3516,13 @@
 
         x402Sprite.material.opacity=0.7+0.3*Math.sin(t*1.5);
 
+        // Animate rings
+        for(var i=0;i<rings.length;i++){
+          rings[i].rotation.z+=0.001*(i+1);
+          rings[i].material.opacity=0.08+0.04*Math.sin(t*0.5+i*2);
+        }
+
+        // Swarm particle movement
         for(var i=0;i<SWARM;i++){
           var dx=sTgt[i*3]-sp[i*3],dy=sTgt[i*3+1]-sp[i*3+1],dz=sTgt[i*3+2]-sp[i*3+2];
           var dist=Math.sqrt(dx*dx+dy*dy+dz*dz);
@@ -3379,19 +3531,26 @@
         }
         sGeom.attributes.position.needsUpdate=true;
 
+        // Connection lines
         var li=0;
         for(var i=0;i<SWARM&&li<80;i++){
           var ti3=Math.floor(i/NODE_COUNT*NODE_COUNT);
           var dx2=sp[i*3]-nodePos[ti3*3],dy2=sp[i*3+1]-nodePos[ti3*3+1],dz2=sp[i*3+2]-nodePos[ti3*3+2];
           var d2=Math.sqrt(dx2*dx2+dy2*dy2+dz2*dz2);
-          if(d2<1.2){lPos[li*6]=sp[i*3];lPos[li*6+1]=sp[i*3+1];lPos[li*6+2]=sp[i*3+2];lPos[li*6+3]=nodePos[ti3*3];lPos[li*6+4]=nodePos[ti3*3+1];lPos[li*6+5]=nodePos[ti3*3+2];li++;}
+          if(d2<1.2){lPos[li*6]=sp[i*3];lPos[li*6+1]=sp[i*3+1];lPos[li*6+2]=sp[i*3+2];lPos[li*6+3]=nodePos[ti3*3];lPos[li*6+4]=nodePos[ti3*3+1];lPos[li*6+5]=nodePos[ti3*3+2];lAlpha[li]=0.5+0.5*Math.sin(t*2+i);li++;}
         }
         for(var i=li*6;i<80*6;i++)lPos[i]=0;
+        for(var i=li;i<80;i++)lAlpha[i]=0;
         lGeom.attributes.position.needsUpdate=true;
+        lGeom.attributes.alpha.needsUpdate=true;
 
+        // Update shader uniforms
         nodeMat.uniforms.time.value=t;
         sMat.uniforms.time.value=t;
         glowMat.uniforms.time.value=t;
+        coreMat.uniforms.time.value=t;
+        lMat.uniforms.time.value=t;
+        dMat.uniforms.time.value=t;
 
         // Camera: subtle mouse parallax
         if(!isDragging){
@@ -3504,6 +3663,117 @@
       }
       refreshData();
       setInterval(refreshData,5000);
+    })();
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- GSAP SCROLLTRIGGER — Section reveal animations     -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <script>
+    (function(){
+      if(typeof gsap==='undefined'||typeof ScrollTrigger==='undefined')return;
+      gsap.registerPlugin(ScrollTrigger);
+
+      // — Section fade-in + slide-up on scroll —
+      gsap.utils.toArray('.stag').forEach(function(el){
+        gsap.from(el,{y:30,opacity:0,duration:0.8,ease:'power3.out',
+          scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none none'}
+        });
+      });
+      gsap.utils.toArray('.stitle').forEach(function(el){
+        gsap.from(el,{y:40,opacity:0,duration:1,ease:'power3.out',delay:0.1,
+          scrollTrigger:{trigger:el,start:'top 85%',toggleActions:'play none none none'}
+        });
+      });
+      gsap.utils.toArray('.sdesc').forEach(function(el){
+        gsap.from(el,{y:30,opacity:0,duration:0.9,ease:'power3.out',delay:0.2,
+          scrollTrigger:{trigger:el,start:'top 85%',toggleActions:'play none none none'}
+        });
+      });
+
+      // — Cards stagger-in —
+      gsap.utils.toArray('.cat-card, .feat-card, .how-card').forEach(function(card,i){
+        gsap.from(card,{y:50,opacity:0,duration:0.7,ease:'power2.out',delay:(i%3)*0.12,
+          scrollTrigger:{trigger:card,start:'top 90%',toggleActions:'play none none none'}
+        });
+      });
+
+      // — Code block typewriter reveal —
+      var codeBlock=document.querySelector('.code-block');
+      if(codeBlock){
+        gsap.from(codeBlock,{x:-40,opacity:0,duration:1,ease:'power3.out',
+          scrollTrigger:{trigger:codeBlock,start:'top 80%',toggleActions:'play none none none'}
+        });
+      }
+
+      // — CTA section parallax —
+      var ctaSection=document.querySelector('.cta-section');
+      if(ctaSection){
+        gsap.from(ctaSection.querySelector('.cta-box'),{scale:0.92,opacity:0,duration:1.2,ease:'power2.out',
+          scrollTrigger:{trigger:ctaSection,start:'top 75%',toggleActions:'play none none none'}
+        });
+      }
+
+      // — Hero stats counter animation —
+      gsap.utils.toArray('.hero-stat').forEach(function(stat,i){
+        gsap.from(stat,{y:20,opacity:0,duration:0.6,ease:'power2.out',delay:i*0.1,
+          scrollTrigger:{trigger:stat,start:'top 95%',toggleActions:'play none none none'}
+        });
+      });
+
+      // — Nav background on scroll —
+      ScrollTrigger.create({
+        start:'top -80',
+        onUpdate:function(self){
+          var nav=document.getElementById('mainNav');
+          if(nav)nav.classList.toggle('scrolled',self.progress>0);
+        }
+      });
+    })();
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- LENIS SMOOTH SCROLL — Butter-smooth scrolling       -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <script>
+    (function(){
+      if(typeof Lenis==='undefined')return;
+
+      var lenis=new Lenis({
+        duration:1.2,
+        easing:function(t){return Math.min(1,1.001-Math.pow(2,-10*t));},
+        orientation:'vertical',
+        gestureOrientation:'vertical',
+        smoothWheel:true,
+        wheelMultiplier:1,
+        touchMultiplier:2,
+        infinite:false
+      });
+
+      // Connect Lenis to GSAP ScrollTrigger
+      if(typeof gsap!=='undefined'&&typeof ScrollTrigger!=='undefined'){
+        lenis.on('scroll',ScrollTrigger.update);
+        gsap.ticker.add(function(time){lenis.raf(time*1000);});
+        gsap.ticker.lagSmoothing(0);
+      }
+
+      // Connect to Three.js globe parallax (scroll-based camera offset)
+      var lastScroll=0;
+      lenis.on('scroll',function(e){
+        var scrollDelta=e-animatedScroll;
+        animatedScroll=e;
+        // Globe responds to scroll direction
+        if(typeof window._globeScrollCallback==='function'){
+          window._globeScrollCallback(scrollDelta);
+        }
+      });
+      var animatedScroll=0;
+
+      // Intercept slideshow wheel to also feed Lenis
+      // (Lenis handles smooth scroll, slideshow handles section snapping)
+      // They coexist: Lenis smooths the scroll, slideshow does snap-to-section
+
+      window._lenis=lenis;
     })();
     </script>
 </body>
