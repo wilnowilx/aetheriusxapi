@@ -1,12 +1,10 @@
 import React, { useRef, useMemo, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Stars } from '@react-three/drei'
-import { EffectComposer, Bloom } from '@react-three/postprocessing'
+import { Stars, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
-// === ATMOSPHERIC GLOW SHADER ===
+// === ATMOSPHERIC GLOW SHADER (rim-light halo, no postprocessing needed) ===
 function AtmosphereGlow() {
-  const meshRef = useRef()
   const uniforms = useMemo(() => ({
     time: { value: 0 },
     glowColor: { value: new THREE.Color(0xa855f7) },
@@ -18,7 +16,7 @@ function AtmosphereGlow() {
   })
 
   return (
-    <mesh ref={meshRef} scale={1.07}>
+    <mesh scale={1.07}>
       <sphereGeometry args={[2.2, 48, 48]} />
       <shaderMaterial
         uniforms={uniforms}
@@ -96,14 +94,10 @@ function InnerCore() {
   )
 }
 
-// === GLOBE WIREFRAME ===
+// === GLOBE WIREFRAME (static mesh — the GROUP orbits, not pieces) ===
 function GlobeWireframe() {
-  const ref = useRef()
-  useFrame((state) => {
-    ref.current.rotation.y = state.clock.elapsedTime * 0.05
-  })
   return (
-    <mesh ref={ref}>
+    <mesh>
       <sphereGeometry args={[2.2, 48, 32]} />
       <meshBasicMaterial color={0xa855f7} wireframe transparent opacity={0.055} />
     </mesh>
@@ -112,7 +106,6 @@ function GlobeWireframe() {
 
 // === AGENT NODES (100 endpoints) ===
 function AgentNodes() {
-  const pointsRef = useRef()
   const NODE_COUNT = 100
 
   const { positions, colors, sizes } = useMemo(() => {
@@ -147,7 +140,7 @@ function AgentNodes() {
   })
 
   return (
-    <points ref={pointsRef}>
+    <points>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
         <bufferAttribute attach="attributes-aColor" args={[colors, 3]} />
@@ -232,13 +225,16 @@ function X402Center() {
 
   return (
     <sprite ref={spriteRef} scale={[1.6, 0.8, 1]}>
-      <spriteMaterial map={texture} transparent blending={THREE.AdditiveBlending} opacity={0.85} />
+      <spriteMaterial map={texture} transparent blending={THREE.AdditiveBlending} opacity={0.85} depthWrite={false} />
     </sprite>
   )
 }
 
 // === MAIN GLOBE SCENE ===
-// Perf: Bloom + Stars are GPU-heavy — disabled on touch/mobile devices
+// Standard pattern (drei OrbitControls): camera orbits the group,
+// drag rotates, autoRotate spins when idle. No postprocessing —
+// the Fresnel shader IS the glow (postprocessing quads can paint
+// an opaque square behind transparent canvases).
 function GlobeScene() {
   const isMobile = useMemo(() => {
     if (typeof window === 'undefined') return false
@@ -249,7 +245,7 @@ function GlobeScene() {
     <Canvas
       camera={{ position: [0, 0.3, 5.2], fov: 40 }}
       gl={{ alpha: true, antialias: !isMobile, powerPreference: 'high-performance' }}
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: 'transparent' }}
       dpr={[1, 1.5]}
     >
       <ambientLight intensity={0.1} />
@@ -262,16 +258,17 @@ function GlobeScene() {
       {!isMobile && (
         <Stars radius={8} depth={20} count={250} factor={2} saturation={0.5} fade speed={0.5} />
       )}
-      {!isMobile && (
-        <EffectComposer multisampling={0}>
-          <Bloom
-            intensity={1.0}
-            luminanceThreshold={0.15}
-            luminanceSmoothing={0.9}
-            radius={0.7}
-          />
-        </EffectComposer>
-      )}
+      <OrbitControls
+        autoRotate
+        autoRotateSpeed={0.8}
+        enableZoom={false}
+        enablePan={false}
+        enableDamping
+        dampingFactor={0.08}
+        rotateSpeed={0.6}
+        minPolarAngle={Math.PI * 0.25}
+        maxPolarAngle={Math.PI * 0.75}
+      />
     </Canvas>
   )
 }
