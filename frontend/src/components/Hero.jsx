@@ -59,12 +59,54 @@ const labelPositions = [
 function Hero() {
   const [labelIdx, setLabelIdx] = useState(0)
   const [stats, setStats] = useState({ volume: '—', agents: '—', payments: '—', health: '—' })
+  const [labels, setLabels] = useState(liveLabels)
 
   // Rotating labels
   useEffect(() => {
     const interval = setInterval(() => {
-      setLabelIdx(prev => (prev + 1) % liveLabels.length)
+      setLabelIdx(prev => (prev + 1) % labels.length)
     }, 1800)
+    return () => clearInterval(interval)
+  }, [labels.length])
+
+  // LIVE labels via QuantumXBrain (null-safe: only overwrite on real values)
+  useEffect(() => {
+    const put = (i, text) => {
+      if (!text) return
+      setLabels(prev => prev.map((l, j) => (j === i ? { ...l, text } : l)))
+    }
+    const refresh = async () => {
+      try {
+        const g = await fetch(`${API_BASE}/v1/x402/gas`).then(r => r.json()).catch(() => null)
+        if (g && g.current_gwei != null) {
+          put(4, `Gas: ${g.current_gwei} gwei`)
+          if (g.cost_estimates && g.cost_estimates.simple_transfer_usd != null) {
+            put(12, `$${g.cost_estimates.simple_transfer_usd}/tx`)
+          }
+        }
+      } catch { /* keep static truth */ }
+      try {
+        const m = await fetch(`${API_BASE}/v1/x402/market-pulse`).then(r => r.json()).catch(() => null)
+        if (m) {
+          if (m.signal && m.signal.label) put(1, `Signal: ${m.signal.label}`)
+          if (m.chain && m.chain.block) put(5, `Block #${Number(m.chain.block).toLocaleString()}`)
+          if (m.market && m.market.eth_usd != null) put(3, `ETH $${Math.round(m.market.eth_usd).toLocaleString()}`)
+        }
+      } catch { /* keep static truth */ }
+      try {
+        const s = await fetch(`${API_BASE}/v1/x402/sentiment`).then(r => r.json()).catch(() => null)
+        if (s) {
+          if (s.fear_greed_index && s.fear_greed_index.value != null) {
+            put(13, `F&G: ${s.fear_greed_index.value} ${s.fear_greed_index.label || ''}`.trim())
+          }
+          if (s.market && s.market.btc_usd != null) {
+            put(14, `BTC $${Math.round(s.market.btc_usd).toLocaleString()}`)
+          }
+        }
+      } catch { /* keep static truth */ }
+    }
+    refresh()
+    const interval = setInterval(refresh, 30000)
     return () => clearInterval(interval)
   }, [])
 
@@ -94,7 +136,7 @@ function Hero() {
     <section id="hero" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', position: 'relative', overflow: 'visible', paddingTop: '120px', isolation: 'isolate', zIndex: 0 }}>
       <div className="inner" style={{ width: '100%', overflow: 'visible' }}>
         {/* Top: badges + GIANT headline, full width */}
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', justifyContent: 'flex-start', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', justifyContent: 'center', alignItems: 'center' }}>
           <div className="section-label" style={{ fontSize: '0.78rem', padding: '6px 14px', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 9999, background: 'rgba(16,185,129,0.08)' }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
             Base Mainnet LIVE
@@ -105,13 +147,16 @@ function Hero() {
           </div>
         </div>
 
-        <h1 className="section-title" style={{ fontSize: 'clamp(3.5rem, 9vw, 8rem)', lineHeight: 1.0, letterSpacing: '-0.03em', margin: '0 0 8px' }}>
-          The Infrastructure<br />
-          <span className="grad-flow">for Agents That Pay</span>
+        <h1 className="section-title" style={{ textAlign: 'center', position: 'relative', zIndex: 3, pointerEvents: 'none', margin: '0 0 8px' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '22px' }}>
+            <span style={{ writingMode: 'vertical-rl', fontSize: 'clamp(1rem, 2vw, 1.6rem)', letterSpacing: '0.4em', color: 'var(--text-sec)', fontWeight: 600 }}>THE</span>
+            <span style={{ fontSize: 'clamp(3rem, 8.5vw, 7.5rem)', lineHeight: 1.0, letterSpacing: '-0.03em', fontWeight: 900 }}>INFRASTRUCTURE</span>
+          </span>
+          <span className="grad-flow" style={{ display: 'block', fontSize: 'clamp(1.8rem, 4.5vw, 3.6rem)', marginTop: '6px', fontWeight: 800 }}>for Agents That Pay</span>
         </h1>
 
         {/* Row: sub + actions + stats (left) / globe (right) */}
-        <div className="hero-row" style={{ display: 'flex', alignItems: 'center', gap: '60px', marginTop: '32px' }}>
+        <div className="hero-row" style={{ display: 'flex', alignItems: 'center', gap: '60px', marginTop: '-56px' }}>
         <div style={{ flex: '1 1 50%', zIndex: 2 }}>
           <p className="section-desc" style={{ marginBottom: '32px', fontSize: '1.15rem' }}>
             100+ live APIs your agents can pay for in USDC on Base. 40 FREE QuantumXBrain intelligence endpoints.
@@ -119,11 +164,11 @@ function Hero() {
           </p>
 
           <div style={{ display: 'flex', gap: '16px', marginBottom: '40px', flexWrap: 'wrap' }}>
-            <a href="#cta" className="btn btn-primary" style={{ padding: '14px 30px', fontSize: '1rem' }}>
+            <a href="#cta" className="btn btn-primary" style={{ padding: '16px 36px', fontSize: '1.05rem', fontWeight: 700, boxShadow: '0 8px 32px rgba(168,85,247,0.45), 0 2px 8px rgba(217,70,239,0.35)' }}>
               Start Building
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
-            <a href="#code" className="btn btn-secondary" style={{ padding: '14px 30px', fontSize: '1rem' }}>
+            <a href="#code" className="btn btn-secondary" style={{ padding: '16px 36px', fontSize: '1.05rem', fontWeight: 600 }}>
               View Docs
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
             </a>
@@ -137,8 +182,8 @@ function Hero() {
               { value: stats.payments, label: 'Wallets seen' },
               { value: stats.health, label: 'Avg latency' },
             ].map((stat, i) => (
-              <div key={i}>
-                <div style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div key={i} style={{ border: '1px solid var(--border)', borderRadius: 14, padding: '14px 16px', background: 'rgba(255,255,255,0.02)' }}>
+                <div style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: 8 }}>
                   {stat.value}
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', animation: 'pulse 2s infinite' }} />
                 </div>
@@ -166,7 +211,7 @@ function Hero() {
 
           {/* Floating labels */}
           <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2 }}>
-            {liveLabels.slice(0, Math.min(labelIdx + 3, liveLabels.length)).map((label, i) => {
+            {labels.slice(0, Math.min(labelIdx + 3, labels.length)).map((label, i) => {
               const pos = labelPositions[i % labelPositions.length]
               return (
                 <div

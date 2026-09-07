@@ -44,7 +44,12 @@ function Nav() {
             <a href="#how">How It Works</a>
             <a href="#heartbeat">Status</a>
             <a href="#telemetry">Telemetry</a>
+            <a href="#docs">Docs</a>
             <a href="dashboard/">Dashboard</a>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.72rem', fontWeight: 600, color: 'var(--green)', padding: '6px 12px', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 9999, background: 'rgba(16,185,129,0.08)', fontFamily: 'JetBrains Mono, monospace' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor', animation: 'pulse 2s infinite' }} />
+              Mainnet
+            </span>
             <a href="#cta" className="btn-nav">Get Started</a>
           </div>
           <button className="mobile-toggle" onClick={() => setMobileOpen(true)}>
@@ -62,6 +67,7 @@ function Nav() {
           <a href="#code" onClick={() => setMobileOpen(false)}>Code</a>
           <a href="#heartbeat" onClick={() => setMobileOpen(false)}>Status</a>
           <a href="#telemetry" onClick={() => setMobileOpen(false)}>Telemetry</a>
+          <a href="#docs" onClick={() => setMobileOpen(false)}>Docs</a>
           <a href="#limits" onClick={() => setMobileOpen(false)}>Rate Limits</a>
           <a href="#cta" className="btn btn-primary" onClick={() => setMobileOpen(false)}>Get Started</a>
         </div>

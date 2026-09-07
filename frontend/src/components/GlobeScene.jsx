@@ -36,11 +36,11 @@ function AtmosphereGlow() {
           uniform vec3 glowColor;
           uniform vec3 accentColor;
           void main() {
-            float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.5);
-            float pulse = 0.8 + 0.2 * sin(time * 1.2 + vWorldPos.y * 2.0);
+            float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 1.6);
+            float pulse = 0.85 + 0.15 * sin(time * 1.2 + vWorldPos.y * 2.0);
             float wave = 0.5 + 0.5 * sin(time * 0.8 + vWorldPos.x * 3.0 + vWorldPos.z * 2.0);
             vec3 col = mix(glowColor, accentColor, wave * 0.4);
-            float alpha = fresnel * pulse * 0.65;
+            float alpha = fresnel * pulse * 0.42;
             gl_FragColor = vec4(col, alpha);
           }
         `}
@@ -79,10 +79,10 @@ function InnerCore() {
           varying vec3 vNormal;
           uniform float time;
           void main() {
-            float rim = pow(1.0 - abs(dot(vNormal, vec3(0, 0, 1))), 3.0);
-            float pulse = 0.7 + 0.3 * sin(time * 0.6);
+            float rim = pow(1.0 - abs(dot(vNormal, vec3(0, 0, 1))), 2.2);
+            float pulse = 0.75 + 0.25 * sin(time * 0.6);
             vec3 col = vec3(0.44, 0.21, 0.73);
-            gl_FragColor = vec4(col, rim * pulse * 0.25);
+            gl_FragColor = vec4(col, rim * pulse * 0.18);
           }
         `}
         side={THREE.FrontSide}
