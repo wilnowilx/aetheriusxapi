@@ -1,5 +1,7 @@
 import React, { useState, useEffect, Suspense } from 'react'
-import GlobeScene from './GlobeScene'
+
+// Lazy: three.js (~700KB) loads AFTER first paint, never blocks the page
+const GlobeScene = React.lazy(() => import('./GlobeScene'))
 
 // Local boundary: a WebGL/globe crash must never kill the hero text
 class GlobeBoundary extends React.Component {

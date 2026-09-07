@@ -94,20 +94,38 @@ const playgroundEndpoints = [
     { method: 'GET', path: '/v1/crypto/market', price: '$0.005', params: '{"token":"ETH"}' },
     { method: 'GET', path: '/v1/crypto/fear-greed', price: '$0.005', params: '{}' },
     { method: 'GET', path: '/v1/crypto/trending', price: '$0.01', params: '{}' },
+    { method: 'GET', path: '/v1/crypto/ohlcv', price: '$0.01', params: '{"token":"ETH","interval":"1d"}' },
     { method: 'GET', path: '/v1/crypto/dominance', price: '$0.005', params: '{}' },
   ]},
   { cat: 'Web', icon: 'M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z', items: [
     { method: 'GET', path: '/v1/web/scrape', price: '$0.01', params: '{"url":"https://example.com"}' },
-    { method: 'GET', path: '/v1/web/whois', price: '$0.01', params: '{"domain":"example.com"}' },
   ]},
   { cat: 'Data', icon: 'M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z', items: [
     { method: 'GET', path: '/v1/data/weather', price: '$0.005', params: '{"lat":"19.4326","lon":"-99.1332"}' },
-    { method: 'GET', path: '/v1/data/ip-geo', price: '$0.005', params: '{"ip":"8.8.8.8"}' },
     { method: 'GET', path: '/v1/email/validate', price: '$0.005', params: '{"email":"test@example.com"}' },
+  ]},
+  { cat: 'Web Tools', icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z', items: [
+    { method: 'GET', path: '/v1/web/whois', price: '$0.01', params: '{"domain":"example.com"}' },
+    { method: 'GET', path: '/v1/web/headers', price: '$0.005', params: '{"url":"https://example.com"}' },
+    { method: 'GET', path: '/v1/web/ssl-check', price: '$0.005', params: '{"domain":"example.com"}' },
+  ]},
+  { cat: 'Data Tools', icon: 'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z', items: [
+    { method: 'GET', path: '/v1/data/ip-geo', price: '$0.005', params: '{"ip":"8.8.8.8"}' },
+    { method: 'GET', path: '/v1/data/ua-parser', price: '$0.002', params: '{"ua":"Mozilla/5.0"}' },
+    { method: 'GET', path: '/v1/data/hash', price: '$0.002', params: '{"input":"hello","algo":"sha256"}' },
+    { method: 'GET', path: '/v1/data/uuid', price: '$0.001', params: '{}' },
+    { method: 'GET', path: '/v1/data/qr-code', price: '$0.003', params: '{"text":"https://aetheriusx.io"}' },
+    { method: 'POST', path: '/v1/data/translate', price: '$0.01', params: '{"text":"hello","target":"es"}' },
+    { method: 'POST', path: '/v1/data/summarize', price: '$0.02', params: '{"text":"Long article text..."}' },
   ]},
   { cat: 'News', icon: 'M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2', items: [
     { method: 'GET', path: '/v1/news/reddit', price: '$0.005', params: '{"subreddit":"cryptocurrency"}' },
     { method: 'GET', path: '/v1/news/devto', price: '$0.005', params: '{"tag":"javascript"}' },
+  ]},
+  { cat: 'DeFi & Token', icon: 'M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6', items: [
+    { method: 'GET', path: '/v1/defi/il-calculator', price: '$0.01', params: '{"pair":"ETH/USDC","range":"30d"}' },
+    { method: 'GET', path: '/v1/defi/staking-apy', price: '$0.005', params: '{"protocol":"lido","token":"ETH"}' },
+    { method: 'GET', path: '/v1/token/nft-metadata', price: '$0.01', params: '{"contract":"0x...","tokenId":"1"}' },
   ]},
 ]
 
@@ -188,7 +206,7 @@ function Playground() {
                     transition: 'all 0.25s', background: selected.path === ep.path ? 'rgba(168,85,247,0.15)' : 'transparent',
                     borderColor: selected.path === ep.path ? 'rgba(168,85,247,0.35)' : 'transparent',
                   }}>
-                    <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.65rem', fontWeight: 600, padding: '2px 6px', borderRadius: 4, background: 'rgba(16,185,129,0.15)', color: 'var(--green)' }}>{ep.method}</span>
+                    <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.65rem', fontWeight: 600, padding: '2px 6px', borderRadius: 4, background: ep.method === 'POST' ? 'rgba(245,158,11,0.15)' : 'rgba(16,185,129,0.15)', color: ep.method === 'POST' ? 'var(--orange)' : 'var(--green)' }}>{ep.method}</span>
                     <span style={{ flex: 1, fontFamily: 'JetBrains Mono, monospace', color: 'var(--text)' }}>{ep.path.replace('/v1/', '/')}</span>
                     <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem', color: 'var(--magenta-light)' }}>{ep.price}</span>
                   </div>
@@ -201,7 +219,7 @@ function Playground() {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: 'rgba(16,185,129,0.15)', color: 'var(--green)' }}>{selected.method}</span>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: selected.method === 'POST' ? 'rgba(245,158,11,0.15)' : 'rgba(16,185,129,0.15)', color: selected.method === 'POST' ? 'var(--orange)' : 'var(--green)' }}>{selected.method}</span>
                 <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem', color: 'var(--text)' }}>{selected.path}</span>
               </div>
               <button onClick={sendRequest} disabled={loading} style={{
@@ -305,10 +323,10 @@ function Categories() {
 // === X402 INTELLIGENCE ===
 function X402Intelligence() {
   const cards = [
-    { title: 'Brain Recommender', desc: 'Tell it what you need — "defi", "wallet", "gas" — and it recommends the best endpoints. AI-powered routing.', code: 'GET /v1/x402/brain?intent=defi', color: 'var(--purple-light)', bg: 'rgba(168,85,247,0.1)', border: 'rgba(168,85,247,0.3)', icon: 'M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z' },
-    { title: 'Market Pulse', desc: 'Real-time Base conditions: gas, chain health, USDC activity, ETH price, bullish/bearish signal. One call.', code: 'GET /v1/x402/market-pulse', color: 'var(--green)', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.3)', icon: 'M22 12h-4l-3 9L9 3l-3 9H2' },
-    { title: 'Wallet Intel', desc: 'Full wallet profile: USDC flow, risk score, counterparty analysis, ETH balance. Any address on Base.', code: 'GET /v1/x402/wallet-intel/{address}', color: 'var(--pink)', bg: 'rgba(236,72,153,0.1)', border: 'rgba(236,72,153,0.3)', icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2' },
-    { title: 'Sentiment + Risk', desc: 'Fear & Greed Index + on-chain sentiment. Multi-factor risk scoring with detailed breakdown. Compliance indicators.', code: 'GET /v1/x402/sentiment · /risk-intel', color: 'var(--cyan)', bg: 'rgba(6,182,212,0.1)', border: 'rgba(6,182,212,0.3)', icon: 'M12 2L2 7l10 5 10-5-10-5z' },
+    { title: 'Brain Recommender', desc: 'Tell it what you need — "defi", "wallet", "gas" — and it recommends the best endpoints. AI-powered routing.', code: 'GET /v1/x402/brain?intent=defi', color: 'var(--purple-light)', bg: 'rgba(168,85,247,0.1)', border: 'rgba(168,85,247,0.3)', iconBg: 'linear-gradient(135deg, rgba(168,85,247,0.12), rgba(217,70,239,0.12))', icon: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>' },
+    { title: 'Market Pulse', desc: 'Real-time Base conditions: gas, chain health, USDC activity, ETH price, bullish/bearish signal. One call.', code: 'GET /v1/x402/market-pulse', color: 'var(--green)', bg: 'rgba(16,185,129,0.1)', border: 'rgba(168,85,247,0.3)', iconBg: 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,182,212,0.12))', icon: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>' },
+    { title: 'Wallet Intel', desc: 'Full wallet profile: USDC flow, risk score, counterparty analysis, ETH balance. Any address on Base.', code: 'GET /v1/x402/wallet-intel/{address}', color: 'var(--pink)', bg: 'rgba(236,72,153,0.1)', border: 'rgba(168,85,247,0.3)', iconBg: 'linear-gradient(135deg, rgba(236,72,153,0.12), rgba(168,85,247,0.12))', icon: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>' },
+    { title: 'Sentiment + Risk', desc: 'Fear & Greed Index + on-chain sentiment. Multi-factor risk scoring with detailed breakdown. Compliance indicators.', code: 'GET /v1/x402/sentiment · /risk-intel', color: 'var(--cyan)', bg: 'rgba(6,182,212,0.1)', border: 'rgba(168,85,247,0.3)', iconBg: 'linear-gradient(135deg, rgba(6,182,212,0.12), rgba(16,185,129,0.12))', icon: '<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>' },
   ]
 
   return (
@@ -326,8 +344,8 @@ function X402Intelligence() {
               padding: '44px 36px', background: 'var(--bg-card)', border: `1px solid ${c.border}`,
               borderRadius: 24, textAlign: 'left', transition: 'all 0.5s',
             }}>
-              <div style={{ width: 64, height: 64, background: `linear-gradient(135deg, ${c.bg}, rgba(217,70,239,0.12))`, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 28, color: c.color }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="30" height="30"><path d={c.icon}/></svg>
+              <div style={{ width: 64, height: 64, background: c.iconBg, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 28, color: c.color }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="30" height="30" dangerouslySetInnerHTML={{ __html: c.icon }} />
               </div>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 12 }}>{c.title}</h3>
               <p style={{ color: 'var(--text-sec)', fontSize: '0.95rem', marginBottom: 16 }}>{c.desc}</p>
@@ -447,9 +465,9 @@ function CodeSection() {
   const [tab, setTab] = useState('py')
 
   const codeBlocks = {
-    py: `<span style="color:var(--green)">$</span> pip install aetheriusx\n\n<span style="color:var(--text-muted)"># Initialize with your wallet</span>\n<span style="color:var(--green)">$</span> python\n<span style="color:var(--purple-light)">&gt;&gt;&gt;</span> <span style="color:var(--cyan)">from</span> aetheriusx <span style="color:var(--cyan)">import</span> Client\n<span style="color:var(--purple-light)">&gt;&gt;&gt;</span> client = Client(<span style="color:var(--green)">"0xYourWallet"</span>)\n\n<span style="color:var(--text-muted)"># Call any API — payment is automatic</span>\n<span style="color:var(--purple-light)">&gt;&gt;&gt;</span> resp = client.get(<span style="color:var(--green)">"<span style="color:var(--orange)">/v1/crypto/price</span>"</span>,\n    params={<span style="color:var(--green)">"token"</span>: <span style="color:var(--green)">"ETH"</span>})\n<span style="color:var(--purple-light)">&gt;&gt;&gt;</span> print(resp.data)\n<span style="color:var(--text-sec)">{"{"}"price": 2384.50, "change": 2.3{"}"}</span>`,
-    js: `<span style="color:var(--green)">$</span> npm install aetheriusx\n\n<span style="color:var(--text-muted)"># Import and initialize</span>\n<span style="color:var(--purple-light)">&gt;</span> <span style="color:var(--cyan)">import</span> { Client } <span style="color:var(--cyan)">from</span> <span style="color:var(--green)">"aetheriusx"</span>\n<span style="color:var(--purple-light)">&gt;</span> <span style="color:var(--kw)">const</span> client = <span style="color:var(--kw)">new</span> Client(<span style="color:var(--green)">"0xYourWallet"</span>)\n\n<span style="color:var(--text-muted)"># Call any API — payment is automatic</span>\n<span style="color:var(--purple-light)">&gt;</span> <span style="color:var(--kw)">const</span> resp = <span style="color:var(--kw)">await</span> client.get(\n  <span style="color:var(--green)">"<span style="color:var(--orange)">/v1/crypto/price</span>"</span>,\n  { params: { token: <span style="color:var(--green)">"ETH"</span> } }\n)\n<span style="color:var(--purple-light)">&gt;</span> console.log(resp.data)\n<span style="color:var(--text-sec)">{"{"}"price": 2384.50, "change": 2.3{"}"}</span>`,
-    curl: `<span style="color:var(--text-muted)"># Direct API call — x402 handles payment</span>\n<span style="color:var(--green)">$</span> curl -X GET <span style="color:var(--green)">"https://api.aetheriusx.io/v1/crypto/price?token=ETH"</span> \\\n  -H <span style="color:var(--green)">"X-Wallet: 0xYourWallet"</span>\n\n<span style="color:var(--text-muted)"># Response (after x402 payment)</span>\n<span style="color:var(--text-sec)">{"{"}\n  "price": 2384.50,\n  "change_24h": 2.3,\n  "token": "ETH"\n{"}"}</span>`,
+    py: `<span style="color:var(--text-muted)"># Install the SDK</span>\n<span style="color:var(--green)">$</span> <span style="color:var(--text)">pip install aetheriusx</span>\n\n<span style="color:var(--text-muted)"># Initialize with your wallet</span>\n<span style="color:var(--green)">$</span> <span style="color:var(--text)">python</span>\n<span style="color:var(--purple-light)">&gt;&gt;&gt; from</span> aetheriusx <span style="color:var(--purple-light)">import</span> <span style="color:var(--pink)">Client</span>\n<span style="color:var(--purple-light)">&gt;&gt;&gt; client</span> = <span style="color:var(--pink)">Client</span>(<span style="color:var(--magenta-light)">"0xYourWallet"</span>)\n\n<span style="color:var(--text-muted)"># Call any API — payment is automatic</span>\n<span style="color:var(--purple-light)">&gt;&gt;&gt; resp</span> = client.<span style="color:var(--pink)">get</span>(<span style="color:var(--magenta-light)">"/v1/crypto/price"</span>,\n        params={<span style="color:var(--magenta-light)">"token"</span>: <span style="color:var(--magenta-light)">"ETH"</span>})\n\n<span style="color:var(--purple-light)">&gt;&gt;&gt; print</span>(resp.data)\n<span style="color:var(--text-sec)">{</span><span style="color:var(--magenta-light)">"price"</span>: <span style="color:var(--orange)">2384.50</span>, <span style="color:var(--magenta-light)">"change"</span>: <span style="color:var(--orange)">2.3</span><span style="color:var(--text-sec)">}</span>\n<span style="color:var(--green)">$</span> <span style="color:var(--text-muted)"># That's it. Payment handled.</span>`,
+    js: `<span style="color:var(--text-muted)">// Install the SDK</span>\n<span style="color:var(--green)">$</span> <span style="color:var(--text)">npm install aetheriusx</span>\n\n<span style="color:var(--text-muted)">// Initialize with your wallet</span>\n<span style="color:var(--purple-light)">import</span> { <span style="color:var(--pink)">Client</span> } <span style="color:var(--purple-light)">from</span> <span style="color:var(--magenta-light)">'aetheriusx'</span>;\n\n<span style="color:var(--purple-light)">const</span> client = <span style="color:var(--purple-light)">new</span> <span style="color:var(--pink)">Client</span>(<span style="color:var(--magenta-light)">'0xYourWallet'</span>);\n\n<span style="color:var(--text-muted)">// Call any API — payment is automatic</span>\n<span style="color:var(--purple-light)">const</span> resp = <span style="color:var(--purple-light)">await</span> client.<span style="color:var(--pink)">get</span>(\n  <span style="color:var(--magenta-light)">'/v1/crypto/price'</span>,\n  { params: { token: <span style="color:var(--magenta-light)">'ETH'</span> } }\n);\n\nconsole.<span style="color:var(--pink)">log</span>(resp.data);\n<span style="color:var(--text-sec)">// { price: 2384.50, change: 2.3 }</span>`,
+    curl: `<span style="color:var(--text-muted)"># Make a request with x402 payment</span>\n<span style="color:var(--green)">$</span> <span style="color:var(--text)">curl</span> <span style="color:var(--cyan)">-X GET</span> \\\n  <span style="color:var(--magenta-light)">"https://api.aetheriusx.io/v1/crypto/price?token=ETH"</span> \\\n  <span style="color:var(--cyan)">-H</span> <span style="color:var(--magenta-light)">"X-PAYMENT: 0x...proof"</span> \\\n  <span style="color:var(--cyan)">-H</span> <span style="color:var(--magenta-light)">"Content-Type: application/json"</span>\n\n<span style="color:var(--text-muted)"># Response</span>\n<span style="color:var(--text-sec)">{</span>\n  <span style="color:var(--magenta-light)">"data"</span>: <span style="color:var(--text-sec)">{</span>\n    <span style="color:var(--magenta-light)">"price"</span>: <span style="color:var(--orange)">2384.50</span>,\n    <span style="color:var(--magenta-light)">"change_24h"</span>: <span style="color:var(--orange)">2.3</span>\n  <span style="color:var(--text-sec)">}</span>\n<span style="color:var(--text-sec)">}</span>`,
   }
 
   return (

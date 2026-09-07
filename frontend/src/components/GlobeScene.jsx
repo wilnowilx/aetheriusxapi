@@ -238,13 +238,19 @@ function X402Center() {
 }
 
 // === MAIN GLOBE SCENE ===
+// Perf: Bloom + Stars are GPU-heavy — disabled on touch/mobile devices
 function GlobeScene() {
+  const isMobile = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return window.matchMedia('(pointer: coarse)').matches ||
+           window.innerWidth < 768
+  }, [])
   return (
     <Canvas
       camera={{ position: [0, 0.3, 5.2], fov: 40 }}
-      gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
+      gl={{ alpha: true, antialias: !isMobile, powerPreference: 'high-performance' }}
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-      dpr={[1, 2]}
+      dpr={[1, 1.5]}
     >
       <ambientLight intensity={0.1} />
       <GlobeWireframe />
@@ -253,15 +259,19 @@ function GlobeScene() {
       <AgentNodes />
       <X402Center />
       <OrbitRings />
-      <Stars radius={8} depth={20} count={500} factor={2} saturation={0.5} fade speed={0.5} />
-      <EffectComposer>
-        <Bloom
-          intensity={1.2}
-          luminanceThreshold={0.1}
-          luminanceSmoothing={0.9}
-          radius={0.8}
-        />
-      </EffectComposer>
+      {!isMobile && (
+        <Stars radius={8} depth={20} count={250} factor={2} saturation={0.5} fade speed={0.5} />
+      )}
+      {!isMobile && (
+        <EffectComposer multisampling={0}>
+          <Bloom
+            intensity={1.0}
+            luminanceThreshold={0.15}
+            luminanceSmoothing={0.9}
+            radius={0.7}
+          />
+        </EffectComposer>
+      )}
     </Canvas>
   )
 }
