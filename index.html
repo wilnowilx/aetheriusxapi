@@ -16,8 +16,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- Three.js r183 (WebGPU-ready, modern) -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.183.0/build/three.min.js"></script>
+    <!-- Three.js 0.160.0 (last UMD build — script tag compatible) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <!-- GSAP + ScrollTrigger (scroll-driven animations) -->
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
@@ -2684,6 +2684,30 @@
                 <div class="trusted-logo">x402</div>
                 <div class="trusted-logo">Coinbase</div>
                 <div class="trusted-logo">USDC</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DONATEX — Open-Source Donation Widget -->
+    <section id="donatex" style="min-height:auto;padding:60px 0;text-align:center;">
+        <div class="inner" style="max-width:600px;margin:0 auto;padding:0 40px;">
+            <div style="background:linear-gradient(135deg,rgba(168,85,247,0.08) 0%,rgba(217,70,239,0.05) 100%);border:1px solid rgba(168,85,247,0.15);border-radius:16px;padding:40px 32px;">
+                <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.12em;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">DonateX</div>
+                <h3 style="font-size:1.4rem;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,var(--purple),var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Support Open-Source</h3>
+                <p style="color:var(--text-sec);font-size:0.9rem;margin-bottom:20px;">Every donation fuels more open-source infrastructure for the agent economy.</p>
+                <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                    <a href="https://www.coinbase.com/earn/x402/spend?recipient=0x677B483128D0399bCD0A5AB36eE990C0246d7f61&asset=USDC&network=base&amount=5" target="_blank" class="btn btn-primary" style="font-size:0.85rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        Donate $5 USDC
+                    </a>
+                    <a href="https://www.coinbase.com/earn/x402/spend?recipient=0x677B483128D0399bCD0A5AB36eE990C0246d7f61&asset=USDC&network=base&amount=25" target="_blank" class="btn btn-secondary" style="font-size:0.85rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        Donate $25 USDC
+                    </a>
+                </div>
+                <p style="color:var(--text-muted);font-size:0.7rem;margin-top:16px;font-family:'JetBrains Mono',monospace;">
+                    Base Mainnet · USDC · 0x677B…7f61
+                </p>
             </div>
         </div>
     </section>
