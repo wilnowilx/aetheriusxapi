@@ -149,7 +149,7 @@ function Hero() {
         </div>
 
         {/* Right: 3D Globe */}
-        <div style={{ flex: '1 1 50%', position: 'relative', overflow: 'visible', aspectRatio: '1', maxHeight: '600px', background: 'transparent', border: 'none', outline: 'none', zIndex: 1, isolation: 'isolate' }}>
+        <div style={{ flex: '1 1 54%', position: 'relative', overflow: 'visible', aspectRatio: '1', maxHeight: '640px', minHeight: '420px', background: 'transparent', border: 'none', outline: 'none', zIndex: 1, isolation: 'isolate' }}>
           {/* Globe glow */}
           <div style={{
             position: 'absolute', inset: '-120px',
