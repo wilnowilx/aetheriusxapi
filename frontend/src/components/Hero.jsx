@@ -264,8 +264,8 @@ function Hero() {
         </h1>
 
         {/* Row: sub + actions + stats (left) / globe (right) */}
-        <div className="hero-row" style={{ display: 'flex', alignItems: 'center', gap: '32px', marginTop: '-20px' }}>
-        <div style={{ flex: '1 1 42%', zIndex: 2 }}>
+        <div className="hero-row" style={{ display: 'flex', alignItems: 'center', gap: '24px', marginTop: '-20px' }}>
+        <div style={{ flex: '1 1 38%', zIndex: 2 }}>
           <p className="section-desc" style={{ marginBottom: '28px', fontSize: '1.1rem', lineHeight: 1.7 }}>
             100+ live APIs your agents can pay for in USDC on Base. 40 FREE QuantumXBrain intelligence endpoints.
             No accounts, no subscriptions. The operating system for machine-to-machine commerce.
@@ -326,10 +326,10 @@ function Hero() {
           </div>
         </div>
 
-        {/* Right: 3D Globe — bigger, fluid, bleeds outside */}
+        {/* Right: 3D Globe — dominant, bleeds outside */}
         <div style={{
-          flex: '1 1 58%', position: 'relative', overflow: 'visible',
-          minHeight: '520px', maxHeight: '680px',
+          flex: '1 1 62%', position: 'relative', overflow: 'visible',
+          minHeight: '550px', maxHeight: '720px',
           background: 'transparent', border: 'none', outline: 'none',
           zIndex: 1, isolation: 'isolate',
           marginLeft: '-10px',

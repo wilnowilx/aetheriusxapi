@@ -36,11 +36,11 @@ function AtmosphereGlow() {
           uniform vec3 glowColor;
           uniform vec3 accentColor;
           void main() {
-            float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 1.2);
+            float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 0.8);
             float pulse = 0.92 + 0.08 * sin(time * 1.2 + vWorldPos.y * 2.0);
             float wave = 0.5 + 0.5 * sin(time * 0.8 + vWorldPos.x * 3.0 + vWorldPos.z * 2.0);
-            vec3 col = mix(glowColor, accentColor, wave * 0.3);
-            float alpha = fresnel * pulse * 0.22;
+            vec3 col = mix(glowColor, accentColor, wave * 0.25);
+            float alpha = fresnel * pulse * 0.15;
             gl_FragColor = vec4(col, alpha);
           }
         `}
@@ -79,10 +79,10 @@ function InnerCore() {
           varying vec3 vNormal;
           uniform float time;
           void main() {
-            float rim = pow(1.0 - abs(dot(vNormal, vec3(0, 0, 1))), 2.0);
+            float rim = pow(1.0 - abs(dot(vNormal, vec3(0, 0, 1))), 1.5);
             float pulse = 0.85 + 0.15 * sin(time * 0.6);
             vec3 col = vec3(0.44, 0.21, 0.73);
-            gl_FragColor = vec4(col, rim * pulse * 0.10);
+            gl_FragColor = vec4(col, rim * pulse * 0.07);
           }
         `}
         side={THREE.FrontSide}
@@ -99,7 +99,7 @@ function GlobeWireframe() {
   return (
     <mesh>
       <sphereGeometry args={[2.2, 48, 32]} />
-      <meshBasicMaterial color={0xa855f7} wireframe transparent opacity={0.04} />
+      <meshBasicMaterial color={0xa855f7} wireframe transparent opacity={0.03} />
     </mesh>
   )
 }
@@ -192,7 +192,7 @@ function OrbitRings() {
           key={i}
           rotation={[Math.PI / 2 + i * 0.2, 0, i * 0.35]}
         >
-          <torusGeometry args={[2.8 + i * 0.35, 0.008, 8, 128]} />
+          <torusGeometry args={[2.3 + i * 0.2, 0.008, 8, 128]} />
           <meshBasicMaterial color={0xa855f7} transparent opacity={0.12 - i * 0.03} />
         </mesh>
       ))}
@@ -243,14 +243,14 @@ function GlobeScene() {
   }, [])
   return (
     <Canvas
-      camera={{ position: [0, 0.3, 9.5], fov: 40 }}
+      camera={{ position: [0, 0.3, 10.0], fov: 40 }}
       gl={{ alpha: true, antialias: !isMobile, powerPreference: 'high-performance' }}
       onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: 'transparent' }}
       dpr={[1, 1.5]}
     >
       <ambientLight intensity={0.1} />
-      <group scale={1.25}>
+      <group scale={1.4}>
         <GlobeWireframe />
         <AtmosphereGlow />
         <InnerCore />
