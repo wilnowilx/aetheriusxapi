@@ -325,12 +325,13 @@ function Categories() {
             <div key={cat.title} data-animate-card style={{
               padding: '16px 12px', background: 'var(--bg-card)', border: '1px solid var(--border)',
               borderRadius: 12, textAlign: 'center', cursor: 'pointer', transition: 'all 0.5s',
+              opacity: cat.soon ? 0.5 : 1,
             }}>
               <div style={{ width: 36, height: 36, margin: '0 auto 8px', background: 'linear-gradient(135deg, rgba(168,85,247,0.1), rgba(217,70,239,0.1))', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-light)' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d={cat.icon}/></svg>
               </div>
-              <div style={{ fontSize: '0.88rem', fontWeight: 700, marginBottom: 4 }}>{cat.title}</div>
-              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem', color: cat.soon ? 'var(--text-muted)' : 'var(--magenta-light)' }}>{cat.count}</div>
+              <div style={{ fontSize: '0.82rem', fontWeight: 700, marginBottom: 4 }}>{cat.title}</div>
+              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.68rem', color: cat.soon ? 'var(--text-muted)' : 'var(--magenta-light)' }}>{cat.count}</div>
             </div>
           ))}
         </div>
@@ -553,7 +554,7 @@ function Waitlist() {
 
   const timeline = [
     { date: 'Aug 2026', title: 'Project Started', desc: 'x402 research, architecture design', status: 'done' },
-    { date: 'Sep 5, 2026', title: 'Mainnet Launch', desc: '80 endpoints live on Base Mainnet with real USDC', status: 'done' },
+    { date: 'Sep 5, 2026', title: 'Mainnet Launch', desc: '100+ endpoints live on Base Mainnet with real USDC', status: 'done' },
     { date: 'Sep 2026', title: 'x402 Intelligence', desc: '20 exclusive on-chain analytics endpoints + grants', status: 'current' },
     { date: 'Q4 2026', title: 'Scale', desc: '120+ endpoints, Go/Rust SDKs, 100 agent-wallets', status: '' },
   ]
@@ -570,7 +571,7 @@ function Waitlist() {
         <div data-animate-card style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, marginTop: 72, textAlign: 'left' }}>
           <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, padding: 40, backdropFilter: 'blur(20px)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32 }}>
-              {[{ val: '0', label: 'On Waitlist' }, { val: '80+', label: 'Live APIs' }, { val: 'x402', label: 'Protocol' }].map(s => (
+              {[{ val: '100+', label: 'Live APIs' }, { val: '40', label: 'FREE Endpoints' }, { val: 'x402', label: 'Protocol' }].map(s => (
                 <div key={s.label} style={{ textAlign: 'center', padding: 16, background: 'rgba(168,85,247,0.06)', borderRadius: 12 }}>
                   <div style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', background: 'linear-gradient(135deg, var(--purple), var(--magenta))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{s.val}</div>
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 4 }}>{s.label}</div>
@@ -624,10 +625,10 @@ function SocialProof() {
         <div style={{ display: 'flex', justifyContent: 'center', gap: 48, flexWrap: 'wrap' }}>
           {[
             { stat: 'Open Source', label: 'MIT License' },
-            { stat: '80+', label: 'Live Endpoints' },
-            { stat: '60/60', label: 'Tests Passing' },
+            { stat: '100+', label: 'Live Endpoints' },
+            { stat: '129', label: 'Tests Passing' },
             { stat: 'x402', label: 'Native Protocol' },
-            { stat: 'Bilingual', label: 'EN / ES' },
+            { stat: 'Mainnet', label: 'Base L2 Live' },
           ].map((item, i) => (
             <div key={i} data-animate-card style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, color: 'var(--text-muted)' }}>
               <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)' }}>{item.stat}</div>
@@ -729,12 +730,12 @@ function Heartbeat() {
   }, [])
 
   const endpoints = [
-    { name: '/api/v1/maps/search', latency: '~120ms', status: 'up' },
-    { name: '/api/v1/token/analyze', latency: '~80ms', status: 'up' },
-    { name: '/api/v1/email/validate', latency: '~40ms', status: 'up' },
-    { name: '/api/v1/web/scrape', latency: '~150ms', status: 'up' },
-    { name: '/api/v1/maps/reviews', latency: '~200ms', status: 'up' },
-    { name: '/api/v1/health', latency: '~5ms', status: 'up' },
+    { name: '/v1/x402/market-pulse', latency: '~320ms', status: 'up' },
+    { name: '/v1/x402/sentiment', latency: '~280ms', status: 'up' },
+    { name: '/v1/x402/gas', latency: '~180ms', status: 'up' },
+    { name: '/v1/x402/wallet-intel', latency: '~450ms', status: 'up' },
+    { name: '/v1/crypto/price', latency: '~120ms', status: 'up' },
+    { name: '/v1/health', latency: '~5ms', status: 'up' },
   ]
 
   return (
@@ -980,10 +981,19 @@ function TrustedBy() {
   return (
     <section id="trusted" data-animate style={{ padding: '80px 0', textAlign: 'center', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', background: 'rgba(255,255,255,0.01)' }}>
       <div className="inner" style={{ padding: '0 40px' }}>
-        <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'var(--text-muted)', marginBottom: 48, fontWeight: 600 }}>Built in the open for builders on</h3>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 72, flexWrap: 'wrap', maxWidth: 900, margin: '0 auto' }}>
-          {['Base', 'Ethereum', 'x402', 'Coinbase', 'USDC'].map(name => (
-            <div key={name} style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-muted)', opacity: 0.3, letterSpacing: '-0.02em' }}>{name}</div>
+        <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'var(--text-muted)', marginBottom: 48, fontWeight: 600 }}>Built in the open for the agent economy on</h3>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 56, flexWrap: 'wrap', maxWidth: 900, margin: '0 auto' }}>
+          {[
+            { name: 'Base', sub: 'L2 by Coinbase' },
+            { name: 'x402', sub: 'HTTP payment protocol' },
+            { name: 'USDC', sub: 'Stablecoin settlement' },
+            { name: 'FastAPI', sub: 'Python backend' },
+            { name: 'React Three Fiber', sub: '3D landing' },
+          ].map(item => (
+            <div key={item.name} style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-sec)', letterSpacing: '-0.02em' }}>{item.name}</div>
+              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 4 }}>{item.sub}</div>
+            </div>
           ))}
         </div>
       </div>

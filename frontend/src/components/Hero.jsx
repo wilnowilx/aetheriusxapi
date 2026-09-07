@@ -257,10 +257,7 @@ function Hero() {
               lineHeight: 1.0,
               letterSpacing: '-0.03em',
               fontWeight: 900,
-              background: 'linear-gradient(135deg, #f0f0f5 0%, #c084fc 50%, #a855f7 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              color: '#f0f0f5',
             }}>INFRASTRUCTURE</span>
           </span>
           <span className="grad-flow" style={{ display: 'block', fontSize: 'clamp(1.8rem, 4.5vw, 3.6rem)', marginTop: '6px', fontWeight: 800 }}>for Agents That Pay</span>
