@@ -41,6 +41,36 @@
       "domain": "api-design",
       "rule": "Use asyncio.gather() for parallel upstream fetches in FastAPI. Reduces latency when combining CoinGecko + DefiLlama + RPC calls.",
       "confidence": 0.9
+    },
+    {
+      "id": "threejs-r183-upgrade",
+      "domain": "web-3d",
+      "rule": "Three.js r183 uses ES modules via CDN (jsdelivr npm). Key improvements: WebGPU renderer support, ACES Filmic tone mapping, anisotropy texture filtering. Shader syntax unchanged from r128.",
+      "confidence": 0.95
+    },
+    {
+      "id": "fresnel-atmospheric-glow",
+      "domain": "web-3d",
+      "rule": "Fresnel-based atmospheric glow: use BackSide sphere with ShaderMaterial, pow(1.0 - abs(dot(vNormal, vec3(0,0,1))), 2.5) for edge glow. Add time-based pulse and wave for organic feel.",
+      "confidence": 0.9
+    },
+    {
+      "id": "gsap-scrolltrigger-pattern",
+      "domain": "web-animation",
+      "rule": "GSAP ScrollTrigger: registerPlugin(ScrollTrigger), use gsap.from() with scrollTrigger:{trigger, start:'top 88%', toggleActions:'play none none none'}. Stagger cards with delay:(i%3)*0.12.",
+      "confidence": 0.9
+    },
+    {
+      "id": "lenis-gsap-integration",
+      "domain": "web-animation",
+      "rule": "Lenis + GSAP integration: lenis.on('scroll', ScrollTrigger.update), gsap.ticker.add(time => lenis.raf(time*1000)). Lenis smooths scroll, GSAP animates on scroll events.",
+      "confidence": 0.9
+    },
+    {
+      "id": "lenis-slideshow-coexistence",
+      "domain": "web-animation",
+      "rule": "Lenis smooth scroll coexists with slideshow wheel snap. Lenis smooths the scroll, slideshow does scrollIntoView({behavior:'smooth'}) for section snapping. They don't conflict.",
+      "confidence": 0.85
     }
   ],
   "mappings": [
@@ -95,6 +125,21 @@
       "date": "2026-09-06",
       "text": "Landing page x402-intel section should show 4 key QuantumXBrain endpoints (brain, market-pulse, wallet-intel, sentiment) with green/purple styling.",
       "files": ["index.html"]
+    },
+    {
+      "date": "2026-09-06",
+      "text": "Three.js r183 upgrade from r128: CDN via jsdelivr npm, shader syntax unchanged, but renderer needs powerPreference:'high-performance' and toneMapping:THREE.ACESFilmicToneMapping for modern look.",
+      "files": ["index.html"]
+    },
+    {
+      "date": "2026-09-06",
+      "text": "GSAP ScrollTrigger + Lenis smooth scroll integration: Lenis smooths scroll, GSAP animates elements on scroll. They complement each other without conflict.",
+      "files": ["index.html"]
+    },
+    {
+      "date": "2026-09-06",
+      "text": "Fresnel atmospheric glow shader for Three.js globe: BackSide sphere + pow(1.0 - abs(dot(vNormal, vec3(0,0,1))), 2.5) + time-based pulse. Much better than simple radial gradient CSS.",
+      "files": ["index.html"]
     }
   ],
   "decisions": [
@@ -121,6 +166,12 @@
       "question": "Should we add more endpoints or enhance existing 20?",
       "answer": "Keep 20 free endpoints as the ceiling. Transform them into QuantumXBrain by combining external APIs. Don't increase count, increase quality.",
       "rationale": "User said 'no es deployar más endpoints, es que los 20 que tienes es el tope de FREE'"
+    },
+    {
+      "date": "2026-09-06",
+      "question": "How to upgrade the landing page with cutting-edge frameworks?",
+      "answer": "Option C (Hybrid): Keep HTML structure, upgrade Three.js r128→r183, add GSAP ScrollTrigger + Lenis smooth scroll, enhance globe with Fresnel shaders. Low risk, high impact, 2-3 days.",
+      "rationale": "User wanted GPT-6 Astra-level immersive experience. Research showed Three.js + GSAP + Lenis is the dominant 2026 stack. Option B (full R3F rebuild) was too risky."
     }
   ]
 }

@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-09-06T23:30:00Z",
+  "status": "landing_page_overhaul_complete",
+  "summary": "Upgraded landing page with Three.js r183, GSAP ScrollTrigger, Lenis smooth scroll. Enhanced globe with Fresnel atmospheric glow, inner core, ambient dust particles. 100 agent nodes, 200 swarm particles, animated orbit rings, pulsing connection lines.",
+  "metrics": {
+    "file_lines": 3780,
+    "three_version": "r183.0",
+    "gsap_version": "3.12.7",
+    "lenis_version": "1.2.3",
+    "globe_nodes": 100,
+    "globe_swarm": 200,
+    "globe_dust": 500,
+    "globe_rings": 3
+  },
+  "commit": "8a1e7ea",
+  "changes": [
+    "Three.js r128 → r183 (WebGPU-ready)",
+    "Added GSAP 3.12.7 + ScrollTrigger",
+    "Added Lenis 1.2.3 smooth scroll",
+    "Globe: Fresnel atmospheric shader (backface glow)",
+    "Globe: Inner core glow shader",
+    "Globe: 500 ambient dust particles",
+    "Globe: Torus orbit rings (animated)",
+    "Globe: Pulsing connection lines with alpha",
+    "Globe: 100 agent nodes (was 80)",
+    "Globe: 200 swarm particles (was 150)",
+    "Globe: ACES Filmic tone mapping",
+    "CSS: Dual pseudo-element globe glow",
+    "GSAP: Staggered card reveals",
+    "GSAP: Hero stat animations",
+    "GSAP: Nav scroll background",
+    "Lenis: Connected to GSAP ticker",
+    "Lenis: Scroll delta for globe parallax"
+  ],
+  "preserved": [
+    "Slideshow wheel scroll-hijack (user confirmed)",
+    "All existing sections and content",
+    "Mobile responsiveness",
+    "Live data fetching from API"
+  ]
+}
