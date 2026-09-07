@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-09-07T05:00:00Z",
+  "status": "landing_crash_proof",
+  "summary": "Landing was blank (React unmounts whole tree on uncaught error, no boundary). Added SectionBoundary per section + GlobeBoundary/Suspense + #root loading fallback. Fixed dashboard absolute link. Unused Float import removed.",
+  "commit": "5e9cdd4",
+  "root_cause": "No error boundaries: any single render throw (R3F Canvas/WebGL, canvas, GSAP) unmounted entire React tree -> blank page",
+  "fixes": [
+    "SectionBoundary class around all 19 sections",
+    "GlobeBoundary + Suspense around R3F globe with gradient-orb fallback",
+    "Loading fallback HTML inside #root",
+    "dashboard/ relative link",
+    "Removed unused Float import"
+  ]
+}
