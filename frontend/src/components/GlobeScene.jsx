@@ -243,7 +243,7 @@ function GlobeScene() {
   }, [])
   return (
     <Canvas
-      camera={{ position: [0, 0.3, 5.2], fov: 40 }}
+      camera={{ position: [0, 0.3, 6.2], fov: 40 }}
       gl={{ alpha: true, antialias: !isMobile, powerPreference: 'high-performance' }}
       onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: 'transparent' }}

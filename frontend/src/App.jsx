@@ -312,7 +312,7 @@ function Categories() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
           API Categories
         </div>
-        <h2 className="section-title">80 Live Endpoints, More Weekly</h2>
+        <h2 className="section-title">100+ Live Endpoints, More Weekly</h2>
         <p className="section-desc" style={{ margin: '0 auto' }}>Production APIs across maps, DeFi, web, data, forex and news — new verticals shipping weekly.</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginTop: 48 }}>
           {cats.map(cat => (
@@ -393,7 +393,7 @@ function X402Intelligence() {
 function HowItWorks() {
   const steps = [
     { num: '1', title: 'Connect Wallet', desc: 'Your crypto wallet is your identity. No signup, no KYC.', icon: 'M3 11h18M7 11V7a5 5 0 0 1 10 0v4' },
-    { num: '2', title: 'Choose API', desc: 'Browse 80 live endpoints. Pick what your agent needs.', icon: 'M11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16z' },
+    { num: '2', title: 'Choose API', desc: 'Browse 100+ live endpoints. Pick what your agent needs.', icon: 'M11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16z' },
     { num: '3', title: 'Pay Per Request', desc: 'x402 handles payment. USDC on Base. Sub-cent fees.', icon: 'M1 4h22v16H1z' },
     { num: '4', title: 'Get Data', desc: 'Instant response. The agent gets exactly what it needs.', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z' },
   ]
@@ -560,7 +560,7 @@ function Waitlist() {
           Early Access
         </div>
         <h2 className="section-title">Join the Agent Economy</h2>
-        <p className="section-desc" style={{ margin: '0 auto' }}>We're live on Base Mainnet. Start building with 80 APIs today. Get early access to new endpoints and exclusive analytics.</p>
+        <p className="section-desc" style={{ margin: '0 auto' }}>We're live on Base Mainnet. Start building with 100+ APIs today. Get early access to new endpoints and exclusive analytics.</p>
         <div data-animate-card style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, marginTop: 72, textAlign: 'left' }}>
           <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, padding: 40, backdropFilter: 'blur(20px)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32 }}>
@@ -758,8 +758,8 @@ function Heartbeat() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
               <div style={{ textAlign: 'center' }}><div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', color: 'var(--green)' }}>99.9%</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Uptime</div></div>
-              <div style={{ textAlign: 'center' }}><div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', color: 'var(--purple-light)' }}>~85ms</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Avg Latency</div></div>
-              <div style={{ textAlign: 'center' }}><div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', color: 'var(--green)' }}>99.7%</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Success Rate</div></div>
+              <div style={{ textAlign: 'center' }}><div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', color: 'var(--purple-light)' }}>~549ms</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Avg Latency</div></div>
+              <div style={{ textAlign: 'center' }}><div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', color: 'var(--green)' }}>94.0%</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Success Rate</div></div>
             </div>
           </div>
           {/* Endpoint Health */}
@@ -1101,7 +1101,7 @@ class SectionBoundary extends React.Component {
 // === APP ===
 function App() {
   const appRef = useRef(null)
-  useScrollAnimations(appRef)
+  useScrollAnimations()
   useSmoothScroll()
 
   return (
