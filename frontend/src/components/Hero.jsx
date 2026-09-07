@@ -100,7 +100,7 @@ function Hero() {
           </div>
 
           {/* Stats */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+          <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
             {[
               { value: stats.volume, label: 'USDC settled (24h)' },
               { value: stats.agents, label: 'Success rate' },
@@ -186,6 +186,7 @@ function Hero() {
           #hero .inner { flex-direction: column !important; }
           #hero .inner > div:first-child { flex: none !important; }
           #hero .inner > div:last-child { flex: none !important; width: 100% !important; aspect-ratio: 1 !important; max-height: 350px !important; }
+          #hero .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
       `}</style>
     </section>

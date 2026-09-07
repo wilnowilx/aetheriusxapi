@@ -20,14 +20,15 @@ export function useSmoothScroll() {
 
     lenis.on('scroll', ScrollTrigger.update)
 
-    gsap.ticker.add((time) => {
+    const onFrame = (time) => {
       lenis.raf(time * 1000)
-    })
+    }
+    gsap.ticker.add(onFrame)
     gsap.ticker.lagSmoothing(0)
 
     return () => {
+      gsap.ticker.remove(onFrame)
       lenis.destroy()
-      gsap.ticker.remove(lenis.raf)
     }
   }, [])
 

@@ -27,7 +27,7 @@ function Nav() {
             <a href="#how">How It Works</a>
             <a href="#heartbeat">Status</a>
             <a href="#telemetry">Telemetry</a>
-            <a href="dashboard/">Dashboard</a>
+            <a href="/dashboard/">Dashboard</a>
             <a href="#cta" className="btn-nav">Get Started</a>
           </div>
           <button className="mobile-toggle" onClick={() => setMobileOpen(true)}>
@@ -179,7 +179,10 @@ function Playground() {
                   {group.cat}
                 </div>
                 {group.items.map(ep => (
-                  <div key={ep.path} onClick={() => selectFromSidebar(ep)} style={{
+                  <div key={ep.path} role="button" tabIndex={0}
+                    onClick={() => selectFromSidebar(ep)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectFromSidebar(ep) } }}
+                    style={{
                     display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 8,
                     cursor: 'pointer', fontSize: '0.82rem', border: '1px solid transparent',
                     transition: 'all 0.25s', background: selected.path === ep.path ? 'rgba(168,85,247,0.15)' : 'transparent',
@@ -317,7 +320,7 @@ function X402Intelligence() {
         </div>
         <h2 className="section-title">20 Free Endpoints. Real On-Chain Intelligence.</h2>
         <p className="section-desc" style={{ margin: '0 auto' }}>We read Base Mainnet directly + CoinGecko + DefiLlama. No API keys. No accounts. The intelligence layer that NOBODY else offers — completely free.</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginTop: 48 }}>
+        <div className="intel-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginTop: 48 }}>
           {cards.map(c => (
             <div key={c.title} data-animate-card style={{
               padding: '44px 36px', background: 'var(--bg-card)', border: `1px solid ${c.border}`,
@@ -344,8 +347,8 @@ function X402Intelligence() {
         </div>
       </div>
       <style>{`
-        @media (max-width: 1024px) { #x402-intel .features-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) { #x402-intel .features-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 1024px) { #x402-intel .intel-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { #x402-intel .intel-grid { grid-template-columns: 1fr; } }
       `}</style>
     </section>
   )
@@ -536,7 +539,7 @@ function Waitlist() {
             <div style={{ marginBottom: 24 }}>
               <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com" style={{ flex: 1, padding: '14px 18px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text)', fontSize: '0.95rem', outline: 'none' }} />
-                <button className="btn btn-primary" style={{ whiteSpace: 'nowrap' }}>Join Waitlist <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+                <button type="button" className="btn btn-primary" style={{ whiteSpace: 'nowrap' }}>Join Waitlist <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
               </div>
               <input type="text" value={wallet} onChange={e => setWallet(e.target.value)} placeholder="0x... (optional — for founder perks)" style={{ width: '100%', padding: '12px 16px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', outline: 'none' }} />
             </div>
@@ -617,15 +620,20 @@ function Heartbeat() {
     resize()
     window.addEventListener('resize', resize)
 
-    const draw = () => {
+    let lastDataTime = 0
+
+    const draw = (timestamp) => {
       if (!running) return
       const w = canvas.width / 2
       const h = canvas.height / 2
       ctx.clearRect(0, 0, w, h)
 
-      // Shift data
-      dataRef.current.push(Math.random() * 40 + 10)
-      if (dataRef.current.length > 60) dataRef.current.shift()
+      // Push data once per second
+      if (timestamp - lastDataTime >= 1000) {
+        dataRef.current.push(Math.random() * 40 + 10)
+        if (dataRef.current.length > 60) dataRef.current.shift()
+        lastDataTime = timestamp
+      }
 
       // Draw grid lines
       ctx.strokeStyle = 'rgba(255,255,255,0.04)'
@@ -655,17 +663,18 @@ function Heartbeat() {
       ctx.lineTo(0, h)
       ctx.fillStyle = grad
       ctx.fill()
-
-      animRef.current = requestAnimationFrame(draw)
     }
 
-    const interval = setInterval(draw, 1000)
-    draw()
+    const frame = (ts) => {
+      if (!running) return
+      draw(ts)
+      animRef.current = requestAnimationFrame(frame)
+    }
+    animRef.current = requestAnimationFrame(frame)
 
     return () => {
       running = false
       cancelAnimationFrame(animRef.current)
-      clearInterval(interval)
       window.removeEventListener('resize', resize)
     }
   }, [])
@@ -902,11 +911,11 @@ function CTA() {
           </h2>
           <p className="section-desc" style={{ margin: '0 auto 48px', position: 'relative', zIndex: 1 }}>Start building today. Health and telemetry free, forever.</p>
           <div style={{ display: 'flex', gap: 20, justifyContent: 'center', position: 'relative', zIndex: 1 }}>
-            <a href="https://x.com/aetheriusxAPI" className="btn btn-primary">
+            <a href="https://x.com/aetheriusxAPI" target="_blank" rel="noreferrer" className="btn btn-primary">
               Follow on X
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             </a>
-            <a href="https://github.com/wilnowilx/aetheriusxapi" className="btn btn-secondary">
+            <a href="https://github.com/wilnowilx/aetheriusxapi" target="_blank" rel="noreferrer" className="btn btn-secondary">
               View GitHub
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
             </a>
@@ -1004,7 +1013,7 @@ function Footer() {
           </div>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, borderTop: '1px solid var(--border)' }}>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>2026 AETHERIUS. All rights reserved.</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>&copy; 2026 AETHERIUS. All rights reserved.</span>
           <div style={{ display: 'flex', gap: 12 }}>
             <a href="https://x.com/aetheriusxAPI" target="_blank" rel="noreferrer" style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 10, color: 'var(--text-sec)', transition: 'all 0.3s', textDecoration: 'none' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
