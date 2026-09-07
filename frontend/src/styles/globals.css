@@ -111,7 +111,10 @@ body {
 section {
   padding: 100px 0;
   position: relative;
-  overflow: hidden;
+}
+
+#hero {
+  overflow: visible;
 }
 
 section .inner {
@@ -129,7 +132,8 @@ section .inner {
 }
 
 /* Kill any stray card/box inside the hero (bg, border, shadow) */
-#hero .inner > div {
+#hero .inner > div,
+#hero .inner > div > div {
   background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
