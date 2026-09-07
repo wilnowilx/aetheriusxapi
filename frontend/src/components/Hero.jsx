@@ -91,39 +91,41 @@ function Hero() {
   }, [])
 
   return (
-    <section id="hero" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', position: 'relative', overflow: 'visible' }}>
-      <div className="inner" style={{ display: 'flex', alignItems: 'center', gap: '60px', width: '100%', overflow: 'visible' }}>
-        {/* Left: Content */}
-        <div style={{ flex: '1 1 50%', zIndex: 2 }}>
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-            <div className="section-label">
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
-              Base Mainnet LIVE
-            </div>
-            <div className="section-label">
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
-              x402 Intelligence
-            </div>
+    <section id="hero" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', position: 'relative', overflow: 'visible', paddingTop: '120px' }}>
+      <div className="inner" style={{ width: '100%', overflow: 'visible' }}>
+        {/* Top: badges + GIANT headline, full width */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
+          <div className="section-label" style={{ fontSize: '0.78rem', padding: '6px 14px', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 9999, background: 'rgba(16,185,129,0.08)' }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
+            Base Mainnet LIVE
           </div>
+          <div className="section-label" style={{ fontSize: '0.78rem', padding: '6px 14px', border: '1px solid rgba(168,85,247,0.35)', borderRadius: 9999, background: 'rgba(168,85,247,0.08)' }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#a855f7', display: 'inline-block' }} />
+            x402 Intelligence
+          </div>
+        </div>
 
-          <h1 className="section-title" style={{ fontSize: 'clamp(3rem, 7vw, 5.4rem)', lineHeight: 1.02, letterSpacing: '-0.02em' }}>
-            The Infrastructure<br />
-            <span className="grad-flow">for Agents That Pay</span>
-          </h1>
+        <h1 className="section-title" style={{ fontSize: 'clamp(3.2rem, 8.5vw, 7rem)', lineHeight: 1.0, letterSpacing: '-0.03em', margin: '0 0 8px' }}>
+          The Infrastructure<br />
+          <span className="grad-flow">for Agents That Pay</span>
+        </h1>
 
-          <p className="section-desc" style={{ marginBottom: '32px' }}>
+        {/* Row: sub + actions + stats (left) / globe (right) */}
+        <div className="hero-row" style={{ display: 'flex', alignItems: 'center', gap: '60px', marginTop: '32px' }}>
+        <div style={{ flex: '1 1 50%', zIndex: 2 }}>
+          <p className="section-desc" style={{ marginBottom: '32px', fontSize: '1.15rem' }}>
             100+ live APIs your agents can pay for in USDC on Base. 40 FREE QuantumXBrain intelligence endpoints.
             No accounts, no subscriptions. The operating system for machine-to-machine commerce.
           </p>
 
-          <div style={{ display: 'flex', gap: '16px', marginBottom: '40px' }}>
-            <a href="#cta" className="btn btn-primary">
+          <div style={{ display: 'flex', gap: '16px', marginBottom: '40px', flexWrap: 'wrap' }}>
+            <a href="#cta" className="btn btn-primary" style={{ padding: '14px 30px', fontSize: '1rem' }}>
               Start Building
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
-            <a href="#code" className="btn btn-secondary">
+            <a href="#code" className="btn btn-secondary" style={{ padding: '14px 30px', fontSize: '1rem' }}>
               View Docs
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
             </a>
           </div>
 
@@ -136,7 +138,7 @@ function Hero() {
               { value: stats.health, label: 'Avg latency' },
             ].map((stat, i) => (
               <div key={i}>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
                   {stat.value}
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', animation: 'pulse 2s infinite' }} />
                 </div>
@@ -197,6 +199,7 @@ function Hero() {
             })}
           </div>
         </div>
+        </div>
       </div>
 
       <style>{`
@@ -215,9 +218,9 @@ function Hero() {
           50% { opacity: 0.4; }
         }
         @media (max-width: 768px) {
-          #hero .inner { flex-direction: column !important; }
-          #hero .inner > div:first-child { flex: none !important; }
-          #hero .inner > div:last-child { flex: none !important; width: 100% !important; aspect-ratio: 1 !important; max-height: 350px !important; }
+          #hero .hero-row { flex-direction: column !important; }
+          #hero .hero-row > div { flex: none !important; width: 100% !important; }
+          #hero .hero-row > div:last-child { aspect-ratio: 1 !important; max-height: 350px !important; }
           #hero .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
       `}</style>
