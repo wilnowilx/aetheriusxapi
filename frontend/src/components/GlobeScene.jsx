@@ -231,10 +231,10 @@ function X402Center() {
 }
 
 // === MAIN GLOBE SCENE ===
-// Standard pattern (drei OrbitControls): camera orbits the group,
-// drag rotates, autoRotate spins when idle. No postprocessing —
-// the Fresnel shader IS the glow (postprocessing quads can paint
-// an opaque square behind transparent canvases).
+// Camera z=9.5 with group scale=1.25: globe appears big,
+// orbit rings (r=3.5 max) fit inside viewport without clipping.
+// Visible width at z=0 with fov=40: 2*9.5*tan(20°)≈6.94.
+// Ring max diameter = 3.5*2 = 7.0 → just fits with scale 1.25.
 function GlobeScene() {
   const isMobile = useMemo(() => {
     if (typeof window === 'undefined') return false
@@ -243,19 +243,21 @@ function GlobeScene() {
   }, [])
   return (
     <Canvas
-      camera={{ position: [0, 0.3, 8.0], fov: 40 }}
+      camera={{ position: [0, 0.3, 9.5], fov: 40 }}
       gl={{ alpha: true, antialias: !isMobile, powerPreference: 'high-performance' }}
       onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: 'transparent' }}
       dpr={[1, 1.5]}
     >
       <ambientLight intensity={0.1} />
-      <GlobeWireframe />
-      <AtmosphereGlow />
-      <InnerCore />
-      <AgentNodes />
-      <X402Center />
-      <OrbitRings />
+      <group scale={1.25}>
+        <GlobeWireframe />
+        <AtmosphereGlow />
+        <InnerCore />
+        <AgentNodes />
+        <X402Center />
+        <OrbitRings />
+      </group>
       {!isMobile && (
         <Stars radius={8} depth={20} count={250} factor={2} saturation={0.5} fade speed={0.5} />
       )}

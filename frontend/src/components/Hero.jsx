@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react'
+import React, { useState, useEffect, useRef, Suspense } from 'react'
 
 // Lazy: three.js (~700KB) loads AFTER first paint, never blocks the page
 const GlobeScene = React.lazy(() => import('./GlobeScene'))
@@ -29,6 +29,99 @@ class GlobeBoundary extends React.Component {
   }
 }
 
+// === AMBIENT PARTICLES (fx.js ported to React) ===
+function AmbientParticles() {
+  const canvasRef = useRef(null)
+
+  useEffect(() => {
+    const cv = canvasRef.current
+    if (!cv) return
+    const ctx = cv.getContext('2d')
+    let W = 0, H = 0
+    let running = true
+    let animId
+
+    function size() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      W = window.innerWidth; H = window.innerHeight
+      cv.width = W * dpr; cv.height = H * dpr
+      cv.style.width = W + 'px'; cv.style.height = H + 'px'
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    }
+    size()
+    window.addEventListener('resize', size)
+
+    const hues = [268, 285, 300, 320]
+    function spawn(anywhere) {
+      const hot = Math.random() < 0.12
+      return {
+        x: Math.random() * W, y: anywhere ? Math.random() * H : H + 6,
+        r: (0.6 + Math.random() * 2.2) * (hot ? 2.2 : 1),
+        vy: -((0.08 + Math.random() * 0.3) * 3),
+        vx: (Math.random() - 0.5) * 0.15,
+        a: (0.15 + Math.random() * 0.5) * (hot ? 1.7 : 1),
+        h: hues[(Math.random() * hues.length) | 0],
+        tw: Math.random() * 6.28
+      }
+    }
+
+    const P = []
+    for (let i = 0; i < 70; i++) P.push(spawn(true))
+    const rings = []
+
+    function tick() {
+      if (!running) return
+      ctx.clearRect(0, 0, W, H)
+      for (let j = 0; j < P.length; j++) {
+        const p = P[j]
+        p.y += p.vy; p.x += p.vx; p.tw += 0.03
+        if (p.y < -6) { p.y = H + 6; p.x = Math.random() * W }
+        if (p.x < -6) p.x = W + 6; if (p.x > W + 6) p.x = -6
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283)
+        ctx.fillStyle = 'hsla(' + p.h + ',90%,70%,' +
+          (p.a * (0.6 + 0.4 * Math.sin(p.tw))).toFixed(3) + ')'
+        ctx.fill()
+      }
+      for (let j = rings.length - 1; j >= 0; j--) {
+        const g = rings[j]; g.r += 1.1; g.a -= 0.006
+        if (g.a <= 0) { rings.splice(j, 1); continue }
+        ctx.beginPath(); ctx.arc(g.x, g.y, g.r, 0, 6.283)
+        ctx.strokeStyle = 'hsla(' + g.h + ',90%,72%,' + g.a.toFixed(3) + ')'
+        ctx.lineWidth = 1.2; ctx.stroke()
+      }
+      animId = requestAnimationFrame(tick)
+    }
+
+    const ringInterval = setInterval(() => {
+      if (!running || !P.length) return
+      const p = P[(Math.random() * P.length) | 0]
+      rings.push({ x: p.x, y: p.y, r: 2, a: 0.35, h: p.h })
+      if (rings.length > 8) rings.shift()
+    }, 2600)
+
+    const visHandler = () => { running = !document.hidden; if (running) animId = requestAnimationFrame(tick) }
+    document.addEventListener('visibilitychange', visHandler)
+    animId = requestAnimationFrame(tick)
+
+    return () => {
+      cancelAnimationFrame(animId)
+      clearInterval(ringInterval)
+      document.removeEventListener('visibilitychange', visHandler)
+      window.removeEventListener('resize', size)
+    }
+  }, [])
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'fixed', inset: 0, zIndex: -1,
+        pointerEvents: 'none', width: '100%', height: '100%'
+      }}
+    />
+  )
+}
+
 const API_BASE = 'https://34-156-149-38.sslip.io/aetherapi'
 
 const liveLabels = [
@@ -50,10 +143,10 @@ const liveLabels = [
 ]
 
 const labelPositions = [
-  { x: 2, y: 5 }, { x: 55, y: -5 }, { x: 66, y: 22 }, { x: 2, y: 48 },
-  { x: 55, y: 62 }, { x: 22, y: -2 }, { x: 40, y: 82 }, { x: 2, y: 28 },
-  { x: 64, y: 42 }, { x: 28, y: 8 }, { x: 8, y: 68 }, { x: 60, y: 10 },
-  { x: 15, y: 42 }, { x: 50, y: 55 }, { x: 62, y: 68 },
+  { x: -5, y: 5 }, { x: 62, y: -5 }, { x: 72, y: 20 }, { x: -5, y: 45 },
+  { x: 62, y: 65 }, { x: 15, y: -5 }, { x: 45, y: 88 }, { x: -5, y: 25 },
+  { x: 70, y: 42 }, { x: 25, y: 5 }, { x: 0, y: 68 }, { x: 68, y: 8 },
+  { x: 8, y: 40 }, { x: 55, y: 58 }, { x: 68, y: 72 },
 ]
 
 function Hero() {
@@ -134,6 +227,7 @@ function Hero() {
 
   return (
     <section id="hero" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', position: 'relative', overflow: 'visible', paddingTop: '120px', isolation: 'isolate', zIndex: 0 }}>
+      <AmbientParticles />
       <div className="inner" style={{ width: '100%', overflow: 'visible' }}>
         {/* Top: badges + GIANT headline, full width */}
         <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', justifyContent: 'center', alignItems: 'center' }}>
@@ -148,16 +242,33 @@ function Hero() {
         </div>
 
         <h1 className="section-title" style={{ textAlign: 'center', position: 'relative', zIndex: 3, pointerEvents: 'none', margin: '0 0 8px' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '22px' }}>
-            <span style={{ writingMode: 'vertical-rl', fontSize: 'clamp(1rem, 2vw, 1.6rem)', letterSpacing: '0.4em', color: 'var(--text-sec)', fontWeight: 600 }}>THE</span>
-            <span style={{ fontSize: 'clamp(3rem, 8.5vw, 7.5rem)', lineHeight: 1.0, letterSpacing: '-0.03em', fontWeight: 900 }}>INFRASTRUCTURE</span>
+          <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0' }}>
+            <span style={{
+              fontSize: 'clamp(0.9rem, 1.8vw, 1.4rem)',
+              letterSpacing: '0.5em',
+              color: 'var(--text-sec)',
+              fontWeight: 500,
+              fontFamily: "'JetBrains Mono', monospace",
+              textTransform: 'uppercase',
+              marginBottom: '-8px'
+            }}>THE</span>
+            <span style={{
+              fontSize: 'clamp(3rem, 8.5vw, 7.5rem)',
+              lineHeight: 1.0,
+              letterSpacing: '-0.03em',
+              fontWeight: 900,
+              background: 'linear-gradient(135deg, #f0f0f5 0%, #c084fc 50%, #a855f7 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>INFRASTRUCTURE</span>
           </span>
           <span className="grad-flow" style={{ display: 'block', fontSize: 'clamp(1.8rem, 4.5vw, 3.6rem)', marginTop: '6px', fontWeight: 800 }}>for Agents That Pay</span>
         </h1>
 
         {/* Row: sub + actions + stats (left) / globe (right) */}
-        <div className="hero-row" style={{ display: 'flex', alignItems: 'center', gap: '40px', marginTop: '-40px' }}>
-        <div style={{ flex: '1 1 48%', zIndex: 2 }}>
+        <div className="hero-row" style={{ display: 'flex', alignItems: 'center', gap: '32px', marginTop: '-20px' }}>
+        <div style={{ flex: '1 1 42%', zIndex: 2 }}>
           <p className="section-desc" style={{ marginBottom: '28px', fontSize: '1.1rem', lineHeight: 1.7 }}>
             100+ live APIs your agents can pay for in USDC on Base. 40 FREE QuantumXBrain intelligence endpoints.
             No accounts, no subscriptions. The operating system for machine-to-machine commerce.
@@ -218,20 +329,20 @@ function Hero() {
           </div>
         </div>
 
-        {/* Right: 3D Globe — NO fixed aspect ratio, fluid height, bleeds outside */}
+        {/* Right: 3D Globe — bigger, fluid, bleeds outside */}
         <div style={{
-          flex: '1 1 52%', position: 'relative', overflow: 'visible',
-          minHeight: '480px', maxHeight: '620px',
+          flex: '1 1 58%', position: 'relative', overflow: 'visible',
+          minHeight: '520px', maxHeight: '680px',
           background: 'transparent', border: 'none', outline: 'none',
           zIndex: 1, isolation: 'isolate',
-          marginLeft: '-20px',
+          marginLeft: '-10px',
           display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>
           {/* Globe glow — circular, extends beyond container */}
           <div style={{
             position: 'absolute',
-            width: '140%', height: '140%',
-            top: '-20%', left: '-20%',
+            width: '160%', height: '160%',
+            top: '-30%', left: '-30%',
             background: 'radial-gradient(circle, rgba(168,85,247,0.25) 0%, rgba(217,70,239,0.12) 30%, rgba(236,72,153,0.06) 50%, transparent 70%)',
             borderRadius: '50%', pointerEvents: 'none', zIndex: -1,
             animation: 'globeGlow 5s ease-in-out infinite alternate'
@@ -301,9 +412,9 @@ function Hero() {
           box-shadow: 0 0 20px rgba(168,85,247,0.15);
         }
         @media (max-width: 768px) {
-          #hero .hero-row { flex-direction: column !important; gap: 24px !important; margin-top: -20px !important; }
+          #hero .hero-row { flex-direction: column !important; gap: 24px !important; margin-top: -10px !important; }
           #hero .hero-row > div { flex: none !important; width: 100% !important; margin-left: 0 !important; }
-          #hero .hero-row > div:last-child { min-height: 320px !important; max-height: 380px !important; }
+          #hero .hero-row > div:last-child { min-height: 340px !important; max-height: 400px !important; }
           #hero .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
           .hero-terminal { width: 100% !important; justify-content: center !important; }
         }
