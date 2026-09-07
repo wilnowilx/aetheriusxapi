@@ -106,9 +106,9 @@ function Hero() {
             </div>
           </div>
 
-          <h1 className="section-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-            The Infrastructure for<br />
-            <span className="grad">Agents That Pay</span>
+          <h1 className="section-title" style={{ fontSize: 'clamp(3rem, 7vw, 5.4rem)', lineHeight: 1.02, letterSpacing: '-0.02em' }}>
+            The Infrastructure<br />
+            <span className="grad-flow">for Agents That Pay</span>
           </h1>
 
           <p className="section-desc" style={{ marginBottom: '32px' }}>

@@ -208,12 +208,12 @@ function X402Center() {
     canvas.width = 512; canvas.height = 256
     const ctx = canvas.getContext('2d')
     ctx.clearRect(0, 0, 512, 256)
-    ctx.font = 'bold 120px monospace'
+    ctx.font = 'bold 150px monospace'
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-    ctx.fillStyle = '#d946ef'; ctx.shadowColor = '#d946ef'; ctx.shadowBlur = 40
+    ctx.fillStyle = '#d946ef'; ctx.shadowColor = '#d946ef'; ctx.shadowBlur = 44
     ctx.fillText('x402', 256, 100)
-    ctx.font = '32px sans-serif'; ctx.fillStyle = '#a855f7'; ctx.shadowBlur = 20
-    ctx.fillText('Protocol', 256, 180)
+    ctx.font = '40px sans-serif'; ctx.fillStyle = '#a855f7'; ctx.shadowBlur = 22
+    ctx.fillText('Protocol', 256, 185)
     return new THREE.CanvasTexture(canvas)
   }, [])
 
@@ -224,7 +224,7 @@ function X402Center() {
   })
 
   return (
-    <sprite ref={spriteRef} scale={[1.6, 0.8, 1]}>
+    <sprite ref={spriteRef} scale={[2.1, 1.05, 1]}>
       <spriteMaterial map={texture} transparent blending={THREE.AdditiveBlending} opacity={0.85} depthWrite={false} />
     </sprite>
   )
@@ -245,6 +245,7 @@ function GlobeScene() {
     <Canvas
       camera={{ position: [0, 0.3, 5.2], fov: 40 }}
       gl={{ alpha: true, antialias: !isMobile, powerPreference: 'high-performance' }}
+      onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: 'transparent' }}
       dpr={[1, 1.5]}
     >

@@ -8,11 +8,16 @@ const API_BASE = 'https://34-156-149-38.sslip.io/aetherapi'
 // === NAV ===
 function Nav() {
   const [scrolled, setScrolled] = useState(false)
+  const [pastHero, setPastHero] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 50)
-    window.addEventListener('scroll', handler)
+    const handler = () => {
+      setScrolled(window.scrollY > 50)
+      setPastHero(window.scrollY > window.innerHeight * 0.55)
+    }
+    handler()
+    window.addEventListener('scroll', handler, { passive: true })
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
@@ -20,7 +25,19 @@ function Nav() {
     <>
       <nav className={scrolled ? 'scrolled' : ''}>
         <div className="nav-wrap">
-          <a href="#hero" className="brand">AETHERIUS</a>
+          <a
+            href="#hero"
+            className="brand"
+            aria-hidden={!pastHero}
+            style={{
+              opacity: pastHero ? 1 : 0,
+              transform: pastHero ? 'none' : 'translateY(-8px)',
+              transition: 'opacity 0.4s ease, transform 0.4s ease',
+              pointerEvents: pastHero ? 'auto' : 'none',
+            }}
+          >
+            AETHERIUS
+          </a>
           <div className="nav-links">
             <a href="#playground">Playground</a>
             <a href="#categories">APIs</a>
