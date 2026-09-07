@@ -9,26 +9,34 @@ export function useSmoothScroll() {
   const lenisRef = useRef(null)
 
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      touchMultiplier: 2,
-      infinite: false,
-    })
+    let lenis = null
+    let onFrame = null
+    try {
+      lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        touchMultiplier: 2,
+        infinite: false,
+      })
 
-    lenisRef.current = lenis
+      lenisRef.current = lenis
 
-    lenis.on('scroll', ScrollTrigger.update)
+      lenis.on('scroll', ScrollTrigger.update)
 
-    const onFrame = (time) => {
-      lenis.raf(time * 1000)
+      onFrame = (time) => {
+        lenis.raf(time * 1000)
+      }
+      gsap.ticker.add(onFrame)
+      gsap.ticker.lagSmoothing(0)
+    } catch (err) {
+      if (typeof console !== 'undefined') console.error('[AETHERIUS] smooth scroll disabled:', err)
     }
-    gsap.ticker.add(onFrame)
-    gsap.ticker.lagSmoothing(0)
 
     return () => {
-      gsap.ticker.remove(onFrame)
-      lenis.destroy()
+      try {
+        if (onFrame) gsap.ticker.remove(onFrame)
+        if (lenis) lenis.destroy()
+      } catch { /* noop */ }
     }
   }, [])
 
