@@ -46,8 +46,8 @@ function Nav() {
             <a href="#telemetry">Telemetry</a>
             <a href="#docs">Docs</a>
             <a href="dashboard/">Dashboard</a>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.72rem', fontWeight: 600, color: 'var(--green)', padding: '6px 12px', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 9999, background: 'rgba(16,185,129,0.08)', fontFamily: 'JetBrains Mono, monospace' }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor', animation: 'pulse 2s infinite' }} />
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.72rem', fontWeight: 600, color: 'var(--green)', padding: '6px 14px', border: '1px solid rgba(16,185,129,0.25)', borderRadius: 9999, background: 'rgba(16,185,129,0.06)', fontFamily: 'JetBrains Mono, monospace', backdropFilter: 'blur(8px)' }}>
+              <span className="glow-dot" style={{ width: 6, height: 6 }} />
               Mainnet
             </span>
             <a href="#cta" className="btn-nav">Get Started</a>
@@ -105,50 +105,45 @@ function PlasmaBg() {
 
 // === PLAYGROUND ===
 const playgroundEndpoints = [
-  { cat: 'Maps', icon: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z', items: [
-    { method: 'GET', path: '/v1/maps/search', price: '$0.01', params: '{"query":"coffee shop","location":"Mexico City"}' },
-    { method: 'GET', path: '/v1/maps/reviews', price: '$0.02', params: '{"place_id":"ChIJN1t_tDeuEmsRUsoyG83frY4"}' },
+  { cat: 'x402 Intelligence', free: true, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+    { method: 'GET', path: '/v1/x402/base-stats', price: 'FREE', params: '{}' },
+    { method: 'GET', path: '/v1/x402/gas', price: 'FREE', params: '{}' },
+    { method: 'GET', path: '/v1/x402/market-pulse', price: 'FREE', params: '{}' },
+    { method: 'GET', path: '/v1/x402/sentiment', price: 'FREE', params: '{}' },
+    { method: 'GET', path: '/v1/x402/stablecoins', price: 'FREE', params: '{}' },
+    { method: 'GET', path: '/v1/x402/whales', price: 'FREE', params: '{}' },
   ]},
-  { cat: 'Crypto', icon: 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6', items: [
-    { method: 'GET', path: '/v1/token/price', price: '$0.005', params: '{"token":"ETH"}' },
-    { method: 'GET', path: '/v1/token/analyze', price: '$0.01', params: '{"address":"0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984"}' },
-  ]},
-  { cat: 'Crypto Market', icon: 'M22 12h-4l-3 9L9 3l-3 9H2', items: [
+  { cat: 'Crypto Market', free: false, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path d="M22 12h-4l-3 9L9 3l-3 9H2" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
     { method: 'GET', path: '/v1/crypto/market', price: '$0.005', params: '{"token":"ETH"}' },
     { method: 'GET', path: '/v1/crypto/fear-greed', price: '$0.005', params: '{}' },
     { method: 'GET', path: '/v1/crypto/trending', price: '$0.01', params: '{}' },
     { method: 'GET', path: '/v1/crypto/ohlcv', price: '$0.01', params: '{"token":"ETH","interval":"1d"}' },
     { method: 'GET', path: '/v1/crypto/dominance', price: '$0.005', params: '{}' },
   ]},
-  { cat: 'Web', icon: 'M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z', items: [
-    { method: 'GET', path: '/v1/web/scrape', price: '$0.01', params: '{"url":"https://example.com"}' },
+  { cat: 'Token', free: false, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10l4-4 4 4" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+    { method: 'GET', path: '/v1/token/price', price: '$0.005', params: '{"token":"ETH"}' },
+    { method: 'GET', path: '/v1/token/analyze', price: '$0.01', params: '{"address":"0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984"}' },
   ]},
-  { cat: 'Data', icon: 'M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z', items: [
+  { cat: 'DeFi', free: false, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+    { method: 'GET', path: '/v1/defi/impermanent-loss', price: '$0.01', params: '{}' },
+    { method: 'GET', path: '/v1/defi/staking-apy', price: '$0.005', params: '{"protocol":"lido","token":"ETH"}' },
+  ]},
+  { cat: 'News', free: false, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2" strokeLinejoin="round" strokeLinecap="round"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+    { method: 'GET', path: '/v1/news/hackernews', price: '$0.01', params: '{}' },
+    { method: 'GET', path: '/v1/news/reddit', price: '$0.01', params: '{"subreddit":"cryptocurrency"}' },
+  ]},
+  { cat: 'Data', free: false, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="22.08" x2="12" y2="12" strokeLinecap="round"/></svg>, items: [
     { method: 'GET', path: '/v1/data/weather', price: '$0.005', params: '{"lat":"19.4326","lon":"-99.1332"}' },
-    { method: 'GET', path: '/v1/email/validate', price: '$0.005', params: '{"email":"test@example.com"}' },
+    { method: 'GET', path: '/v1/data/ip', price: '$0.005', params: '{"ip":"8.8.8.8"}' },
+    { method: 'GET', path: '/v1/data/uuid', price: '$0.001', params: '{}' },
+    { method: 'GET', path: '/v1/data/hash', price: '$0.002', params: '{"input":"hello","algo":"sha256"}' },
+    { method: 'GET', path: '/v1/data/qrcode', price: '$0.003', params: '{"text":"https://aetheriusx.io"}' },
+    { method: 'POST', path: '/v1/data/translate', price: '$0.01', params: '{"text":"hello","target":"es"}' },
   ]},
-  { cat: 'Web Tools', icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z', items: [
+  { cat: 'Web Tools', free: false, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12" strokeLinecap="round"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+    { method: 'GET', path: '/v1/web/ssl', price: '$0.005', params: '{"domain":"example.com"}' },
     { method: 'GET', path: '/v1/web/whois', price: '$0.01', params: '{"domain":"example.com"}' },
     { method: 'GET', path: '/v1/web/headers', price: '$0.005', params: '{"url":"https://example.com"}' },
-    { method: 'GET', path: '/v1/web/ssl-check', price: '$0.005', params: '{"domain":"example.com"}' },
-  ]},
-  { cat: 'Data Tools', icon: 'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z', items: [
-    { method: 'GET', path: '/v1/data/ip-geo', price: '$0.005', params: '{"ip":"8.8.8.8"}' },
-    { method: 'GET', path: '/v1/data/ua-parser', price: '$0.002', params: '{"ua":"Mozilla/5.0"}' },
-    { method: 'GET', path: '/v1/data/hash', price: '$0.002', params: '{"input":"hello","algo":"sha256"}' },
-    { method: 'GET', path: '/v1/data/uuid', price: '$0.001', params: '{}' },
-    { method: 'GET', path: '/v1/data/qr-code', price: '$0.003', params: '{"text":"https://aetheriusx.io"}' },
-    { method: 'POST', path: '/v1/data/translate', price: '$0.01', params: '{"text":"hello","target":"es"}' },
-    { method: 'POST', path: '/v1/data/summarize', price: '$0.02', params: '{"text":"Long article text..."}' },
-  ]},
-  { cat: 'News', icon: 'M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2', items: [
-    { method: 'GET', path: '/v1/news/reddit', price: '$0.005', params: '{"subreddit":"cryptocurrency"}' },
-    { method: 'GET', path: '/v1/news/devto', price: '$0.005', params: '{"tag":"javascript"}' },
-  ]},
-  { cat: 'DeFi & Token', icon: 'M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6', items: [
-    { method: 'GET', path: '/v1/defi/il-calculator', price: '$0.01', params: '{"pair":"ETH/USDC","range":"30d"}' },
-    { method: 'GET', path: '/v1/defi/staking-apy', price: '$0.005', params: '{"protocol":"lido","token":"ETH"}' },
-    { method: 'GET', path: '/v1/token/nft-metadata', price: '$0.01', params: '{"contract":"0x...","tokenId":"1"}' },
   ]},
 ]
 
@@ -199,39 +194,42 @@ function Playground() {
     <section id="playground" data-animate style={{ paddingTop: 40 }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3" strokeLinejoin="round" strokeLinecap="round"/></svg>
           Live Playground
         </div>
         <h2 className="section-title">Try It Right Now</h2>
-        <p className="section-desc" style={{ margin: '0 auto' }}>Select an endpoint and see real responses. No signup required.</p>
+        <p className="section-desc" style={{ margin: '0 auto' }}>Select an endpoint and see real responses. Free endpoints work instantly.</p>
 
         <div data-animate-card style={{
-          display: 'grid', gridTemplateColumns: '280px 1fr', gap: 24, marginTop: 56,
-          background: 'rgba(10,10,20,0.6)', border: '1px solid rgba(168,85,247,0.25)',
+          display: 'grid', gridTemplateColumns: '280px 1fr', gap: 0, marginTop: 56,
+          background: 'rgba(10,10,20,0.5)', border: '1px solid rgba(168,85,247,0.15)',
           borderRadius: 20, overflow: 'hidden', minHeight: 500, position: 'relative',
-          boxShadow: '0 0 60px rgba(168,85,247,0.08), 0 0 120px rgba(217,70,239,0.04)',
+          boxShadow: '0 0 60px rgba(168,85,247,0.06), 0 0 120px rgba(217,70,239,0.03)',
+          backdropFilter: 'blur(20px)',
         }}>
           {/* Sidebar */}
-          <div style={{ background: 'rgba(255,255,255,0.02)', borderRight: '1px solid var(--border)', padding: 16, overflowY: 'auto', maxHeight: 500 }}>
+          <div style={{ background: 'rgba(255,255,255,0.015)', borderRight: '1px solid rgba(255,255,255,0.04)', padding: 16, overflowY: 'auto', maxHeight: 500 }}>
             {playgroundEndpoints.map(group => (
               <div key={group.cat} style={{ marginBottom: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--purple-light)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d={group.icon}/></svg>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: '0.72rem', fontWeight: 700, color: group.free ? 'var(--green)' : 'var(--purple-light)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  {group.icon}
                   {group.cat}
+                  {group.free && <span style={{ fontSize: '0.6rem', padding: '2px 6px', borderRadius: 6, background: 'rgba(16,185,129,0.15)', color: 'var(--green)', marginLeft: 'auto' }}>FREE</span>}
                 </div>
                 {group.items.map(ep => (
                   <div key={ep.path} role="button" tabIndex={0}
                     onClick={() => selectFromSidebar(ep)}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectFromSidebar(ep) } }}
                     style={{
-                    display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 8,
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 10,
                     cursor: 'pointer', fontSize: '0.82rem', border: '1px solid transparent',
-                    transition: 'all 0.25s', background: selected.path === ep.path ? 'rgba(168,85,247,0.15)' : 'transparent',
-                    borderColor: selected.path === ep.path ? 'rgba(168,85,247,0.35)' : 'transparent',
+                    transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
+                    background: selected.path === ep.path ? 'rgba(168,85,247,0.12)' : 'transparent',
+                    borderColor: selected.path === ep.path ? 'rgba(168,85,247,0.25)' : 'transparent',
                   }}>
-                    <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.65rem', fontWeight: 600, padding: '2px 6px', borderRadius: 4, background: ep.method === 'POST' ? 'rgba(245,158,11,0.15)' : 'rgba(16,185,129,0.15)', color: ep.method === 'POST' ? 'var(--orange)' : 'var(--green)' }}>{ep.method}</span>
-                    <span style={{ flex: 1, fontFamily: 'JetBrains Mono, monospace', color: 'var(--text)' }}>{ep.path.replace('/v1/', '/')}</span>
-                    <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem', color: 'var(--magenta-light)' }}>{ep.price}</span>
+                    <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem', fontWeight: 600, padding: '2px 6px', borderRadius: 4, background: ep.method === 'POST' ? 'rgba(245,158,11,0.12)' : ep.price === 'FREE' ? 'rgba(16,185,129,0.12)' : 'rgba(16,185,129,0.12)', color: ep.method === 'POST' ? 'var(--orange)' : 'var(--green)' }}>{ep.method}</span>
+                    <span style={{ flex: 1, fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-sec)', fontSize: '0.78rem' }}>{ep.path.replace('/v1/', '/')}</span>
+                    <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.68rem', color: ep.price === 'FREE' ? 'var(--green)' : 'var(--magenta-light)' }}>{ep.price}</span>
                   </div>
                 ))}
               </div>
@@ -240,44 +238,45 @@ function Playground() {
 
           {/* Main area */}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', background: 'rgba(255,255,255,0.015)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: selected.method === 'POST' ? 'rgba(245,158,11,0.15)' : 'rgba(16,185,129,0.15)', color: selected.method === 'POST' ? 'var(--orange)' : 'var(--green)' }}>{selected.method}</span>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem', color: 'var(--text)' }}>{selected.path}</span>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem', fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: selected.method === 'POST' ? 'rgba(245,158,11,0.12)' : 'rgba(16,185,129,0.12)', color: selected.method === 'POST' ? 'var(--orange)' : 'var(--green)' }}>{selected.method}</span>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.88rem', color: 'var(--text)' }}>{selected.path}</span>
               </div>
               <button onClick={sendRequest} disabled={loading} style={{
                 display: 'flex', alignItems: 'center', gap: 8, padding: '10px 22px',
                 background: 'linear-gradient(135deg, var(--purple-deep), var(--magenta))',
                 color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: '0.85rem',
                 cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.5 : 1,
-                boxShadow: '0 4px 16px rgba(168,85,247,0.3)', transition: 'all 0.3s',
+                boxShadow: '0 4px 16px rgba(168,85,247,0.25)', transition: 'all 0.3s',
               }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3" strokeLinejoin="round" strokeLinecap="round"/></svg>
                 Send
               </button>
             </div>
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
               <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Parameters</div>
               <textarea value={params} onChange={e => setParams(e.target.value)} style={{
                 width: '100%', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.82rem',
-                padding: '12px 16px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border)',
+                padding: '12px 16px', background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.04)',
                 borderRadius: 10, color: 'var(--text)', minHeight: 44, outline: 'none', resize: 'vertical',
-              }} />
+                transition: 'border-color 0.3s',
+              }} onFocus={e => e.target.style.borderColor = 'rgba(168,85,247,0.3)'} onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.04)'} />
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: '1px solid var(--border)', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                 <span>Response</span>
-                {status && <span style={{ fontFamily: 'JetBrains Mono, monospace', padding: '2px 8px', borderRadius: 4, background: 'rgba(16,185,129,0.15)', color: 'var(--green)' }}>{status}</span>}
+                {status && <span style={{ fontFamily: 'JetBrains Mono, monospace', padding: '2px 8px', borderRadius: 4, background: status.startsWith('2') ? 'rgba(16,185,129,0.12)' : status.startsWith('4') ? 'rgba(245,158,11,0.12)' : 'rgba(236,72,153,0.12)', color: status.startsWith('2') ? 'var(--green)' : status.startsWith('4') ? 'var(--orange)' : 'var(--pink)' }}>{status}</span>}
                 {time && <span style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-sec)' }}>{time}</span>}
               </div>
-              <div style={{ flex: 1, padding: 20, fontFamily: 'JetBrains Mono, monospace', fontSize: '0.82rem', lineHeight: 1.6, color: 'var(--text)', overflowY: 'auto', maxHeight: 300, background: 'rgba(0,0,0,0.15)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+              <div style={{ flex: 1, padding: 20, fontFamily: 'JetBrains Mono, monospace', fontSize: '0.82rem', lineHeight: 1.6, color: 'var(--text)', overflowY: 'auto', maxHeight: 300, background: 'rgba(0,0,0,0.1)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                 {loading ? <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Loading...</span> :
                  response || <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Click "Send" to make a request...</span>}
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 12, padding: '12px 20px', borderTop: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 10, padding: '12px 20px', borderTop: '1px solid rgba(255,255,255,0.04)', background: 'rgba(255,255,255,0.015)', flexWrap: 'wrap' }}>
               {['x402 Payment Required', 'USDC on Base', 'Settled instantly'].map(b => (
-                <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.25)', borderRadius: 9999, fontSize: '0.72rem', fontWeight: 500, color: 'var(--purple-light)' }}>{b}</div>
+                <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px', background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.15)', borderRadius: 9999, fontSize: '0.68rem', fontWeight: 500, color: 'var(--purple-light)' }}>{b}</div>
               ))}
             </div>
           </div>
@@ -294,44 +293,40 @@ function Playground() {
 // === CATEGORIES ===
 function Categories() {
   const cats = [
-    { title: 'Maps & Location', count: '5 live', icon: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z' },
-    { title: 'Crypto & DeFi', count: '19 live', icon: 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' },
-    { title: 'Web & Scraping', count: '4 live', icon: 'M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z' },
-    { title: 'AI & ML', count: 'soon', icon: 'M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z', soon: true },
-    { title: 'Finance', count: '3 live', icon: 'M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' },
-    { title: 'Communication', count: '1 live', icon: 'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z' },
-    { title: 'Weather', count: '3 live', icon: 'M17 18a5 5 0 0 0-10 0' },
-    { title: 'News & Media', count: '6 live', icon: 'M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2' },
-    { title: 'Security', count: 'soon', icon: 'M3 11h18M7 11V7a5 5 0 0 1 10 0v4', soon: true },
-    { title: 'Data & Analytics', count: '8 live', icon: 'M21.21 15.89A10 10 0 1 1 8 2.83' },
-    { title: 'Crypto Market Data', count: '5 live', icon: 'M22 12h-4l-3 9L9 3l-3 9H2' },
-    { title: 'Web Tools', count: '3 live', icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z' },
-    { title: 'Data Tools', count: '7 live', icon: 'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z' },
-    { title: 'Gaming', count: 'soon', icon: 'M2 6h20M6 12h4M14 12h4', soon: true },
-    { title: 'Health & Science', count: 'soon', icon: 'M22 12h-4l-3 9L9 3l-3 9H2', soon: true },
+    { title: 'Maps & Location', count: '5 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" strokeLinejoin="round" strokeLinecap="round"/><circle cx="12" cy="10" r="3" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Crypto & DeFi', count: '19 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Web & Scraping', count: '4 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'AI & ML', count: 'soon', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z" strokeLinejoin="round" strokeLinecap="round"/><path d="M16 14v2a4 4 0 01-8 0v-2M12 18v4M8 22h8" strokeLinejoin="round" strokeLinecap="round"/></svg>, soon: true },
+    { title: 'Finance', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Weather', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'News & Media', count: '6 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Data & Analytics', count: '8 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="22.08" x2="12" y2="12" strokeLinecap="round"/></svg> },
+    { title: 'Crypto Market Data', count: '5 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Web Tools', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="14 2 14 8 20 8" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Data Tools', count: '7 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><ellipse cx="12" cy="5" rx="9" ry="3" strokeLinejoin="round" strokeLinecap="round"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" strokeLinejoin="round" strokeLinecap="round"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Security', count: 'soon', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinejoin="round" strokeLinecap="round"/></svg>, soon: true },
   ]
 
   return (
     <section id="categories" data-animate style={{ textAlign: 'center' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><rect x="3" y="3" width="7" height="7" rx="1.5" strokeLinejoin="round" strokeLinecap="round"/><rect x="14" y="3" width="7" height="7" rx="1.5" strokeLinejoin="round" strokeLinecap="round"/><rect x="14" y="14" width="7" height="7" rx="1.5" strokeLinejoin="round" strokeLinecap="round"/><rect x="3" y="14" width="7" height="7" rx="1.5" strokeLinejoin="round" strokeLinecap="round"/></svg>
           API Categories
         </div>
         <h2 className="section-title">100+ Live Endpoints, More Weekly</h2>
         <p className="section-desc" style={{ margin: '0 auto' }}>Production APIs across maps, DeFi, web, data, forex and news — new verticals shipping weekly.</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginTop: 48 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginTop: 48 }}>
           {cats.map(cat => (
-            <div key={cat.title} data-animate-card style={{
-              padding: '16px 12px', background: 'var(--bg-card)', border: '1px solid var(--border)',
-              borderRadius: 12, textAlign: 'center', cursor: 'pointer', transition: 'all 0.5s',
-              opacity: cat.soon ? 0.5 : 1,
+            <div key={cat.title} data-animate-card className="glass-card" style={{
+              padding: '20px 14px', textAlign: 'center', cursor: 'pointer',
+              opacity: cat.soon ? 0.45 : 1,
             }}>
-              <div style={{ width: 36, height: 36, margin: '0 auto 8px', background: 'linear-gradient(135deg, rgba(168,85,247,0.1), rgba(217,70,239,0.1))', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-light)' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d={cat.icon}/></svg>
+              <div style={{ width: 44, height: 44, margin: '0 auto 10px', background: 'linear-gradient(135deg, rgba(168,85,247,0.08), rgba(217,70,239,0.06))', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-light)' }}>
+                {cat.icon}
               </div>
-              <div style={{ fontSize: '0.82rem', fontWeight: 700, marginBottom: 4 }}>{cat.title}</div>
-              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.68rem', color: cat.soon ? 'var(--text-muted)' : 'var(--magenta-light)' }}>{cat.count}</div>
+              <div style={{ fontSize: '0.82rem', fontWeight: 700, marginBottom: 4, color: 'var(--text)' }}>{cat.title}</div>
+              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.68rem', color: cat.soon ? 'var(--text-muted)' : 'var(--green)' }}>{cat.count}</div>
             </div>
           ))}
         </div>
@@ -347,44 +342,41 @@ function Categories() {
 // === X402 INTELLIGENCE ===
 function X402Intelligence() {
   const cards = [
-    { title: 'Brain Recommender', desc: 'Tell it what you need — "defi", "wallet", "gas" — and it recommends the best endpoints. AI-powered routing.', code: 'GET /v1/x402/brain?intent=defi', color: 'var(--purple-light)', bg: 'rgba(168,85,247,0.1)', border: 'rgba(168,85,247,0.3)', iconBg: 'linear-gradient(135deg, rgba(168,85,247,0.12), rgba(217,70,239,0.12))', icon: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>' },
-    { title: 'Market Pulse', desc: 'Real-time Base conditions: gas, chain health, USDC activity, ETH price, bullish/bearish signal. One call.', code: 'GET /v1/x402/market-pulse', color: 'var(--green)', bg: 'rgba(16,185,129,0.1)', border: 'rgba(168,85,247,0.3)', iconBg: 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,182,212,0.12))', icon: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>' },
-    { title: 'Wallet Intel', desc: 'Full wallet profile: USDC flow, risk score, counterparty analysis, ETH balance. Any address on Base.', code: 'GET /v1/x402/wallet-intel/{address}', color: 'var(--pink)', bg: 'rgba(236,72,153,0.1)', border: 'rgba(168,85,247,0.3)', iconBg: 'linear-gradient(135deg, rgba(236,72,153,0.12), rgba(168,85,247,0.12))', icon: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>' },
-    { title: 'Sentiment + Risk', desc: 'Fear & Greed Index + on-chain sentiment. Multi-factor risk scoring with detailed breakdown. Compliance indicators.', code: 'GET /v1/x402/sentiment · /risk-intel', color: 'var(--cyan)', bg: 'rgba(6,182,212,0.1)', border: 'rgba(168,85,247,0.3)', iconBg: 'linear-gradient(135deg, rgba(6,182,212,0.12), rgba(16,185,129,0.12))', icon: '<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>' },
+    { title: 'Brain Recommender', desc: 'Tell it what you need — "defi", "wallet", "gas" — and it recommends the best endpoints. AI-powered routing.', code: 'GET /v1/x402/brain?intent=defi', color: 'var(--purple-light)', bg: 'rgba(168,85,247,0.06)', iconBg: 'linear-gradient(135deg, rgba(168,85,247,0.1), rgba(217,70,239,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" strokeLinecap="round"/></svg> },
+    { title: 'Market Pulse', desc: 'Real-time Base conditions: gas, chain health, USDC activity, ETH price, bullish/bearish signal. One call.', code: 'GET /v1/x402/market-pulse', color: 'var(--green)', bg: 'rgba(16,185,129,0.06)', iconBg: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Wallet Intel', desc: 'Full wallet profile: USDC flow, risk score, counterparty analysis, ETH balance. Any address on Base.', code: 'GET /v1/x402/wallet-intel/{address}', color: 'var(--pink)', bg: 'rgba(236,72,153,0.06)', iconBg: 'linear-gradient(135deg, rgba(236,72,153,0.1), rgba(168,85,247,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" strokeLinejoin="round" strokeLinecap="round"/><circle cx="12" cy="7" r="4" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Sentiment + Risk', desc: 'Fear & Greed Index + on-chain sentiment. Multi-factor risk scoring with detailed breakdown. Compliance indicators.', code: 'GET /v1/x402/sentiment · /risk-intel', color: 'var(--cyan)', bg: 'rgba(6,182,212,0.06)', iconBg: 'linear-gradient(135deg, rgba(6,182,212,0.1), rgba(16,185,129,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
   ]
 
   return (
-    <section id="x402-intel" data-animate style={{ background: 'linear-gradient(180deg, rgba(168,85,247,0.08) 0%, transparent 100%)', textAlign: 'center' }}>
+    <section id="x402-intel" data-animate style={{ background: 'linear-gradient(180deg, rgba(168,85,247,0.05) 0%, transparent 100%)', textAlign: 'center' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          QUANTUMXBrain — FREE Intelligence Layer
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg>
+          QuantumXBrain — FREE Intelligence Layer
         </div>
         <h2 className="section-title">20 Free Endpoints. Real On-Chain Intelligence.</h2>
         <p className="section-desc" style={{ margin: '0 auto' }}>We read Base Mainnet directly + CoinGecko + DefiLlama. No API keys. No accounts. The intelligence layer that NOBODY else offers — completely free.</p>
-        <div className="intel-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginTop: 48 }}>
+        <div className="intel-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginTop: 48 }}>
           {cards.map(c => (
-            <div key={c.title} data-animate-card style={{
-              padding: '44px 36px', background: 'var(--bg-card)', border: `1px solid ${c.border}`,
-              borderRadius: 24, textAlign: 'left', transition: 'all 0.5s',
-            }}>
-              <div style={{ width: 64, height: 64, background: c.iconBg, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 28, color: c.color }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="30" height="30" dangerouslySetInnerHTML={{ __html: c.icon }} />
+            <div key={c.title} data-animate-card className="glass-card" style={{ padding: '36px 28px', textAlign: 'left' }}>
+              <div style={{ width: 56, height: 56, background: c.iconBg, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24, color: c.color }}>
+                {c.icon}
               </div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 12 }}>{c.title}</h3>
-              <p style={{ color: 'var(--text-sec)', fontSize: '0.95rem', marginBottom: 16 }}>{c.desc}</p>
-              <div style={{ padding: '8px 12px', background: c.bg, borderRadius: 8, fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', color: c.color }}>{c.code}</div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: 10, color: 'var(--text)' }}>{c.title}</h3>
+              <p style={{ color: 'var(--text-sec)', fontSize: '0.9rem', marginBottom: 16, lineHeight: 1.6 }}>{c.desc}</p>
+              <div style={{ padding: '8px 12px', background: c.bg, borderRadius: 8, fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem', color: c.color }}>{c.code}</div>
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 24, padding: '20px 36px', background: 'var(--bg-card)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 24, textAlign: 'left' }}>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: 8 }}>+ 16 More Free Endpoints</h3>
-          <p style={{ color: 'var(--text-sec)', fontSize: '0.82rem' }}>Gas Intelligence · Token Discovery · Whale Clustering · DeFi Yield · Tx Patterns · Wallet Compare · Leaderboard · Contract Intel · Velocity · History · Search · Network Health · Stablecoin Flow</p>
+        <div className="glass-card" style={{ marginTop: 20, padding: '20px 32px', textAlign: 'left', borderColor: 'rgba(245,158,11,0.15)' }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: 8, color: 'var(--text)' }}>+ 16 More Free Endpoints</h3>
+          <p style={{ color: 'var(--text-sec)', fontSize: '0.82rem', lineHeight: 1.6 }}>Gas Intelligence · Token Discovery · Whale Clustering · DeFi Yield · Tx Patterns · Wallet Compare · Leaderboard · Contract Intel · Velocity · History · Search · Network Health · Stablecoin Flow</p>
         </div>
-        <div style={{ textAlign: 'center', marginTop: 40 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '16px 24px', background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.25)', borderRadius: 12 }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple-light)" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span style={{ color: 'var(--purple-light)', fontWeight: 600 }}>20 endpoints · 100% FREE · X-AETHERIUS-Fingerprint header on every response</span>
+        <div style={{ textAlign: 'center', marginTop: 32 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '14px 22px', background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.15)', borderRadius: 12, backdropFilter: 'blur(8px)' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--purple-light)" strokeWidth="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" strokeLinejoin="round" strokeLinecap="round"/></svg>
+            <span style={{ color: 'var(--purple-light)', fontWeight: 600, fontSize: '0.88rem' }}>20 endpoints · 100% FREE · X-AETHERIUS-Fingerprint header on every response</span>
           </div>
         </div>
       </div>
@@ -399,17 +391,17 @@ function X402Intelligence() {
 // === HOW IT WORKS ===
 function HowItWorks() {
   const steps = [
-    { num: '1', title: 'Connect Wallet', desc: 'Your crypto wallet is your identity. No signup, no KYC.', icon: 'M3 11h18M7 11V7a5 5 0 0 1 10 0v4' },
-    { num: '2', title: 'Choose API', desc: 'Browse 100+ live endpoints. Pick what your agent needs.', icon: 'M11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16z' },
-    { num: '3', title: 'Pay Per Request', desc: 'x402 handles payment. USDC on Base. Sub-cent fees.', icon: 'M1 4h22v16H1z' },
-    { num: '4', title: 'Get Data', desc: 'Instant response. The agent gets exactly what it needs.', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z' },
+    { num: '1', title: 'Connect Wallet', desc: 'Your crypto wallet is your identity. No signup, no KYC.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="34" height="34"><rect x="2" y="6" width="20" height="14" rx="3" strokeLinejoin="round" strokeLinecap="round"/><path d="M2 10h20" strokeLinejoin="round" strokeLinecap="round"/><circle cx="16" cy="15" r="1.5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { num: '2', title: 'Choose API', desc: 'Browse 100+ live endpoints. Pick what your agent needs.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="34" height="34"><circle cx="11" cy="11" r="8" strokeLinejoin="round" strokeLinecap="round"/><line x1="21" y1="21" x2="16.65" y2="16.65" strokeLinecap="round"/></svg> },
+    { num: '3', title: 'Pay Per Request', desc: 'x402 handles payment. USDC on Base. Sub-cent fees.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="34" height="34"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { num: '4', title: 'Get Data', desc: 'Instant response. The agent gets exactly what it needs.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="34" height="34"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
   ]
 
   return (
     <section id="how" data-animate style={{ textAlign: 'center' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path d="M12 16v-4M12 8h.01" strokeLinecap="round"/></svg>
           How It Works
         </div>
         <h2 className="section-title">Four Steps to Autonomous Access</h2>
@@ -418,16 +410,16 @@ function HowItWorks() {
           {steps.map((step, i) => (
             <React.Fragment key={step.num}>
               <div data-animate-card style={{ flex: 1, maxWidth: 260, textAlign: 'center', padding: '0 16px' }}>
-                <div style={{ width: 80, height: 80, margin: '0 auto 24px', background: 'linear-gradient(135deg, rgba(168,85,247,0.08), rgba(217,70,239,0.08))', border: '1px solid rgba(168,85,247,0.3)', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-light)', position: 'relative' }}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="36" height="36"><path d={step.icon}/></svg>
-                  <span style={{ position: 'absolute', top: -6, right: -6, width: 28, height: 28, background: 'linear-gradient(135deg, var(--purple), var(--magenta))', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>{step.num}</span>
+                <div style={{ width: 80, height: 80, margin: '0 auto 24px', background: 'linear-gradient(135deg, rgba(168,85,247,0.06), rgba(217,70,239,0.04))', border: '1px solid rgba(168,85,247,0.15)', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-light)', position: 'relative', backdropFilter: 'blur(8px)' }}>
+                  {step.icon}
+                  <span style={{ position: 'absolute', top: -6, right: -6, width: 28, height: 28, background: 'linear-gradient(135deg, var(--purple), var(--magenta))', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: 'white', boxShadow: '0 4px 12px rgba(168,85,247,0.3)' }}>{step.num}</span>
                 </div>
-                <div style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: 10 }}>{step.title}</div>
+                <div style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: 10, color: 'var(--text)' }}>{step.title}</div>
                 <div style={{ color: 'var(--text-sec)', fontSize: '0.88rem', maxWidth: 200, margin: '0 auto', lineHeight: 1.5 }}>{step.desc}</div>
               </div>
               {i < steps.length - 1 && (
-                <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', paddingTop: 36, color: 'var(--purple)', opacity: 0.4 }}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="32" height="32"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', paddingTop: 36, color: 'var(--purple)', opacity: 0.3 }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M5 12h14M12 5l7 7-7 7" strokeLinejoin="round" strokeLinecap="round"/></svg>
                 </div>
               )}
             </React.Fragment>
@@ -444,34 +436,31 @@ function HowItWorks() {
 // === FEATURES ===
 function Features() {
   const features = [
-    { title: 'AI-Native Design', desc: 'Built for machines. No accounts, no UI, no human friction. Agents pay and use directly.', icon: 'M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z' },
-    { title: 'x402 Protocol', desc: 'HTTP 402 with crypto payments. The emerging standard for machine-to-machine commerce.', icon: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71' },
-    { title: 'USDC on Base', desc: 'Stablecoin payments on L2. Sub-cent fees, instant finality, global reach.', icon: 'M1 4h22v16H1z' },
-    { title: 'Permissionless', desc: 'No KYC, no subscriptions. Connect wallet and use. That\'s it.', icon: 'M3 11h18M7 11V7a5 5 0 0 1 10 0v4' },
-    { title: 'Global Access', desc: 'Anyone with a crypto wallet. No bank account needed. No borders.', icon: 'M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z' },
-    { title: 'Instant Settlement', desc: 'Payments verified on-chain in seconds. No waiting, no intermediaries.', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z' },
+    { title: 'AI-Native Design', desc: 'Built for machines. No accounts, no UI, no human friction. Agents pay and use directly.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z" strokeLinejoin="round" strokeLinecap="round"/><path d="M16 14v2a4 4 0 01-8 0v-2M12 18v4M8 22h8" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'x402 Protocol', desc: 'HTTP 402 with crypto payments. The emerging standard for machine-to-machine commerce.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" strokeLinejoin="round" strokeLinecap="round"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.72-1.71" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'USDC on Base', desc: 'Stablecoin payments on L2. Sub-cent fees, instant finality, global reach.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path d="M12 6v12M8 10l4-4 4 4M8 14l4 4 4-4" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Permissionless', desc: 'No KYC, no subscriptions. Connect wallet and use. That\'s it.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="9 12 11 14 15 10" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Global Access', desc: 'Anyone with a crypto wallet. No bank account needed. No borders.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><line x1="2" y1="12" x2="22" y2="12" strokeLinecap="round"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Instant Settlement', desc: 'Payments verified on-chain in seconds. No waiting, no intermediaries.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
   ]
 
   return (
     <section id="features" data-animate style={{ textAlign: 'center' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path d="M12 2L2 7l10 5 10-5-10-5z" strokeLinejoin="round" strokeLinecap="round"/></svg>
           Features
         </div>
         <h2 className="section-title">Built for the Agent Economy</h2>
         <p className="section-desc" style={{ margin: '0 auto' }}>Every feature designed for machine-to-machine commerce.</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginTop: 72 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginTop: 72 }}>
           {features.map(f => (
-            <div key={f.title} data-animate-card style={{
-              padding: '44px 36px', background: 'var(--bg-card)', border: '1px solid var(--border)',
-              borderRadius: 24, textAlign: 'left', transition: 'all 0.5s',
-            }}>
-              <div style={{ width: 64, height: 64, background: 'linear-gradient(135deg, rgba(168,85,247,0.12), rgba(217,70,239,0.12))', borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 28, color: 'var(--purple-light)' }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="30" height="30"><path d={f.icon}/></svg>
+            <div key={f.title} data-animate-card className="glass-card" style={{ padding: '36px 28px', textAlign: 'left' }}>
+              <div style={{ width: 56, height: 56, background: 'linear-gradient(135deg, rgba(168,85,247,0.08), rgba(217,70,239,0.06))', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24, color: 'var(--purple-light)' }}>
+                {f.icon}
               </div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 12 }}>{f.title}</h3>
-              <p style={{ color: 'var(--text-sec)', fontSize: '0.95rem' }}>{f.desc}</p>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: 10, color: 'var(--text)' }}>{f.title}</h3>
+              <p style={{ color: 'var(--text-sec)', fontSize: '0.9rem', lineHeight: 1.6 }}>{f.desc}</p>
             </div>
           ))}
         </div>
