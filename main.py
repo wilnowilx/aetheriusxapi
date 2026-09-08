@@ -423,6 +423,23 @@ async def telemetry():
                             currency=CURRENCY, version=VERSION, wallet=PAY_TO)
 
 
+@app.get("/v1/anti-replay/stats")
+@app.get("/api/v1/anti-replay/stats")
+async def anti_replay_stats():
+    """FREE: Anti-replay nonce cache stats for monitoring.
+
+    Shows active nonces, TTL, and cache health. Useful for dashboard
+    monitoring and verifying TOCTOU protection is active.
+    """
+    from x402_middleware import _nonce_cache
+    return {
+        "service": "aetheriusxAPI",
+        "protection": "TOCTOU anti-replay",
+        "status": "active",
+        **_nonce_cache.stats(),
+    }
+
+
 @app.get("/")
 async def root():
     return {"service": "aetheriusxAPI", "version": VERSION,

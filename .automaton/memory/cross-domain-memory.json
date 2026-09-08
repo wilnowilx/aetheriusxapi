@@ -95,6 +95,18 @@
       "domain": "web-3d",
       "rule": "R3F bloom: import {EffectComposer} from '@react-three/postprocessing' and {Bloom} from '@react-three/postprocessing'. Wrap scene in <EffectComposer><Bloom intensity={1.2} radius={0.8} /></EffectComposer>.",
       "confidence": 0.9
+    },
+    {
+      "id": "toctou-nonce-cache",
+      "domain": "security",
+      "rule": "TOCTOU anti-replay for payment middleware: hash proof content (SHA-256, first 16 hex chars), store in RAM dict with TTL (300s), block duplicates with 409. Thread-safe via threading.Lock. Normalize proofs (strip+lowercase) to catch variations.",
+      "confidence": 0.95
+    },
+    {
+      "id": "nonce-cache-test-pattern",
+      "domain": "testing",
+      "rule": "When testing middleware with nonce cache, use autouse fixture to clear _nonce_cache._seen before/after each test. Tests sharing same proof string will fail without this. Unique proofs per request or fixture clearing is mandatory.",
+      "confidence": 0.95
     }
   ],
   "mappings": [
@@ -164,6 +176,11 @@
       "date": "2026-09-06",
       "text": "Fresnel atmospheric glow shader for Three.js globe: BackSide sphere + pow(1.0 - abs(dot(vNormal, vec3(0,0,1))), 2.5) + time-based pulse. Much better than simple radial gradient CSS.",
       "files": ["index.html"]
+    },
+    {
+      "date": "2026-09-07",
+      "text": "TOCTOU anti-replay: RAM nonce cache with SHA-256 hashing, TTL eviction (300s), threading.Lock for thread safety. Added to x402_middleware.py. Tests need autouse fixture to clear cache between runs.",
+      "files": ["x402_middleware.py", "tests/test_api.py"]
     }
   ],
   "decisions": [
@@ -196,6 +213,12 @@
       "question": "How to upgrade the landing page with cutting-edge frameworks?",
       "answer": "Option C (Hybrid): Keep HTML structure, upgrade Three.js r128→r183, add GSAP ScrollTrigger + Lenis smooth scroll, enhance globe with Fresnel shaders. Low risk, high impact, 2-3 days.",
       "rationale": "User wanted GPT-6 Astra-level immersive experience. Research showed Three.js + GSAP + Lenis is the dominant 2026 stack. Option B (full R3F rebuild) was too risky."
+    },
+    {
+      "date": "2026-09-07",
+      "question": "How to prevent payment proof replay attacks (TOCTOU window)?",
+      "answer": "RAM-based nonce cache: SHA-256 hash of proof content, stored in dict with 300s TTL, thread-safe via Lock. First use passes, duplicate → 409. Added to SimulatedX402Middleware.",
+      "rationale": "Between HTTP validation and L2 settlement, a proof could be replayed. Nonce cache blocks this instantly without blockchain lookup."
     }
   ]
 }

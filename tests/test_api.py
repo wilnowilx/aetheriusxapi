@@ -17,9 +17,22 @@ import pytest
 from fastapi.testclient import TestClient
 
 from main import app, PRICES
+from x402_middleware import _nonce_cache
 
 client = TestClient(app)
 PAID = {"X-PAYMENT": "simulated-payment"}
+
+
+@pytest.fixture(autouse=True)
+def _clear_nonce_cache():
+    """Reset the anti-replay nonce cache before each test.
+
+    Each test sends the same proof string; without clearing, the second
+    request in any test would be blocked as a duplicate (409).
+    """
+    _nonce_cache._seen.clear()
+    yield
+    _nonce_cache._seen.clear()
 
 
 def test_health_free():
@@ -138,7 +151,7 @@ def test_settlement_header_on_paid():
     r = client.get("/health")
     assert "X-PAYMENT-SETTLED" not in r.headers  # free route: no header
     r = client.get("/v1/email/validate", params={"email": "not-an-email"},
-                   headers=PAID)
+                   headers={"X-PAYMENT": "settlement-test-free"})
     assert r.headers.get("X-PAYMENT-SETTLED") == "simulated"
 
 
@@ -433,3 +446,123 @@ def test_wallet_compare_two_wallets():
     body = r.json()
     assert body.get("status") == "ok"
     assert "wallet_a" in body or "comparison" in body
+
+
+# ─── TOCTOU Anti-Replay Protection ─────────────────────────────────────────
+
+class TestAntiReplay:
+    """Verify that payment proofs can only be used once (TOCTOU protection)."""
+
+    def test_first_request_passes(self):
+        """First request with a proof should succeed (200)."""
+        r = client.get("/v1/email/validate",
+                       params={"email": "test@test.com"},
+                       headers={"X-PAYMENT": "unique-proof-aaa"})
+        assert r.status_code == 200
+
+    def test_duplicate_proof_rejected_409(self):
+        """Same proof used twice → 409 Conflict on second request."""
+        proof = "unique-proof-bbb"
+        headers = {"X-PAYMENT": proof}
+
+        # First request: succeeds
+        r1 = client.get("/v1/email/validate",
+                        params={"email": "test@test.com"},
+                        headers=headers)
+        assert r1.status_code == 200
+
+        # Second request with same proof: blocked
+        r2 = client.get("/v1/email/validate",
+                        params={"email": "test@test.com"},
+                        headers=headers)
+        assert r2.status_code == 409
+        body = r2.json()
+        assert body["error"] == "Payment proof already used"
+        assert "nonce" in body
+
+    def test_different_proofs_both_pass(self):
+        """Two different proofs should both succeed."""
+        r1 = client.get("/v1/email/validate",
+                        params={"email": "a@test.com"},
+                        headers={"X-PAYMENT": "proof-ccc"})
+        assert r1.status_code == 200
+
+        r2 = client.get("/v1/email/validate",
+                        params={"email": "b@test.com"},
+                        headers={"X-PAYMENT": "proof-ddd"})
+        assert r2.status_code == 200
+
+    def test_different_routes_same_proof_blocked(self):
+        """Same proof on different routes → 409 on second route."""
+        proof = "unique-proof-eee"
+
+        r1 = client.get("/v1/email/validate",
+                        params={"email": "test@test.com"},
+                        headers={"X-PAYMENT": proof})
+        assert r1.status_code == 200
+
+        r2 = client.get("/v1/data/weather",
+                        params={"lat": 19.43, "lon": -99.13},
+                        headers={"X-PAYMENT": proof})
+        assert r2.status_code == 409
+
+    def test_proof_whitespace_normalization(self):
+        """Proofs with different whitespace are treated as same (normalized)."""
+        r1 = client.get("/v1/email/validate",
+                        params={"email": "test@test.com"},
+                        headers={"X-PAYMENT": "  proof-fff  "})
+        assert r1.status_code == 200
+
+        r2 = client.get("/v1/email/validate",
+                        params={"email": "test@test.com"},
+                        headers={"X-PAYMENT": "proof-fff"})
+        assert r2.status_code == 409
+
+    def test_409_body_shape(self):
+        """409 response has correct x402-style body."""
+        proof = "unique-proof-ggg"
+        client.get("/v1/email/validate",
+                   params={"email": "test@test.com"},
+                   headers={"X-PAYMENT": proof})
+
+        r = client.get("/v1/email/validate",
+                       params={"email": "test@test.com"},
+                       headers={"X-PAYMENT": proof})
+        assert r.status_code == 409
+        body = r.json()
+        assert "error" in body
+        assert "detail" in body
+        assert "nonce" in body
+        assert "hint" in body
+
+    def test_no_payment_still_returns_402(self):
+        """Missing proof still returns 402 (not affected by anti-replay)."""
+        r = client.get("/v1/email/validate",
+                       params={"email": "test@test.com"})
+        assert r.status_code == 402
+        assert r.json()["error"] == "Payment required"
+
+    def test_free_routes_unaffected(self):
+        """Free routes bypass anti-replay entirely."""
+        r1 = client.get("/health")
+        assert r1.status_code == 200
+
+        r2 = client.get("/health")
+        assert r2.status_code == 200
+
+    def test_nonce_cache_stats(self):
+        """Nonce cache tracks active nonces correctly."""
+        from x402_middleware import _nonce_cache
+        _nonce_cache._seen.clear()
+
+        client.get("/v1/email/validate",
+                   params={"email": "test@test.com"},
+                   headers={"X-PAYMENT": "stats-test-1"})
+        stats = _nonce_cache.stats()
+        assert stats["active_nonces"] == 1
+
+        client.get("/v1/email/validate",
+                   params={"email": "test@test.com"},
+                   headers={"X-PAYMENT": "stats-test-2"})
+        stats = _nonce_cache.stats()
+        assert stats["active_nonces"] == 2
