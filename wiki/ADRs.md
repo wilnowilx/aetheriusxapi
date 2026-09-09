@@ -43,5 +43,7 @@
   across chats and memory doesn't survive.
 - **Decision:** Author in `wiki/` (PR-reviewed) → Action mirrors to `.wiki.git`
   on merge to `main`. UI edits forbidden (overwritten by sync).
-- **Consequences:** Docs change with code; needs a `WIKI_TOKEN` PAT secret
-  (rotate documented here when expiry breaks sync).
+- **Consequences:** Docs change with code; Action path needs a `WIKI_TOKEN`
+  PAT secret — which needs 2FA on the account (repo secrets are restricted
+  without it). Until then, mirror locally: `python3 tools/wiki_sync.py`
+  (uses your login, zero secrets). Rotate the PAT here when expiry breaks sync.

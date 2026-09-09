@@ -21,6 +21,9 @@ concurrency:
 
 jobs:
   publish:
+    # Skips (green) until WIKI_TOKEN exists — creating repo secrets requires
+    # 2FA on the account. Local fallback: python3 tools/wiki_sync.py
+    if: ${{ secrets.WIKI_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout wiki source (sparse)
