@@ -5,6 +5,11 @@
 
 ## [Unreleased]
 
+- Security audit response: SSRF guard on `/v1/web/scrape` (public-IP only +
+  re-validated redirects), route-coverage test (deny-by-default: every /v1
+  route priced or explicitly free), Dockerfile non-root user, `security.yml`
+  CI (bandit + pip-audit), Sepolia replay E2E PASS (same proof → 402, single
+  $0.001 settlement). Suite: 141 passed.
 - README "Unit economics" block from real `PRICES` (60 paid counted by tier;
   billing floor $0.002; uuid $0.001 is a loss-leader outside free tier).
 - `TERMS.md`: plain-language API terms (as-is, non-custodial, no SLA,

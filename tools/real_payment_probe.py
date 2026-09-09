@@ -34,6 +34,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", required=True)
     ap.add_argument("--pay", action="store_true", help="v2: complete payment (needs funds)")
+    ap.add_argument("--replay", action="store_true",
+                    help="adversarial: fresh pay (200) then SAME proof again (must fail + no double spend)")
     args = ap.parse_args()
 
     # 1. Canary without payment MUST 402 with PaymentRequired shape.
@@ -74,11 +76,93 @@ def main() -> int:
         return 1
 
     print("v1 PASS: official 402 shape + free tier + telemetry OK")
-    if not args.pay:
+    if not args.pay and not args.replay:
         print("(v2 payment completion needs --pay with funded TEST_PKEY)")
         return 0
 
+    if args.replay:
+        return _replay_attack(args.base, CANARY, chal)
     return _v2_complete_payment(args.base, CANARY, chal)
+
+
+def _usdc_sepolia(addr: str) -> float:
+    import time
+    import urllib.request as _u
+    url = ("https://base-sepolia.blockscout.com/api/v2/addresses/"
+           + addr + "/token-balances")
+    data = None
+    for attempt in range(4):
+        try:
+            with _u.urlopen(url, timeout=30) as r:
+                data = json.load(r)
+            break
+        except Exception as e:
+            print(f"(balance retry {attempt + 1}/4: {type(e).__name__})")
+            time.sleep(8)
+    if data is None:
+        print("(balance source unavailable — continuing without on-chain cross-check)")
+        return -1.0
+    for t in data:
+        if (t.get("token", {}) or {}).get("address_hash", "").lower() == \
+                "0x036cbd53842c5426634e7929541ec2318f3dcf7e":
+            return float(t.get("value", 0)) / 1e6
+    return 0.0
+
+
+def _replay_attack(base, path, chal) -> int:
+    """Pay once (must 200), replay identical proof (must NOT 200, no 2nd debit)."""
+    import base64
+
+    from eth_account import Account
+    from x402.mechanisms.evm.exact import ExactEvmClientScheme
+    from x402.mechanisms.evm.signers import EthAccountSigner
+    from x402.schemas import PaymentPayload, PaymentRequirements
+
+    accepts = chal.get("accepts", [])
+    req = accepts[0]
+    if req.get("network") != "eip155:84532" or req.get("payTo", "").lower() != MERCHANT.lower():
+        print("REFUSE: replay test only against Sepolia merchant canary")
+        return 1
+    acct = Account.from_key(_load_test_key())
+    scheme = ExactEvmClientScheme(EthAccountSigner(acct))
+    requirements = PaymentRequirements(
+        scheme=req["scheme"], network=req["network"], asset=req["asset"],
+        amount=req["amount"], pay_to=req["payTo"],
+        max_timeout_seconds=req.get("maxTimeoutSeconds", 300),
+        extra=req.get("extra", {}),
+    )
+    sig = base64.b64encode(json.dumps(PaymentPayload(
+        x402_version=chal.get("x402Version", 2),
+        payload=scheme.create_payment_payload(requirements),
+        accepted=req, resource=chal.get("resource", {}),
+    ).model_dump()).encode()).decode()
+
+    _, _, tb0 = _req(base, "/v1/telemetry")
+    vol0 = json.loads(tb0).get("totals", {}).get("volume_usdc", 0)
+    bal0 = _usdc_sepolia(acct.address)
+    c1, _, _ = _req(base, path, {"PAYMENT-SIGNATURE": sig})
+    print(f"[R1] first submit -> {c1} (expect 200)")
+    if c1 != 200:
+        print("FAIL: fresh payment did not settle; cannot test replay")
+        return 1
+    c2, _, b2 = _req(base, path, {"PAYMENT-SIGNATURE": sig})
+    print(f"[R2] replay same proof -> {c2} (expect NOT 200)")
+    _, _, tb1 = _req(base, "/v1/telemetry")
+    vol1 = json.loads(tb1).get("totals", {}).get("volume_usdc", 0)
+    dvol = round(vol1 - vol0, 6)
+    print(f"[R3] telemetry volume +{dvol} (expect 0.001 exactly once)")
+    if c2 == 200:
+        print("FAIL: replayed proof accepted — double spend possible")
+        return 1
+    if dvol != 0.001:
+        print(f"FAIL: unexpected volume delta {dvol}")
+        return 1
+    if bal0 >= 0:
+        bal1 = _usdc_sepolia(acct.address)
+        if bal1 >= 0:
+            print(f"[R4] on-chain debit {round(bal0 - bal1, 6)} (expect 0.001)")
+    print("REPLAY-TEST PASS: single settlement, replay rejected")
+    return 0
 
 
 # ── v2: complete payment with official SDK client flow ────────────────

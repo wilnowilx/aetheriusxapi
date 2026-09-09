@@ -1,0 +1,30 @@
+# Static security gates: fail the PR on new issues (no new-network calls).
+name: Security gates
+
+on:
+  pull_request:
+    paths: ['**.py', 'requirements.txt', 'Dockerfile']
+  push:
+    branches: [main]
+    paths: ['**.py', 'requirements.txt', 'Dockerfile']
+  workflow_dispatch:
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with: { fetch-depth: 1 }
+
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+
+      - name: bandit (main attack surface)
+        run: |
+          pip install bandit
+          bandit -ll -r main.py x402_middleware.py telemetry.py
+
+      - name: pip-audit (known CVEs in deps)
+        run: |
+          pip install pip-audit
+          pip-audit --desc -r requirements.txt

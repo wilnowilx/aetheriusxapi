@@ -25,8 +25,10 @@ Key-gated:
 """
 
 import asyncio
+import ipaddress
 import os
 import re
+import socket
 import subprocess
 import time
 from datetime import datetime, timezone
@@ -825,13 +827,61 @@ async def token_price(address: str = Query(..., description="Token contract"),
 
 # === WEB ===
 
+def _is_public_url(url: str) -> bool:
+    """SSRF guard: only http(s) URLs resolving exclusively to public IPs.
+
+    Blocks loopback, private ranges, link-local (incl. cloud metadata
+    169.254.169.254), reserved, multicast and unspecified addresses.
+    Note: validates at request time; DNS-rebinding between check and fetch
+    is a known residual (mitigated by short timeouts, no creds in env).
+    """
+    try:
+        p = httpx.URL(url)
+    except Exception:
+        return False
+    if p.scheme not in ("http", "https") or not p.host:
+        return False
+    try:
+        infos = socket.getaddrinfo(p.host, None)
+    except OSError:
+        return False
+    if not infos:
+        return False
+    for _fam, _typ, _proto, _canon, sockaddr in infos:
+        try:
+            ip = ipaddress.ip_address(sockaddr[0])
+        except ValueError:
+            return False
+        if (ip.is_private or ip.is_loopback or ip.is_link_local
+                or ip.is_reserved or ip.is_multicast or ip.is_unspecified):
+            return False
+    return True
+
+
 @app.get("/v1/web/scrape")
 @app.get("/api/v1/web/scrape")
 async def web_scrape(url: str = Query(..., description="URL to scrape")):
     """Fetch a page, return title, text preview, links, content length."""
+    if not _is_public_url(url):
+        return _err(403, {"error": "URL resolves to non-public address (SSRF guard)",
+                          "url": url})
     try:
-        async with httpx.AsyncClient(timeout=20, follow_redirects=True) as client:
-            resp = await client.get(url, headers=UA)
+        # No auto-redirects: each hop is re-validated by the same guard.
+        async with httpx.AsyncClient(timeout=20, follow_redirects=False) as client:
+            for _hop in range(4):
+                resp = await client.get(url, headers=UA)
+                if resp.status_code not in (301, 302, 303, 307, 308):
+                    break
+                nxt = resp.headers.get("location", "")
+                if not nxt.startswith("http"):
+                    from urllib.parse import urljoin
+                    nxt = urljoin(url, nxt)
+                if not _is_public_url(nxt):
+                    return _err(403, {"error": "Redirect target non-public (SSRF guard)",
+                                      "url": nxt})
+                url = nxt
+            else:
+                return _err(508, {"error": "Too many redirects", "url": url})
             if resp.status_code != 200:
                 return _err(resp.status_code,
                             {"error": f"HTTP {resp.status_code}",

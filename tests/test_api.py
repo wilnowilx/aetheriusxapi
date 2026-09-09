@@ -178,21 +178,25 @@ def assert_live_or_upstream_error(resp, required_keys):
 def test_error_branches_return_json():
     # Regression: error paths must build valid JSON bodies (Starlette
     # JSONResponse takes content first; status_code is keyword-only).
+    # NOTE: distinct proofs per request — the anti-replay cache 409s
+    # a reused proof even inside one test (that's the feature working).
     r = client.get("/v1/token/price",
                    params={"address": "0xabc", "chain": "solana"},
-                   headers=PAID)
+                   headers={"X-PAYMENT": "err-branch-1"})
     assert r.status_code in (200, 404, 500, 502)
     assert "error" in r.json() or "price_usd" in r.json()
 
     r = client.get("/v1/token/holders",
-                   params={"address": "0xabc"}, headers=PAID)
+                   params={"address": "0xabc"},
+                   headers={"X-PAYMENT": "err-branch-2"})
     assert r.status_code in (200, 501, 502)
     assert "error" in r.json() or "holders" in r.json()
 
     r = client.get("/v1/web/scrape",
                    params={"url": "http://invalid.invalid"},
-                   headers=PAID)
-    assert r.status_code in (200, 500, 502)
+                   headers={"X-PAYMENT": "err-branch-3"})
+    # 403 = SSRF guard (unresolvable host); 500/502 = upstream fetch failure
+    assert r.status_code in (200, 403, 500, 502)
     assert "error" in r.json() or "title" in r.json()
 
 
@@ -566,3 +570,59 @@ class TestAntiReplay:
                    headers={"X-PAYMENT": "stats-test-2"})
         stats = _nonce_cache.stats()
         assert stats["active_nonces"] == 2
+
+
+# === SSRF guard (no network needed for blocked cases) ===
+def test_ssrf_blocks_private_targets():
+    from main import _is_public_url
+    for bad in ["http://127.0.0.1:4020/health",
+                "http://10.0.0.5/", "http://169.254.169.254/latest/meta-data/",
+                "http://0.0.0.0/", "http://[::1]/",
+                "ftp://example.com/", "file:///etc/passwd"]:
+        assert _is_public_url(bad) is False, bad
+
+
+def test_ssrf_blocks_metadata_hostname():
+    from main import _is_public_url
+    import socket
+    orig = socket.getaddrinfo
+    # metadata host resolves link-local no matter the network
+    socket.getaddrinfo = lambda *a, **k: [(2, 1, 6, "", ("169.254.169.254", 0))]
+    try:
+        assert _is_public_url("http://metadata.google.internal/") is False
+    finally:
+        socket.getaddrinfo = orig
+
+
+def test_scrape_endpoint_rejects_loopback():
+    r = client.get("/v1/data/weather", params={"lat": "1", "lon": "1"},
+                   headers={"X-PAYMENT": "ssrf-test-loopback"})
+    assert r.status_code == 200  # sanity: paid path works
+    r = client.get("/v1/web/scrape", params={"url": "http://127.0.0.1:9/"},
+                   headers={"X-PAYMENT": "ssrf-test-scrape"})
+    assert r.status_code == 403
+    assert "SSRF" in r.json()["error"]
+
+
+# === Route coverage: deny-by-default (every /v1 route priced or free) ===
+def test_all_v1_routes_priced_or_explicitly_free():
+    import re
+    from main import app, PRICES
+    # Explicitly-free by design: health, telemetry, monitoring stats,
+    # free-tier sample. Anything else unpriced here = fail-open bug.
+    FREE_EXACT = {"/health", "/v1/health", "/v1/telemetry", "/",
+                  "/v1/anti-replay/stats", "/v1/storage/drift/sample"}
+    FREE_PREFIX = ("/v1/x402/", "/dashboard", "/donatex",
+                   "/docs", "/openapi.json", "/redoc")
+    missing = []
+    for route in app.routes:
+        path = getattr(route, "path", "")
+        if not (path.startswith("/v1") or path.startswith("/api/v1")):
+            continue
+        canon = path.replace("/api/v1/", "/v1/")
+        if canon in PRICES or canon in FREE_EXACT:
+            continue
+        if canon.startswith(FREE_PREFIX):
+            continue
+        missing.append(path)
+    assert not missing, f"UNPRICED routes (fail-open!): {missing}"

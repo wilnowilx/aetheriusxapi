@@ -13,6 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY main.py x402_middleware.py telemetry.py ./
 COPY dashboard ./dashboard
 
+RUN useradd -m appuser && chown -R appuser:appuser /app
+USER appuser
+
 ENV X402_MODE=simulated \
     PORT=4020 \
     PYTHONUNBUFFERED=1

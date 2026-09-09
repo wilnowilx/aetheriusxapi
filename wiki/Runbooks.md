@@ -56,3 +56,14 @@ with sudo where marked.
   confirm via direct upstream check before changing anything.
 - `wallets_seen: 0` with `challenges_402 > 0` → agents hitting 402 but not
   settling; expected in simulated mode, investigate only if sudden change.
+
+## R6 — Treasury hygiene (money rules, not code)
+
+- Merchant (`pay_to`) is a hot operating float, never savings. Sweep to cold
+  above a set threshold on a fixed cadence; cold never signs automation.
+- Test keys are dust-only, gitignored (`.env.test`), rotated by deletion
+  (new address, no "rotation" ceremony). A burned test key costs nothing.
+- No private key or seed ever enters chat, tickets, screenshots, or repo —
+  not even "temporarily". The moment it does, treat it as compromised.
+- Facilitator fees ($0.001/tx beyond free tier) are a P&L line: sub-$0.002
+  routes are loss-leaders (see README unit economics), not bugs.
