@@ -34,6 +34,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", required=True)
     ap.add_argument("--pay", action="store_true", help="v2: complete payment (needs funds)")
+    ap.add_argument("--mainnet", action="store_true",
+                    help="allow eip155:8453 (default: Sepolia-only). REAL MONEY.")
     ap.add_argument("--replay", action="store_true",
                     help="adversarial: fresh pay (200) then SAME proof again (must fail + no double spend)")
     args = ap.parse_args()
@@ -57,8 +59,9 @@ def main() -> int:
     amt = accepts[0].get("amount", "") if accepts else ""
     pay = accepts[0].get("payTo", "") if accepts else ""
     print(f"[2] x402v{chal.get('x402Version')} network={net} amount={amt} payTo={pay[:10]}...")
-    if net != "eip155:84532":
-        print(f"FAIL: expected Base Sepolia eip155:84532, got {net}")
+    want = "eip155:8453" if "--mainnet" in sys.argv else "eip155:84532"
+    if net != want:
+        print(f"FAIL: expected {want}, got {net}")
         return 1
 
     # 2. Free route still 200 (canary must not break free tier).
@@ -202,8 +205,10 @@ def _v2_complete_payment(base, path, chal) -> int:
     req = accepts[0]
 
     # ── POLICY GATE (code, not prompts) ──
-    if req.get("network") != "eip155:84532":
-        print(f"REFUSE: network {req.get('network')} is not Base Sepolia")
+    allow_mainnet = "--mainnet" in sys.argv
+    want = "eip155:8453" if allow_mainnet else "eip155:84532"
+    if req.get("network") != want:
+        print(f"REFUSE: network {req.get('network')} != {want} (pass --mainnet for mainnet)")
         return 1
     if req.get("scheme") != "exact":
         print(f"REFUSE: scheme {req.get('scheme')} is not exact")
@@ -214,7 +219,7 @@ def _v2_complete_payment(base, path, chal) -> int:
     if req.get("payTo", "").lower() != MERCHANT.lower():
         print(f"REFUSE: payTo {req.get('payTo')} is not the merchant")
         return 1
-    print("[5] policy PASS (sepolia/exact/merchant/cap)")
+    print(f"[5] policy PASS ({req.get('network')}/exact/merchant/cap)")
 
     acct = Account.from_key(_load_test_key())
     signer = EthAccountSigner(acct)

@@ -10,6 +10,9 @@
   route priced or explicitly free), Dockerfile non-root user, `security.yml`
   CI (bandit + pip-audit), Sepolia replay E2E PASS (same proof → 402, single
   $0.001 settlement). Suite: 141 passed.
+- **First MAINNET settlement:** official 402 → EIP-3009 sign → 200, $0.001
+  USDC on Base mainnet (test 0.48612→0.48512, merchant 0→0.001), volume
+  tracked. Proof: probe `--pay --mainnet` v2 PASS via CDP facilitator.
 - README "Unit economics" block from real `PRICES` (60 paid counted by tier;
   billing floor $0.002; uuid $0.001 is a loss-leader outside free tier).
 - `TERMS.md`: plain-language API terms (as-is, non-custodial, no SLA,
