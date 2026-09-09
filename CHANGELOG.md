@@ -5,6 +5,8 @@
 
 ## [Unreleased]
 
+- README "Unit economics" block from real `PRICES` (60 paid counted by tier;
+  billing floor $0.002; uuid $0.001 is a loss-leader outside free tier).
 - `TERMS.md`: plain-language API terms (as-is, non-custodial, no SLA,
   settlement honesty) — closes the ToS gap for grant evaluators.
 - **First real settlement (Sepolia staging):** official 402 → EIP-3009 sign →

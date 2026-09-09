@@ -454,6 +454,23 @@ Live (mainnet): `https://wilnowilx.github.io/aetheriusxapi/#dashboard`
 
 > **60 paid endpoints + 40 FREE endpoints (20 x402 Intelligence + 20 QuantumXBrain) = 100 total, all live.** With grant funding, we'll expand to **120+ endpoints across 12 categories.**
 
+### Unit economics (auditable — from `PRICES` in `main.py`, not a model)
+
+| Tier | Price/call | Facilitator cost* | Net margin | Endpoints |
+|---|---|---|---|---|
+| Validation (`/uuid`) | $0.001 | $0.001 | $0.0000 (breakeven) | 1 |
+| Entry (`/hash`) | $0.002 | $0.001 | $0.0010 (50%) | 1 |
+| Utility (`/ua`) | $0.003 | $0.001 | $0.0020 (67%) | 1 |
+| Standard (`/token/price` et al.) | $0.005–$0.01 | $0.001 | 80–90% | 44 |
+| Premium (`/token/holders` et al.) | $0.015–$0.03 | $0.001 | 93–97% | 13 |
+
+\* CDP facilitator: 1,000 tx/mo free, then $0.001/tx. Payer gas is $0 (facilitator
+submits). Within the free tier the full price is margin.
+
+**Billing floor: $0.002.** Below it the facilitator fee eats the call outside
+the free tier — `/uuid` at $0.001 exists as a loss-leader for loop validation,
+not as a business. This is measured cost structure, not a projection.
+
 ---
 
 ## 🔬 QuantumXBrain — FREE Intelligence Layer
