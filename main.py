@@ -337,7 +337,17 @@ if X402_MODE == "real":
         from x402.mechanisms.evm.exact import ExactEvmServerScheme
         from x402.server import x402ResourceServer
 
-        _facilitator = HTTPFacilitatorClient(FacilitatorConfig(url=FACILITATOR_URL))
+        # Facilitator priority: CDP hosted (mainnet-capable, JWT auth via
+        # CDP_API_KEY_ID/SECRET) -> public x402.org (testnets only).
+        _facilitator = None
+        try:
+            from cdp.x402 import create_facilitator_config
+            _facilitator = HTTPFacilitatorClient(create_facilitator_config())
+            print("[x402] facilitator: CDP hosted (mainnet-capable)", flush=True)
+        except Exception as e:
+            print(f"[x402] CDP unavailable ({e}); using public facilitator", flush=True)
+        if _facilitator is None:
+            _facilitator = HTTPFacilitatorClient(FacilitatorConfig(url=FACILITATOR_URL))
         _server = x402ResourceServer(_facilitator)
         _server.register(NETWORK, ExactEvmServerScheme())
         _routes = {}
