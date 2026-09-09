@@ -53,7 +53,7 @@ function Nav() {
             <a href="#cta" className="btn-nav">Get Started</a>
           </div>
           <button className="mobile-toggle" onClick={() => setMobileOpen(true)}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5"><path strokeLinejoin="round" strokeLinecap="round" d="M3 12h18M3 6h18M3 18h18"/></svg>
           </button>
         </div>
       </nav>
@@ -105,7 +105,7 @@ function PlasmaBg() {
 
 // === PLAYGROUND ===
 const playgroundEndpoints = [
-  { cat: 'x402 Intelligence', free: true, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+  { cat: 'x402 Intelligence', free: true, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
     { method: 'GET', path: '/v1/x402/base-stats', price: 'FREE', params: '{}' },
     { method: 'GET', path: '/v1/x402/gas', price: 'FREE', params: '{}' },
     { method: 'GET', path: '/v1/x402/market-pulse', price: 'FREE', params: '{}' },
@@ -113,26 +113,26 @@ const playgroundEndpoints = [
     { method: 'GET', path: '/v1/x402/stablecoins', price: 'FREE', params: '{}' },
     { method: 'GET', path: '/v1/x402/whales', price: 'FREE', params: '{}' },
   ]},
-  { cat: 'Crypto Market', free: false, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path d="M22 12h-4l-3 9L9 3l-3 9H2" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+  { cat: 'Crypto Market', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M22 12h-4l-3 9L9 3l-3 9H2" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
     { method: 'GET', path: '/v1/crypto/market', price: '$0.005', params: '{"token":"ETH"}' },
     { method: 'GET', path: '/v1/crypto/fear-greed', price: '$0.005', params: '{}' },
     { method: 'GET', path: '/v1/crypto/trending', price: '$0.01', params: '{}' },
     { method: 'GET', path: '/v1/crypto/ohlcv', price: '$0.01', params: '{"token":"ETH","interval":"1d"}' },
     { method: 'GET', path: '/v1/crypto/dominance', price: '$0.005', params: '{}' },
   ]},
-  { cat: 'Token', free: false, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10l4-4 4 4" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+  { cat: 'Token', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 6v12M8 10l4-4 4 4" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
     { method: 'GET', path: '/v1/token/price', price: '$0.005', params: '{"token":"ETH"}' },
     { method: 'GET', path: '/v1/token/analyze', price: '$0.01', params: '{"address":"0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984"}' },
   ]},
-  { cat: 'DeFi', free: false, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+  { cat: 'DeFi', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
     { method: 'GET', path: '/v1/defi/impermanent-loss', price: '$0.01', params: '{}' },
     { method: 'GET', path: '/v1/defi/staking-apy', price: '$0.005', params: '{"protocol":"lido","token":"ETH"}' },
   ]},
-  { cat: 'News', free: false, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2" strokeLinejoin="round" strokeLinecap="round"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+  { cat: 'News', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M18 14h-8M15 18h-5M10 6h8v4h-8z" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
     { method: 'GET', path: '/v1/news/hackernews', price: '$0.01', params: '{}' },
     { method: 'GET', path: '/v1/news/reddit', price: '$0.01', params: '{"subreddit":"cryptocurrency"}' },
   ]},
-  { cat: 'Data', free: false, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="22.08" x2="12" y2="12" strokeLinecap="round"/></svg>, items: [
+  { cat: 'Data', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="22.08" x2="12" y2="12" strokeLinecap="round"/></svg>, items: [
     { method: 'GET', path: '/v1/data/weather', price: '$0.005', params: '{"lat":"19.4326","lon":"-99.1332"}' },
     { method: 'GET', path: '/v1/data/ip', price: '$0.005', params: '{"ip":"8.8.8.8"}' },
     { method: 'GET', path: '/v1/data/uuid', price: '$0.001', params: '{}' },
@@ -140,7 +140,7 @@ const playgroundEndpoints = [
     { method: 'GET', path: '/v1/data/qrcode', price: '$0.003', params: '{"text":"https://aetheriusx.io"}' },
     { method: 'POST', path: '/v1/data/translate', price: '$0.01', params: '{"text":"hello","target":"es"}' },
   ]},
-  { cat: 'Web Tools', free: false, icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12" strokeLinecap="round"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+  { cat: 'Web Tools', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
     { method: 'GET', path: '/v1/web/ssl', price: '$0.005', params: '{"domain":"example.com"}' },
     { method: 'GET', path: '/v1/web/whois', price: '$0.01', params: '{"domain":"example.com"}' },
     { method: 'GET', path: '/v1/web/headers', price: '$0.005', params: '{"url":"https://example.com"}' },
@@ -194,7 +194,7 @@ function Playground() {
     <section id="playground" data-animate style={{ paddingTop: 40 }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3" strokeLinejoin="round" strokeLinecap="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3" strokeLinejoin="round" strokeLinecap="round"/></svg>
           Live Playground
         </div>
         <h2 className="section-title">Try It Right Now</h2>
@@ -202,7 +202,7 @@ function Playground() {
 
         <div data-animate-card style={{
           display: 'grid', gridTemplateColumns: '280px 1fr', gap: 0, marginTop: 56,
-          background: 'rgba(10,10,20,0.5)', border: '1px solid rgba(168,85,247,0.15)',
+          background: 'rgba(10,10,20,0.5)', border: '1px solid rgba(168,85,247,0.08)',
           borderRadius: 20, overflow: 'hidden', minHeight: 500, position: 'relative',
           boxShadow: '0 0 60px rgba(168,85,247,0.06), 0 0 120px rgba(217,70,239,0.03)',
           backdropFilter: 'blur(20px)',
@@ -224,7 +224,7 @@ function Playground() {
                     display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 10,
                     cursor: 'pointer', fontSize: '0.82rem', border: '1px solid transparent',
                     transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
-                    background: selected.path === ep.path ? 'rgba(168,85,247,0.12)' : 'transparent',
+                    background: selected.path === ep.path ? 'rgba(168,85,247,0.07)' : 'transparent',
                     borderColor: selected.path === ep.path ? 'rgba(168,85,247,0.25)' : 'transparent',
                   }}>
                     <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem', fontWeight: 600, padding: '2px 6px', borderRadius: 4, background: ep.method === 'POST' ? 'rgba(245,158,11,0.12)' : ep.price === 'FREE' ? 'rgba(16,185,129,0.12)' : 'rgba(16,185,129,0.12)', color: ep.method === 'POST' ? 'var(--orange)' : 'var(--green)' }}>{ep.method}</span>
@@ -250,7 +250,7 @@ function Playground() {
                 cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.5 : 1,
                 boxShadow: '0 4px 16px rgba(168,85,247,0.25)', transition: 'all 0.3s',
               }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3" strokeLinejoin="round" strokeLinecap="round"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5"><polygon points="5 3 19 12 5 21 5 3" strokeLinejoin="round" strokeLinecap="round"/></svg>
                 Send
               </button>
             </div>
@@ -276,7 +276,7 @@ function Playground() {
             </div>
             <div style={{ display: 'flex', gap: 10, padding: '12px 20px', borderTop: '1px solid rgba(255,255,255,0.04)', background: 'rgba(255,255,255,0.015)', flexWrap: 'wrap' }}>
               {['x402 Payment Required', 'USDC on Base', 'Settled instantly'].map(b => (
-                <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px', background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.15)', borderRadius: 9999, fontSize: '0.68rem', fontWeight: 500, color: 'var(--purple-light)' }}>{b}</div>
+                <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px', background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.08)', borderRadius: 9999, fontSize: '0.68rem', fontWeight: 500, color: 'var(--purple-light)' }}>{b}</div>
               ))}
             </div>
           </div>
@@ -293,25 +293,25 @@ function Playground() {
 // === CATEGORIES ===
 function Categories() {
   const cats = [
-    { title: 'Maps & Location', count: '5 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" strokeLinejoin="round" strokeLinecap="round"/><circle cx="12" cy="10" r="3" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Crypto & DeFi', count: '19 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Web & Scraping', count: '4 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'AI & ML', count: 'soon', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z" strokeLinejoin="round" strokeLinecap="round"/><path d="M16 14v2a4 4 0 01-8 0v-2M12 18v4M8 22h8" strokeLinejoin="round" strokeLinecap="round"/></svg>, soon: true },
-    { title: 'Finance', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Weather', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'News & Media', count: '6 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Data & Analytics', count: '8 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="22.08" x2="12" y2="12" strokeLinecap="round"/></svg> },
-    { title: 'Crypto Market Data', count: '5 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Web Tools', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="14 2 14 8 20 8" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Data Tools', count: '7 live', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><ellipse cx="12" cy="5" rx="9" ry="3" strokeLinejoin="round" strokeLinecap="round"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" strokeLinejoin="round" strokeLinecap="round"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Security', count: 'soon', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinejoin="round" strokeLinecap="round"/></svg>, soon: true },
+    { title: 'Maps & Location', count: '5 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" strokeLinejoin="round" strokeLinecap="round"/><circle cx="12" cy="10" r="3" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Crypto & DeFi', count: '19 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Web & Scraping', count: '4 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'AI & ML', count: 'soon', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M16 14v2a4 4 0 01-8 0v-2M12 18v4M8 22h8" strokeLinejoin="round" strokeLinecap="round"/></svg>, soon: true },
+    { title: 'Finance', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Weather', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'News & Media', count: '6 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Data & Analytics', count: '8 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="22.08" x2="12" y2="12" strokeLinecap="round"/></svg> },
+    { title: 'Crypto Market Data', count: '5 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Web Tools', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="14 2 14 8 20 8" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Data Tools', count: '7 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><ellipse cx="12" cy="5" rx="9" ry="3" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Security', count: 'soon', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinejoin="round" strokeLinecap="round"/></svg>, soon: true },
   ]
 
   return (
     <section id="categories" data-animate style={{ textAlign: 'center' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><rect x="3" y="3" width="7" height="7" rx="1.5" strokeLinejoin="round" strokeLinecap="round"/><rect x="14" y="3" width="7" height="7" rx="1.5" strokeLinejoin="round" strokeLinecap="round"/><rect x="14" y="14" width="7" height="7" rx="1.5" strokeLinejoin="round" strokeLinecap="round"/><rect x="3" y="14" width="7" height="7" rx="1.5" strokeLinejoin="round" strokeLinecap="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><rect x="3" y="3" width="7" height="7" rx="1.5" strokeLinejoin="round" strokeLinecap="round"/><rect x="14" y="3" width="7" height="7" rx="1.5" strokeLinejoin="round" strokeLinecap="round"/><rect x="14" y="14" width="7" height="7" rx="1.5" strokeLinejoin="round" strokeLinecap="round"/><rect x="3" y="14" width="7" height="7" rx="1.5" strokeLinejoin="round" strokeLinecap="round"/></svg>
           API Categories
         </div>
         <h2 className="section-title">100+ Live Endpoints, More Weekly</h2>
@@ -342,17 +342,17 @@ function Categories() {
 // === X402 INTELLIGENCE ===
 function X402Intelligence() {
   const cards = [
-    { title: 'Brain Recommender', desc: 'Tell it what you need — "defi", "wallet", "gas" — and it recommends the best endpoints. AI-powered routing.', code: 'GET /v1/x402/brain?intent=defi', color: 'var(--purple-light)', bg: 'rgba(168,85,247,0.06)', iconBg: 'linear-gradient(135deg, rgba(168,85,247,0.1), rgba(217,70,239,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" strokeLinecap="round"/></svg> },
-    { title: 'Market Pulse', desc: 'Real-time Base conditions: gas, chain health, USDC activity, ETH price, bullish/bearish signal. One call.', code: 'GET /v1/x402/market-pulse', color: 'var(--green)', bg: 'rgba(16,185,129,0.06)', iconBg: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Wallet Intel', desc: 'Full wallet profile: USDC flow, risk score, counterparty analysis, ETH balance. Any address on Base.', code: 'GET /v1/x402/wallet-intel/{address}', color: 'var(--pink)', bg: 'rgba(236,72,153,0.06)', iconBg: 'linear-gradient(135deg, rgba(236,72,153,0.1), rgba(168,85,247,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" strokeLinejoin="round" strokeLinecap="round"/><circle cx="12" cy="7" r="4" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Sentiment + Risk', desc: 'Fear & Greed Index + on-chain sentiment. Multi-factor risk scoring with detailed breakdown. Compliance indicators.', code: 'GET /v1/x402/sentiment · /risk-intel', color: 'var(--cyan)', bg: 'rgba(6,182,212,0.06)', iconBg: 'linear-gradient(135deg, rgba(6,182,212,0.1), rgba(16,185,129,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Brain Recommender', desc: 'Tell it what you need — "defi", "wallet", "gas" — and it recommends the best endpoints. AI-powered routing.', code: 'GET /v1/x402/brain?intent=defi', color: 'var(--purple-light)', bg: 'rgba(168,85,247,0.06)', iconBg: 'linear-gradient(135deg, rgba(168,85,247,0.06), rgba(217,70,239,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" strokeLinecap="round"/></svg> },
+    { title: 'Market Pulse', desc: 'Real-time Base conditions: gas, chain health, USDC activity, ETH price, bullish/bearish signal. One call.', code: 'GET /v1/x402/market-pulse', color: 'var(--green)', bg: 'rgba(16,185,129,0.06)', iconBg: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Wallet Intel', desc: 'Full wallet profile: USDC flow, risk score, counterparty analysis, ETH balance. Any address on Base.', code: 'GET /v1/x402/wallet-intel/{address}', color: 'var(--pink)', bg: 'rgba(236,72,153,0.06)', iconBg: 'linear-gradient(135deg, rgba(236,72,153,0.1), rgba(168,85,247,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" strokeLinejoin="round" strokeLinecap="round"/><circle cx="12" cy="7" r="4" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Sentiment + Risk', desc: 'Fear & Greed Index + on-chain sentiment. Multi-factor risk scoring with detailed breakdown. Compliance indicators.', code: 'GET /v1/x402/sentiment · /risk-intel', color: 'var(--cyan)', bg: 'rgba(6,182,212,0.06)', iconBg: 'linear-gradient(135deg, rgba(6,182,212,0.1), rgba(16,185,129,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
   ]
 
   return (
     <section id="x402-intel" data-animate style={{ background: 'linear-gradient(180deg, rgba(168,85,247,0.05) 0%, transparent 100%)', textAlign: 'center' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path strokeLinejoin="round" strokeLinecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg>
           QuantumXBrain — FREE Intelligence Layer
         </div>
         <h2 className="section-title">20 Free Endpoints. Real On-Chain Intelligence.</h2>
@@ -374,8 +374,8 @@ function X402Intelligence() {
           <p style={{ color: 'var(--text-sec)', fontSize: '0.82rem', lineHeight: 1.6 }}>Gas Intelligence · Token Discovery · Whale Clustering · DeFi Yield · Tx Patterns · Wallet Compare · Leaderboard · Contract Intel · Velocity · History · Search · Network Health · Stablecoin Flow</p>
         </div>
         <div style={{ textAlign: 'center', marginTop: 32 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '14px 22px', background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.15)', borderRadius: 12, backdropFilter: 'blur(8px)' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--purple-light)" strokeWidth="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" strokeLinejoin="round" strokeLinecap="round"/></svg>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '14px 22px', background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.08)', borderRadius: 12, backdropFilter: 'blur(8px)' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="var(--purple-light)" strokeWidth="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" strokeLinejoin="round" strokeLinecap="round"/></svg>
             <span style={{ color: 'var(--purple-light)', fontWeight: 600, fontSize: '0.88rem' }}>20 endpoints · 100% FREE · X-AETHERIUS-Fingerprint header on every response</span>
           </div>
         </div>
@@ -391,17 +391,17 @@ function X402Intelligence() {
 // === HOW IT WORKS ===
 function HowItWorks() {
   const steps = [
-    { num: '1', title: 'Connect Wallet', desc: 'Your crypto wallet is your identity. No signup, no KYC.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="34" height="34"><rect x="2" y="6" width="20" height="14" rx="3" strokeLinejoin="round" strokeLinecap="round"/><path d="M2 10h20" strokeLinejoin="round" strokeLinecap="round"/><circle cx="16" cy="15" r="1.5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { num: '2', title: 'Choose API', desc: 'Browse 100+ live endpoints. Pick what your agent needs.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="34" height="34"><circle cx="11" cy="11" r="8" strokeLinejoin="round" strokeLinecap="round"/><line x1="21" y1="21" x2="16.65" y2="16.65" strokeLinecap="round"/></svg> },
-    { num: '3', title: 'Pay Per Request', desc: 'x402 handles payment. USDC on Base. Sub-cent fees.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="34" height="34"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { num: '4', title: 'Get Data', desc: 'Instant response. The agent gets exactly what it needs.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="34" height="34"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { num: '1', title: 'Connect Wallet', desc: 'Your crypto wallet is your identity. No signup, no KYC.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="34" height="34"><rect x="2" y="6" width="20" height="14" rx="3" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M2 10h20" strokeLinejoin="round" strokeLinecap="round"/><circle cx="16" cy="15" r="1.5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { num: '2', title: 'Choose API', desc: 'Browse 100+ live endpoints. Pick what your agent needs.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="34" height="34"><circle cx="11" cy="11" r="8" strokeLinejoin="round" strokeLinecap="round"/><line x1="21" y1="21" x2="16.65" y2="16.65" strokeLinecap="round"/></svg> },
+    { num: '3', title: 'Pay Per Request', desc: 'x402 handles payment. USDC on Base. Sub-cent fees.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="34" height="34"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { num: '4', title: 'Get Data', desc: 'Instant response. The agent gets exactly what it needs.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="34" height="34"><path strokeLinejoin="round" strokeLinecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
   ]
 
   return (
     <section id="how" data-animate style={{ textAlign: 'center' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path d="M12 16v-4M12 8h.01" strokeLinecap="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 16v-4M12 8h.01" strokeLinecap="round"/></svg>
           How It Works
         </div>
         <h2 className="section-title">Four Steps to Autonomous Access</h2>
@@ -410,7 +410,7 @@ function HowItWorks() {
           {steps.map((step, i) => (
             <React.Fragment key={step.num}>
               <div data-animate-card style={{ flex: 1, maxWidth: 260, textAlign: 'center', padding: '0 16px' }}>
-                <div style={{ width: 80, height: 80, margin: '0 auto 24px', background: 'linear-gradient(135deg, rgba(168,85,247,0.06), rgba(217,70,239,0.04))', border: '1px solid rgba(168,85,247,0.15)', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-light)', position: 'relative', backdropFilter: 'blur(8px)' }}>
+                <div style={{ width: 80, height: 80, margin: '0 auto 24px', background: 'linear-gradient(135deg, rgba(168,85,247,0.06), rgba(217,70,239,0.04))', border: '1px solid rgba(168,85,247,0.08)', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-light)', position: 'relative', backdropFilter: 'blur(8px)' }}>
                   {step.icon}
                   <span style={{ position: 'absolute', top: -6, right: -6, width: 28, height: 28, background: 'linear-gradient(135deg, var(--purple), var(--magenta))', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: 'white', boxShadow: '0 4px 12px rgba(168,85,247,0.3)' }}>{step.num}</span>
                 </div>
@@ -419,7 +419,7 @@ function HowItWorks() {
               </div>
               {i < steps.length - 1 && (
                 <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', paddingTop: 36, color: 'var(--purple)', opacity: 0.3 }}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M5 12h14M12 5l7 7-7 7" strokeLinejoin="round" strokeLinecap="round"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M5 12h14M12 5l7 7-7 7" strokeLinejoin="round" strokeLinecap="round"/></svg>
                 </div>
               )}
             </React.Fragment>
@@ -436,19 +436,19 @@ function HowItWorks() {
 // === FEATURES ===
 function Features() {
   const features = [
-    { title: 'AI-Native Design', desc: 'Built for machines. No accounts, no UI, no human friction. Agents pay and use directly.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z" strokeLinejoin="round" strokeLinecap="round"/><path d="M16 14v2a4 4 0 01-8 0v-2M12 18v4M8 22h8" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'x402 Protocol', desc: 'HTTP 402 with crypto payments. The emerging standard for machine-to-machine commerce.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" strokeLinejoin="round" strokeLinecap="round"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.72-1.71" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'USDC on Base', desc: 'Stablecoin payments on L2. Sub-cent fees, instant finality, global reach.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path d="M12 6v12M8 10l4-4 4 4M8 14l4 4 4-4" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Permissionless', desc: 'No KYC, no subscriptions. Connect wallet and use. That\'s it.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="9 12 11 14 15 10" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Global Access', desc: 'Anyone with a crypto wallet. No bank account needed. No borders.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><line x1="2" y1="12" x2="22" y2="12" strokeLinecap="round"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Instant Settlement', desc: 'Payments verified on-chain in seconds. No waiting, no intermediaries.', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'AI-Native Design', desc: 'Built for machines. No accounts, no UI, no human friction. Agents pay and use directly.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M16 14v2a4 4 0 01-8 0v-2M12 18v4M8 22h8" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'x402 Protocol', desc: 'HTTP 402 with crypto payments. The emerging standard for machine-to-machine commerce.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.72-1.71" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'USDC on Base', desc: 'Stablecoin payments on L2. Sub-cent fees, instant finality, global reach.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 6v12M8 10l4-4 4 4M8 14l4 4 4-4" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Permissionless', desc: 'No KYC, no subscriptions. Connect wallet and use. That\'s it.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="9 12 11 14 15 10" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Global Access', desc: 'Anyone with a crypto wallet. No bank account needed. No borders.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><line x1="2" y1="12" x2="22" y2="12" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Instant Settlement', desc: 'Payments verified on-chain in seconds. No waiting, no intermediaries.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
   ]
 
   return (
     <section id="features" data-animate style={{ textAlign: 'center' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path d="M12 2L2 7l10 5 10-5-10-5z" strokeLinejoin="round" strokeLinecap="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5z" strokeLinejoin="round" strokeLinecap="round"/></svg>
           Features
         </div>
         <h2 className="section-title">Built for the Agent Economy</h2>
@@ -487,14 +487,14 @@ function CodeSection() {
     <section id="code" data-animate style={{ textAlign: 'center', background: 'linear-gradient(180deg, rgba(168,85,247,0.03) 0%, transparent 100%)' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
           For Developers
         </div>
         <h2 className="section-title">Integrate in Minutes</h2>
         <p className="section-desc" style={{ margin: '0 auto' }}>One SDK. Every API. Zero configuration.</p>
         <div data-animate-card style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 48, marginTop: 72, alignItems: 'start' }}>
           <div>
-            <div style={{ background: '#0c0c14', border: '1px solid rgba(168,85,247,0.3)', borderRadius: 16, overflow: 'hidden', textAlign: 'left' }}>
+            <div style={{ background: '#0c0c14', border: '1px solid rgba(168,85,247,0.16)', borderRadius: 16, overflow: 'hidden', textAlign: 'left' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 20px', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid var(--border)' }}>
                 <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ef4444' }} />
                 <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#f59e0b' }} />
@@ -521,7 +521,7 @@ function CodeSection() {
             <ul style={{ listStyle: 'none' }}>
               {['Auto-negotiates payment via x402', 'Python + JavaScript SDKs, typed and tested', 'Type-safe with full IDE support', 'Built-in retry and error handling', 'Zero configuration needed'].map(item => (
                 <li key={item} style={{ padding: '14px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 14, color: 'var(--text-sec)' }}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2" width="22" height="22"><polyline points="20 6 9 17 4 12"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="var(--green)" strokeWidth="1.5" width="22" height="22"><polyline points="20 6 9 17 4 12"/></svg>
                   {item}
                 </li>
               ))}
@@ -552,13 +552,13 @@ function Waitlist() {
     <section id="waitlist" data-animate style={{ textAlign: 'center' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path strokeLinejoin="round" strokeLinecap="round" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
           Early Access
         </div>
         <h2 className="section-title">Join the Agent Economy</h2>
         <p className="section-desc" style={{ margin: '0 auto' }}>We're live on Base Mainnet. Start building with 100+ APIs today. Get early access to new endpoints and exclusive analytics.</p>
         <div data-animate-card style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, marginTop: 72, textAlign: 'left' }}>
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, padding: 40, backdropFilter: 'blur(20px)' }}>
+          <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(16px)', borderRadius: 24, padding: 40, backdropFilter: 'blur(20px)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32 }}>
               {[{ val: '100+', label: 'Live APIs' }, { val: '40', label: 'FREE Endpoints' }, { val: 'x402', label: 'Protocol' }].map(s => (
                 <div key={s.label} style={{ textAlign: 'center', padding: 16, background: 'rgba(168,85,247,0.06)', borderRadius: 12 }}>
@@ -569,21 +569,21 @@ function Waitlist() {
             </div>
             <div style={{ marginBottom: 24 }}>
               <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com" style={{ flex: 1, padding: '14px 18px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text)', fontSize: '0.95rem', outline: 'none' }} />
-                <button type="button" className="btn btn-primary" style={{ whiteSpace: 'nowrap' }}>Join Waitlist <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com" style={{ flex: 1, padding: '14px 18px', background: 'rgba(0,0,0,0.25)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text)', fontSize: '0.95rem', outline: 'none' }} />
+                <button type="button" className="btn btn-primary" style={{ whiteSpace: 'nowrap' }}>Join Waitlist <svg width="16" height="16" viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5"><path strokeLinejoin="round" strokeLinecap="round" d="M5 12h14M12 5l7 7-7 7"/></svg></button>
               </div>
-              <input type="text" value={wallet} onChange={e => setWallet(e.target.value)} placeholder="0x... (optional — for founder perks)" style={{ width: '100%', padding: '12px 16px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', outline: 'none' }} />
+              <input type="text" value={wallet} onChange={e => setWallet(e.target.value)} placeholder="0x... (optional — for founder perks)" style={{ width: '100%', padding: '12px 16px', background: 'rgba(0,0,0,0.25)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', outline: 'none' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {['Early mainnet access', 'Priority support', 'Founder pricing locked'].map(p => (
                 <div key={p} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.88rem', color: 'var(--text-sec)' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="var(--green)" strokeWidth="1.5"><polyline points="20 6 9 17 4 12"/></svg>
                   {p}
                 </div>
               ))}
             </div>
           </div>
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, padding: 40, backdropFilter: 'blur(20px)' }}>
+          <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(16px)', borderRadius: 24, padding: 40, backdropFilter: 'blur(20px)' }}>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: 32 }}>Launch Roadmap</h3>
             <div style={{ position: 'relative', paddingLeft: 28 }}>
               <div style={{ position: 'absolute', left: 8, top: 8, bottom: 8, width: 2, background: 'var(--border)' }} />
@@ -695,7 +695,7 @@ function Heartbeat() {
 
       // Gradient fill
       const grad = ctx.createLinearGradient(0, 0, 0, h)
-      grad.addColorStop(0, 'rgba(168,85,247,0.15)')
+      grad.addColorStop(0, 'rgba(168,85,247,0.08)')
       grad.addColorStop(1, 'rgba(168,85,247,0)')
       ctx.lineTo(w, h)
       ctx.lineTo(0, h)
@@ -731,17 +731,17 @@ function Heartbeat() {
     <section id="heartbeat" data-animate style={{ textAlign: 'center' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path strokeLinejoin="round" strokeLinecap="round" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
           System Status
         </div>
         <h2 className="section-title">Live Infrastructure</h2>
         <p className="section-desc" style={{ margin: '0 auto' }}>Real-time health of every API endpoint.</p>
         <div data-animate-card style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, marginTop: 72 }}>
           {/* Request Volume */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, padding: 36, textAlign: 'left' }}>
+          <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(16px)', borderRadius: 24, padding: 36, textAlign: 'left' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
               <div style={{ fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="var(--green)" strokeWidth="1.5"><path strokeLinejoin="round" strokeLinecap="round" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                 Request Volume
               </div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 9999, fontSize: '0.75rem', fontWeight: 600, background: 'rgba(16,185,129,0.12)', color: 'var(--green)' }}>
@@ -759,16 +759,16 @@ function Heartbeat() {
             </div>
           </div>
           {/* Endpoint Health */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, padding: 36, textAlign: 'left' }}>
+          <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(16px)', borderRadius: 24, padding: 36, textAlign: 'left' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
               <div style={{ fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple-light)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="var(--purple-light)" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 6v6l4 2"/></svg>
                 Endpoint Health
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {endpoints.map(ep => (
-                <div key={ep.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid var(--border)' }}>
+                <div key={ep.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.88rem', fontWeight: 500 }}>
                     <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--green)', boxShadow: '0 0 6px var(--green)' }} />
                     {ep.name}
@@ -793,7 +793,7 @@ function Telemetry() {
     <section id="telemetry" data-animate style={{ background: 'linear-gradient(180deg, rgba(168,85,247,0.04), transparent 55%)' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M3 12h4l2-8 4 16 2-8h6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path strokeLinejoin="round" strokeLinecap="round" d="M3 12h4l2-8 4 16 2-8h6"/></svg>
           Distributed Telemetry
         </div>
         <h2 className="section-title">See the system between requests.</h2>
@@ -806,7 +806,7 @@ function Telemetry() {
           ].map((node, i) => (
             <React.Fragment key={i}>
               {i > 0 && <div style={{ color: 'var(--magenta-light)', fontFamily: 'JetBrains Mono, monospace', fontSize: '1.7rem', display: 'flex', alignItems: 'center' }}>→</div>}
-              <div data-animate-card style={{ padding: 26, textAlign: 'left', background: 'rgba(255,255,255,0.025)', border: '1px solid var(--border)', borderRadius: 16, transition: 'all 0.35s' }}>
+              <div data-animate-card className="glass-card" style={{ padding: 26, textAlign: 'left' }}>
                 <span style={{ display: 'block', color: 'var(--purple-light)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.7rem', marginBottom: 24 }}>{node.idx}</span>
                 <strong style={{ display: 'block', fontSize: '1.15rem', marginBottom: 8 }}>{node.title}</strong>
                 <small style={{ color: 'var(--text-sec)', fontSize: '0.82rem' }}>{node.desc}</small>
@@ -838,25 +838,24 @@ function Docs() {
     <section id="docs" data-animate style={{ textAlign: 'center' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path strokeLinejoin="round" strokeLinecap="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path strokeLinejoin="round" strokeLinecap="round" d="M14 2v6h6"/></svg>
           Documentation
         </div>
         <h2 className="section-title">Everything You Need</h2>
         <p className="section-desc" style={{ margin: '0 auto' }}>Complete guides, references, and examples. <a href="https://github.com/wilnowilx/aetheriusxapi/tree/main/docs/tutorials" target="_blank" rel="noreferrer" style={{ color: 'var(--purple-light)', textDecoration: 'none', borderBottom: '1px dashed rgba(168,85,247,0.4)' }}>Tutoriales en español → docs/tutorials</a></p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginTop: 72 }}>
           {docs.map(d => (
-            <a key={d.title} href={d.href} target="_blank" rel="noreferrer" data-animate-card style={{
-              padding: '40px 32px', background: 'var(--bg-card)', border: '1px solid var(--border)',
-              borderRadius: 24, textAlign: 'left', transition: 'all 0.5s', textDecoration: 'none', color: 'inherit', display: 'block',
+            <a key={d.title} href={d.href} target="_blank" rel="noreferrer" data-animate-card className="glass-card" style={{
+              padding: '36px 28px', textAlign: 'left', textDecoration: 'none', color: 'inherit', display: 'block',
             }}>
-              <div style={{ width: 56, height: 56, background: 'linear-gradient(135deg, rgba(168,85,247,0.1), rgba(6,182,212,0.1))', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24, color: 'var(--cyan)' }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="28" height="28"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              <div style={{ width: 56, height: 56, background: 'linear-gradient(135deg, rgba(168,85,247,0.06), rgba(6,182,212,0.1))', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24, color: 'var(--cyan)' }}>
+                <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path strokeLinejoin="round" strokeLinecap="round" d="M14 2v6h6"/></svg>
               </div>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 12, color: 'var(--text)' }}>{d.title}</h3>
               <p style={{ color: 'var(--text-sec)', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: 20 }}>{d.desc}</p>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'var(--purple-light)', fontWeight: 600, fontSize: '0.9rem' }}>
                 {d.link}
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="18" height="18"><path strokeLinejoin="round" strokeLinecap="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
               </span>
             </a>
           ))}
@@ -876,13 +875,13 @@ function Limits() {
     <section id="limits" data-animate style={{ textAlign: 'center' }}>
       <div className="inner">
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><circle cx="12" cy="12" r="10"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 6v6l4 2"/></svg>
           Rate Limits
         </div>
         <h2 className="section-title">Fair Use, Transparent Limits</h2>
         <p className="section-desc" style={{ margin: '0 auto' }}>Every tier has clear limits. No hidden throttling.</p>
-        <div data-animate-card style={{ marginTop: 64, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, overflow: 'hidden', textAlign: 'left' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', padding: '18px 28px', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid var(--border)', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', fontWeight: 700 }}>
+        <div data-animate-card className="glass-card" style={{ marginTop: 64, overflow: 'hidden', textAlign: 'left' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', padding: '18px 28px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', fontWeight: 700 }}>
             <span>Tier</span><span>Requests / min</span><span>Requests / day</span><span>Burst</span>
           </div>
           {[
@@ -890,8 +889,8 @@ function Limits() {
             { tier: 'Pro', cls: 'tier-pro', rpm: '100', rpd: '10,000', burst: '200' },
             { tier: 'Enterprise', cls: 'tier-ent', rpm: '1,000', rpd: 'Unlimited', burst: 'Custom' },
           ].map(row => (
-            <div key={row.tier} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', padding: '18px 28px', borderBottom: '1px solid var(--border)', alignItems: 'center' }}>
-              <div><span style={{ display: 'inline-block', padding: '4px 12px', borderRadius: 6, fontSize: '0.78rem', fontWeight: 600, background: row.cls === 'tier-free' ? 'rgba(255,255,255,0.08)' : row.cls === 'tier-pro' ? 'rgba(168,85,247,0.15)' : 'rgba(217,70,239,0.15)', color: row.cls === 'tier-free' ? 'var(--text-sec)' : row.cls === 'tier-pro' ? 'var(--purple-light)' : 'var(--magenta-light)' }}>{row.tier}</span></div>
+            <div key={row.tier} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', padding: '18px 28px', borderBottom: '1px solid rgba(255,255,255,0.04)', alignItems: 'center' }}>
+              <div><span style={{ display: 'inline-block', padding: '4px 12px', borderRadius: 6, fontSize: '0.78rem', fontWeight: 600, background: row.cls === 'tier-free' ? 'rgba(255,255,255,0.08)' : row.cls === 'tier-pro' ? 'rgba(168,85,247,0.08)' : 'rgba(217,70,239,0.15)', color: row.cls === 'tier-free' ? 'var(--text-sec)' : row.cls === 'tier-pro' ? 'var(--purple-light)' : 'var(--magenta-light)' }}>{row.tier}</span></div>
               <span>{row.rpm}</span><span>{row.rpd}</span><span>{row.burst}</span>
             </div>
           ))}
@@ -911,13 +910,13 @@ function Founders() {
         <p className="section-desc" style={{ margin: '0 auto' }}>Founding agents lock lifetime 50% off every endpoint, vote the roadmap, and get a direct line. When the 10 are gone, they're gone.</p>
         <div data-animate-card style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', margin: '48px auto', maxWidth: 900 }}>
           {[{ val: '50% lifetime', sub: 'every call, forever' }, { val: 'Vote roadmap', sub: 'you steer what ships' }, { val: 'Direct line', sub: 'priority support on X' }].map(p => (
-            <div key={p.val} style={{ flex: '1 1 200px', background: 'rgba(255,255,255,0.025)', border: '1px solid var(--border)', borderRadius: 16, padding: 26 }}>
+            <div key={p.val} style={{ flex: '1 1 200px', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: 26, backdropFilter: 'blur(12px)' }}>
               <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{p.val}</div>
               <div style={{ color: 'var(--text-sec)', fontSize: '0.85rem', marginTop: 6 }}>{p.sub}</div>
             </div>
           ))}
         </div>
-        <div data-animate-card style={{ maxWidth: 640, margin: '8px auto 0', background: 'rgba(255,255,255,0.025)', border: '1px solid var(--border)', borderRadius: 16, padding: 24, textAlign: 'left' }}>
+        <div data-animate-card style={{ maxWidth: 640, margin: '8px auto 0', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, backdropFilter: 'blur(12px)', padding: 24, textAlign: 'left' }}>
           <div style={{ fontWeight: 700, marginBottom: 12 }}>Founder math — what would YOU pay?</div>
           <p style={{ color: 'var(--text-sec)', fontSize: '0.82rem', marginBottom: 8 }}>Own an API? We turn it into a paid x402 API for you (white-label). <a href="https://x.com/aetheriusxAPI" target="_blank" rel="noreferrer" style={{ color: 'var(--purple-light)' }}>Talk to us ↗</a></p>
         </div>
@@ -938,11 +937,11 @@ function CTA() {
       <div className="inner">
         <div style={{
           padding: '80px 60px', background: 'linear-gradient(135deg, rgba(168,85,247,0.06), rgba(217,70,239,0.06))',
-          border: '1px solid rgba(168,85,247,0.2)', borderRadius: 32, position: 'relative', overflow: 'hidden',
+          border: '1px solid rgba(168,85,247,0.14)', borderRadius: 32, position: 'relative', overflow: 'hidden',
         }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 30% 50%, rgba(168,85,247,0.1), transparent 50%), radial-gradient(circle at 70% 50%, rgba(217,70,239,0.1), transparent 50%)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 30% 50%, rgba(168,85,247,0.06), transparent 50%), radial-gradient(circle at 70% 50%, rgba(217,70,239,0.1), transparent 50%)' }} />
           <div className="section-label" style={{ justifyContent: 'center', position: 'relative', zIndex: 1 }}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             Get Started
           </div>
           <h2 className="section-title" style={{ position: 'relative', zIndex: 1 }}>
@@ -952,11 +951,11 @@ function CTA() {
           <div style={{ display: 'flex', gap: 20, justifyContent: 'center', position: 'relative', zIndex: 1 }}>
             <a href="https://x.com/aetheriusxAPI" target="_blank" rel="noreferrer" className="btn btn-primary">
               Follow on X
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5"><path strokeLinejoin="round" strokeLinecap="round" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             </a>
             <a href="https://github.com/wilnowilx/aetheriusxapi" target="_blank" rel="noreferrer" className="btn btn-secondary">
               View GitHub
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5"><path strokeLinejoin="round" strokeLinecap="round" d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
             </a>
           </div>
         </div>
@@ -968,7 +967,7 @@ function CTA() {
 // === TRUSTED BY ===
 function TrustedBy() {
   return (
-    <section id="trusted" data-animate style={{ padding: '80px 0', textAlign: 'center', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', background: 'rgba(255,255,255,0.01)' }}>
+    <section id="trusted" data-animate style={{ padding: '80px 0', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.01)' }}>
       <div className="inner" style={{ padding: '0 40px' }}>
         <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'var(--text-muted)', marginBottom: 48, fontWeight: 600 }}>Built in the open for the agent economy on</h3>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 56, flexWrap: 'wrap', maxWidth: 900, margin: '0 auto' }}>
@@ -996,8 +995,8 @@ function DonateX() {
     <section id="donatex" data-animate style={{ minHeight: 'auto', padding: '60px 0', textAlign: 'center' }}>
       <div className="inner" style={{ maxWidth: 600, margin: '0 auto', padding: '0 40px' }}>
         <div style={{
-          background: 'linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(217,70,239,0.05) 100%)',
-          border: '1px solid rgba(168,85,247,0.15)', borderRadius: 16, padding: '40px 32px'
+          background: 'linear-gradient(135deg, rgba(168,85,247,0.05) 0%, rgba(217,70,239,0.03) 100%)',
+          border: '1px solid rgba(168,85,247,0.08)', borderRadius: 16, padding: '40px 32px'
         }}>
           <div className="section-label" style={{ justifyContent: 'center', marginBottom: 8 }}>DonateX</div>
           <h3 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: 8 }}>
@@ -1008,11 +1007,11 @@ function DonateX() {
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="https://www.coinbase.com/earn/x402/spend?recipient=0x677B483128D0399bCD0A5AB36eE990C0246d7f61&asset=USDC&network=base&amount=5" target="_blank" rel="noreferrer" className="btn btn-primary" style={{ fontSize: '0.85rem' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5"><path strokeLinejoin="round" strokeLinecap="round" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
               Donate $5 USDC
             </a>
             <a href="https://www.coinbase.com/earn/x402/spend?recipient=0x677B483128D0399bCD0A5AB36eE990C0246d7f61&asset=USDC&network=base&amount=25" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ fontSize: '0.85rem' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               Donate $25 USDC
             </a>
           </div>
@@ -1028,7 +1027,7 @@ function DonateX() {
 // === FOOTER ===
 function Footer() {
   return (
-    <footer style={{ minHeight: 'auto', padding: '80px 0 40px', borderTop: '1px solid var(--border)' }}>
+    <footer style={{ minHeight: 'auto', padding: '80px 0 40px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
       <div className="inner">
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
           <div>
@@ -1060,17 +1059,17 @@ function Footer() {
             </ul>
           </div>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, borderTop: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>&copy; 2026 AETHERIUS. All rights reserved.</span>
           <div style={{ display: 'flex', gap: 12 }}>
             <a href="https://x.com/aetheriusxAPI" target="_blank" rel="noreferrer" style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 10, color: 'var(--text-sec)', transition: 'all 0.3s', textDecoration: 'none' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path strokeLinejoin="round" strokeLinecap="round" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             </a>
             <a href="https://github.com/wilnowilx/aetheriusxapi" target="_blank" rel="noreferrer" style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 10, color: 'var(--text-sec)', transition: 'all 0.3s', textDecoration: 'none' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path strokeLinejoin="round" strokeLinecap="round" d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
             </a>
             <a href="https://t.me/aetheriusxAPI_global" target="_blank" rel="noreferrer" style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 10, color: 'var(--text-sec)', transition: 'all 0.3s', textDecoration: 'none' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path strokeLinejoin="round" strokeLinecap="round" d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
             </a>
           </div>
         </div>
