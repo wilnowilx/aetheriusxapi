@@ -21,9 +21,9 @@ concurrency:
 
 jobs:
   publish:
-    # Skips (green) until WIKI_TOKEN exists — creating repo secrets requires
-    # 2FA on the account. Local fallback: python3 tools/wiki_sync.py
-    if: ${{ secrets.WIKI_TOKEN != '' }}
+    # No job-level secret gate (expression context rejects it on dispatch).
+    # The clone step below skips green when WIKI_TOKEN is absent.
+    # Local fallback always available: python3 tools/wiki_sync.py
     runs-on: ubuntu-latest
     steps:
       - name: Checkout wiki source (sparse)
@@ -34,18 +34,27 @@ jobs:
           sparse-checkout-cone-mode: false
           fetch-depth: 1
 
-      - name: Clone wiki repo
+      - name: Clone wiki repo (or skip green without WIKI_TOKEN)
+        id: clone
         env:
-          GH_TOKEN: ${{ secrets.WIKI_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.WIKI_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "WIKI_TOKEN absent — sync skipped (local fallback: tools/wiki_sync.py)"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
           git clone "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.wiki.git" wiki-remote
 
       - name: Sync content (mirror)
+        if: steps.clone.outputs.skip != 'true'
         run: |
           rsync -av --delete --exclude='.git' wiki/ wiki-remote/
 
       - name: Commit and push
+        if: steps.clone.outputs.skip != 'true'
         working-directory: wiki-remote
         run: |
           git config user.name "github-actions[bot]"
