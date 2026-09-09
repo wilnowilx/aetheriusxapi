@@ -24,8 +24,15 @@ with sudo where marked.
 
 ## R2 — Deploy / rollback
 
-1. Backend: sync reviewed files per `docs/DEPLOY.md`, then
-   `sudo systemctl restart aetherapi`.
+1. Backend: sync reviewed files per `docs/DEPLOY.md`.
+   **Pre-restart:** confirm no stray process holds the port — a manually
+   launched `main.py` survives `systemctl restart` and keeps serving STALE
+   code while systemd crash-loops behind it (happened 2026-09-08/09: a Sep-8
+   zombie served a full day). Check `ps` for non-systemd listeners first,
+   kill strays, then restart.
+   **Post-restart (FULL matrix, no shortcuts):** `/health` 200 · free route
+   200 · paid without payment 402 · **paid WITH payment 200** · SSRF probe
+   (`/v1/web/scrape?url=http://127.0.0.1:9/` → 403).
 2. Frontend: `cd frontend && npm run build`, copy `dist/` bundles to Pages
    paths, push `main`, wait for Pages build.
 3. Verify (all three, in order): `/health` 200 · free route
