@@ -631,7 +631,6 @@ Every response carries the `X-AETHERIUS-Fingerprint: quantumxbrain-v1` header.
 - [ ] Revenue sharing model
 - [ ] Agent marketplace
 - [ ] Enterprise tier with SLA
-- [ ] Multi-chain support (Ethereum, Polygon, Arbitrum)
 
 ---
 
