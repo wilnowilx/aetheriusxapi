@@ -131,8 +131,8 @@ timeline
 
 **Total commits:** 209 and counting (`git log --oneline | wc -l` — velocity is public).
 
-**Build velocity:** 100 live endpoints (60 paid + 40 free: 20 x402 Intelligence + 20 QuantumXBrain, all returning 200) + 39 tests + 2 SDKs (v2.0) + dashboard + R3F landing + playground + demo + 2 grant submissions + Telegram bot + GitHub Actions in **6 days**.
-If one person builds this in 144 hours, imagine what funded builders ship on Base.
+**Build velocity:** 100 live endpoints (60 paid + 40 free: 20 x402 Intelligence + 20 QuantumXBrain, all returning 200) + 39 tests + 2 SDKs (v2.0) + dashboard + R3F landing + playground + demo + Telegram bot + GitHub Actions in **6 days** (209 commits).
+Velocity is public — `git log --oneline | wc -l`.
 
 ---
 
@@ -668,7 +668,7 @@ AETHERIUS is live and being promoted across multiple platforms:
 
 | Platform | Status | Link |
 |----------|--------|------|
-| **Dev.to** | ✅ Article live | [dev.to/wilnowilx](https://dev.to/wilnowilx/i-built-an-api-marketplace-where-ai-agents-pay-per-request-in-usdc-80-endpoints-in-4-days-solo-15lc) |
+| **Dev.to** | ✅ 2 articles live | [API marketplace where agents pay per request](https://dev.to/wilnowilx/i-built-an-api-marketplace-where-ai-agents-pay-per-request-in-usdc-80-endpoints-in-4-days-solo-15lc) · [dev.to/wilnowilx](https://dev.to/wilnowilx) |
 | **Hacker News** | 📝 Pending submission | news.ycombinator.com |
 | **Reddit** | ⚠️ New account (low karma) | r/webdev, r/cryptocurrency |
 | **Postman Network** | 📝 To publish | postman.com/publish |
@@ -739,11 +739,12 @@ AETHERIUS is live and being promoted across multiple platforms:
 
 ### What you get
 
-- **Lifetime 50% off** every endpoint (Founding Agents)
-- **Vote on the roadmap** — you steer what ships
-- **Your name in the codebase** — git log is forever
-- **Real-world impact** — your code runs on Base, settles USDC, and powers autonomous agents
-- **Open-source portfolio** — contributions are public and verifiable
+- **Vote on the roadmap** — contributors steer what ships
+- **Shipped to mainnet** — merged code runs on Base and serves real agent traffic
+- **On-chain verifiable work** — every contribution is public, attributed in git, and verifiable
+- **Real-world impact** — code that settles USDC and powers autonomous agents, not demos
+
+> Commercial note: Founding Agents (lifetime 50% off) is a separate platform program, not a contribution reward. See the landing page for details.
 
 ### Development Setup
 
