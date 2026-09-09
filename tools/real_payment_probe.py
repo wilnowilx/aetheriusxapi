@@ -78,9 +78,92 @@ def main() -> int:
         print("(v2 payment completion needs --pay with funded TEST_PKEY)")
         return 0
 
-    # v2 placeholder enforced: refuses to run until implemented against SDK.
-    print("v2 not yet implemented — needs official client flow + funded key")
-    return 2
+    return _v2_complete_payment(args.base, CANARY, chal)
+
+
+# ── v2: complete payment with official SDK client flow ────────────────
+# Policy lives HERE in code (never prompts): Sepolia only, exact only,
+# merchant only, hard amount cap. Any mismatch aborts BEFORE signing.
+MERCHANT = "0x677B483128D0399bCD0A5AB36eE990C0246d7f61"
+MAX_AMOUNT_UNITS = 100000  # $0.10 USDC cap per call (canary is $0.001)
+
+
+def _load_test_key():
+    import pathlib
+
+    envf = pathlib.Path(__file__).resolve().parent.parent / ".env.test"
+    kv = {}
+    for line in envf.read_text().splitlines():
+        if "=" in line and not line.startswith("#"):
+            k, v = line.split("=", 1)
+            kv[k.strip()] = v.strip()
+    if not kv.get("TEST_PKEY"):
+        print("FAIL: .env.test missing TEST_PKEY (dust-only test key)")
+        sys.exit(2)
+    return kv["TEST_PKEY"]
+
+
+def _v2_complete_payment(base, path, chal) -> int:
+    import base64
+
+    from eth_account import Account
+    from x402.mechanisms.evm.exact import ExactEvmClientScheme
+    from x402.mechanisms.evm.signers import EthAccountSigner
+    from x402.schemas import PaymentPayload, PaymentRequirements
+
+    accepts = chal.get("accepts", [])
+    if not accepts:
+        print("FAIL: challenge has no accepts[]")
+        return 1
+    req = accepts[0]
+
+    # ── POLICY GATE (code, not prompts) ──
+    if req.get("network") != "eip155:84532":
+        print(f"REFUSE: network {req.get('network')} is not Base Sepolia")
+        return 1
+    if req.get("scheme") != "exact":
+        print(f"REFUSE: scheme {req.get('scheme')} is not exact")
+        return 1
+    if int(req.get("amount", "0")) > MAX_AMOUNT_UNITS:
+        print(f"REFUSE: amount {req.get('amount')} exceeds cap {MAX_AMOUNT_UNITS}")
+        return 1
+    if req.get("payTo", "").lower() != MERCHANT.lower():
+        print(f"REFUSE: payTo {req.get('payTo')} is not the merchant")
+        return 1
+    print("[5] policy PASS (sepolia/exact/merchant/cap)")
+
+    acct = Account.from_key(_load_test_key())
+    signer = EthAccountSigner(acct)
+    print(f"[6] signer addr={signer.address}")
+    scheme = ExactEvmClientScheme(signer)
+    requirements = PaymentRequirements(
+        scheme=req["scheme"], network=req["network"], asset=req["asset"],
+        amount=req["amount"], pay_to=req["payTo"],
+        max_timeout_seconds=req.get("maxTimeoutSeconds", 300),
+        extra=req.get("extra", {}),
+    )
+    result = scheme.create_payment_payload(requirements)
+    envelope = PaymentPayload(
+        x402_version=chal.get("x402Version", 2), payload=result,
+        accepted=req, resource=chal.get("resource", {}),
+    ).model_dump()
+    sig = base64.b64encode(json.dumps(envelope).encode()).decode()
+    print(f"[7] signed authorization from={result.get('authorization', {}).get('from', '?')[:12]}...")
+
+    # Telemetry baseline, then paid retry.
+    _, _, tb0 = _req(base, "/v1/telemetry")
+    vol0 = json.loads(tb0).get("totals", {}).get("volume_usdc", 0)
+    code, headers, body = _req(base, path, {"PAYMENT-SIGNATURE": sig})
+    print(f"[8] paid retry -> {code}")
+    if code != 200:
+        print(f"FAIL: expected 200, got {code}: {body[:400]}")
+        return 1
+    print(f"[9] settle header: {headers.get('X-PAYMENT-RESPONSE') or headers.get('PAYMENT-RESPONSE') or headers.get('X-Payment-Response', '')[:80]}")
+    _, _, tb1 = _req(base, "/v1/telemetry")
+    vol1 = json.loads(tb1).get("totals", {}).get("volume_usdc", 0)
+    print(f"[10] volume {vol0} -> {vol1} USDC")
+    print("v2 PASS: real 402 -> sign -> 200 + settlement + volume")
+    return 0
 
 
 if __name__ == "__main__":
