@@ -5,6 +5,8 @@
 
 ## [Unreleased]
 
+- `TERMS.md`: plain-language API terms (as-is, non-custodial, no SLA,
+  settlement honesty) — closes the ToS gap for grant evaluators.
 - **First real settlement (Sepolia staging):** official 402 → EIP-3009 sign →
   200, $0.001 USDC settled on-chain (payer 20→19.999), volume tracked in
   telemetry. Proof: `tools/real_payment_probe.py --pay` v2 PASS.

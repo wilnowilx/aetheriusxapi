@@ -793,6 +793,7 @@ MIT License — see [LICENSE](LICENSE) for details.
 | **Documentation** | [GitHub Docs](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) |
 | **Wiki** | [Architecture, protocol, runbooks, ADRs](https://github.com/wilnowilx/aetheriusxapi/wiki) |
 | **Security** | [Policy + private reporting](https://github.com/wilnowilx/aetheriusxapi/blob/main/SECURITY.md) |
+| **Terms** | [API terms: as-is, non-custodial, no SLA](https://github.com/wilnowilx/aetheriusxapi/blob/main/TERMS.md) |
 | **Changelog** | [Releases, verifiable](https://github.com/wilnowilx/aetheriusxapi/blob/main/CHANGELOG.md) |
 | **Discussions** | [Q&A, ideas, endpoint proposals](https://github.com/wilnowilx/aetheriusxapi/discussions) |
 | **Tutorials (ES)** | [docs/tutorials](https://github.com/wilnowilx/aetheriusxapi/tree/main/docs/tutorials) |
