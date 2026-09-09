@@ -13,8 +13,8 @@ Crypto-native API marketplace where **AI agents pay per request in USDC on Base 
 No accounts, no API keys, no credit cards — the wallet is the identity.
 
 **Live on Base Mainnet (not a deck — running code since Sep 5, 2026):**
-- 100+ endpoints live: 60 paid + 40 FREE (20 x402 Intelligence + 20 QuantumXBrain)
-- 8 categories: Maps ×5, Crypto ×13, Web ×7, Data ×14, DeFi ×10, Forex ×3, News ×6, x402 Intelligence ×4, QuantumXBrain ×20
+- 100 endpoints live: 60 paid + 40 FREE (20 x402 Intelligence + 20 QuantumXBrain, all verified 200)
+- 11 categories: Maps ×5, Token & Crypto ×13, Web ×7, Data ×14, Email ×1, DeFi ×10, Forex ×3, News ×6, Storage ×1, Crypto Market ×5, x402 Intelligence ×20, QuantumXBrain ×20
 - E2E proven: real USDC payments settling on Base Mainnet
 - Interactive dashboard with API explorer: `/dashboard/`
 - **QuantumXBrain**: AI-powered intelligence layer combining on-chain data + CoinGecko + DefiLlama in real-time
@@ -102,13 +102,13 @@ Python/JS/Go SDKs · 100 paying agent-wallets · public status page with uptime/
 ## Metrics (verifiable today)
 
 - **Network:** Base Mainnet (`eip155:8453`), wallet `0x677B…7f61`
-- **Live:** 80 endpoints (60 paid + 20 free x402 Intelligence)
-- **E2E:** real USDC payments settling on Base Mainnet
-- **Tests:** 60/60 green (`pytest -q`), incl. telemetry accounting tests
+- **Live:** 100 endpoints (60 paid + 40 free: 20 x402 Intelligence + 20 QuantumXBrain, all verified 200)
+- **E2E:** x402 challenge flow live (402 → payment → 200, volume tracked in telemetry)
+- **Tests:** 39 green (incl. telemetry accounting + TOCTOU anti-replay tests)
 - **Public telemetry:** `GET /v1/telemetry` (free) — uptime, per-endpoint stats,
   settled USDC volume, latency feed. Powers the live dashboard.
-- **x402 Intelligence:** 4 FREE exclusive endpoints reading on-chain data
+- **x402 Intelligence + QuantumXBrain:** 40 FREE endpoints reading on-chain data (Base RPC + CoinGecko + DefiLlama)
 - **Uptime:** systemd + auto-restart, Nginx reverse proxy
 - **Cost:** single GCP VM (Europe), full stack under $50/mo
-- **Build velocity:** 80 endpoints in 96 hours, solo builder, $5.80 ETH capital
+- **Build velocity:** 100 endpoints in 144 hours (6 days, 209 commits), solo builder, $5.80 ETH capital
 - **Honesty policy:** key-gated endpoints return 501 with setup instructions, never fake data
