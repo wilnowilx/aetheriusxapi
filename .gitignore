@@ -25,3 +25,7 @@ venv/
 Thumbs.db
 .vscode/
 .idea/
+
+# Internal research — NEVER public (infra details, private protocols)
+docs/sentinel/
+.automaton/

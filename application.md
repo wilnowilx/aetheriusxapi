@@ -44,7 +44,13 @@ Solo builder operating live x402 infrastructure on Base. Python, FastAPI,
 GCP/Kubernetes, telemetry/NATS, x402 protocol. Venezuelan immigrant in Mexico,
 no bank account, no ID — only crypto wallet. Building everything solo with $5.80 ETH.
 
-## Why Base?
+## Why Base? (Base-first by design)
+
+AETHERIUS is a Base-native protocol. Every endpoint, every payment, every
+telemetry event settles on or reads from Base Mainnet (`eip155:8453`) — 100%
+of our transaction volume, wallet activity, and developer traction accrues to
+Base. Any future chain support is a later technical evolution, never the focus:
+our roadmap, metrics, and grant milestones are all Base-local.
 
 1. Sub-cent fees make $0.005–$0.03 per-call micropayments viable — impossible on L1.
 2. USDC on Base is the natural settlement asset for agents (stable, liquid, instant).
@@ -53,6 +59,8 @@ no bank account, no ID — only crypto wallet. Building everything solo with $5.
 5. Every paid call is onchain activity: wallets, transactions, volume attributable to Base.
 6. x402 Intelligence + QuantumXBrain read Base Mainnet directly — exclusive analytics layer.
 7. QuantumXBrain combines on-chain + CoinGecko + DefiLlama — agents get intelligence in ONE call.
+8. Base's 2-second blocks + instant L2 finality are what agent commerce needs: sub-50ms
+   paid responses are only possible because settlement and data live on the same fast layer.
 
 ## TRACK A — Creator Grant ($4,000): builders documenting the agent economy
 

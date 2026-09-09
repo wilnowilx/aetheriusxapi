@@ -302,7 +302,7 @@ curl "https://34-156-149-38.sslip.io/aetherapi/v1/x402/top-agents"
 - **Expand to 120+ endpoints** with grant funding
 - **SDK releases** for Go and Rust
 - **Third-party API provider onboarding**
-- **Multi-chain support** (Ethereum, Polygon, Arbitrum)
+- **Deeper Base-native primitives** (smart wallets, x402 facilitator — Base-first by design)
 - **500M+ Spanish-speaking developers** included via bilingual docs
 
 ---

@@ -341,7 +341,7 @@ phenomenon (distributed-state drift).
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| chain | string | No | base, ethereum, optimism, arbitrum, polygon (default: base) |
+| chain | string | No | base (default, primary). Other layers (ethereum, optimism, arbitrum, polygon) accepted only as drift-comparison baselines |
 | layers | int | No | RPC layers to compare (default: 2) |
 
 **Response:**

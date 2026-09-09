@@ -631,6 +631,7 @@ Every response carries the `X-AETHERIUS-Fingerprint: quantumxbrain-v1` header.
 - [ ] Revenue sharing model
 - [ ] Agent marketplace
 - [ ] Enterprise tier with SLA
+- [ ] Deeper Base-native primitives (smart wallets, x402 facilitator, sequencer-fed analytics) — Base-first by design
 
 ---
 
