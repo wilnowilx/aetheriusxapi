@@ -343,6 +343,15 @@ if X402_MODE == "real":
         _routes = {}
         _routes.update(_paid_routes_for_sdk("/v1"))
         _routes.update(_paid_routes_for_sdk("/api/v1"))
+        # Canary: AETHERIUS_REAL_ROUTES="/v1/data/uuid" restricts real mode to
+        # listed paths (both /v1 and /api/v1 forms). Empty = all paid routes.
+        _allow = [r.strip() for r in os.getenv("AETHERIUS_REAL_ROUTES", "").split(",") if r.strip()]
+        if _allow:
+            def _wanted(key: str) -> bool:
+                _method, path = key.split(" ", 1)
+                return any(path == a or path == "/api" + a for a in _allow)
+            _routes = {k: v for k, v in _routes.items() if _wanted(k)}
+            print(f"[x402] canary: {len(_routes)} routes ({','.join(_allow)})", flush=True)
         app.add_middleware(PaymentMiddlewareASGI, routes=_routes, server=_server)
         print(f"[x402] REAL mode: {len(_routes)} paid routes on {NETWORK}", flush=True)
     except ImportError as e:
