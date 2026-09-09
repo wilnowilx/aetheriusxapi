@@ -28,7 +28,7 @@
 
 > **What does "xAPI" mean?** The `x` stands for **x402** — the HTTP payment protocol that makes this possible. AETHERIUS is an API marketplace powered by x402 crypto payments. We have APIs. We're just different: agents pay per request with USDC instead of signing up for monthly subscriptions.
 
-[Website](https://wilnowilx.github.io/aetheriusxapi/) · [Documentation](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) · [Tutoriales (ES)](https://github.com/wilnowilx/aetheriusxapi/tree/main/docs/tutorials) · [Twitter](https://x.com/aetheriusxAPI) · [Telegram](https://t.me/aetheriusxAPI) · [x402 Protocol](https://x402.org)
+[Website](https://wilnowilx.github.io/aetheriusxapi/) · [Wiki](https://github.com/wilnowilx/aetheriusxapi/wiki) · [Documentation](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) · [Tutoriales (ES)](https://github.com/wilnowilx/aetheriusxapi/tree/main/docs/tutorials) · [Twitter](https://x.com/aetheriusxAPI) · [Telegram](https://t.me/aetheriusxAPI) · [x402 Protocol](https://x402.org)
 
 </div>
 
@@ -791,6 +791,7 @@ MIT License — see [LICENSE](LICENSE) for details.
 | **Website** | [wilnowilx.github.io/aetheriusxapi](https://wilnowilx.github.io/aetheriusxapi/) |
 | **Dashboard** | [wilnowilx.github.io/aetheriusxapi/dashboard](https://wilnowilx.github.io/aetheriusxapi/dashboard/) |
 | **Documentation** | [GitHub Docs](https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md) |
+| **Wiki** | [Architecture, protocol, runbooks, ADRs](https://github.com/wilnowilx/aetheriusxapi/wiki) |
 | **Tutorials (ES)** | [docs/tutorials](https://github.com/wilnowilx/aetheriusxapi/tree/main/docs/tutorials) |
 | **Twitter** | [@aetheriusxAPI](https://x.com/aetheriusxAPI) |
 | **Telegram Channel** | [@aetherius_xAPI](https://t.me/aetherius_xAPI) |

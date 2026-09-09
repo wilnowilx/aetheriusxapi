@@ -1,0 +1,56 @@
+# Mirrors wiki/ (PR-reviewed source) into the repo's .wiki.git on merge to main.
+# Never edit via the Wiki UI — sync uses rsync --delete and overwrites it.
+# Requires secret WIKI_TOKEN (PAT, repo write scope). Falls back to GITHUB_TOKEN
+# (works in many configs, fails silently in some — watch the sync step logs).
+# One-time setup: open the Wiki tab once and publish a placeholder page so the
+# hidden .wiki.git repo exists; afterwards this workflow owns it.
+
+name: Publish Wiki
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'wiki/**'
+      - '.github/workflows/wiki-publish.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: wiki-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout wiki source (sparse)
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            wiki
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+
+      - name: Clone wiki repo
+        env:
+          GH_TOKEN: ${{ secrets.WIKI_TOKEN || secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.wiki.git" wiki-remote
+
+      - name: Sync content (mirror)
+        run: |
+          rsync -av --delete --exclude='.git' wiki/ wiki-remote/
+
+      - name: Commit and push
+        working-directory: wiki-remote
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No wiki changes to publish."
+          else
+            git commit -m "docs(wiki): sync from ${GITHUB_SHA:0:7}"
+            git push origin HEAD
+          fi
