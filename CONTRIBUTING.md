@@ -21,10 +21,14 @@ Thank you for your interest in contributing to aetheriusxAPI! This document prov
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/aetheriusx-api-site.git
-cd aetheriusx-api-site
+git clone https://github.com/wilnowilx/aetheriusxapi.git
+cd aetheriusxapi
 pip install -r requirements.txt
 ```
+
+> Every PR answers the template checklist: tests green, docs updated
+> (`docs/API.md` for routes, `wiki/` for behavior/ops), `CHANGELOG.md` entry,
+> no secrets, Base-first narrative. See `.github/PULL_REQUEST_TEMPLATE.md`.
 
 ### Running Locally
 

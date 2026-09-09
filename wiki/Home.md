@@ -40,3 +40,5 @@ Runbooks, quarterly for the rest, always after an incident.
 - `docs/tutorials/` → guided lessons EN/ES (canonical lesson files).
 - `wiki/` (here) → ownership, architecture, protocol deep-dive, runbooks, ADRs.
 - Landing + Dashboard → live product surface (GitHub Pages + backend).
+- Governance → `SECURITY.md` (private vuln reporting), `CODEOWNERS`,
+  `CONTRIBUTING.md`, issue/PR templates, `CHANGELOG.md`, `CITATION.md`.

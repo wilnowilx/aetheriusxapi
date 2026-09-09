@@ -1,0 +1,37 @@
+name: Bug report
+description: Something returns the wrong status, shape, or price
+title: "[bug] "
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What broke
+      description: Endpoint + observed vs expected (status, body shape, price)
+      placeholder: "GET /v1/token/price → 500, expected 200 with {price}"
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal repro
+      description: curl or SDK snippet anyone can run (no secrets)
+      render: shell
+    validations: { required: true }
+  - type: dropdown
+    id: env
+    attributes:
+      label: Environment
+      options: [Live mainnet (sslip.io), Local uvicorn, Docker, Landing playground]
+    validations: { required: true }
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Response body/headers (trim), telemetry excerpt, screenshots
+  - type: checkboxes
+    id: sec
+    attributes:
+      label: Security check
+      options:
+        - label: This is NOT a vulnerability (vulns go via SECURITY.md, never here)
+          required: true

@@ -1,0 +1,46 @@
+# Lints Markdown (README, docs/, wiki/, governance) + validates internal links.
+# External URLs are never fetched (no flaky network in CI).
+
+name: Docs lint
+
+on:
+  pull_request:
+    paths: ['**.md', 'wiki/**', '.markdownlint.json']
+  push:
+    branches: [main]
+    paths: ['**.md', 'wiki/**', '.markdownlint.json']
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with: { fetch-depth: 1 }
+
+      - name: markdownlint
+        run: npx -y markdownlint-cli2 "**/*.md" "wiki/**/*.md" "#node_modules"
+
+      - name: Internal link check (relative paths only)
+        run: |
+          python3 - <<'EOF'
+          import pathlib, re, sys
+          roots = [pathlib.Path('.')]
+          bad = []
+          pat = re.compile(r'\[[^\]]*\]\(([^)#\s][^)\s]*?)(#[^)]*)?\)')
+          files = [p for p in pathlib.Path('.').rglob('*.md')
+                   if '.git/' not in str(p) and 'node_modules' not in str(p)
+                   and '/assets/' not in str(p) and not str(p).startswith('frontend/node_modules')]
+          for f in files:
+              base = f.parent
+              for m in pat.finditer(f.read_text(encoding='utf-8', errors='ignore')):
+                  url = m.group(1)
+                  if re.match(r'https?://|mailto:|#|[[{]', url):
+                      continue
+                  target = (base / url).resolve()
+                  if not target.exists():
+                      bad.append(f'{f}: {url}')
+          if bad:
+              print('BROKEN INTERNAL LINKS:'); print('\n'.join(bad)); sys.exit(1)
+          print(f'OK — {len(files)} markdown files, internal links resolve.')
+          EOF
