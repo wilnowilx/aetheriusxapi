@@ -7,8 +7,10 @@ aetheriusxAPI is a crypto-native API marketplace where AI agents pay per request
 ## Base URL
 
 ```
-https://api.aetheriusx.io
+https://34-156-149-38.sslip.io/aetherapi
 ```
+
+Live playground: https://wilnowilx.github.io/aetheriusxapi/#playground
 
 ## Authentication
 

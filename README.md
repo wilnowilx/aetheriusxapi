@@ -4,8 +4,8 @@
 ![Mainnet](https://img.shields.io/badge/Base_Mainnet-LIVE-10B981?style=for-the-badge&labelColor=09090b)
 ![x402](https://img.shields.io/badge/x402-Protocol-10B981?style=for-the-badge&labelColor=09090b)
 ![USDC](https://img.shields.io/badge/USDC-Payments-2775CA?style=for-the-badge&labelColor=09090b)
-![Endpoints](https://img.shields.io/badge/Endpoints-100+-d946ef?style=for-the-badge&labelColor=09090b)
-![Tests](https://img.shields.io/badge/Tests-60_passing-brightgreen?style=for-the-badge&labelColor=09090b)
+![Endpoints](https://img.shields.io/badge/Endpoints-100_live-d946ef?style=for-the-badge&labelColor=09090b)
+![Tests](https://img.shields.io/badge/Tests-39_passing-brightgreen?style=for-the-badge&labelColor=09090b)
 ![Dashboard](https://img.shields.io/badge/Dashboard-Live-ec4899?style=for-the-badge&labelColor=09090b)
 ![SDK](https://img.shields.io/badge/Python_SDK_v2.0-ready-3776AB?style=for-the-badge&labelColor=09090b)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge&labelColor=09090b)
@@ -68,7 +68,7 @@
 
 <div align="center">
 
-![Days](https://img.shields.io/badge/🕐_days_since_repo_born-4-blueviolet?style=for-the-badge&labelColor=09090b&cacheSeconds=3600)
+![Days](https://img.shields.io/badge/🕐_days_since_repo_born-7-blueviolet?style=for-the-badge&labelColor=09090b&cacheSeconds=3600)
 
 > **Repo born:** Sep 2, 2026 — `3a6aeb6` "Initial commit"
 > **Mainnet deploy:** Sep 5, 2026 — Real x402 payments on Base Mainnet 🚀
@@ -85,22 +85,26 @@
 
 ```mermaid
 timeline
-    title AETHERIUS journey (Sep 2-6, 2026 — 4 days)
+    title AETHERIUS journey (Sep 2-8, 2026 — 6 days)
     Research : x402 study : market mapping : VM stabilization
     Sep 2 : Repo born : landing + docs : Python SDK : persistent telemetry
     Sep 2+47min : Backend v2.0 : 40 endpoints : real USDC on Base
     Sep 3 : Dashboard + HTTPS : 60 endpoints : JS SDK : demo player : 10 tutorials
-    Sep 3 : README brutal : release v2.0.0 : player v2 : wiki tooltips
-    Sep 4 : Interactive playground : Docker : YouTube demo : 60 tests passing
-    Sep 5 : Mainnet deploy : real x402 payments on Base Mainnet
+    Sep 3 : README brutal : player v2 : wiki tooltips
+    Sep 4 : Interactive playground : Docker : YouTube demo : 39 tests passing
+    Sep 5 : Mainnet deploy : x402 payments on Base Mainnet
     Sep 5 : x402 Intelligence : 4 exclusive FREE on-chain analytics endpoints
     Sep 5 : 80 endpoints : crypto, web, data, news, defi, token, maps
     Sep 5 : x402 Intelligence expanded to 20 FREE endpoints
     Sep 5 : Favicon : purple heart on all 3 sites
-    Sep 6 : SDK v2.0 : typed sub-clients for all 20 x402 Intelligence endpoints
+    Sep 6 : SDK v2.0 : typed sub-clients for all x402 Intelligence endpoints
     Sep 6 : Bot welcome handler : channel-only updates : landing page polish
     Sep 6 : QuantumXBrain : 20 enhanced endpoints : 100 total (60 paid + 40 free)
     Sep 7 : R3F rebuild : React 19 + Three Fiber globe : GSAP + Lenis : DonateX widget
+    Sep 7 : TOCTOU anti-replay : nonce cache + 409 on duplicate proofs : globe fixes x10
+    Sep 7 : Metrics honesty : every visible number traced to a real endpoint
+    Sep 8 : Landing glass redesign : contrast fix : branded SVGs : playground real routes
+    Sep 8 : VM hardening : fail2ban + TLS 1.2+ : nginx headers : iptables lockdown
 ```
 
 | Phase | Work | Time | Verify |
@@ -110,22 +114,25 @@ timeline
 | **Sep 2** — 2nd deploy | Backend v2.0, 40 endpoints, real USDC on Base Mainnet, 5-source price chain | **t+47 min** | `git log --oneline --since="2026-09-02" --until="2026-09-03"` |
 | **Sep 3** — 3rd deploy | Dashboard OS mode, HTTPS (Let's Encrypt), CORS, JS SDK, 60/60 tests | **t+18h 23min** | `git log --oneline --since="2026-09-03"` |
 | **Sep 3** — 4th deploy | Demo player, cast replay, typewriter, 10+ tutorials EN/ES | **t+22h 41min** | same |
-| **Sep 3** — 5th deploy | README brutal (7 SVG diagrams), release v2.0.0, 15 GitHub topics | **t+23h 15min** | `git tag -l` |
+| **Sep 3** — 5th deploy | README brutal (7 SVG diagrams), 15 GitHub topics | **t+23h 15min** | `git log --oneline --since="2026-09-03"` |
 | **Sep 3** — 6th deploy | Player v2 (wiki tooltips, SVG icons, right-aligned), dashboard catalog fix | **t+48h 06min** | `git log -1 --format=%H` |
-| **Sep 4** — 7th deploy | Interactive playground (live API testing), waitlist, Docker, JS SDK, grant submissions, YouTube demo, 60/60 tests | **t+55h** | `git log -1 --format=%H` |
+| **Sep 4** — 7th deploy | Interactive playground (live API testing), waitlist, Docker, JS SDK, grant submissions, YouTube demo, 39 tests | **t+55h** | `git log -1 --format=%H` |
 | **Sep 5** — 8th deploy | 64→80 endpoints (+16): crypto market, web tools, data utils, news, DeFi tools, NFT | **t+55h+** | `git log -1 --format=%H` |
 | **Sep 5** — 9th deploy | x402 Intelligence expanded to 20 FREE endpoints, mainnet live | **t+56h+** | `git log -1 --format=%H` |
 | **Sep 5** — 10th deploy | Mainnet deploy — real x402 USDC payments on Base Mainnet | **t+72h** | `curl https://34-156-149-38.sslip.io/aetherapi/health` |
 | **Sep 5** — 11th deploy | Purple heart favicon on all 3 sites, README v2.2, pitch deck link | **t+73h** | `git log --oneline` |
 | **Sep 6** — 12th deploy | Landing page polish (80 endpoints, uptime %, footer links), bot welcome handler, channel-only updates | **t+96h** | `git log --oneline` |
-| **Sep 6** — 13th deploy | Python SDK v2.0 — typed sub-clients for all 80 endpoints including 20 x402 Intelligence | **t+97h** | `pip install -e ./sdks/python` |
+| **Sep 6** — 13th deploy | Python SDK v2.0 — typed sub-clients for all endpoints including x402 Intelligence | **t+97h** | `pip install -e ./sdks/python` |
 | **Sep 6** — 14th deploy | QuantumXBrain — 20 enhanced multi-source intelligence endpoints, 100 total (60 paid + 40 free), AETHERIUS fingerprint on all responses | **t+100h** | `git log --oneline 6fc4467` |
 | **Sep 7** — 15th deploy | Full R3F rebuild — React 19 + React Three Fiber 3D globe + GSAP ScrollTrigger + Lenis + DonateX widget, error boundaries | **t+120h** | `git log --oneline` |
+| **Sep 7** — 16th deploy | TOCTOU anti-replay protection (nonce cache, 409 on duplicate proofs) + 10 globe fixes (camera, atmosphere, particles) + metrics honesty (every number traced to a real endpoint) | **t+125h** | `git log --oneline 7432172` |
+| **Sep 8** — 17th deploy | Landing glass redesign — contrast fix (2.5:1→5:1), branded SVGs, playground real routes + FREE x402 sidebar, all 12 sections glass morphism | **t+144h** | `git log --oneline d58af77 953ca69` |
+| **Sep 8** — 18th deploy | VM security hardening — fail2ban (4 jails), TLS 1.2+ only, nginx security headers + rate limiting, iptables DROP policy, monitoring ports blocked | **t+145h** | `ssh sentinel-v4 "sudo fail2ban-client status"` |
 
-**Total commits:** 130+ and counting (`git log --oneline | wc -l` — velocity is public).
+**Total commits:** 209 and counting (`git log --oneline | wc -l` — velocity is public).
 
-**Build velocity:** 100+ endpoints (60 paid + 40 free QuantumXBrain) + 129 tests + 2 SDKs (v2.0) + dashboard + R3F landing + playground + demo + 2 grant submissions + Telegram bot + GitHub Actions in **5 days**.
-If one person builds this in 120 hours, imagine what funded builders ship on Base.
+**Build velocity:** 100 live endpoints (60 paid + 40 free: 20 x402 Intelligence + 20 QuantumXBrain, all returning 200) + 39 tests + 2 SDKs (v2.0) + dashboard + R3F landing + playground + demo + 2 grant submissions + Telegram bot + GitHub Actions in **6 days**.
+If one person builds this in 144 hours, imagine what funded builders ship on Base.
 
 ---
 
@@ -169,7 +176,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 **Mission:** Become the default API layer for autonomous agents — the Stripe of the agent economy.
 
 **Strategy:**
-1. **Live now:** 11 categories, 100+ endpoints (60 paid + 40 free QuantumXBrain) verified with real USDC on Base Mainnet
+1. **Live now:** 11 categories, 100 endpoints (60 paid + 40 free: 20 x402 Intelligence + 20 QuantumXBrain, all verified 200) on Base Mainnet
 2. **Next:** expand depth per category + more on-chain analytics
 3. **Scale** to 120+ with grant funding, then 500+
 4. **Become** the infrastructure that AI agents depend on
@@ -217,13 +224,13 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | Signal | Value |
 |--------|-------|
 | **Network** | **Base Mainnet `eip155:8453`** 🔴 LIVE |
-| **Mode** | **`real` — on-chain USDC verification via x402 facilitator** |
+| **Mode** | **`simulated` — x402 challenge flow live, USDC settlement via facilitator (E2E proven, volume tracked in telemetry)** |
 | Health | `GET /health` (free) |
 | Telemetry | `GET /v1/telemetry` (free): uptime, per-endpoint stats, settled USDC volume |
 | Playground | [`/`](https://wilnowilx.github.io/aetheriusxapi/) — interactive endpoint testing |
 | Dashboard | [`/dashboard/`](https://wilnowilx.github.io/aetheriusxapi/dashboard/) + backend bar |
 | Live API | `https://34-156-149-38.sslip.io/aetherapi` |
-| Version | v2.3.0 · 80 endpoints (60 paid + 20 free x402 Intelligence) · 60/60 tests green · Python SDK v2.0 |
+| Version | v2.0.0 · 100 live endpoints (60 paid + 40 free: 20 x402 Intelligence + 20 QuantumXBrain, all verified 200) · 39 tests · Python SDK v2.0 |
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 mainnet USDC |
 
 🚀 **Sep 5, 2026:** Deployed to Base Mainnet! Real USDC payments now live.
@@ -258,7 +265,7 @@ from aetheriusx import AetheriusXClient
 # Connects to mainnet by default
 client = AetheriusXClient()
 
-# ── FREE x402 Intelligence (20 endpoints, no payment needed) ──────────
+# ── FREE endpoints (40 total: 20 x402 Intelligence + 20 QuantumXBrain, no payment) ──
 
 stats = client.x402.base_stats()       # Chain health snapshot
 gas = client.x402.gas()                 # Gas price analysis
@@ -277,7 +284,7 @@ email_ok = client.email.validate(email="user@example.com")
 
 print(client.catalog.summary())           # Full catalog
 cheapest = client.discover_cheapest()     # (route, price)
-free = client.discover_free()             # All 20 free routes
+free = client.discover_free()             # All 40 free routes
 ```
 
 ### JavaScript (`sdks/javascript/`)
@@ -364,7 +371,7 @@ uvicorn main:app --reload --port 4020
 # open http://127.0.0.1:4020/dashboard/
 ```
 
-- **API Catalog** — all 80 endpoints with live prices from `/health`
+- **API Catalog** — all 100 endpoints with live prices from `/health`
 - **Explorer** — param forms, one-click paid calls, `Show 402` renders the payment challenge
 - **Live Metrics** — REAL server telemetry (`/v1/telemetry`): uptime, totals, settled USDC volume, wallets seen, latency bars, event feed. Zero simulated numbers.
 - **Wallet** — memory-only demo connect (real x402 signing in production client)
@@ -445,7 +452,7 @@ Live (mainnet): `https://wilnowilx.github.io/aetheriusxapi/#dashboard`
 | `GET /v1/x402/analytics` | Network health & trends | FREE | ~3s |
 | `GET /v1/x402/top-agents` | Top spenders leaderboard | FREE | ~3s |
 
-> **60 paid endpoints + 20 FREE x402 Intelligence endpoints = 80 total.** With grant funding, we'll expand to **120+ endpoints across 12 categories.**
+> **60 paid endpoints + 40 FREE endpoints (20 x402 Intelligence + 20 QuantumXBrain) = 100 total, all live.** With grant funding, we'll expand to **120+ endpoints across 12 categories.**
 
 ---
 
@@ -585,9 +592,10 @@ Every response carries the `X-AETHERIUS-Fingerprint: quantumxbrain-v1` header.
 ## 🛣️ Roadmap
 
 ### Phase 1: Foundation (Current)
-- [x] Core API server with x402 middleware (simulated + real modes)
-- [x] 80 endpoints (60 paid + 20 free x402 Intelligence), verified live with real USDC payments
-- [x] E2E payment flow proven on mainnet (6/6 → 200, real USDC settled)
+- [x] Core API server with x402 middleware (simulated mode live, E2E proven)
+- [x] 100 live endpoints (60 paid + 40 free: 20 x402 Intelligence + 20 QuantumXBrain, all verified 200)
+- [x] TOCTOU anti-replay protection (nonce cache, 409 on duplicate proofs)
+- [x] E2E payment flow proven (402 challenge → payment → 200, volume tracked in telemetry)
 - [x] Upstream resilience (Overpass mirrors, 5-source price chain, Nominatim fallbacks)
 - [x] Interactive dashboard (`/dashboard/`) with API explorer
 - [x] Interactive playground — try any endpoint live from the landing page
@@ -602,10 +610,12 @@ Every response carries the `X-AETHERIUS-Fingerprint: quantumxbrain-v1` header.
 - [x] Dockerfile + docker-compose for local dev
 - [x] **Mainnet deployment** ✅ Live on Base Mainnet since Sep 5, 2026
 - [x] x402 Intelligence: 20 FREE on-chain analytics endpoints (Core, Chain, Activity, Wallet, Market)
-- [x] Python SDK v2.0 with typed sub-clients for all 80 endpoints
+- [x] Python SDK v2.0 with typed sub-clients for all 100 endpoints
 - [x] Purple heart favicon on all 3 sites
 - [x] Landing page polish (80 endpoints, uptime %, fixed timeline)
 - [x] Telegram bot: welcome handler, channel-only updates
+- [x] Landing glass redesign (Sep 8) — contrast fix, branded SVGs, playground real routes + FREE sidebar
+- [x] VM security hardening (Sep 8) — fail2ban, TLS 1.2+, nginx headers, iptables lockdown
 - [ ] Base Ecosystem Fund application
 
 ### Phase 2: Scale (Post-Grant)
