@@ -5,6 +5,8 @@
 
 ## [Unreleased]
 
+- Interactive Instruments landing section (cost calculator from live `/health`
+  prices, wallet-intel explorer, staged live 402→200 loop visualizer).
 - Wiki as source of truth (`wiki/` + sync Action, ADRs, runbooks).
 - Institutional governance: `SECURITY.md`, `CODEOWNERS`, issue/PR templates,
   docs lint CI, `CITATION.md`.

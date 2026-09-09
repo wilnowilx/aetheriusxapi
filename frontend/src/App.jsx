@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import Hero from './components/Hero'
+import Instruments from './components/Instruments'
 import { useScrollAnimations } from './hooks/useScrollAnimations'
 import { useSmoothScroll } from './hooks/useSmoothScroll'
 
@@ -1116,6 +1117,7 @@ function App() {
         <Hero />
       </SectionBoundary>
       <SectionBoundary><Playground /></SectionBoundary>
+      <SectionBoundary><Instruments /></SectionBoundary>
       <SectionBoundary><Categories /></SectionBoundary>
       <SectionBoundary><X402Intelligence /></SectionBoundary>
       <SectionBoundary><HowItWorks /></SectionBoundary>
