@@ -104,7 +104,7 @@ timeline
     Sep 7 : TOCTOU anti-replay : nonce cache + 409 on duplicate proofs : globe fixes x10
     Sep 7 : Metrics honesty : every visible number traced to a real endpoint
     Sep 8 : Landing glass redesign : contrast fix : branded SVGs : playground real routes
-    Sep 8 : VM hardening : fail2ban + TLS 1.2+ : nginx headers : iptables lockdown
+    Sep 8 : VM hardening : hardened perimeter : TLS lockdown : firewall
 ```
 
 | Phase | Work | Time | Verify |
@@ -127,7 +127,7 @@ timeline
 | **Sep 7** — 15th deploy | Full R3F rebuild — React 19 + React Three Fiber 3D globe + GSAP ScrollTrigger + Lenis + DonateX widget, error boundaries | **t+120h** | `git log --oneline` |
 | **Sep 7** — 16th deploy | TOCTOU anti-replay protection (nonce cache, 409 on duplicate proofs) + 10 globe fixes (camera, atmosphere, particles) + metrics honesty (every number traced to a real endpoint) | **t+125h** | `git log --oneline 7432172` |
 | **Sep 8** — 17th deploy | Landing glass redesign — contrast fix (2.5:1→5:1), branded SVGs, playground real routes + FREE x402 sidebar, all 12 sections glass morphism | **t+144h** | `git log --oneline d58af77 953ca69` |
-| **Sep 8** — 18th deploy | VM security hardening — fail2ban (4 jails), TLS 1.2+ only, nginx security headers + rate limiting, iptables DROP policy, monitoring ports blocked | **t+145h** | `ssh sentinel-v4 "sudo fail2ban-client status"` |
+| **Sep 8** — 18th deploy | VM security hardening — hardened perimeter (IDS, TLS lockdown, firewall, rate limiting) | **t+145h** | `curl https://34-156-149-38.sslip.io/aetherapi/health` |
 
 **Total commits:** 209 and counting (`git log --oneline | wc -l` — velocity is public).
 
@@ -245,7 +245,7 @@ What you see is exactly what a paying client gets.
 
 **[▶ Watch the demo](https://youtu.be/TDzMALSe00A)** · [interactive player](https://wilnowilx.github.io/aetheriusxapi/docs/demo/player.html)
 
-The replay shows the full x402 loop — discovery, payment challenge, settlement, data. No cuts, no simulated responses, no fake data. Every response is a real endpoint on mainnet. The telemetry you see on the dashboard updates live.
+The replay shows the full x402 loop against live mainnet endpoints — discovery, payment challenge, settlement, data. No cuts. The telemetry you see on the dashboard updates live.
 
 **[Dashboard](https://wilnowilx.github.io/aetheriusxapi/dashboard/)** · [raw .cast](https://wilnowilx.github.io/aetheriusxapi/docs/demo/take-1.cast) · [script](docs/demo/demo_90s.py)
 
@@ -615,7 +615,7 @@ Every response carries the `X-AETHERIUS-Fingerprint: quantumxbrain-v1` header.
 - [x] Landing page polish (80 endpoints, uptime %, fixed timeline)
 - [x] Telegram bot: welcome handler, channel-only updates
 - [x] Landing glass redesign (Sep 8) — contrast fix, branded SVGs, playground real routes + FREE sidebar
-- [x] VM security hardening (Sep 8) — fail2ban, TLS 1.2+, nginx headers, iptables lockdown
+- [x] VM security hardening (Sep 8) — hardened perimeter (IDS, TLS, firewall)
 - [ ] Base Ecosystem Fund application
 
 ### Phase 2: Scale (Post-Grant)
