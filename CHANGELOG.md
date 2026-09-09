@@ -5,6 +5,9 @@
 
 ## [Unreleased]
 
+- **First real settlement (Sepolia staging):** official 402 → EIP-3009 sign →
+  200, $0.001 USDC settled on-chain (payer 20→19.999), volume tracked in
+  telemetry. Proof: `tools/real_payment_probe.py --pay` v2 PASS.
 - Interactive Instruments landing section (cost calculator from live `/health`
   prices, wallet-intel explorer, staged live 402→200 loop visualizer).
 - Wiki as source of truth (`wiki/` + sync Action, ADRs, runbooks).
