@@ -82,11 +82,13 @@ function Nav() {
 function PlasmaBg() {
   return (
     <div className="plasma-bg">
-      <div className="plasma-blob" style={{ width: 700, height: 700, background: 'radial-gradient(circle, rgba(168,85,247,0.55) 0%, transparent 70%)', top: '-10%', left: '-5%', animationDuration: '16s' }} />
-      <div className="plasma-blob" style={{ width: 580, height: 580, background: 'radial-gradient(circle, rgba(217,70,239,0.48) 0%, transparent 70%)', top: '30%', right: '-10%', animationDuration: '13s', animationDelay: '-5s' }} />
-      <div className="plasma-blob" style={{ width: 520, height: 520, background: 'radial-gradient(circle, rgba(236,72,153,0.42) 0%, transparent 70%)', bottom: '-5%', left: '20%', animationDuration: '15s', animationDelay: '-10s' }} />
-      <div className="plasma-blob" style={{ width: 460, height: 460, background: 'radial-gradient(circle, rgba(6,182,212,0.34) 0%, transparent 70%)', top: '60%', left: '50%', animationDuration: '12s', animationDelay: '-3s' }} />
-      <div className="plasma-blob" style={{ width: 400, height: 400, background: 'radial-gradient(circle, rgba(168,85,247,0.34) 0%, transparent 70%)', top: '10%', left: '40%', animationDuration: '17s', animationDelay: '-8s' }} />
+      <div className="plasma-blob" style={{ width: 760, height: 760, background: 'radial-gradient(circle, rgba(168,85,247,0.68) 0%, transparent 70%)', top: '-12%', left: '-6%', animationDuration: '16s' }} />
+      <div className="plasma-blob" style={{ width: 640, height: 640, background: 'radial-gradient(circle, rgba(217,70,239,0.6) 0%, transparent 70%)', top: '28%', right: '-12%', animationDuration: '13s', animationDelay: '-5s' }} />
+      <div className="plasma-blob" style={{ width: 580, height: 580, background: 'radial-gradient(circle, rgba(236,72,153,0.54) 0%, transparent 70%)', bottom: '-6%', left: '18%', animationDuration: '15s', animationDelay: '-10s' }} />
+      <div className="plasma-blob" style={{ width: 520, height: 520, background: 'radial-gradient(circle, rgba(6,182,212,0.44) 0%, transparent 70%)', top: '58%', left: '52%', animationDuration: '12s', animationDelay: '-3s' }} />
+      <div className="plasma-blob" style={{ width: 460, height: 460, background: 'radial-gradient(circle, rgba(168,85,247,0.44) 0%, transparent 70%)', top: '8%', left: '42%', animationDuration: '17s', animationDelay: '-8s' }} />
+      <div className="plasma-blob" style={{ width: 500, height: 500, background: 'radial-gradient(circle, rgba(232,121,249,0.4) 0%, transparent 70%)', top: '45%', right: '5%', animationDuration: '14s', animationDelay: '-6s' }} />
+      <div className="grain-overlay" />
       <style>{`
         @keyframes plasmaFloat {
           0% { transform: translate(0, 0) scale(1) rotate(0deg); }
