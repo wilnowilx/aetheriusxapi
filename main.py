@@ -499,6 +499,128 @@ if os.path.isdir(os.path.join(os.path.dirname(__file__), "donatex")):
               name="donatex")
 
 
+# === MCP SSE — Public discovery endpoint for Bazaar ===
+import json as _json
+import asyncio as _asyncio
+from fastapi.responses import StreamingResponse as _SR
+
+_MCP_TOOLS = [
+    {"name": "base_stats", "description": "Base Mainnet health: block, gas, chain ID, RPC status."},
+    {"name": "gas", "description": "Gas price analysis + cost estimates on Base."},
+    {"name": "market_pulse", "description": "Real-time Base market conditions + bullish/bearish signal."},
+    {"name": "sentiment", "description": "Fear & Greed + BTC trend + composite sentiment score."},
+    {"name": "network", "description": "Full Base network health dashboard."},
+    {"name": "whales", "description": "Large USDC transfers over a threshold."},
+    {"name": "stablecoins", "description": "Stablecoin activity: USDC/USDT/DAI flows on Base."},
+    {"name": "analytics", "description": "Network analytics: volume, trends, transfer stats."},
+    {"name": "telemetry", "description": "Live AETHERIUS platform telemetry."},
+    {"name": "health", "description": "Agent health check: wallet, chain, facilitator status."},
+]
+
+_mcp_sessions: dict[str, list] = {}  # session_id → pending responses
+
+
+@app.get("/mcp/sse", tags=["mcp"])
+async def mcp_sse(request: Request):
+    """MCP SSE discovery endpoint. Bazaar connects here."""
+    import uuid
+    sid = str(uuid.uuid4())[:12]
+    _mcp_sessions[sid] = []
+
+    async def stream():
+        # Send endpoint URL for client to POST messages
+        yield f"event: endpoint\ndata: /mcp/messages?session={sid}\n\n"
+        # Keep alive and forward responses
+        try:
+            while True:
+                if _mcp_sessions.get(sid):
+                    msg = _mcp_sessions[sid].pop(0)
+                    yield f"data: {_json.dumps(msg)}\n\n"
+                await _asyncio.sleep(0.1)
+        except _asyncio.CancelledError:
+            _mcp_sessions.pop(sid, None)
+
+    return _SR(stream(), media_type="text/event-stream",
+               headers={"Cache-Control": "no-cache", "X-AETHERIUS-MCP": "1.0"})
+
+
+@app.post("/mcp/messages", tags=["mcp"])
+async def mcp_messages(request: Request):
+    """MCP message handler. Processes JSON-RPC from Bazaar agents."""
+    body = await request.json()
+    method = body.get("method", "")
+    req_id = body.get("id")
+    resp = {"jsonrpc": "2.0", "id": req_id}
+
+    if method == "initialize":
+        resp["result"] = {
+            "protocolVersion": "2025-03-26",
+            "capabilities": {"tools": {"listChanged": False}},
+            "serverInfo": {"name": "aetherius", "version": "1.0.0"},
+        }
+    elif method == "tools/list":
+        resp["result"] = {"tools": _MCP_TOOLS}
+    elif method == "tools/call":
+        args = body.get("params", {})
+        tool_name = args.get("name", "")
+        tool_args = args.get("arguments", {})
+        # For MCP tool calls, invoke the actual route handlers directly
+        # (avoids self-referential HTTP call which can deadlock)
+        try:
+            if tool_name == "telemetry":
+                data = _json.dumps(tracker.snapshot())[:8000]
+            elif tool_name == "health":
+                data = _json.dumps({
+                    "status": "alive", "service": "aetheriusxAPI",
+                    "version": "2.0.0", "mode": X402_MODE,
+                    "network": NETWORK, "currency": CURRENCY, "wallet": PAY_TO,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                })[:8000]
+            else:
+                # For external-facing tools, fetch from upstream APIs directly
+                import urllib.request as _ureq
+                _upstream = {
+                    "base_stats": "https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&tag=latest&apikey=YourApiKeyToken",
+                    "gas": "https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=YourApiKeyToken",
+                    "market_pulse": "https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin&vs_currencies=usd&include_24hr_change=true",
+                    "sentiment": "https://api.alternative.me/fng/",
+                    "network": "https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&tag=latest&apikey=YourApiKeyToken",
+                    "whales": "https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48&sort=desc&apikey=YourApiKeyToken",
+                    "stablecoins": "https://stablecoins.llama.fi/stablecoins?includePrices=true",
+                    "analytics": "https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&tag=latest&apikey=YourApiKeyToken",
+                }
+                upstream_url = _upstream.get(tool_name)
+                if upstream_url:
+                    r = _ureq.urlopen(_ureq.Request(upstream_url, headers={"User-Agent": "aetherius-mcp/1.0"}), timeout=15)
+                    data = r.read().decode()[:8000]
+                else:
+                    data = _json.dumps({"error": f"Unknown tool: {tool_name}"})
+            resp["result"] = {"content": [{"type": "text", "text": data}]}
+        except Exception as e:
+            resp["result"] = {"content": [{"type": "text", "text": str(e)}], "isError": True}
+    elif method == "notifications/initialized":
+        # Client ack, no response needed
+        return JSONResponse({"ok": True})
+    else:
+        resp["error"] = {"code": -32601, "message": f"Unknown method: {method}"}
+
+    # Queue response for SSE stream
+    from starlette.requests import Request as _Req
+    session = request.query_params.get("session", "")
+    if session in _mcp_sessions:
+        _mcp_sessions[session].append(resp)
+    return JSONResponse(resp)
+
+
+@app.get("/mcp/health", tags=["mcp"])
+async def mcp_health():
+    """MCP server health check for Bazaar discovery."""
+    return JSONResponse({
+        "status": "ok", "server": "aetherius-mcp", "version": "1.0.0",
+        "tools": len(_MCP_TOOLS), "sse": "/mcp/sse", "messages": "/mcp/messages",
+    })
+
+
 # === MAPS (OpenStreetMap: Nominatim + Overpass, no key) ===
 
 async def _geocode(client: httpx.AsyncClient, location: str):
