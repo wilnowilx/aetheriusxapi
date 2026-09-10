@@ -210,7 +210,7 @@ function Playground() {
           backdropFilter: 'blur(20px)',
         }}>
           {/* Sidebar */}
-          <div style={{ background: 'rgba(255,255,255,0.015)', borderRight: '1px solid rgba(255,255,255,0.04)', padding: 16, overflowY: 'auto', maxHeight: 500 }}>
+          <div className="noscroll" style={{ background: 'rgba(255,255,255,0.015)', borderRight: '1px solid rgba(255,255,255,0.04)', padding: 16, overflowY: 'auto', maxHeight: 500 }}>
             {playgroundEndpoints.map(group => (
               <div key={group.cat} style={{ marginBottom: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: '0.72rem', fontWeight: 700, color: group.free ? 'var(--green)' : 'var(--purple-light)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
@@ -271,7 +271,7 @@ function Playground() {
                 {status && <span style={{ fontFamily: 'JetBrains Mono, monospace', padding: '2px 8px', borderRadius: 4, background: status.startsWith('2') ? 'rgba(16,185,129,0.12)' : status.startsWith('4') ? 'rgba(245,158,11,0.12)' : 'rgba(236,72,153,0.12)', color: status.startsWith('2') ? 'var(--green)' : status.startsWith('4') ? 'var(--orange)' : 'var(--pink)' }}>{status}</span>}
                 {time && <span style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-sec)' }}>{time}</span>}
               </div>
-              <div style={{ flex: 1, padding: 20, fontFamily: 'JetBrains Mono, monospace', fontSize: '0.82rem', lineHeight: 1.6, color: 'var(--text)', overflowY: 'auto', maxHeight: 300, background: 'rgba(0,0,0,0.1)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+              <div className="noscroll" style={{ flex: 1, padding: 20, fontFamily: 'JetBrains Mono, monospace', fontSize: '0.82rem', lineHeight: 1.6, color: 'var(--text)', overflowY: 'auto', maxHeight: 300, background: 'rgba(0,0,0,0.1)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                 {loading ? <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Loading...</span> :
                  response || <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Click "Send" to make a request...</span>}
               </div>

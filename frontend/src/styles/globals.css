@@ -362,3 +362,16 @@ canvas {
   background: transparent !important;
   display: block;
 }
+
+/* Invisible-but-functional scrollbars for inner panels.
+   Page-level scrolling keeps its native scrollbar; only section
+   interiors (sidebars, response consoles, data panels) go chromeless. */
+.noscroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.noscroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}

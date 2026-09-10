@@ -180,11 +180,11 @@ function FlowExplorer() {
                 <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>{STAGE_COPY[selected].title}</h3>
               </div>
               <p style={{ color: 'var(--text-sec)', fontSize: '0.85rem', lineHeight: 1.6, marginBottom: 16 }}>{STAGE_COPY[selected].desc}</p>
-              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem', lineHeight: 1.6, color: 'var(--text-sec)', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 10, padding: '12px 14px', maxHeight: 170, overflowY: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-word', marginBottom: 14 }}>
+              <div className="noscroll" style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem', lineHeight: 1.6, color: 'var(--text-sec)', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 10, padding: '12px 14px', maxHeight: 170, overflowY: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-word', marginBottom: 14 }}>
                 {loading ? <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Loading live data…</span> : stageData}
               </div>
               {log.length > 0 && (
-                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem', lineHeight: 1.7, color: 'var(--text)', background: 'rgba(168,85,247,0.05)', border: '1px solid rgba(168,85,247,0.15)', borderRadius: 10, padding: '12px 14px', maxHeight: 130, overflowY: 'auto', marginBottom: 14 }}>
+                <div className="noscroll" style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem', lineHeight: 1.7, color: 'var(--text)', background: 'rgba(168,85,247,0.05)', border: '1px solid rgba(168,85,247,0.15)', borderRadius: 10, padding: '12px 14px', maxHeight: 130, overflowY: 'auto', marginBottom: 14 }}>
                   {log.map((l, i) => <div key={i}>{l}</div>)}
                 </div>
               )}

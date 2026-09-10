@@ -55,7 +55,7 @@ function CostCalculator() {
       </p>
       {err ? <div style={{ color: 'var(--pink)', fontSize: '0.85rem' }}>{err}</div> : (
         <>
-          <div style={{ maxHeight: 180, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 20 }}>
+          <div className="noscroll" style={{ maxHeight: 180, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 20 }}>
             {routes.map(r => (
               <label key={r.path} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.8rem', cursor: 'pointer', padding: '6px 10px', borderRadius: 8, background: selected[r.path] ? 'rgba(168,85,247,0.08)' : 'transparent' }}>
                 <input type="checkbox" checked={!!selected[r.path]} onChange={() => toggle(r.path)} style={{ accentColor: 'var(--purple)' }} />
@@ -155,7 +155,7 @@ function WalletExplorer() {
             ))}
           </div>
         ) : (
-          <pre style={{ fontSize: '0.72rem', color: 'var(--text-sec)', whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: 220, overflowY: 'auto' }}>{JSON.stringify(data, null, 2)}</pre>
+          <pre className="noscroll" style={{ fontSize: '0.72rem', color: 'var(--text-sec)', whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: 220, overflowY: 'auto' }}>{JSON.stringify(data, null, 2)}</pre>
         )
       )}
     </div>
