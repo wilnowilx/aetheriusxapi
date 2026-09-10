@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import Hero from './components/Hero'
 import Instruments from './components/Instruments'
+import FlowExplorer from './components/FlowExplorer'
 import { useScrollAnimations } from './hooks/useScrollAnimations'
 import { useSmoothScroll } from './hooks/useSmoothScroll'
 
@@ -1118,6 +1119,7 @@ function App() {
       </SectionBoundary>
       <SectionBoundary><Playground /></SectionBoundary>
       <SectionBoundary><Instruments /></SectionBoundary>
+      <SectionBoundary><FlowExplorer /></SectionBoundary>
       <SectionBoundary><Categories /></SectionBoundary>
       <SectionBoundary><X402Intelligence /></SectionBoundary>
       <SectionBoundary><HowItWorks /></SectionBoundary>
