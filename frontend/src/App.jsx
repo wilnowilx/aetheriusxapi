@@ -1104,6 +1104,56 @@ class SectionBoundary extends React.Component {
   }
 }
 
+// === DOT NAV (restored slide traction — IO highlight, click to glide) ===
+const DOT_SECTIONS = [
+  ['hero', 'Intro'], ['playground', 'Playground'], ['flow', 'Flow'],
+  ['categories', 'APIs'], ['docs', 'Docs'], ['cta', 'Start'],
+]
+
+function DotNav() {
+  const [active, setActive] = useState('hero')
+
+  useEffect(() => {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id) })
+    }, { rootMargin: '-38% 0px -55% 0px' })
+    DOT_SECTIONS.forEach(([id]) => {
+      const el = document.getElementById(id)
+      if (el) obs.observe(el)
+    })
+    return () => obs.disconnect()
+  }, [])
+
+  const go = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+
+  return (
+    <div className="dot-nav" aria-hidden="true">
+      {DOT_SECTIONS.map(([id, label]) => (
+        <button key={id} title={label} onClick={() => go(id)}
+          className={active === id ? 'dot active' : 'dot'} />
+      ))}
+      <style>{`
+        .dot-nav {
+          position: fixed; right: 22px; top: 50%; transform: translateY(-50%);
+          display: flex; flex-direction: column; gap: 12px; z-index: 900;
+        }
+        .dot-nav .dot {
+          width: 8px; height: 8px; border-radius: 50%;
+          background: rgba(255,255,255,0.18); border: none; cursor: pointer;
+          padding: 0; transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+        .dot-nav .dot:hover { background: rgba(192,132,252,0.7); transform: scale(1.3); }
+        .dot-nav .dot.active {
+          background: var(--magenta-light);
+          box-shadow: 0 0 10px var(--magenta), 0 0 20px rgba(217,70,239,0.4);
+          transform: scale(1.35);
+        }
+        @media (max-width: 1100px) { .dot-nav { display: none; } }
+      `}</style>
+    </div>
+  )
+}
+
 // === APP ===
 function App() {
   const appRef = useRef(null)
@@ -1136,6 +1186,7 @@ function App() {
       <SectionBoundary><TrustedBy /></SectionBoundary>
       <SectionBoundary><DonateX /></SectionBoundary>
       <Footer />
+      <DotNav />
     </div>
   )
 }

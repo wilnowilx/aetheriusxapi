@@ -45,9 +45,14 @@ function makeGlowTexture(color) {
   return new THREE.CanvasTexture(canvas)
 }
 
-// === NODES ===
+// === NODES — one distinct form per stage (x402/Base-inspired) ===
+// Agent: octahedron (autonomous facets) · Challenge: toll ring (the 402 gate)
+// Sign: torus knot (cryptographic binding) · Settle: compressing discs
+// (Base layers reaching finality) · Data: packet cube with bright core
 function FlowNodes({ flow, selected, onSelect }) {
   const groupRefs = useRef([])
+  const spinRefs = useRef([])
+  const glowRefs = useRef([])
   const ringRef = useRef()
   const labels = useMemo(() => STAGES.map(s => makeLabelTexture(s.label, s.color)), [])
   const glows = useMemo(() => STAGES.map(s => makeGlowTexture(s.color)), [])
@@ -65,6 +70,16 @@ function FlowNodes({ flow, selected, onSelect }) {
       const cur = g.scale.x + (target - g.scale.x) * Math.min(1, delta * 10)
       g.position.set(tmp[0], tmp[1] + Math.sin(t * 0.9 + i * 2.0) * 0.12, tmp[2])
       g.scale.setScalar(cur)
+      const sp = spinRefs.current[i]
+      if (sp) {
+        if (i === 0) sp.rotation.y = t * 0.5
+        else if (i === 1) sp.rotation.x = t * 0.7
+        else if (i === 2) { sp.rotation.x = t * 0.4; sp.rotation.y = t * 0.55; sp.scale.setScalar(1 + Math.sin(t * 2.2) * 0.06) }
+        else if (i === 3) { sp.rotation.y = t * 0.9; sp.position.y = Math.sin(t * 1.8) * 0.07 }
+        else { sp.rotation.y = -t * 0.5; sp.rotation.x = t * 0.2 }
+      }
+      const gm = glowRefs.current[i]
+      if (gm) gm.opacity = selected === i ? 0.95 : 0.5 + Math.sin(t * 1.6 + i) * 0.08
     })
     if (ringRef.current) {
       ringRef.current.rotation.z = t * 0.8
@@ -77,28 +92,52 @@ function FlowNodes({ flow, selected, onSelect }) {
     }
   })
 
+  const hit = (i) => ({
+    onClick: (ev) => { ev.stopPropagation(); onSelect(i) },
+    onPointerOver: (ev) => { ev.stopPropagation(); flow.hover = i; document.body.style.cursor = 'pointer' },
+    onPointerOut: () => { flow.hover = -1; document.body.style.cursor = 'auto' },
+  })
+
   return (
     <group>
       {STAGES.map((s, i) => (
         <group key={s.id} ref={el => { groupRefs.current[i] = el }}>
           <sprite scale={[3.2, 3.2, 1]}>
-            <spriteMaterial map={glows[i]} transparent blending={THREE.AdditiveBlending} depthWrite={false} opacity={0.55} />
+            <spriteMaterial ref={el => { glowRefs.current[i] = el }} map={glows[i]} transparent blending={THREE.AdditiveBlending} depthWrite={false} opacity={0.55} />
           </sprite>
-          <mesh onClick={(ev) => { ev.stopPropagation(); onSelect(i) }} onPointerOver={(ev) => { ev.stopPropagation(); flow.hover = i; document.body.style.cursor = 'pointer' }} onPointerOut={() => { flow.hover = -1; document.body.style.cursor = 'auto' }}>
-            <icosahedronGeometry args={[0.55, 1]} />
-            <meshBasicMaterial color={s.color} wireframe transparent opacity={0.85} />
-          </mesh>
-          <mesh>
-            <icosahedronGeometry args={[0.3, 1]} />
-            <meshBasicMaterial color={s.color} transparent opacity={0.9} />
-          </mesh>
-          <sprite position={[0, 1.15, 0]} scale={[2.6, 0.65, 1]}>
+          <group ref={el => { spinRefs.current[i] = el }} {...hit(i)}>
+            {i === 0 && (<>
+              <mesh><octahedronGeometry args={[0.62, 0]} /><meshBasicMaterial color={s.color} wireframe transparent opacity={0.85} /></mesh>
+              <mesh><octahedronGeometry args={[0.3, 0]} /><meshBasicMaterial color={s.color} transparent opacity={0.9} /></mesh>
+            </>)}
+            {i === 1 && (<>
+              <mesh><torusGeometry args={[0.55, 0.15, 12, 40]} /><meshBasicMaterial color={s.color} wireframe transparent opacity={0.8} /></mesh>
+              <mesh><sphereGeometry args={[0.16, 16, 16]} /><meshBasicMaterial color={s.color} transparent opacity={0.95} /></mesh>
+            </>)}
+            {i === 2 && (<>
+              <mesh><torusKnotGeometry args={[0.4, 0.13, 80, 12]} /><meshBasicMaterial color={s.color} wireframe transparent opacity={0.75} /></mesh>
+              <mesh><sphereGeometry args={[0.17, 16, 16]} /><meshBasicMaterial color={s.color} transparent opacity={0.95} /></mesh>
+            </>)}
+            {i === 3 && (<>
+              {[-0.24, 0, 0.24].map((y, k) => (
+                <mesh key={k} position={[0, y, 0]}>
+                  <cylinderGeometry args={[0.52 - k * 0.04, 0.52 - k * 0.04, 0.1, 28]} />
+                  <meshBasicMaterial color={s.color} wireframe={k !== 1} transparent opacity={k === 1 ? 0.9 : 0.7} />
+                </mesh>
+              ))}
+            </>)}
+            {i === 4 && (<>
+              <mesh><boxGeometry args={[0.62, 0.62, 0.62]} /><meshBasicMaterial color={s.color} wireframe transparent opacity={0.85} /></mesh>
+              <mesh><boxGeometry args={[0.28, 0.28, 0.28]} /><meshBasicMaterial color={0xffffff} transparent opacity={0.9} /></mesh>
+            </>)}
+          </group>
+          <sprite position={[0, 1.2, 0]} scale={[2.6, 0.65, 1]}>
             <spriteMaterial map={labels[i]} transparent depthWrite={false} opacity={0.95} />
           </sprite>
         </group>
       ))}
       <mesh ref={ringRef} visible={false}>
-        <torusGeometry args={[0.95, 0.03, 8, 64]} />
+        <torusGeometry args={[1.0, 0.03, 8, 64]} />
         <meshBasicMaterial color={0xffffff} transparent opacity={0.7} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
     </group>

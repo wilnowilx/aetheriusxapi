@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 // Lazy: three.js (~700KB) loads AFTER first paint, never blocks the page
 const GlobeScene = React.lazy(() => import('./GlobeScene'))
@@ -225,6 +227,22 @@ function Hero() {
     return () => clearInterval(interval)
   }, [])
 
+  // Hero exit parallax — slides the hero up and away on first scroll.
+  // .to() from natural state only: if ScrollTrigger misfires, content stays visible.
+  useEffect(() => {
+    let tween
+    try {
+      gsap.registerPlugin(ScrollTrigger)
+      tween = gsap.to('#hero .hero-fade', {
+        y: -90, opacity: 0.15, ease: 'none',
+        scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom 35%', scrub: 0.6 },
+      })
+    } catch { /* parallax is decoration — never break the hero */ }
+    return () => {
+      try { tween && tween.scrollTrigger && tween.scrollTrigger.kill(); tween && tween.kill() } catch {}
+    }
+  }, [])
+
   return (
     <section id="hero" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', position: 'relative', overflow: 'visible', paddingTop: '120px', isolation: 'isolate', zIndex: 0 }}>
       <AmbientParticles />
@@ -241,7 +259,7 @@ function Hero() {
           </div>
         </div>
 
-        <h1 className="section-title" style={{ textAlign: 'center', position: 'relative', zIndex: 3, pointerEvents: 'none', margin: '0 0 8px' }}>
+        <h1 className="section-title hero-fade" style={{ textAlign: 'center', position: 'relative', zIndex: 3, pointerEvents: 'none', margin: '0 0 8px' }}>
           <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0' }}>
             <span style={{
               fontSize: 'clamp(0.9rem, 1.8vw, 1.4rem)',
@@ -264,7 +282,7 @@ function Hero() {
         </h1>
 
         {/* Row: sub + actions + stats (left) / globe (right) */}
-        <div className="hero-row" style={{ display: 'flex', alignItems: 'center', gap: '24px', marginTop: '-20px' }}>
+        <div className="hero-row hero-fade" style={{ display: 'flex', alignItems: 'center', gap: '24px', marginTop: '-20px' }}>
         <div style={{ flex: '1 1 38%', zIndex: 2 }}>
           <p className="section-desc" style={{ marginBottom: '28px', fontSize: '1.1rem', lineHeight: 1.7 }}>
             100+ live APIs your agents can pay for in USDC on Base. 40 FREE QuantumXBrain intelligence endpoints.
@@ -389,6 +407,19 @@ function Hero() {
         </div>
       </div>
 
+      {/* Scroll cue — first slide transition into the playground */}
+      <div className="hero-cue" role="button" tabIndex={0}
+        onClick={() => document.getElementById('playground')?.scrollIntoView({ behavior: 'smooth' })}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') document.getElementById('playground')?.scrollIntoView({ behavior: 'smooth' }) }}
+        style={{
+          position: 'absolute', bottom: 26, left: '50%', transform: 'translateX(-50%)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+          cursor: 'pointer', zIndex: 5,
+        }}>
+        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.62rem', letterSpacing: '0.32em', color: 'var(--text-muted)' }}>SCROLL</span>
+        <svg className="cue-chev" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--purple-light)" strokeWidth="1.5"><path d="M6 9l6 6 6-6" strokeLinejoin="round" strokeLinecap="round"/></svg>
+      </div>
+
       <style>{`
         @keyframes globeGlow {
           0% { opacity: 0.5; transform: scale(0.9); }
@@ -407,6 +438,12 @@ function Hero() {
         .hero-terminal:hover {
           border-color: rgba(168,85,247,0.45) !important;
           box-shadow: 0 0 20px rgba(168,85,247,0.15);
+        }
+        .hero-cue { animation: none; }
+        .hero-cue .cue-chev { animation: cueDrop 1.8s ease-in-out infinite; }
+        @keyframes cueDrop {
+          0%, 100% { transform: translateY(0); opacity: 0.35; }
+          50% { transform: translateY(9px); opacity: 1; }
         }
         @media (max-width: 768px) {
           #hero .hero-row { flex-direction: column !important; gap: 24px !important; margin-top: -10px !important; }
