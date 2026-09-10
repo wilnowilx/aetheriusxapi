@@ -1,0 +1,96 @@
+{
+  "name": "aetherius",
+  "version": "1.0.0",
+  "description": "AETHERIUS x402 Intelligence — Base network data for AI agents. Pay per request in USDC.",
+  "homepage": "https://wilnowilx.github.io/aetheriusxapi/",
+  "repository": "https://github.com/wilnowilx/aetheriusxapi",
+  "mcp": {
+    "sse": "https://34-156-149-38.sslip.io/aetherapi/mcp/sse",
+    "messages": "https://34-156-149-38.sslip.io/aetherapi/mcp/messages",
+    "health": "https://34-156-149-38.sslip.io/aetherapi/mcp/health"
+  },
+  "payment": {
+    "protocol": "x402",
+    "network": "eip155:8453",
+    "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "assetSymbol": "USDC",
+    "merchant": "0x677B483128D0399bCD0A5AB36eE990C0246d7f61",
+    "facilitator": "CDP"
+  },
+  "tools": [
+    {
+      "name": "base_stats",
+      "description": "Base Mainnet health: block, gas, chain ID, RPC status.",
+      "price": "free",
+      "category": "network"
+    },
+    {
+      "name": "gas",
+      "description": "Gas price analysis + cost estimates on Base.",
+      "price": "free",
+      "category": "network"
+    },
+    {
+      "name": "market_pulse",
+      "description": "Real-time Base market conditions + bullish/bearish signal.",
+      "price": "free",
+      "category": "market"
+    },
+    {
+      "name": "sentiment",
+      "description": "Fear & Greed + BTC trend + composite sentiment score.",
+      "price": "free",
+      "category": "market"
+    },
+    {
+      "name": "network",
+      "description": "Full Base network health dashboard.",
+      "price": "free",
+      "category": "network"
+    },
+    {
+      "name": "whales",
+      "description": "Large USDC transfers over a threshold.",
+      "price": "free",
+      "category": "intelligence"
+    },
+    {
+      "name": "stablecoins",
+      "description": "Stablecoin activity: USDC/USDT/DAI flows on Base.",
+      "price": "free",
+      "category": "market"
+    },
+    {
+      "name": "analytics",
+      "description": "Network analytics: volume, trends, transfer stats.",
+      "price": "free",
+      "category": "analytics"
+    },
+    {
+      "name": "telemetry",
+      "description": "Live AETHERIUS platform telemetry.",
+      "price": "free",
+      "category": "platform"
+    },
+    {
+      "name": "health",
+      "description": "Agent health check: wallet, chain, facilitator status.",
+      "price": "free",
+      "category": "platform"
+    }
+  ],
+  "paidRoutes": [
+    {
+      "path": "/v1/data/uuid",
+      "description": "UUID v4 generator (canary — first paid route)",
+      "price": "0.001 USDC",
+      "category": "data"
+    }
+  ],
+  "discovery": {
+    "protocol": "mcp",
+    "transport": "sse",
+    "authentication": "x402-payment",
+    "declaredAt": "2026-09-10T09:05:00Z"
+  }
+}

@@ -621,6 +621,23 @@ async def mcp_health():
     })
 
 
+@app.get("/mcp/discovery", tags=["mcp"])
+async def mcp_discovery():
+    """Bazaar discovery manifest — declares tools, payment, and MCP endpoints."""
+    import pathlib
+    manifest_path = pathlib.Path(__file__).parent / "tools" / "mcp" / "bazaar-discovery.json"
+    try:
+        data = _json.loads(manifest_path.read_text())
+        return JSONResponse(data)
+    except Exception:
+        return JSONResponse({
+            "name": "aetherius", "version": "1.0.0",
+            "mcp": {"sse": "/mcp/sse", "messages": "/mcp/messages", "health": "/mcp/health"},
+            "payment": {"protocol": "x402", "network": "eip155:8453", "merchant": PAY_TO},
+            "tools": [{"name": t["name"], "description": t["description"], "price": "free"} for t in _MCP_TOOLS],
+        })
+
+
 # === MAPS (OpenStreetMap: Nominatim + Overpass, no key) ===
 
 async def _geocode(client: httpx.AsyncClient, location: str):
