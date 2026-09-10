@@ -278,16 +278,46 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+_fetch_cache: dict[str, tuple[float, tuple]] = {}
+_FETCH_CACHE_TTL = 15  # seconds — balances freshness vs latency
+_FETCH_CACHE_MAX = 300  # max cached entries (prevent memory growth)
+
 async def fetch_json(client: httpx.AsyncClient, url: str,
                      params: dict | None = None,
-                     timeout: float = 15):
-    """GET JSON from an upstream. Returns (ok, payload). Never raises."""
+                     timeout: float = 15,
+                     cache_ttl: float | None = _FETCH_CACHE_TTL):
+    """GET JSON from an upstream. Returns (ok, payload). Never raises.
+
+    Caches responses for `cache_ttl` seconds (default 15s).
+    Pass cache_ttl=0 to disable caching for this call.
+    """
+    # Build cache key
+    cache_key = url
+    if params:
+        cache_key += "?" + "&".join(f"{k}={v}" for k, v in sorted(params.items()))
+
+    # Check cache
+    now = time.time()
+    if cache_ttl and cache_key in _fetch_cache:
+        ts, cached = _fetch_cache[cache_key]
+        if now - ts < cache_ttl:
+            return cached
+
+    # Cache miss — fetch from upstream
     try:
         r = await client.get(url, params=params or {}, headers=UA,
                              timeout=timeout)
         if r.status_code == 200:
             try:
-                return True, r.json()
+                result = (True, r.json())
+                # Store in cache
+                if cache_ttl:
+                    _fetch_cache[cache_key] = (now, result)
+                    # Evict oldest if over limit
+                    if len(_fetch_cache) > _FETCH_CACHE_MAX:
+                        oldest = min(_fetch_cache, key=lambda k: _fetch_cache[k][0])
+                        del _fetch_cache[oldest]
+                return result
             except Exception:
                 return False, {"error": "Upstream returned non-JSON",
                                "url": url}
@@ -2583,8 +2613,22 @@ BASE_RPCS = [
     "https://base-mainnet.public.blastapi.io",
 ]
 
+_rpc_cache: dict[str, tuple[float, dict]] = {}
+_RPC_CACHE_TTL = 10  # seconds — balance freshness vs latency for RPC calls
+
 async def _base_rpc_call(client: httpx.AsyncClient, method: str, params: list) -> dict:
-    """Make a JSON-RPC call to Base, trying multiple RPCs."""
+    """Make a JSON-RPC call to Base, trying multiple RPCs. Cached for 10s."""
+    # Cache key: method + params
+    cache_key = f"{method}:{str(params)}"
+    now = time.time()
+
+    # Check cache
+    if cache_key in _rpc_cache:
+        ts, cached = _rpc_cache[cache_key]
+        if now - ts < _RPC_CACHE_TTL:
+            return cached
+
+    # Cache miss — fetch from RPC
     payload = {
         "jsonrpc": "2.0",
         "id": 1,
@@ -2597,7 +2641,9 @@ async def _base_rpc_call(client: httpx.AsyncClient, method: str, params: list) -
             if r.status_code == 200:
                 data = r.json()
                 if "result" in data:
-                    return {"ok": True, "result": data["result"]}
+                    result = {"ok": True, "result": data["result"]}
+                    _rpc_cache[cache_key] = (now, result)
+                    return result
                 elif "error" in data:
                     return {"ok": False, "error": data["error"].get("message", str(data["error"]))}
         except Exception:
@@ -2608,25 +2654,16 @@ async def _base_rpc_call(client: httpx.AsyncClient, method: str, params: list) -
 # Cache for block number to avoid repeated RPC calls
 _block_cache = {"block": None, "ts": 0}
 
-# CoinGecko response cache (10s TTL) — prevents rate-limit 429s
-import time as _time
-_cg_cache: dict[str, tuple[float, tuple[bool, dict]]] = {}
+# CoinGecko response cache — now delegated to fetch_json's built-in cache
+# This wrapper exists for backward compatibility with endpoints that call it directly
 _CG_CACHE_TTL = 10  # seconds
 
 async def fetch_json_cached(client: httpx.AsyncClient, url: str,
                             params: dict | None = None,
                             timeout: float = 15,
                             cache_ttl: float = _CG_CACHE_TTL):
-    """fetch_json with TTL cache. Only caches GET requests to known APIs."""
-    cache_key = url + "?" + "&".join(f"{k}={v}" for k, v in sorted((params or {}).items()))
-    now = _time.time()
-    if cache_key in _cg_cache:
-        ts, cached = _cg_cache[cache_key]
-        if now - ts < cache_ttl:
-            return cached
-    result = await fetch_json(client, url, params, timeout)
-    _cg_cache[cache_key] = (now, result)
-    return result
+    """fetch_json with TTL cache. Delegates to fetch_json's built-in cache."""
+    return await fetch_json(client, url, params, timeout, cache_ttl=cache_ttl)
 
 async def _get_base_block_number(client: httpx.AsyncClient) -> int | None:
     """Get current block number on Base (cached for 10s)."""
@@ -3087,13 +3124,23 @@ async def x402_top_agents(
 # ============================================================
 
 
+_base_stats_cache: tuple[float, dict] | None = None
+_BASE_STATS_CACHE_TTL = 10  # seconds
+
 @app.get("/v1/x402/base-stats")
 @app.get("/api/v1/x402/base-stats")
 async def x402_base_stats():
     """
     🧠 EXCLUSIVE: Base chain health — block number, gas price, chain status.
-    Real-time snapshot of the Base network.
+    Cached for 10s to avoid 3x RPC calls on every request.
     """
+    global _base_stats_cache
+    now = time.time()
+
+    # Check cache
+    if _base_stats_cache and (now - _base_stats_cache[0]) < _BASE_STATS_CACHE_TTL:
+        return _base_stats_cache[1]
+
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             block_r = await _base_rpc_call(client, "eth_blockNumber", [])
@@ -3104,7 +3151,7 @@ async def x402_base_stats():
             gas_gwei = round(int(gas_r["result"], 16) / 1e9, 4) if gas_r["ok"] else None
             chain_id = int(chain_r["result"], 16) if chain_r["ok"] else None
 
-            return {
+            response = {
                 "status": "ok",
                 "network": "Base Mainnet",
                 "chain_id": chain_id,
@@ -3116,16 +3163,29 @@ async def x402_base_stats():
                 "finality": "instant (L2)",
                 "fetched_at": _now(),
             }
+            _base_stats_cache = (now, response)
+            return response
     except Exception as e:
         return _err(500, {"error": str(e)})
 
+
+_gas_cache: tuple[float, dict] | None = None
+_GAS_CACHE_TTL = 15  # seconds
 
 @app.get("/v1/x402/gas")
 @app.get("/api/v1/x402/gas")
 async def x402_gas():
     """
     🧠 EXCLUSIVE: Gas price analysis on Base — current, min, max, cost estimates.
+    Cached for 15s to avoid 3x RPC calls + sleeps on every request.
     """
+    global _gas_cache
+    now = time.time()
+
+    # Check cache
+    if _gas_cache and (now - _gas_cache[0]) < _GAS_CACHE_TTL:
+        return _gas_cache[1]
+
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             results = []
@@ -3140,7 +3200,7 @@ async def x402_gas():
                 return _err(502, {"error": "Cannot fetch gas price"})
 
             current = results[-1]
-            return {
+            response = {
                 "status": "ok",
                 "network": "Base Mainnet",
                 "current_gwei": round(current, 4),
@@ -3155,6 +3215,8 @@ async def x402_gas():
                 "eth_price_usd": 2500,
                 "fetched_at": _now(),
             }
+            _gas_cache = (now, response)
+            return response
     except Exception as e:
         return _err(500, {"error": str(e)})
 
@@ -5475,4 +5537,14 @@ if __name__ == "__main__":
     print("GET /v1/x402/risk-intel       Multi-factor risk scoring")
     print("GET /v1/x402/search-intel     Universal search")
     print("==============================")
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    # Optimized uvicorn: keepalive + tuned timeouts
+    # Note: workers=1 because we run via `python main.py` (not `uvicorn main:app`)
+    # For multi-worker, use: uvicorn main:app --workers 2
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=port,
+        timeout_keep_alive=30,
+        log_level="info",
+        access_log=True,
+    )
