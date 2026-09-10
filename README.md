@@ -105,6 +105,13 @@ timeline
     Sep 7 : Metrics honesty : every visible number traced to a real endpoint
     Sep 8 : Landing glass redesign : contrast fix : branded SVGs : playground real routes
     Sep 8 : VM hardening : hardened perimeter : TLS lockdown : firewall
+    Sep 9 : Flow Explorer 3D : 5 distinct geometries : scroll-driven explode : live data panels
+    Sep 9 : Instruments section : Cost Calculator : Wallet Intel Explorer : Flow Visualizer
+    Sep 9 : Wiki institutional : 9 pages : auto-sync Action : SECURITY + CODEOWNERS + TERMS
+    Sep 9 : MCP bridge : 9 free tools via stdio : opencode integration
+    Sep 10 : Canary flip : /v1/data/uuid LIVE on Base Mainnet : real $0.001 USDC settled via CDP
+    Sep 10 : Bazaar discovery : /mcp/discovery manifest : 10 MCP tools over HTTPS SSE
+    Sep 10 : Fail-open fix : canary complement stays simulated : 0 unguarded routes
 ```
 
 | Phase | Work | Time | Verify |
@@ -128,10 +135,12 @@ timeline
 | **Sep 7** — 16th deploy | TOCTOU anti-replay protection (nonce cache, 409 on duplicate proofs) + 10 globe fixes (camera, atmosphere, particles) + metrics honesty (every number traced to a real endpoint) | **t+125h** | `git log --oneline 7432172` |
 | **Sep 8** — 17th deploy | Landing glass redesign — contrast fix (2.5:1→5:1), branded SVGs, playground real routes + FREE x402 sidebar, all 12 sections glass morphism | **t+144h** | `git log --oneline d58af77 953ca69` |
 | **Sep 8** — 18th deploy | VM security hardening — hardened perimeter (IDS, TLS lockdown, firewall, rate limiting) | **t+145h** | `curl https://34-156-149-38.sslip.io/aetherapi/health` |
+| **Sep 9** — 19th deploy | Flow Explorer 3D + Instruments + Wiki institutional + MCP bridge + governance (SECURITY, CODEOWNERS, TERMS, CITATION, CHANGELOG) | **t+168h** | `git log --oneline` |
+| **Sep 10** — 20th deploy | **CANARY LIVE** — `/v1/data/uuid` settling real $0.001 USDC via CDP on Base Mainnet + Bazaar discovery + fail-open fix | **t+192h** | `curl https://34-156-149-38.sslip.io/aetherapi/mcp/discovery` |
 
-**Total commits:** 209 and counting (`git log --oneline | wc -l` — velocity is public).
+**Total commits:** 215+ and counting (`git log --oneline | wc -l` — velocity is public).
 
-**Build velocity:** 100 live endpoints (60 paid + 40 free: 20 x402 Intelligence + 20 QuantumXBrain, all returning 200) + 39 tests + 2 SDKs (v2.0) + dashboard + R3F landing + playground + demo + Telegram bot + GitHub Actions in **6 days** (209 commits).
+**Build velocity:** 100 live endpoints (60 paid + 40 free) + canary LIVE on Base Mainnet + MCP discovery + 39 tests + 2 SDKs + dashboard + R3F landing + playground + demo + Telegram bot + GitHub Actions in **8 days** (215+ commits).
 Velocity is public — `git log --oneline | wc -l`.
 
 ---
@@ -224,7 +233,7 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | Signal | Value |
 |--------|-------|
 | **Network** | **Base Mainnet `eip155:8453`** 🔴 LIVE |
-| **Mode** | **`simulated` — x402 challenge flow live, USDC settlement via facilitator (E2E proven, volume tracked in telemetry)** |
+| **Mode** | **`real` — Canary live on `/v1/data/uuid`, CDP facilitator settling USDC on-chain, complement routes simulated** |
 | Health | `GET /health` (free) |
 | Telemetry | `GET /v1/telemetry` (free): uptime, per-endpoint stats, settled USDC volume |
 | Playground | [`/`](https://wilnowilx.github.io/aetheriusxapi/) — interactive endpoint testing |
@@ -234,7 +243,9 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 mainnet USDC |
 
 🚀 **Sep 5, 2026:** Deployed to Base Mainnet! Real USDC payments now live.
+🔥 **Sep 10, 2026:** Canary LIVE — `/v1/data/uuid` settling real $0.001 USDC via CDP facilitator.
 💵 **Wallet:** `0x677B483128D0399bCD0A5AB36eE990C0246d7f61` (receiving real payments)
+📡 **MCP Discovery:** `https://34-156-149-38.sslip.io/aetherapi/mcp/discovery` (Bazaar-ready)
 
 ---
 
@@ -633,6 +644,11 @@ Every response carries the `X-AETHERIUS-Fingerprint: quantumxbrain-v1` header.
 - [x] Telegram bot: welcome handler, channel-only updates
 - [x] Landing glass redesign (Sep 8) — contrast fix, branded SVGs, playground real routes + FREE sidebar
 - [x] VM security hardening (Sep 8) — hardened perimeter (IDS, TLS, firewall)
+- [x] Flow Explorer 3D (Sep 9) — 5 distinct geometries, scroll-driven, live data panels
+- [x] Wiki institutional (Sep 9) — 9 pages, auto-sync Action, SECURITY + CODEOWNERS + TERMS
+- [x] MCP SSE server (Sep 10) — 10 tools over HTTPS, Bazaar discovery manifest
+- [x] **Canary LIVE** (Sep 10) — `/v1/data/uuid` settling real $0.001 USDC on Base Mainnet via CDP
+- [x] Fail-open fix (Sep 10) — canary complement stays simulated, 0 unguarded routes
 - [ ] Base Ecosystem Fund application
 
 ### Phase 2: Scale (Post-Grant)
