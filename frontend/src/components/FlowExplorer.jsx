@@ -51,7 +51,7 @@ async function fetchStage(i, signal) {
     case 1: return get('/v1/data/uuid')
     case 2: return get('/v1/x402/gas')
     case 3: return get('/v1/x402/market-pulse')
-    case 4: return get('/v1/data/uuid', { 'X-PAYMENT': 'flow-explorer-demo' })
+    case 4: return get('/v1/data/uuid', { 'X-PAYMENT': `flow-explorer-demo-${Date.now()}` })
     default: return ''
   }
 }
@@ -64,7 +64,7 @@ function FlowExplorer() {
   const [running, setRunning] = useState(false)
   const [visible, setVisible] = useState(true)
   const [log, setLog] = useState([])
-  const flow = useMemo(() => ({ explode: 0, active: false }), [])
+  const flow = useMemo(() => ({ explode: 0, active: false, hover: -1 }), [])
   const abortRef = useRef(null)
 
   // Scroll-driven explode (writes straight into the mutable flow object — no re-renders)
@@ -134,7 +134,7 @@ function FlowExplorer() {
       setSelected(3)
       say('→ retry + X-PAYMENT · facilitator settles on Base')
       const t2 = performance.now()
-      const r2 = await fetch(`${API_BASE}/v1/data/uuid`, { headers: { 'X-PAYMENT': 'flow-explorer-loop' } })
+      const r2 = await fetch(`${API_BASE}/v1/data/uuid`, { headers: { 'X-PAYMENT': `flow-explorer-loop-${Date.now()}` } })
       const d2 = await r2.json().catch(() => ({}))
       say(`← 200 · ${Math.round(performance.now() - t2)}ms · settled${r2.headers.get('X-PAYMENT-SETTLED') ? ' ✓' : ' (simulated)'}`)
       await new Promise(r => setTimeout(r, 450))

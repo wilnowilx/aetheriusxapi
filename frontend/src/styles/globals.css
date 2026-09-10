@@ -369,6 +369,8 @@ canvas {
 .noscroll {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  /* Stop wheel/touch scroll from chaining out to the whole landing */
+  overscroll-behavior: contain;
 }
 .noscroll::-webkit-scrollbar {
   display: none;

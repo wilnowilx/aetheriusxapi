@@ -1,6 +1,6 @@
 import React, { useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls, Stars } from '@react-three/drei'
 import * as THREE from 'three'
 
 // === STAGES (brand colors — shared, dependency-free) ===
@@ -53,15 +53,18 @@ function FlowNodes({ flow, selected, onSelect }) {
   const glows = useMemo(() => STAGES.map(s => makeGlowTexture(s.color)), [])
   const tmp = useMemo(() => [0, 0, 0], [])
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const e = flow.explode
     const t = state.clock.elapsedTime
     groupRefs.current.forEach((g, i) => {
       if (!g) return
       explodedPos(i, e, tmp)
       const breathe = 1 + Math.sin(t * 1.6 + i) * 0.04
+      const hover = flow.hover === i ? 1.22 : 1
+      const target = breathe * (selected === i ? 1.35 : hover)
+      const cur = g.scale.x + (target - g.scale.x) * Math.min(1, delta * 10)
       g.position.set(tmp[0], tmp[1] + Math.sin(t * 0.9 + i * 2.0) * 0.12, tmp[2])
-      g.scale.setScalar(breathe * (selected === i ? 1.35 : 1))
+      g.scale.setScalar(cur)
     })
     if (ringRef.current) {
       ringRef.current.rotation.z = t * 0.8
@@ -81,7 +84,7 @@ function FlowNodes({ flow, selected, onSelect }) {
           <sprite scale={[3.2, 3.2, 1]}>
             <spriteMaterial map={glows[i]} transparent blending={THREE.AdditiveBlending} depthWrite={false} opacity={0.55} />
           </sprite>
-          <mesh onClick={(ev) => { ev.stopPropagation(); onSelect(i) }} onPointerOver={() => { document.body.style.cursor = 'pointer' }} onPointerOut={() => { document.body.style.cursor = 'auto' }}>
+          <mesh onClick={(ev) => { ev.stopPropagation(); onSelect(i) }} onPointerOver={(ev) => { ev.stopPropagation(); flow.hover = i; document.body.style.cursor = 'pointer' }} onPointerOut={() => { flow.hover = -1; document.body.style.cursor = 'auto' }}>
             <icosahedronGeometry args={[0.55, 1]} />
             <meshBasicMaterial color={s.color} wireframe transparent opacity={0.85} />
           </mesh>
@@ -223,11 +226,13 @@ function FlowScene({ flow, selected, onSelect, frameloop }) {
       dpr={[1, 1.5]}
     >
       <ambientLight intensity={0.4} />
+      <Stars radius={40} depth={12} count={isMobile ? 250 : 700} factor={3} saturation={0.4} fade speed={0.5} />
       <FlowEdges flow={flow} />
       <FlowParticles flow={flow} count={isMobile ? 90 : 240} />
       <FlowNodes flow={flow} selected={selected} onSelect={onSelect} />
       {!isMobile && (
         <OrbitControls
+          autoRotate autoRotateSpeed={0.45}
           enableZoom={false} enablePan={false} enableDamping dampingFactor={0.1}
           rotateSpeed={0.4} minPolarAngle={Math.PI * 0.3} maxPolarAngle={Math.PI * 0.7}
         />
