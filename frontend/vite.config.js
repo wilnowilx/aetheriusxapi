@@ -3,7 +3,10 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/aetheriusxapi/',
+  // PAGES_BASE overrides deploy subpath: main site vs staging mirror.
+  //   production: npm run build                      -> /aetheriusxapi/
+  //   staging:    PAGES_BASE=/aetheriusxapi-staging/ npm run build -> mirror
+  base: process.env.PAGES_BASE || '/aetheriusxapi/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
