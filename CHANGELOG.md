@@ -5,6 +5,9 @@
 
 ## [Unreleased]
 
+- Flow Explorer 3D: exploded x402 loop (scroll-driven explode, 5 live-data
+  stages, run-live-loop with particles). Lazy chunk (5.5KB), globe patterns
+  reused, crash-isolated, offscreen rendering paused.
 - Security audit response: SSRF guard on `/v1/web/scrape` (public-IP only +
   re-validated redirects), route-coverage test (deny-by-default: every /v1
   route priced or explicitly free), Dockerfile non-root user, `security.yml`
