@@ -364,7 +364,17 @@ if X402_MODE == "real":
                 return any(path == a or path == "/api" + a for a in _allow)
             _routes = {k: v for k, v in _routes.items() if _wanted(k)}
             print(f"[x402] canary: {len(_routes)} routes ({','.join(_allow)})", flush=True)
-        app.add_middleware(PaymentMiddlewareASGI, routes=_routes, server=_server)
+            # Complement stays simulated: without this, non-canary paid routes
+            # would be UNGUARDED (fail-open) while the canary runs real.
+            # Simulated is added AFTER (= outer) so canary routes fall through.
+            _complement = {k: v for k, v in PRICES.items() if k not in _allow}
+            app.add_middleware(PaymentMiddlewareASGI, routes=_routes, server=_server)
+            app.add_middleware(SimulatedX402Middleware, prices=_complement,
+                               pay_to=PAY_TO, network=NETWORK, currency=CURRENCY)
+            print(f"[x402] canary complement: {len(_complement)} simulated routes",
+                  flush=True)
+        else:
+            app.add_middleware(PaymentMiddlewareASGI, routes=_routes, server=_server)
         print(f"[x402] REAL mode: {len(_routes)} paid routes on {NETWORK}", flush=True)
     except ImportError as e:
         print(f"[x402] SDK missing ({e}); falling back to SIMULATED mode", flush=True)
