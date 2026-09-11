@@ -33,7 +33,7 @@ function SupernovaLoader({ onComplete }) {
 
     let running = true
     const startTime = performance.now()
-    const TOTAL_DURATION = 2200 // ms
+    const TOTAL_DURATION = 1500 // ms
 
     const draw = (now) => {
       if (!running) return
@@ -70,55 +70,62 @@ function SupernovaLoader({ onComplete }) {
         ctx.fillRect(0, 0, w, h)
       }
 
-      // --- Phase 2: Flash + Expansion (t 0.3→0.8) — one fluid burst ---
+      // --- Phase 2: Star of David flash + expansion ---
       if (t >= 0.3 && t < 0.85) {
         const p = (t - 0.3) / 0.55 // 0→1
 
-        // Central flash — peaks at p=0.1, fades by p=0.4
+        // Flash intensity — peaks at p=0.1, fades by p=0.4
         const flashIntensity = p < 0.1
           ? p / 0.1 // rise
           : Math.max(0, 1 - (p - 0.1) / 0.3) // decay
-        const flashR = 120 + p * 500
-        const flash = ctx.createRadialGradient(cx, cy, 0, cx, cy, flashR)
-        flash.addColorStop(0, `rgba(255,255,255,${flashIntensity * 0.9})`)
-        flash.addColorStop(0.08, `rgba(0,82,255,${flashIntensity * 0.7})`)
-        flash.addColorStop(0.25, `rgba(168,85,247,${flashIntensity * 0.35})`)
-        flash.addColorStop(0.5, `rgba(217,70,239,${flashIntensity * 0.12})`)
-        flash.addColorStop(1, 'transparent')
-        ctx.fillStyle = flash
+
+        // Central glow behind the star
+        const glowR = 80 + p * 300
+        const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR)
+        glow.addColorStop(0, `rgba(255,255,255,${flashIntensity * 0.7})`)
+        glow.addColorStop(0.12, `rgba(0,82,255,${flashIntensity * 0.45})`)
+        glow.addColorStop(0.35, `rgba(168,85,247,${flashIntensity * 0.15})`)
+        glow.addColorStop(1, 'transparent')
+        ctx.fillStyle = glow
         ctx.fillRect(0, 0, w, h)
 
-        // Expanding ring — fluid, one ring with multiple color stops
-        const ringRadius = p * Math.max(w, h) * 0.7
-        const ringAlpha = Math.max(0, 0.5 * (1 - p * p))
-        const ringWidth = 3 + (1 - p) * 8
+        // Star of David — two interlocked triangles
+        const triRadius = (60 + p * 320) * (Math.max(w, h) / 800)
+        const triAlpha = flashIntensity * 0.9
+        const triWidth = 2.5 + (1 - p) * 4
+
+        ctx.save()
+        ctx.translate(cx, cy)
+
+        // Triangle 1 (pointing up)
         ctx.beginPath()
-        ctx.arc(cx, cy, ringRadius, 0, Math.PI * 2)
-        ctx.strokeStyle = `rgba(0,82,255,${ringAlpha * 0.6})`
-        ctx.lineWidth = ringWidth
+        for (let i = 0; i < 3; i++) {
+          const angle = (i / 3) * Math.PI * 2 - Math.PI / 2
+          const x = Math.cos(angle) * triRadius
+          const y = Math.sin(angle) * triRadius
+          if (i === 0) ctx.moveTo(x, y)
+          else ctx.lineTo(x, y)
+        }
+        ctx.closePath()
+        ctx.strokeStyle = `rgba(0,82,255,${triAlpha})`
+        ctx.lineWidth = triWidth
         ctx.stroke()
 
-        // Second ring trailing
-        if (p > 0.1) {
-          const ring2Radius = (p - 0.1) * Math.max(w, h) * 0.7
-          const ring2Alpha = Math.max(0, 0.3 * (1 - (p - 0.1) / 0.9) * (1 - (p - 0.1) / 0.9))
-          ctx.beginPath()
-          ctx.arc(cx, cy, ring2Radius, 0, Math.PI * 2)
-          ctx.strokeStyle = `rgba(168,85,247,${ring2Alpha * 0.4})`
-          ctx.lineWidth = ringWidth * 0.6
-          ctx.stroke()
+        // Triangle 2 (pointing down)
+        ctx.beginPath()
+        for (let i = 0; i < 3; i++) {
+          const angle = (i / 3) * Math.PI * 2 + Math.PI / 2
+          const x = Math.cos(angle) * triRadius
+          const y = Math.sin(angle) * triRadius
+          if (i === 0) ctx.moveTo(x, y)
+          else ctx.lineTo(x, y)
         }
+        ctx.closePath()
+        ctx.strokeStyle = `rgba(168,85,247,${triAlpha * 0.75})`
+        ctx.lineWidth = triWidth * 0.85
+        ctx.stroke()
 
-        // Third ring trailing
-        if (p > 0.2) {
-          const ring3Radius = (p - 0.2) * Math.max(w, h) * 0.7
-          const ring3Alpha = Math.max(0, 0.2 * (1 - (p - 0.2) / 0.8) * (1 - (p - 0.2) / 0.8))
-          ctx.beginPath()
-          ctx.arc(cx, cy, ring3Radius, 0, Math.PI * 2)
-          ctx.strokeStyle = `rgba(217,70,239,${ring3Alpha * 0.3})`
-          ctx.lineWidth = ringWidth * 0.4
-          ctx.stroke()
-        }
+        ctx.restore()
 
         // Scattered particles from center
         const scattered = 40

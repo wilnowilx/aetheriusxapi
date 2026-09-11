@@ -107,6 +107,18 @@
       "domain": "testing",
       "rule": "When testing middleware with nonce cache, use autouse fixture to clear _nonce_cache._seen before/after each test. Tests sharing same proof string will fail without this. Unique proofs per request or fixture clearing is mandatory.",
       "confidence": 0.95
+    },
+    {
+      "id": "django-middleware-pattern",
+      "domain": "python-web",
+      "rule": "Django middleware: new-style uses get_response parameter in __init__ and __call__(request). Headers stored in META with HTTP_ prefix (except Content-Type/Content-Length). Use JsonResponse for API responses. Factory function returns class, not instance.",
+      "confidence": 0.95
+    },
+    {
+      "id": "x402-contribution-strategy",
+      "domain": "open-source",
+      "rule": "When contributing to a protocol repo, scan for biggest framework gaps (0 implementations). Django had zero x402 middleware while FastAPI and Flask had full support. Filling the biggest gap gets the most attention. Mirror all contributions to own repo as backup.",
+      "confidence": 0.9
     }
   ],
   "mappings": [
@@ -181,6 +193,23 @@
       "date": "2026-09-07",
       "text": "TOCTOU anti-replay: RAM nonce cache with SHA-256 hashing, TTL eviction (300s), threading.Lock for thread safety. Added to x402_middleware.py. Tests need autouse fixture to clear cache between runs.",
       "files": ["x402_middleware.py", "tests/test_api.py"]
+    },
+    {
+      "date": "2026-09-08",
+      "text": "x402-foundation contribution PR #3403: Django middleware. Biggest gap in x402 ecosystem — Django is the most popular Python web framework with zero x402 support. Pattern: Django new-style middleware (get_response), HTTPAdapter protocol for HttpRequest, X402PaymentMiddleware class, payment_middleware() factory, settings-based config (X402_ROUTES, X402_FACILITATOR_URL, etc.).",
+      "files": ["x402-foundation/python/x402/http/middleware/django.py"]
+    },
+    {
+      "id": "mcp-sdk-2x-compat",
+      "domain": "python",
+      "rule": "MCP SDK 2.x renamed FastMCP to MCPServer (mcp.server.mcpserver). Context import path changed. Use try/except for backward compat: try from mcp.server.fastmcp import Context, except ImportError: from mcp.server.mcpserver import Context. Also .meta replaces ._meta as Pydantic field.",
+      "confidence": 0.95
+    },
+    {
+      "id": "gpg-signing-windows",
+      "domain": "devops",
+      "rule": "On Windows Git Bash, GPG signing requires gpg.format=openpgp. Export key with gpg --export --armor KEY_ID. GitHub requires verified signature on PRs before review. SSH signing requires allowedSignersFile setup.",
+      "confidence": 0.9
     }
   ],
   "decisions": [
@@ -219,6 +248,24 @@
       "question": "How to prevent payment proof replay attacks (TOCTOU window)?",
       "answer": "RAM-based nonce cache: SHA-256 hash of proof content, stored in dict with 300s TTL, thread-safe via Lock. First use passes, duplicate → 409. Added to SimulatedX402Middleware.",
       "rationale": "Between HTTP validation and L2 settlement, a proof could be replayed. Nonce cache blocks this instantly without blockchain lookup."
+    },
+    {
+      "date": "2026-09-08",
+      "question": "What's the highest-impact x402-foundation contribution to make?",
+      "answer": "Django middleware — the most popular Python web framework with zero x402 support. FastAPI and Flask both had full middleware implementations. Django was the biggest gap.",
+      "rationale": "Scanned all 230 open PRs and ~100 issues. Django middleware was the most visible gap. Framework coverage table showed Django missing from the 'Framework Coverage' section."
+    },
+    {
+      "date": "2026-09-08",
+      "question": "How to maximize visibility of x402 contributions?",
+      "answer": "Mirror every contribution to aetheriusxapi repo as backup. Keep local copies of all specs, implementations, and tests. Even if PRs aren't merged, the code lives in both repos.",
+      "rationale": "PRs to external repos can be rejected or lost. Local copies ensure the work is never wasted."
+    },
+    {
+      "date": "2026-09-08",
+      "question": "How to maximize contribution impact with limited time?",
+      "answer": "Target Python-specific bugs first (#3149, #3261) because they're in our expertise, have concrete fixes, and unblock real users. Documentation gaps (#3210) merge fastest.",
+      "rationale": "Found 80+ open issues. Prioritized by: (1) Python language, (2) concrete bug with clear fix, (3) real user impact, (4) merge probability. Bugs > features for reputation."
     }
   ]
 }
