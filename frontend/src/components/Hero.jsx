@@ -14,124 +14,161 @@ class GlobeBoundary extends React.Component {
   }
 }
 
-// === SUPERNOVA LOADING SCREEN ===
+// === SUPERNOVA — single fluid explosion ===
 function SupernovaLoader({ onComplete }) {
-  const [phase, setPhase] = useState(0) // 0=loading, 1=flash, 2=expanding, 3=done
   const canvasRef = useRef(null)
   const animRef = useRef(null)
+  const overlayRef = useRef(null)
 
-  useEffect(() => {
-    // Phase timing
-    const t1 = setTimeout(() => setPhase(1), 800)   // flash
-    const t2 = setTimeout(() => setPhase(2), 1100)   // expand
-    const t3 = setTimeout(() => setPhase(3), 2200)   // done
-    const t4 = setTimeout(() => onComplete?.(), 2600) // unmount
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4) }
-  }, [onComplete])
-
-  // Canvas animation
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-    let start = performance.now()
+    const dpr = window.devicePixelRatio || 1
+    canvas.width = window.innerWidth * dpr
+    canvas.height = window.innerHeight * dpr
+    ctx.scale(dpr, dpr)
+    const w = window.innerWidth, h = window.innerHeight
+    const cx = w / 2, cy = h / 2
+
     let running = true
+    const startTime = performance.now()
+    const TOTAL_DURATION = 2200 // ms
 
     const draw = (now) => {
       if (!running) return
-      const t = (now - start) / 1000
-      const w = canvas.width, h = canvas.height
+      const elapsed = now - startTime
+      const t = Math.min(elapsed / TOTAL_DURATION, 1) // 0→1 normalized
+
       ctx.clearRect(0, 0, w, h)
 
-      // Central point
-      const cx = w / 2, cy = h / 2
-
-      if (phase === 0) {
-        // Contracting particles to center
-        const count = 60
-        for (let i = 0; i < count; i++) {
-          const angle = (i / count) * Math.PI * 2
-          const dist = Math.max(0, 200 - t * 180)
-          const x = cx + Math.cos(angle + t * 0.5) * dist
-          const y = cy + Math.sin(angle + t * 0.5) * dist
-          const alpha = Math.min(1, t * 2)
-          const size = 1.5 + Math.sin(t * 3 + i) * 0.5
+      // --- Phase 1: Implosion (t 0→0.35) — particles contract to center ---
+      if (t < 0.35) {
+        const p = t / 0.35 // 0→1 within this phase
+        const eased = 1 - (1 - p) * (1 - p) // ease-out quad
+        const particleCount = 80
+        for (let i = 0; i < particleCount; i++) {
+          const angle = (i / particleCount) * Math.PI * 2 + eased * 0.8
+          const startDist = 180 + (i % 5) * 40
+          const dist = startDist * (1 - eased)
+          const x = cx + Math.cos(angle) * dist
+          const y = cy + Math.sin(angle) * dist
+          const alpha = eased * 0.8
+          const size = 1 + eased * 1.5
           ctx.beginPath()
           ctx.arc(x, y, size, 0, Math.PI * 2)
-          ctx.fillStyle = `rgba(0,82,255,${alpha * 0.6})`
+          ctx.fillStyle = `rgba(0,82,255,${alpha})`
           ctx.fill()
         }
-        // Central glow
-        const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 30 + t * 20)
-        glow.addColorStop(0, `rgba(0,82,255,${Math.min(0.5, t)})`)
+        // Central glow building
+        const glowR = 15 + eased * 40
+        const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR)
+        glow.addColorStop(0, `rgba(0,82,255,${eased * 0.6})`)
+        glow.addColorStop(0.5, `rgba(168,85,247,${eased * 0.3})`)
         glow.addColorStop(1, 'transparent')
         ctx.fillStyle = glow
         ctx.fillRect(0, 0, w, h)
       }
 
-      if (phase === 1) {
-        // Bright flash
-        const flash = ctx.createRadialGradient(cx, cy, 0, cx, cy, 400)
-        flash.addColorStop(0, 'rgba(255,255,255,0.95)')
-        flash.addColorStop(0.15, 'rgba(0,82,255,0.8)')
-        flash.addColorStop(0.4, 'rgba(168,85,247,0.3)')
+      // --- Phase 2: Flash + Expansion (t 0.3→0.8) — one fluid burst ---
+      if (t >= 0.3 && t < 0.85) {
+        const p = (t - 0.3) / 0.55 // 0→1
+
+        // Central flash — peaks at p=0.1, fades by p=0.4
+        const flashIntensity = p < 0.1
+          ? p / 0.1 // rise
+          : Math.max(0, 1 - (p - 0.1) / 0.3) // decay
+        const flashR = 120 + p * 500
+        const flash = ctx.createRadialGradient(cx, cy, 0, cx, cy, flashR)
+        flash.addColorStop(0, `rgba(255,255,255,${flashIntensity * 0.9})`)
+        flash.addColorStop(0.08, `rgba(0,82,255,${flashIntensity * 0.7})`)
+        flash.addColorStop(0.25, `rgba(168,85,247,${flashIntensity * 0.35})`)
+        flash.addColorStop(0.5, `rgba(217,70,239,${flashIntensity * 0.12})`)
         flash.addColorStop(1, 'transparent')
         ctx.fillStyle = flash
         ctx.fillRect(0, 0, w, h)
-      }
 
-      if (phase === 2) {
-        // Expanding rings
-        const ringCount = 4
-        for (let i = 0; i < ringCount; i++) {
-          const expandT = t - 1.1 - i * 0.15
-          if (expandT < 0) continue
-          const radius = expandT * 600
-          const alpha = Math.max(0, 0.4 - expandT * 0.25)
+        // Expanding ring — fluid, one ring with multiple color stops
+        const ringRadius = p * Math.max(w, h) * 0.7
+        const ringAlpha = Math.max(0, 0.5 * (1 - p * p))
+        const ringWidth = 3 + (1 - p) * 8
+        ctx.beginPath()
+        ctx.arc(cx, cy, ringRadius, 0, Math.PI * 2)
+        ctx.strokeStyle = `rgba(0,82,255,${ringAlpha * 0.6})`
+        ctx.lineWidth = ringWidth
+        ctx.stroke()
+
+        // Second ring trailing
+        if (p > 0.1) {
+          const ring2Radius = (p - 0.1) * Math.max(w, h) * 0.7
+          const ring2Alpha = Math.max(0, 0.3 * (1 - (p - 0.1) / 0.9) * (1 - (p - 0.1) / 0.9))
           ctx.beginPath()
-          ctx.arc(cx, cy, radius, 0, Math.PI * 2)
-          ctx.strokeStyle = i === 0 ? `rgba(0,82,255,${alpha})` :
-                           i === 1 ? `rgba(168,85,247,${alpha * 0.7})` :
-                           `rgba(217,70,239,${alpha * 0.5})`
-          ctx.lineWidth = 2 - i * 0.3
+          ctx.arc(cx, cy, ring2Radius, 0, Math.PI * 2)
+          ctx.strokeStyle = `rgba(168,85,247,${ring2Alpha * 0.4})`
+          ctx.lineWidth = ringWidth * 0.6
           ctx.stroke()
         }
-        // Residual glow fading
-        const fadeGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 200)
-        const fadeAlpha = Math.max(0, 0.3 - (t - 1.1) * 0.3)
-        fadeGlow.addColorStop(0, `rgba(0,82,255,${fadeAlpha})`)
-        fadeGlow.addColorStop(1, 'transparent')
-        ctx.fillStyle = fadeGlow
+
+        // Third ring trailing
+        if (p > 0.2) {
+          const ring3Radius = (p - 0.2) * Math.max(w, h) * 0.7
+          const ring3Alpha = Math.max(0, 0.2 * (1 - (p - 0.2) / 0.8) * (1 - (p - 0.2) / 0.8))
+          ctx.beginPath()
+          ctx.arc(cx, cy, ring3Radius, 0, Math.PI * 2)
+          ctx.strokeStyle = `rgba(217,70,239,${ring3Alpha * 0.3})`
+          ctx.lineWidth = ringWidth * 0.4
+          ctx.stroke()
+        }
+
+        // Scattered particles from center
+        const scattered = 40
+        for (let i = 0; i < scattered; i++) {
+          const angle = (i / scattered) * Math.PI * 2 + p * 0.3
+          const dist = p * (150 + (i % 7) * 80)
+          const x = cx + Math.cos(angle) * dist
+          const y = cy + Math.sin(angle) * dist
+          const alpha = Math.max(0, (1 - p) * 0.5)
+          const size = 0.8 + (1 - p) * 1.2
+          ctx.beginPath()
+          ctx.arc(x, y, size, 0, Math.PI * 2)
+          ctx.fillStyle = i % 3 === 0
+            ? `rgba(0,82,255,${alpha})`
+            : i % 3 === 1
+            ? `rgba(168,85,247,${alpha * 0.7})`
+            : `rgba(217,70,239,${alpha * 0.5})`
+          ctx.fill()
+        }
+      }
+
+      // --- Phase 3: Fade out (t 0.7→1.0) ---
+      if (t >= 0.7) {
+        const p = (t - 0.7) / 0.3
+        const fadeAlpha = p * p // accelerating fade
+        ctx.fillStyle = `rgba(1,0,5,${fadeAlpha})`
         ctx.fillRect(0, 0, w, h)
       }
 
       animRef.current = requestAnimationFrame(draw)
     }
-    animRef.current = requestAnimationFrame(draw)
-    return () => { running = false; cancelAnimationFrame(animRef.current) }
-  }, [phase])
 
-  if (phase >= 3) return null
+    animRef.current = requestAnimationFrame(draw)
+
+    // Complete after animation
+    const timer = setTimeout(() => {
+      running = false
+      cancelAnimationFrame(animRef.current)
+      onComplete?.()
+    }, TOTAL_DURATION + 100)
+
+    return () => { running = false; cancelAnimationFrame(animRef.current); clearTimeout(timer) }
+  }, [onComplete])
 
   return (
-    <div style={{
+    <div ref={overlayRef} style={{
       position: 'fixed', inset: 0, zIndex: 9999,
       background: '#010005',
-      opacity: phase === 2 ? Math.max(0, 1 - ((performance.now() % 1000) / 1000) * 0.8) : 1,
-      transition: 'opacity 0.5s ease-out',
-      pointerEvents: phase >= 3 ? 'none' : 'auto',
     }}>
       <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
-      <div style={{
-        position: 'absolute', bottom: '12%', left: '50%', transform: 'translateX(-50%)',
-        fontFamily: "'JetBrains Mono', monospace",
-        fontSize: '0.65rem', color: 'rgba(0,82,255,0.5)',
-        letterSpacing: '0.3em',
-      }}>
-        {phase === 0 ? 'INITIALIZING' : phase === 1 ? '' : 'AETHERIUS'}
-      </div>
     </div>
   )
 }
@@ -319,13 +356,10 @@ function CosmicSound() {
 
   const toggleSound = useCallback(() => {
     if (playing) {
-      // Fade out
       const { gain } = nodesRef.current
       if (gain) {
         gain.gain.linearRampToValueAtTime(0, audioCtxRef.current.currentTime + 0.5)
-        setTimeout(() => {
-          try { audioCtxRef.current?.suspend() } catch {}
-        }, 500)
+        setTimeout(() => { try { audioCtxRef.current?.suspend() } catch {} }, 500)
       }
       setPlaying(false)
       return
@@ -338,28 +372,23 @@ function CosmicSound() {
       const ctx = audioCtxRef.current
       ctx.resume()
 
-      // Master gain
       const gain = ctx.createGain()
       gain.gain.value = 0
       gain.connect(ctx.destination)
 
-      // Pad 1: deep drone
       const osc1 = ctx.createOscillator()
       osc1.type = 'sine'; osc1.frequency.value = 55
       const g1 = ctx.createGain(); g1.gain.value = 0.12
       osc1.connect(g1); g1.connect(gain); osc1.start()
 
-      // Pad 2: harmonic
       const osc2 = ctx.createOscillator()
       osc2.type = 'sine'; osc2.frequency.value = 82.5
       const g2 = ctx.createGain(); g2.gain.value = 0.06
       osc2.connect(g2); g2.connect(gain); osc2.start()
 
-      // Pad 3: shimmer
       const osc3 = ctx.createOscillator()
       osc3.type = 'triangle'; osc3.frequency.value = 165
       const g3 = ctx.createGain(); g3.gain.value = 0.02
-      // LFO on shimmer
       const lfo = ctx.createOscillator()
       lfo.type = 'sine'; lfo.frequency.value = 0.1
       const lfoGain = ctx.createGain()
@@ -367,7 +396,6 @@ function CosmicSound() {
       lfo.connect(lfoGain); lfoGain.connect(g3.gain); lfo.start()
       osc3.connect(g3); g3.connect(gain); osc3.start()
 
-      // Noise for atmosphere
       const bufferSize = ctx.sampleRate * 2
       const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
       const data = noiseBuffer.getChannelData(0)
@@ -379,7 +407,6 @@ function CosmicSound() {
       noise.connect(noiseFilter); noiseFilter.connect(gain); noise.start()
 
       nodesRef.current = { gain, osc1, osc2, osc3, lfo, noise }
-      // Fade in
       gain.gain.linearRampToValueAtTime(1, ctx.currentTime + 1)
       setPlaying(true)
     } catch (e) {
@@ -463,19 +490,7 @@ function Hero() {
   const liveData = useLiveData()
   const [globePaused, setGlobePaused] = useState(false)
   const [loaded, setLoaded] = useState(false)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const heroRef = useRef(null)
-
-  // Parallax mouse depth effect
-  useEffect(() => {
-    const handleMouse = (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 2
-      const y = (e.clientY / window.innerHeight - 0.5) * 2
-      setMousePos({ x, y })
-    }
-    window.addEventListener('mousemove', handleMouse, { passive: true })
-    return () => window.removeEventListener('mousemove', handleMouse)
-  }, [])
 
   // IntersectionObserver: pause globe when hero scrolls off-screen
   useEffect(() => {
@@ -515,13 +530,11 @@ function Hero() {
       }}>
         <CosmicVoid />
 
-        {/* Globe — with parallax depth on mouse */}
+        {/* Globe — no transforms, just flex centering */}
         <div style={{
           position: 'absolute', inset: 0, zIndex: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           pointerEvents: 'none',
-          transform: `translate(${mousePos.x * -8}px, ${mousePos.y * -5}px)`,
-          transition: 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         }}>
           <div style={{
             position: 'absolute', width: '100%', height: '100%',
@@ -543,14 +556,12 @@ function Hero() {
           </GlobeBoundary>
         </div>
 
-        {/* Content — with opposite parallax for depth */}
+        {/* Content — no transforms */}
         <div className="hero-fade" style={{
           position: 'relative', zIndex: 10,
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', textAlign: 'center',
           padding: '0 24px', gap: 0,
-          transform: `translate(${mousePos.x * 12}px, ${mousePos.y * 8}px)`,
-          transition: 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         }}>
           {/* x402 badge */}
           <div style={{
