@@ -110,38 +110,143 @@ function InnerCore() {
   )
 }
 
-// === WIREFRAME — visible structure ===
-function VisibleWireframe() {
+// === DYSON SPHERE — energy reticule megastructure ===
+function DysonSphere() {
   const ref = useRef()
   const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
   useFrame((state, delta) => { uniforms.time.value += delta * 0.5 })
   return (
     <mesh ref={ref}>
-      <sphereGeometry args={[2.2, 28, 18]} />
+      <sphereGeometry args={[2.2, 48, 32]} />
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={`
-          varying vec3 vPos; varying vec3 vWorldPos;
+          varying vec3 vPos; varying vec3 vWorldPos; varying vec2 vUv;
           uniform float time;
           void main() {
             vPos = position;
             vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
+            vUv = uv;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           }
         `}
         fragmentShader={`
-          varying vec3 vPos; varying vec3 vWorldPos;
+          varying vec3 vPos; varying vec3 vWorldPos; varying vec2 vUv;
           uniform float time;
+
           void main() {
-            float pulse = 0.6 + 0.4 * sin(time * 0.5 + vWorldPos.y * 2.0);
-            float fade = smoothstep(0.0, 0.3, abs(vPos.y));
-            vec3 col = mix(vec3(0.659, 0.333, 0.969), vec3(0.133, 0.827, 0.933), 0.3 + 0.2 * sin(time * 0.3));
-            gl_FragColor = vec4(col, 0.02 * pulse * fade);
+            // Latitude lines (horizontal rings)
+            float lat = abs(sin(vUv.y * 3.14159 * 16.0));
+            float latLine = smoothstep(0.97, 1.0, lat);
+
+            // Longitude lines (vertical meridians)
+            float lon = abs(sin(vUv.x * 3.14159 * 24.0));
+            float lonLine = smoothstep(0.97, 1.0, lon);
+
+            // Combine into grid
+            float grid = max(latLine, lonLine);
+
+            // Energy pulse traveling along lines
+            float pulse1 = sin(time * 1.2 + vWorldPos.y * 4.0) * 0.5 + 0.5;
+            float pulse2 = sin(time * 0.8 + vWorldPos.x * 3.0 + vWorldPos.z * 2.0) * 0.5 + 0.5;
+            float energy = pulse1 * 0.6 + pulse2 * 0.4;
+
+            // Intersection nodes (bright spots where lat/lon cross)
+            float nodeLat = abs(sin(vUv.y * 3.14159 * 16.0));
+            float nodeLon = abs(sin(vUv.x * 3.14159 * 24.0));
+            float node = smoothstep(0.92, 1.0, nodeLat) * smoothstep(0.92, 1.0, nodeLon);
+            float nodeGlow = node * (0.7 + 0.3 * sin(time * 2.0 + vWorldPos.x * 5.0));
+
+            // Color: Coinbase Blue base + purple energy + white nodes
+            vec3 blueBase = vec3(0.0, 0.322, 1.0);     // #0052FF
+            vec3 purpleEnergy = vec3(0.659, 0.333, 0.969); // purple
+            vec3 whiteNode = vec3(0.9, 0.95, 1.0);
+
+            vec3 col = mix(blueBase, purpleEnergy, energy * 0.4);
+            col = mix(col, whiteNode, nodeGlow * 0.8);
+
+            // Fresnel edge fade
+            float fresnel = pow(1.0 - abs(dot(normalize(vWorldPos), vec3(0.0, 0.0, 1.0))), 1.5);
+            float alpha = grid * (0.15 + energy * 0.1) + nodeGlow * 0.4;
+            alpha *= (0.6 + fresnel * 0.4);
+
+            gl_FragColor = vec4(col, alpha);
           }
         `}
-        wireframe transparent depthWrite={false}
+        transparent depthWrite={false} side={THREE.DoubleSide}
       />
     </mesh>
+  )
+}
+
+// === DYSON POLE BEAMS — energy columns from poles ===
+function DysonPoleBeams() {
+  const groupRef = useRef()
+  const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
+  useFrame((state, delta) => { uniforms.time.value += delta * 0.3 })
+
+  const { positions, colors, sizes } = useMemo(() => {
+    const count = 60
+    const pos = new Float32Array(count * 3)
+    const col = new Float32Array(count * 3)
+    const sz = new Float32Array(count)
+    for (let i = 0; i < count; i++) {
+      const t = i / count
+      const angle = t * Math.PI * 2
+      // Top pole beam
+      if (i < 30) {
+        const r = 0.1 + t * 0.3
+        pos[i * 3] = r * Math.cos(angle * 8)
+        pos[i * 3 + 1] = 2.2 + t * 1.8
+        pos[i * 3 + 2] = r * Math.sin(angle * 8)
+        col[i * 3] = 0.0; col[i * 3 + 1] = 0.322; col[i * 3 + 2] = 1.0
+      } else {
+        // Bottom pole beam
+        const r = 0.1 + (t - 0.5) * 0.3
+        pos[i * 3] = r * Math.cos(angle * 8)
+        pos[i * 3 + 1] = -2.2 - (t - 0.5) * 1.8
+        pos[i * 3 + 2] = r * Math.sin(angle * 8)
+        col[i * 3] = 0.659; col[i * 3 + 1] = 0.333; col[i * 3 + 2] = 0.969
+      }
+      sz[i] = 0.02 + Math.random() * 0.03
+    }
+    return { positions: pos, colors: col, sizes: sz }
+  }, [])
+
+  return (
+    <group ref={groupRef}>
+      <points>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+          <bufferAttribute attach="attributes-aColor" args={[colors, 3]} />
+          <bufferAttribute attach="attributes-aSize" args={[sizes, 1]} />
+        </bufferGeometry>
+        <shaderMaterial
+          uniforms={uniforms}
+          vertexShader={`
+            attribute float aSize; attribute vec3 aColor;
+            varying vec3 vColor; varying float vAlpha; uniform float time;
+            void main() {
+              vColor = aColor;
+              vAlpha = 0.3 + 0.7 * abs(sin(time * 2.0 + position.y * 1.5));
+              vec4 mv = modelViewMatrix * vec4(position, 1.0);
+              gl_PointSize = aSize * (300.0 / -mv.z);
+              gl_Position = projectionMatrix * mv;
+            }
+          `}
+          fragmentShader={`
+            varying vec3 vColor; varying float vAlpha;
+            void main() {
+              float d = length(gl_PointCoord - vec2(0.5));
+              if (d > 0.5) discard;
+              float glow = pow(1.0 - d * 2.0, 2.0);
+              gl_FragColor = vec4(vColor, glow * vAlpha * 0.6);
+            }
+          `}
+          transparent depthWrite={false} blending={THREE.AdditiveBlending}
+        />
+      </points>
+    </group>
   )
 }
 
@@ -413,7 +518,8 @@ function GlobeScene({ liveData, paused }) {
     >
       <ambientLight intensity={0.05} />
       <group scale={1.3}>
-        <VisibleWireframe />
+        <DysonSphere />
+        <DysonPoleBeams />
         <OuterHalo />
         <AtmosphereGlow />
         <InnerCore />
