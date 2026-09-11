@@ -210,69 +210,20 @@ function BaseCore({ flowRef }) {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Pre-render the BASE company logo: stylized emblem in brand colors
+  // Texto BASE 3D: el sprite fluye mejor que el emblema geométrico.
+  // El pulso vivo (flowRef) se mantiene: respiración + latido por bloque.
   const baseLogoTexture = useMemo(() => {
     const canvas = document.createElement('canvas')
-    canvas.width = 512; canvas.height = 512
+    canvas.width = 512; canvas.height = 128
     const ctx = canvas.getContext('2d')
-    ctx.clearRect(0, 0, 512, 512)
-
-    // Draw background gradient (purple → magenta → pink, matching brand palette)
-    const gradient = ctx.createRadialGradient(256, 256, 0, 256, 256, 256)
-    gradient.addColorStop(0, 'rgba(168,85,247,0.9)')   // purple core
-    gradient.addColorStop(0.3, 'rgba(217,70,239,0.6)') // magenta mid
-    gradient.addColorStop(1, 'rgba(236,72,153,0.4)')   // pink edge
-    ctx.fillStyle = gradient
-    ctx.fillRect(0, 0, 512, 512)
-
-    // Draw stylized "BASE" emblem: geometric abstract mark
-    // Central circle representing the platform
-    ctx.save()
-    ctx.translate(256, 256)
-
-    // Outer ring - platform boundary
-    ctx.strokeStyle = 'rgba(168,85,247,0.6)'
-    ctx.lineWidth = 3
-    ctx.beginPath()
-    ctx.arc(0, 0, 65, 0, Math.PI * 2)
-    ctx.stroke()
-
-    // Inner circle - focus area
-    ctx.fillStyle = 'rgba(34,211,238,0.2)'
-    ctx.beginPath()
-    ctx.arc(0, 0, 45, 0, Math.PI * 2)
-    ctx.fill()
-
-    // Accent arcs - representing connectivity/data flow
-    ctx.lineWidth = 2
-    const angles = [0, Math.PI/4, Math.PI/2, 3*Math.PI/4, Math.PI, 5*Math.PI/4, 3*Math.PI/2, 7*Math.PI/4]
-    angles.forEach((angle, i) => {
-      const nextAngle = angles[(i+1) % angles.length]
-      ctx.beginPath()
-      ctx.moveTo(0, 0)
-      ctx.rotate(angle)
-      ctx.lineTo(0, 50)
-      ctx.rotate(-angle)
-      ctx.strokeStyle = `rgba(236,72,153,${0.5 + 0.3 * Math.sin(i * 0.8)})`
-      ctx.stroke()
-    })
-
-    // "BASE" text mark in center - small and subtle
-    ctx.font = 'bold 48px monospace'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillStyle = 'rgba(255,255,255,0.4)'
-    ctx.fillText('BASE', 0, 0)
-
-    ctx.restore()
-
-    // Outer glow - pulse effect aura
-    ctx.strokeStyle = 'rgba(168,85,247,0.4)'
-    ctx.lineWidth = 6
-    ctx.beginPath()
-    ctx.arc(256, 256, 80, 0, Math.PI * 2)
-    ctx.stroke()
-
+    ctx.clearRect(0, 0, 512, 128)
+    ctx.font = 'bold 72px monospace'
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+    ctx.fillStyle = '#0052FF'
+    ctx.shadowColor = '#0052FF'; ctx.shadowBlur = 30
+    ctx.fillText('BASE', 256, 64)
+    ctx.shadowBlur = 0
+    ctx.fillText('BASE', 256, 64)
     return new THREE.CanvasTexture(canvas)
   }, [])
 
@@ -297,13 +248,13 @@ function BaseCore({ flowRef }) {
           map={baseLogoTexture}
           transparent
           blending={THREE.AdditiveBlending}
-          opacity={1.0}
+          opacity={0.85}
           depthWrite={false}
         />
       </sprite>
       <mesh>
         <sphereGeometry args={[0.4, 16, 12]} />
-        <meshBasicMaterial color={0x0052FF} transparent opacity={0.05} />
+        <meshBasicMaterial color={0x0052FF} transparent opacity={0.08} />
       </mesh>
     </group>
   )

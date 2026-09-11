@@ -147,12 +147,22 @@ function CRTLoader({ onComplete }) {
       ctx.fillStyle = '#010005'
       ctx.fillRect(0, 0, w, h)
 
-      // --- Fase A: punto → línea horizontal (t 0→0.38) ---
-      if (t < 0.38) {
-        const p = t / 0.38
+      // --- Fase A: punto → línea horizontal con profundidad (t 0→0.5) ---
+      if (t < 0.5) {
+        const p = t / 0.5
         const ease = p * p
-        const halfW = 3 + ease * w * 0.22
+        const halfW = 3 + ease * w * 0.24
         const dotR = (2 + p * 5) * S
+        // halo profundo: la línea respira sobre un aura elíptica
+        const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, halfW * 1.4)
+        halo.addColorStop(0, `rgba(150,170,255,${0.22 * flick})`)
+        halo.addColorStop(0.5, `rgba(168,85,247,${0.12 * flick})`)
+        halo.addColorStop(1, 'rgba(0,82,255,0)')
+        ctx.fillStyle = halo
+        ctx.beginPath()
+        ctx.arc(cx, cy, halfW * 1.4, 0, Math.PI * 2)
+        ctx.fill()
+        // punto de ignición
         const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, dotR * 6)
         glow.addColorStop(0, `rgba(255,255,255,${0.8 * flick})`)
         glow.addColorStop(0.4, `rgba(34,211,238,${0.25 * flick})`)
@@ -161,6 +171,7 @@ function CRTLoader({ onComplete }) {
         ctx.beginPath()
         ctx.arc(cx, cy, dotR * 6, 0, Math.PI * 2)
         ctx.fill()
+        // cuerpo de la línea: franja púrpura→núcleo blanco→cian
         const lg = ctx.createLinearGradient(cx - halfW, 0, cx + halfW, 0)
         lg.addColorStop(0, 'rgba(0,82,255,0)')
         lg.addColorStop(0.25, `rgba(168,85,247,${0.7 * flick})`)
@@ -168,35 +179,65 @@ function CRTLoader({ onComplete }) {
         lg.addColorStop(0.75, `rgba(34,211,238,${0.7 * flick})`)
         lg.addColorStop(1, 'rgba(0,82,255,0)')
         ctx.fillStyle = lg
-        ctx.fillRect(cx - halfW, cy - 1.5, halfW * 2, 3)
+        ctx.fillRect(cx - halfW, cy - 2, halfW * 2, 4)
+        // núcleo caliente de 1px
+        ctx.fillStyle = `rgba(255,255,255,${0.9 * flick})`
+        ctx.fillRect(cx - halfW, cy - 0.5, halfW * 2, 1)
+        // reflejos tenues arriba/abajo: la línea flota en vidrio
+        const rg = ctx.createLinearGradient(0, cy - 26 * S, 0, cy + 26 * S)
+        rg.addColorStop(0, 'rgba(34,211,238,0)')
+        rg.addColorStop(0.5, `rgba(150,170,255,${0.10 * flick})`)
+        rg.addColorStop(1, 'rgba(168,85,247,0)')
+        ctx.fillStyle = rg
+        ctx.fillRect(cx - halfW, cy - 26 * S, halfW * 2, 52 * S)
+        // shimmer viajero: un brillo recorre la línea
+        const sx = cx - halfW + (0.5 + 0.5 * Math.sin(elapsed * 0.006)) * halfW * 2
+        const shim = ctx.createRadialGradient(sx, cy, 0, sx, cy, 26 * S)
+        shim.addColorStop(0, `rgba(255,255,255,${0.55 * flick})`)
+        shim.addColorStop(1, 'rgba(255,255,255,0)')
+        ctx.fillStyle = shim
+        ctx.beginPath()
+        ctx.arc(sx, cy, 26 * S, 0, Math.PI * 2)
+        ctx.fill()
       }
 
-      // --- Fase B: apertura vertical + scanlines (t 0.38→0.62) ---
-      if (t >= 0.38 && t < 0.62) {
-        const p = (t - 0.38) / 0.24
-        const ease = 1 - (1 - p) * (1 - p)
-        const halfW = w * 0.22
-        const halfH = 2 + ease * h * 0.24
-        const vg = ctx.createLinearGradient(0, cy - halfH, 0, cy + halfH)
-        vg.addColorStop(0, 'rgba(0,82,255,0)')
-        vg.addColorStop(0.5, `rgba(220,230,255,${0.5 * flick})`)
-        vg.addColorStop(1, 'rgba(0,82,255,0)')
-        ctx.fillStyle = vg
-        ctx.fillRect(cx - halfW, cy - halfH, halfW * 2, halfH * 2)
-        // bordes CRT
-        ctx.fillStyle = `rgba(255,255,255,${0.8 * flick})`
-        ctx.fillRect(cx - halfW, cy - halfH, halfW * 2, 1.5)
-        ctx.fillRect(cx - halfW, cy + halfH - 1.5, halfW * 2, 1.5)
-        // scanlines
-        ctx.fillStyle = `rgba(0,0,0,${0.25 * flick})`
-        for (let y = cy - halfH; y < cy + halfH; y += 4) {
-          ctx.fillRect(cx - halfW, y, halfW * 2, 1)
-        }
+      // --- Fase B: la línea respira y barre antes del destello (t 0.5→0.6) ---
+      if (t >= 0.5 && t < 0.6) {
+        const q = (t - 0.5) / 0.1
+        const halfW = w * 0.24
+        const breathe = 0.85 + 0.15 * Math.sin(elapsed * 0.02)
+        const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, halfW * 1.4)
+        halo.addColorStop(0, `rgba(150,170,255,${0.22 * flick * breathe})`)
+        halo.addColorStop(0.5, `rgba(168,85,247,${0.12 * flick * breathe})`)
+        halo.addColorStop(1, 'rgba(0,82,255,0)')
+        ctx.fillStyle = halo
+        ctx.beginPath()
+        ctx.arc(cx, cy, halfW * 1.4, 0, Math.PI * 2)
+        ctx.fill()
+        const lg = ctx.createLinearGradient(cx - halfW, 0, cx + halfW, 0)
+        lg.addColorStop(0, 'rgba(0,82,255,0)')
+        lg.addColorStop(0.25, `rgba(168,85,247,${0.7 * flick * breathe})`)
+        lg.addColorStop(0.5, `rgba(255,255,255,${0.95 * flick * breathe})`)
+        lg.addColorStop(0.75, `rgba(34,211,238,${0.7 * flick * breathe})`)
+        lg.addColorStop(1, 'rgba(0,82,255,0)')
+        ctx.fillStyle = lg
+        ctx.fillRect(cx - halfW, cy - 2, halfW * 2, 4)
+        ctx.fillStyle = `rgba(255,255,255,${0.9 * flick * breathe})`
+        ctx.fillRect(cx - halfW, cy - 0.5, halfW * 2, 1)
+        // barrido final de izquierda a derecha: carga el destello
+        const sx = cx - halfW + q * halfW * 2
+        const shim = ctx.createRadialGradient(sx, cy, 0, sx, cy, 34 * S)
+        shim.addColorStop(0, `rgba(255,255,255,${0.7 * flick})`)
+        shim.addColorStop(1, 'rgba(255,255,255,0)')
+        ctx.fillStyle = shim
+        ctx.beginPath()
+        ctx.arc(sx, cy, 34 * S, 0, Math.PI * 2)
+        ctx.fill()
       }
 
-      // --- Fase C: colapso en destello → estrella ✦ (t 0.62→0.85) ---
-      if (t >= 0.62 && t < 0.85) {
-        const p = (t - 0.62) / 0.23
+      // --- Fase C: colapso en destello → estrella ✦ (t 0.6→0.85) ---
+      if (t >= 0.6 && t < 0.85) {
+        const p = (t - 0.6) / 0.25
         const flash = p < 0.15 ? p / 0.15 : Math.max(0, 1 - (p - 0.15) / 0.35)
         if (flash > 0) {
           ctx.fillStyle = `rgba(235,240,255,${flash * 0.85 * flick})`
