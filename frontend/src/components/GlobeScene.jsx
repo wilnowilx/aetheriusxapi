@@ -656,9 +656,39 @@ function ImpactManager({ onImpactsReady }) {
   return null
 }
 
+// === IMPACTS BRIDGE — holds impact state INSIDE Canvas ===
+// setImpactPoints used to live in the <Canvas> wrapper: every frame produced a
+// new array → wrapper re-rendered 60x/s recreating the inline camera prop →
+// R3F re-applied the camera each frame and fought OrbitControls autoRotate to
+// a standstill ("moves a little, then freezes"). Keeping the state here means
+// per-frame updates only reconcile Canvas children — the camera is untouched.
+function GlobeImpacts() {
+  const [impactPoints, setImpactPoints] = useState([])
+  const lastSig = useRef('')
+
+  // Only notify when the active set actually changes (idle frames send nothing)
+  const handleImpactsReady = useCallback((pts) => {
+    let sig = pts.length + ':'
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i]
+      sig += p.position.x.toFixed(1) + ',' + p.position.y.toFixed(1) + ',' + p.position.z.toFixed(1) + ',' + p.intensity.toFixed(2) + ';'
+    }
+    if (sig !== lastSig.current) {
+      lastSig.current = sig
+      setImpactPoints(pts)
+    }
+  }, [])
+
+  return (
+    <>
+      <VisibleWireframe impactPoints={impactPoints} />
+      <ImpactManager onImpactsReady={handleImpactsReady} />
+    </>
+  )
+}
+
 // === MAIN GLOBE SCENE ===
 function GlobeScene({ liveData, paused }) {
-  const [impactPoints, setImpactPoints] = useState([])
   const isMobile = useMemo(() => {
     if (typeof window === 'undefined') return false
     return window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768
@@ -670,21 +700,27 @@ function GlobeScene({ liveData, paused }) {
     }
   }, [])
 
+  // Memoized Canvas props: fresh inline objects on every render would make R3F
+  // re-apply them (camera snap) and fight OrbitControls. Stable identities.
+  const cameraProps = useMemo(() => ({ position: [0, 0.3, 10.5], fov: 40 }), [])
+  const glProps = useMemo(() => ({ alpha: true, antialias: !isMobile, powerPreference: 'high-performance' }), [isMobile])
+  const canvasStyle = useMemo(() => ({ position: 'absolute', inset: 0, width: '100%', height: '100%', background: 'transparent' }), [])
+  const dprRange = useMemo(() => [1, 1.5], [])
+
   return (
     <Canvas
-      camera={{ position: [0, 0.3, 10.5], fov: 40 }}
-      gl={{ alpha: true, antialias: !isMobile, powerPreference: 'high-performance' }}
+      camera={cameraProps}
+      gl={glProps}
       onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: 'transparent' }}
-      dpr={[1, 1.5]}
+      style={canvasStyle}
+      dpr={dprRange}
       frameloop={paused ? 'demand' : 'always'}
     >
       <ambientLight intensity={0.05} />
       <group scale={1.3}>
-        <VisibleWireframe impactPoints={impactPoints} />
+        <GlobeImpacts />
         <BaseCore />
         <EnergyParticles liveData={liveData} onImpact={handleImpact} />
-        <ImpactManager onImpactsReady={setImpactPoints} />
         <OuterHalo />
         <AtmosphereGlow />
         <InnerCore />
