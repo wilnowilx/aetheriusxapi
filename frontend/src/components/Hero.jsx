@@ -81,29 +81,29 @@ function SupernovaLoader({ onComplete }) {
           ? p / 0.1 // rise
           : Math.max(0, 1 - (p - 0.1) / 0.3) // decay
 
-        // Central glow behind the sparkle
-        const glowR = 80 + p * 300
+        // Central glow behind the sparkle (subtle)
+        const glowR = 60 + p * 200
         const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR)
-        glow.addColorStop(0, `rgba(255,255,255,${flashIntensity * 0.7})`)
-        glow.addColorStop(0.12, `rgba(0,82,255,${flashIntensity * 0.45})`)
-        glow.addColorStop(0.35, `rgba(168,85,247,${flashIntensity * 0.15})`)
+        glow.addColorStop(0, `rgba(255,255,255,${flashIntensity * 0.45})`)
+        glow.addColorStop(0.12, `rgba(0,82,255,${flashIntensity * 0.28})`)
+        glow.addColorStop(0.35, `rgba(168,85,247,${flashIntensity * 0.1})`)
         glow.addColorStop(1, 'transparent')
         ctx.fillStyle = glow
         ctx.fillRect(0, 0, w, h)
 
-        // 4-point sparkle — long thin points, concave waist (like ✦)
-        const R = (60 + p * 340) * (Math.max(w, h) / 800)
-        const waist = R * 0.10
-        const starAlpha = flashIntensity
+        // 4-point sparkle — small, thin, subtle (like ✦)
+        const R = (36 + p * 190) * (Math.max(w, h) / 800)
+        const waist = R * 0.07
+        const starAlpha = flashIntensity * 0.7
 
         ctx.save()
         ctx.translate(cx, cy)
 
         // Filled sparkle body (white core → blue edge)
         const bodyGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, R)
-        bodyGrad.addColorStop(0, `rgba(255,255,255,${0.95 * starAlpha})`)
-        bodyGrad.addColorStop(0.25, `rgba(0,82,255,${0.75 * starAlpha})`)
-        bodyGrad.addColorStop(0.6, `rgba(168,85,247,${0.35 * starAlpha})`)
+        bodyGrad.addColorStop(0, `rgba(255,255,255,${0.85 * starAlpha})`)
+        bodyGrad.addColorStop(0.25, `rgba(0,82,255,${0.55 * starAlpha})`)
+        bodyGrad.addColorStop(0.6, `rgba(168,85,247,${0.22 * starAlpha})`)
         bodyGrad.addColorStop(1, 'rgba(168,85,247,0)')
         ctx.fillStyle = bodyGrad
         ctx.beginPath()
@@ -120,9 +120,9 @@ function SupernovaLoader({ onComplete }) {
         ctx.lineWidth = 1.5
         ctx.stroke()
 
-        // Long lens-flare spikes (vertical + horizontal)
-        const spikeLen = R * 1.5
-        const spikeW = 2 + (1 - p) * 2
+        // Long lens-flare spikes (vertical + horizontal, subtle)
+        const spikeLen = R * 1.2
+        const spikeW = 1 + (1 - p) * 1.2
         let lg = ctx.createLinearGradient(0, -spikeLen, 0, spikeLen)
         lg.addColorStop(0, 'rgba(0,82,255,0)')
         lg.addColorStop(0.5, `rgba(255,255,255,${0.55 * starAlpha})`)
@@ -148,11 +148,11 @@ function SupernovaLoader({ onComplete }) {
 
         // One faint expanding ring (continuity into the globe reveal)
         const ringRadius = p * Math.max(w, h) * 0.55
-        const ringAlpha = Math.max(0, 0.35 * (1 - p * p)) * flashIntensity
+        const ringAlpha = Math.max(0, 0.18 * (1 - p * p)) * flashIntensity
         ctx.beginPath()
         ctx.arc(cx, cy, ringRadius, 0, Math.PI * 2)
         ctx.strokeStyle = `rgba(0,82,255,${ringAlpha})`
-        ctx.lineWidth = 2 + (1 - p) * 5
+        ctx.lineWidth = 1 + (1 - p) * 2.5
         ctx.stroke()
 
         // Scattered particles from center
