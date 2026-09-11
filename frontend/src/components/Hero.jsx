@@ -447,12 +447,65 @@ function useLiveData() {
   return data
 }
 
+// === CSS GLOBE FALLBACK — when WebGL is unavailable (strict fingerprinting
+// blockers, old devices). Never show a dead hero: slow orbital rings + glow.
+function GlobeCSSFallback() {
+  return (
+    <div style={{
+      position: 'absolute', inset: '-12%', pointerEvents: 'none',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      <div style={{
+        width: '52vmin', height: '52vmin', borderRadius: '50%', position: 'relative',
+        background: 'radial-gradient(circle, rgba(168,85,247,0.10) 0%, rgba(34,211,238,0.05) 45%, transparent 70%)',
+      }}>
+        <div style={{
+          position: 'absolute', inset: 0, borderRadius: '50%',
+          border: '1px solid rgba(168,85,247,0.22)', borderTopColor: 'rgba(0,82,255,0.55)',
+          animation: 'cssSpin 26s linear infinite',
+        }} />
+        <div style={{
+          position: 'absolute', inset: '7%', borderRadius: '50%',
+          border: '1px dashed rgba(34,211,238,0.18)',
+          animation: 'cssSpinRev 44s linear infinite',
+        }} />
+        <div style={{ position: 'absolute', inset: '-4%', animation: 'cssSpin 12s linear infinite' }}>
+          <div style={{
+            position: 'absolute', top: '6%', left: '50%', width: 6, height: 6,
+            borderRadius: '50%', background: '#22d3ee', boxShadow: '0 0 12px #22d3ee',
+          }} />
+        </div>
+        <div style={{ position: 'absolute', inset: '10%', animation: 'cssSpinRev 18s linear infinite' }}>
+          <div style={{
+            position: 'absolute', bottom: '10%', left: '50%', width: 5, height: 5,
+            borderRadius: '50%', background: '#a855f7', boxShadow: '0 0 10px #a855f7',
+          }} />
+        </div>
+        <style>{`@keyframes cssSpin{to{transform:rotate(360deg)}}@keyframes cssSpinRev{to{transform:rotate(-360deg)}}`}</style>
+      </div>
+    </div>
+  )
+}
+
 // === MAIN HERO ===
 function Hero() {
   const liveData = useLiveData()
   const [globePaused, setGlobePaused] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const [webglOK, setWebglOK] = useState(true)
   const heroRef = useRef(null)
+
+  // WebGL availability probe — strict fingerprinting blockers (Brave Shields)
+  // return a null context. Detect once, fall back to the CSS globe.
+  useEffect(() => {
+    try {
+      const c = document.createElement('canvas')
+      const gl = c.getContext('webgl2') || c.getContext('webgl')
+      if (!gl) setWebglOK(false)
+    } catch {
+      setWebglOK(false)
+    }
+  }, [])
 
   // IntersectionObserver: pause globe when hero scrolls off-screen
   useEffect(() => {
@@ -515,6 +568,7 @@ function Hero() {
             animation: 'holoPulse 8s ease-in-out infinite alternate',
           }} />
 
+          {webglOK ? (
           <GlobeBoundary>
             <Suspense fallback={
               <div style={{ width: 280, height: 280, borderRadius: '50%',
@@ -526,6 +580,9 @@ function Hero() {
               </div>
             </Suspense>
           </GlobeBoundary>
+          ) : (
+            <GlobeCSSFallback />
+          )}
         </div>
 
         {/* Content — no transforms */}
