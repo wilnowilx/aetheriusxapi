@@ -739,7 +739,7 @@ return (
           )}
         </div>
 
-        {/* Content — no transforms */}
+        {/* Content — minimal: badge + scroll cue only. Text lives in orbital rings now. */}
         <div className="hero-fade" style={{
           position: 'relative', zIndex: 10,
           display: 'flex', flexDirection: 'column',
@@ -770,39 +770,6 @@ return (
               color: '#d946ef',
               letterSpacing: '0.1em',
             }}>PROTOCOL</span>
-          </div>
-
-          {/* Title */}
-          <h1 style={{
-            fontSize: 'clamp(2.5rem, 8vw, 7rem)',
-            lineHeight: 1.1, letterSpacing: '-0.02em',
-            fontWeight: 400, color: 'rgba(255,255,255,0.95)', margin: 0,
-            textShadow: '0 0 60px rgba(168,85,247,0.15), 0 0 30px rgba(34,211,238,0.08)',
-            fontFamily: "'Inter', sans-serif",
-          }}>The Marketplace<br/>That Lives</h1>
-
-          <div style={{
-            fontSize: 'clamp(1rem, 2vw, 1.4rem)',
-            marginTop: 12, fontWeight: 300,
-            color: 'rgba(255,255,255,0.4)',
-            letterSpacing: '0.02em',
-          }}>API infrastructure for AI agents that pay</div>
-
-          {/* Live metrics */}
-          <div style={{
-            display: 'flex', gap: 24, marginTop: 32,
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '0.65rem',
-            color: 'rgba(255,255,255,0.25)',
-            letterSpacing: '0.06em',
-          }}>
-            <span>{liveData.endpoints} endpoints</span>
-            <span style={{ color: 'rgba(168,85,247,0.4)' }}>·</span>
-            <span>{liveData.freeEndpoints} free</span>
-            <span style={{ color: 'rgba(168,85,247,0.4)' }}>·</span>
-            <span style={{ color: liveData.status === 'live' ? 'rgba(16,185,129,0.5)' : 'rgba(255,255,255,0.25)' }}>
-              {liveData.latency}
-            </span>
           </div>
         </div>
 

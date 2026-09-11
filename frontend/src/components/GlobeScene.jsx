@@ -508,6 +508,154 @@ function OrbitRings() {
   )
 }
 
+// === ORBITAL TEXT RINGS — Saturn-like rings with readable text ===
+// Tres anillos concéntricos con texto legible que orbitan la esfera.
+// Cada anillo es una frase completa dividida en segmentos (sprites)
+// que rotan juntos. Los sprites hacen billboard para legibilidad,
+// pero el grupo rota como anillo sólido.
+function OrbitalTextRings({ liveData }) {
+  const groupRef = useRef()
+  const elapsed = useRef(0)
+
+  // Anillo 1: título principal — radio mayor, más lento, más grande
+  // Anillo 2: subtítulo — radio medio
+  // Anillo 3: métricas vivas — radio menor, más rápido
+  const ringsConfig = useMemo(() => {
+    const d = liveData || {}
+    return [
+      {
+        radius: 3.2,
+        tilt: Math.PI / 2,
+        speed: 0.04,
+        color: '#c084fc',
+        opacity: 0.55,
+        fontSize: 1.15,
+        segments: [
+          'THE',
+          'MARKETPLACE',
+          'THAT',
+          'LIVES',
+        ],
+      },
+      {
+        radius: 2.75,
+        tilt: Math.PI / 2 + 0.15,
+        speed: 0.06,
+        color: '#d946ef',
+        opacity: 0.45,
+        fontSize: 0.75,
+        segments: [
+          'API',
+          'INFRASTRUCTURE',
+          'FOR',
+          'AI',
+          'AGENTS',
+          'THAT',
+          'PAY',
+        ],
+      },
+      {
+        radius: 2.35,
+        tilt: Math.PI / 2 + 0.28,
+        speed: 0.09,
+        color: '#22d3ee',
+        opacity: 0.5,
+        fontSize: 0.55,
+        segments: [
+          `${d.endpoints || '100+'}`,
+          'ENDPOINTS',
+          '·',
+          `${d.freeEndpoints || '40'}`,
+          'FREE',
+          '·',
+          `${d.latency || '—'}`,
+        ],
+      },
+    ]
+  }, [liveData])
+
+  // Crear texturas para cada segmento
+  const ringsTextures = useMemo(() =>
+    ringsConfig.map(ring =>
+      ring.segments.map(seg => {
+        const canvas = document.createElement('canvas')
+        const isDot = seg === '·'
+        canvas.width = isDot ? 128 : 512
+        canvas.height = 128
+        const ctx = canvas.getContext('2d')
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        const size = Math.round(ring.fontSize * (isDot ? 60 : 80))
+        ctx.font = `bold ${size}px 'JetBrains Mono', monospace`
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillStyle = ring.color
+        ctx.shadowColor = ring.color
+        ctx.shadowBlur = isDot ? 8 : 20
+        ctx.fillText(seg, canvas.width / 2, canvas.height / 2)
+        return new THREE.CanvasTexture(canvas)
+      })
+    )
+  , [ringsConfig])
+
+  useFrame((state, delta) => {
+    elapsed.current += delta
+    if (groupRef.current) {
+      // Cada anillo rota a su velocidad, creando paralaje
+      ringsConfig.forEach((ring, i) => {
+        const ringGroup = groupRef.current.children[i]
+        if (ringGroup) {
+          ringGroup.rotation.y = elapsed.current * ring.speed
+        }
+      })
+    }
+  })
+
+  return (
+    <group ref={groupRef}>
+      {ringsConfig.map((ring, ringIdx) => (
+        <group key={ringIdx} rotation={[ring.tilt, 0, 0]}>
+          {ring.segments.map((seg, segIdx) => {
+            const angle = (segIdx / ring.segments.length) * Math.PI * 2
+            return (
+              <sprite
+                key={`${ringIdx}-${segIdx}`}
+                position={[
+                  ring.radius * Math.cos(angle),
+                  ring.radius * Math.sin(angle) * Math.sin(ring.tilt),
+                  ring.radius * Math.sin(angle) * Math.cos(ring.tilt),
+                ]}
+                scale={[
+                  ring.fontSize * (seg === '·' ? 0.6 : 1.8),
+                  ring.fontSize * 0.45,
+                  1,
+                ]}
+              >
+                <spriteMaterial
+                  map={ringsTextures[ringIdx][segIdx]}
+                  transparent
+                  blending={THREE.AdditiveBlending}
+                  opacity={ring.opacity}
+                  depthWrite={false}
+                />
+              </sprite>
+            )
+          })}
+          {/* Thin visual ring line for structure */}
+          <mesh>
+            <torusGeometry args={[ring.radius, 0.0025, 8, 160]} />
+            <meshBasicMaterial
+              color={ring.color}
+              transparent
+              opacity={ring.opacity * 0.15}
+              depthWrite={false}
+            />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  )
+}
+
 // === ORBITAL DATA — real x402 metrics orbiting the globe ===
 function OrbitalData({ liveData }) {
   const groupRef = useRef()
@@ -804,6 +952,7 @@ function GlobeScene({ liveData, paused }) {
         <InnerCore />
         <AgentNodes />
         <OrbitRings />
+        <OrbitalTextRings liveData={liveData} />
         <OrbitalData liveData={liveData} />
         <DataStream />
       </group>
