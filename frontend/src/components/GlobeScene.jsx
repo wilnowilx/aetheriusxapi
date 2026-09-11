@@ -32,7 +32,7 @@ function OuterHalo() {
             float pulse = 0.85 + 0.15 * sin(time * 0.4 + vWorldPos.y * 1.2);
             float wave = 0.5 + 0.5 * sin(time * 0.3 + vWorldPos.x * 1.8);
             vec3 col = mix(colorA, colorB, wave * 0.2);
-            gl_FragColor = vec4(col, fresnel * pulse * 0.05);
+            gl_FragColor = vec4(col, fresnel * pulse * 0.1);
           }
         `}
         side={THREE.BackSide} transparent depthWrite={false} blending={THREE.AdditiveBlending}
@@ -70,7 +70,7 @@ function AtmosphereGlow() {
             float pulse = 0.88 + 0.12 * sin(time * 0.8 + vWorldPos.y * 2.0);
             float wave = 0.5 + 0.5 * sin(time * 0.5 + vWorldPos.x * 2.2 + vWorldPos.z * 1.3);
             vec3 col = mix(colorA, colorB, wave * 0.25);
-            gl_FragColor = vec4(col, fresnel * pulse * 0.1);
+            gl_FragColor = vec4(col, fresnel * pulse * 0.18);
           }
         `}
         side={THREE.BackSide} transparent depthWrite={false} blending={THREE.AdditiveBlending}
@@ -101,7 +101,7 @@ function InnerCore() {
             float rim = pow(1.0 - abs(dot(vNormal, vec3(0, 0, 1))), 2.0);
             float pulse = 0.85 + 0.15 * sin(time * 0.4);
             vec3 col = vec3(0.659, 0.333, 0.969);
-            gl_FragColor = vec4(col, rim * pulse * 0.04);
+            gl_FragColor = vec4(col, rim * pulse * 0.08);
           }
         `}
         side={THREE.FrontSide} transparent depthWrite={false} blending={THREE.AdditiveBlending}
@@ -127,7 +127,7 @@ function VisibleWireframe({ impactPoints }) {
   }), [])
 
   useFrame((state, delta) => {
-    uniforms.time.value += delta * 0.5
+    uniforms.time.value += delta * 0.8
     // Feed impact points into shader
     if (impactPoints) {
       for (let i = 0; i < 8 && i < impactPoints.length; i++) {
@@ -163,16 +163,16 @@ function VisibleWireframe({ impactPoints }) {
           float impactPulse(vec3 worldPos, vec3 impactPos, float intensity) {
             float dist = length(worldPos - impactPos);
             // Expanding ring from impact point
-            float ring = abs(dist - time * 1.5 * intensity);
-            float ringPulse = exp(-ring * 3.0) * intensity;
+            float ring = abs(dist - time * 2.0 * intensity);
+            float ringPulse = exp(-ring * 2.5) * intensity;
             // Proximity glow
-            float prox = exp(-dist * 1.8) * intensity * 0.5;
+            float prox = exp(-dist * 1.2) * intensity * 0.6;
             return ringPulse + prox;
           }
 
           void main() {
-            float pulse = 0.6 + 0.4 * sin(time * 0.5 + vWorldPos.y * 2.0);
-            float fade = smoothstep(0.0, 0.3, abs(vPos.y));
+            float pulse = 0.55 + 0.45 * sin(time * 0.7 + vWorldPos.y * 2.0 + vWorldPos.x * 1.5);
+            float fade = smoothstep(0.0, 0.2, abs(vPos.y));
 
             // Accumulate impact pulses
             float impacts = 0.0;
@@ -192,7 +192,7 @@ function VisibleWireframe({ impactPoints }) {
             vec3 impactCol = mix(vec3(0.0, 0.322, 1.0), vec3(1.0, 1.0, 1.0), 0.6);
             vec3 col = mix(baseCol, impactCol, impacts * 0.7);
 
-            float alpha = 0.02 * pulse * fade + impacts * 0.15;
+            float alpha = 0.08 * pulse * fade + impacts * 0.25;
             gl_FragColor = vec4(col, alpha);
           }
         `}
@@ -252,7 +252,7 @@ function BaseCore() {
 
 // === ENERGY PARTICLES — travel center → wireframe, pulse on impact ===
 function EnergyParticles({ liveData, onImpact }) {
-  const PARTICLE_COUNT = 40
+  const PARTICLE_COUNT = 60
   const elapsed = useRef(0)
   const pointsRef = useRef()
   const WIRE_RADIUS = 2.2
@@ -271,7 +271,7 @@ function EnergyParticles({ liveData, onImpact }) {
       pos[i * 3 + 2] = (Math.random() - 0.5) * 0.3
       const theta = Math.random() * Math.PI * 2
       const phi = Math.acos(2 * Math.random() - 1)
-      const speed = 0.8 + Math.random() * 0.6
+      const speed = 1.8 + Math.random() * 1.2
       vel[i * 3] = Math.sin(phi) * Math.cos(theta) * speed
       vel[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed
       vel[i * 3 + 2] = Math.cos(phi) * speed
@@ -279,9 +279,9 @@ function EnergyParticles({ liveData, onImpact }) {
       col[i * 3] = 0.0 * (1 - t) + 0.659 * t
       col[i * 3 + 1] = 0.322 * (1 - t) + 0.333 * t
       col[i * 3 + 2] = 1.0 * (1 - t) + 0.969 * t
-      sz[i] = 0.015 + Math.random() * 0.02
+      sz[i] = 0.04 + Math.random() * 0.05
       life[i] = Math.random() * 3
-      maxLife[i] = 2.5 + Math.random() * 1.5
+      maxLife[i] = 1.8 + Math.random() * 1.2
     }
     return { positions: pos, velocities: vel, colors: col, sizes: sz, lifetimes: life, maxLifetimes: maxLife, hit }
   }, [])
@@ -301,12 +301,12 @@ function EnergyParticles({ liveData, onImpact }) {
         positions[i * 3 + 2] = (Math.random() - 0.5) * 0.3
         const theta = Math.random() * Math.PI * 2
         const phi = Math.acos(2 * Math.random() - 1)
-        const speed = 0.8 + Math.random() * 0.6
+        const speed = 1.8 + Math.random() * 1.2
         velocities[i * 3] = Math.sin(phi) * Math.cos(theta) * speed
         velocities[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed
         velocities[i * 3 + 2] = Math.cos(phi) * speed
         lifetimes[i] = 0
-        maxLifetimes[i] = 2.5 + Math.random() * 1.5
+        maxLifetimes[i] = 1.8 + Math.random() * 1.2
         hit[i] = 0
         continue
       }
@@ -353,9 +353,9 @@ function EnergyParticles({ liveData, onImpact }) {
           varying vec3 vColor; varying float vAlpha; uniform float time;
           void main() {
             vColor = aColor;
-            vAlpha = 0.6 + 0.4 * sin(time * 3.0 + position.x * 5.0);
+            vAlpha = 0.7 + 0.3 * sin(time * 4.0 + position.x * 5.0);
             vec4 mv = modelViewMatrix * vec4(position, 1.0);
-            gl_PointSize = aSize * (400.0 / -mv.z);
+            gl_PointSize = aSize * (500.0 / -mv.z);
             gl_Position = projectionMatrix * mv;
           }
         `}
@@ -364,8 +364,8 @@ function EnergyParticles({ liveData, onImpact }) {
           void main() {
             float d = length(gl_PointCoord - vec2(0.5));
             if (d > 0.5) discard;
-            float glow = pow(1.0 - d * 2.0, 2.0);
-            gl_FragColor = vec4(vColor, glow * vAlpha * 0.8);
+            float glow = pow(1.0 - d * 2.0, 1.5);
+            gl_FragColor = vec4(vColor, glow * vAlpha * 1.0);
           }
         `}
         transparent depthWrite={false} blending={THREE.AdditiveBlending}
@@ -416,10 +416,10 @@ function AgentNodes() {
           void main() {
             vColor = aColor;
             vec3 pos = position;
-            pos += normalize(position) * sin(time * 1.0 + position.x * 2.5) * 0.025;
-            vAlpha = 0.5 + 0.5 * sin(time * 1.6 + position.y * 1.8);
+            pos += normalize(position) * sin(time * 1.5 + position.x * 2.5) * 0.04;
+            vAlpha = 0.6 + 0.4 * sin(time * 2.0 + position.y * 1.8);
             vec4 mv = modelViewMatrix * vec4(pos, 1.0);
-            gl_PointSize = aSize * (360.0 / -mv.z);
+            gl_PointSize = aSize * (450.0 / -mv.z);
             gl_Position = projectionMatrix * mv;
           }
         `}
@@ -428,8 +428,8 @@ function AgentNodes() {
           void main() {
             float d = length(gl_PointCoord - vec2(0.5));
             if (d > 0.5) discard;
-            float glow = pow(1.0 - d * 2.0, 2.0);
-            gl_FragColor = vec4(vColor, glow * vAlpha * 0.8);
+            float glow = pow(1.0 - d * 2.0, 1.5);
+            gl_FragColor = vec4(vColor, glow * vAlpha * 0.9);
           }
         `}
         transparent depthWrite={false} blending={THREE.AdditiveBlending}
@@ -443,9 +443,9 @@ function OrbitRings() {
   return (
     <group>
       {[
-        { radius: 2.5, tilt: Math.PI / 2, color: 0xa855f7, opacity: 0.07 },
-        { radius: 2.7, tilt: Math.PI / 2 + 0.18, color: 0x22d3ee, opacity: 0.05 },
-        { radius: 2.9, tilt: Math.PI / 2 + 0.35, color: 0xd946ef, opacity: 0.04 },
+        { radius: 2.5, tilt: Math.PI / 2, color: 0xa855f7, opacity: 0.15 },
+        { radius: 2.7, tilt: Math.PI / 2 + 0.18, color: 0x22d3ee, opacity: 0.10 },
+        { radius: 2.9, tilt: Math.PI / 2 + 0.35, color: 0xd946ef, opacity: 0.08 },
       ].map((r, i) => (
         <mesh key={i} rotation={[r.tilt, 0, i * 0.3]}>
           <torusGeometry args={[r.radius, 0.005, 8, 160]} />
@@ -492,12 +492,12 @@ function OrbitalData({ liveData }) {
 
   useFrame((state, delta) => {
     elapsed.current += delta
-    if (groupRef.current) groupRef.current.rotation.y = elapsed.current * 0.12
+    if (groupRef.current) groupRef.current.rotation.y = elapsed.current * 0.25
     spriteRefs.current.forEach((sprite, i) => {
       if (sprite) {
         const isHovered = hovered === i
-        sprite.material.opacity = isHovered ? 0.9 : (0.3 + 0.2 * Math.sin(elapsed.current * 1.5 + i * 1.2))
-        const targetScale = isHovered ? labels[i].size * 2.4 : labels[i].size * 1.8
+        sprite.material.opacity = isHovered ? 0.95 : (0.55 + 0.25 * Math.sin(elapsed.current * 2.0 + i * 1.2))
+        const targetScale = isHovered ? labels[i].size * 2.8 : labels[i].size * 2.2
         sprite.scale.x += (targetScale - sprite.scale.x) * 0.1
       }
     })
@@ -523,7 +523,7 @@ function OrbitalData({ liveData }) {
               map={tex}
               transparent
               blending={THREE.AdditiveBlending}
-              opacity={0.35}
+              opacity={0.6}
               depthWrite={false}
             />
           </sprite>
@@ -541,7 +541,7 @@ function DataStream() {
   useFrame((state, delta) => {
     elapsed.current += delta
     uniforms.time.value = elapsed.current
-    if (groupRef.current) groupRef.current.rotation.y = elapsed.current * 0.06
+    if (groupRef.current) groupRef.current.rotation.y = elapsed.current * 0.15
   })
 
   const { positions, colors, sizes } = useMemo(() => {
@@ -561,7 +561,7 @@ function DataStream() {
       col[i * 3] = 0.659 * (1 - t) + 0.133 * t
       col[i * 3 + 1] = 0.333 * (1 - t) + 0.827 * t
       col[i * 3 + 2] = 0.969 * (1 - t) + 0.933 * t
-      sz[i] = 0.015 + Math.random() * 0.025
+      sz[i] = 0.03 + Math.random() * 0.04
     }
     return { positions: pos, colors: col, sizes: sz }
   }, [])
@@ -581,9 +581,9 @@ function DataStream() {
             varying vec3 vColor; varying float vAlpha; uniform float time;
             void main() {
               vColor = aColor;
-              vAlpha = 0.4 + 0.6 * sin(time * 2.0 + position.x * 3.0);
+              vAlpha = 0.5 + 0.5 * sin(time * 2.5 + position.x * 3.0);
               vec4 mv = modelViewMatrix * vec4(position, 1.0);
-              gl_PointSize = aSize * (280.0 / -mv.z);
+              gl_PointSize = aSize * (400.0 / -mv.z);
               gl_Position = projectionMatrix * mv;
             }
           `}
@@ -592,8 +592,8 @@ function DataStream() {
             void main() {
               float d = length(gl_PointCoord - vec2(0.5));
               if (d > 0.5) discard;
-              float glow = pow(1.0 - d * 2.0, 1.5);
-              gl_FragColor = vec4(vColor, glow * vAlpha * 0.7);
+            float glow = pow(1.0 - d * 2.0, 1.2);
+            gl_FragColor = vec4(vColor, glow * vAlpha * 0.9);
             }
           `}
           transparent depthWrite={false} blending={THREE.AdditiveBlending}
@@ -628,7 +628,7 @@ function ImpactManager({ onImpactsReady }) {
       }
     }
     // Decay active impacts
-    const decaySpeed = 1.5
+    const decaySpeed = 0.6
     impactSlots.current.forEach(slot => {
       if (slot.active) {
         slot.age += delta
@@ -697,7 +697,7 @@ function GlobeScene({ liveData, paused }) {
         <Stars radius={10} depth={20} count={250} factor={2} saturation={0.25} fade speed={0.15} />
       )}
       <OrbitControls
-        autoRotate autoRotateSpeed={0.5}
+        autoRotate autoRotateSpeed={1.8}
         enableZoom={false} enablePan={false}
         enableDamping dampingFactor={0.08}
         rotateSpeed={0.5}
