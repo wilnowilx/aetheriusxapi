@@ -191,6 +191,7 @@ function VisibleWireframe({ impactPoints }) {
             // Impact color (white-blue flash)
             vec3 impactCol = mix(vec3(0.0, 0.322, 1.0), vec3(1.0, 1.0, 1.0), 0.6);
             vec3 col = mix(baseCol, impactCol, impacts * 0.7);
+            col += vec3(0.10, 0.06, 0.015) * impacts; // filo ámbar duna en la captura
 
             float alpha = 0.045 * pulse * fade + impacts * 0.15;
             gl_FragColor = vec4(col, alpha);
@@ -202,60 +203,147 @@ function VisibleWireframe({ impactPoints }) {
   )
 }
 
-// === BASE CORE — 3D nucleus emitting energy ===
-function BaseCore() {
+// === BASE CORE — estrella viva de la esfera de Dyson ===
+// El núcleo BASE pulsa: respiración continua + latido en cada ráfaga de flujo.
+// flowRef: { intensity (0.6–1.8), pulse (0–1) } — lo escribe el ticker de flujo ≤500ms.
+function BaseCore({ flowRef }) {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  const texture = useMemo(() => {
+  // Pre-render the BASE company logo: stylized emblem in brand colors
+  const baseLogoTexture = useMemo(() => {
     const canvas = document.createElement('canvas')
-    canvas.width = 512; canvas.height = 128
+    canvas.width = 512; canvas.height = 512
     const ctx = canvas.getContext('2d')
-    ctx.clearRect(0, 0, 512, 128)
-    ctx.font = 'bold 72px monospace'
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-    ctx.fillStyle = '#0052FF'
-    ctx.shadowColor = '#0052FF'; ctx.shadowBlur = 30
-    ctx.fillText('BASE', 256, 64)
-    ctx.shadowBlur = 0
-    ctx.fillText('BASE', 256, 64)
+    ctx.clearRect(0, 0, 512, 512)
+
+    // Draw background gradient (purple → magenta → pink, matching brand palette)
+    const gradient = ctx.createRadialGradient(256, 256, 0, 256, 256, 256)
+    gradient.addColorStop(0, 'rgba(168,85,247,0.9)')   // purple core
+    gradient.addColorStop(0.3, 'rgba(217,70,239,0.6)') // magenta mid
+    gradient.addColorStop(1, 'rgba(236,72,153,0.4)')   // pink edge
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, 0, 512, 512)
+
+    // Draw stylized "BASE" emblem: geometric abstract mark
+    // Central circle representing the platform
+    ctx.save()
+    ctx.translate(256, 256)
+
+    // Outer ring - platform boundary
+    ctx.strokeStyle = 'rgba(168,85,247,0.6)'
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    ctx.arc(0, 0, 65, 0, Math.PI * 2)
+    ctx.stroke()
+
+    // Inner circle - focus area
+    ctx.fillStyle = 'rgba(34,211,238,0.2)'
+    ctx.beginPath()
+    ctx.arc(0, 0, 45, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Accent arcs - representing connectivity/data flow
+    ctx.lineWidth = 2
+    const angles = [0, Math.PI/4, Math.PI/2, 3*Math.PI/4, Math.PI, 5*Math.PI/4, 3*Math.PI/2, 7*Math.PI/4]
+    angles.forEach((angle, i) => {
+      const nextAngle = angles[(i+1) % angles.length]
+      ctx.beginPath()
+      ctx.moveTo(0, 0)
+      ctx.rotate(angle)
+      ctx.lineTo(0, 50)
+      ctx.rotate(-angle)
+      ctx.strokeStyle = `rgba(236,72,153,${0.5 + 0.3 * Math.sin(i * 0.8)})`
+      ctx.stroke()
+    })
+
+    // "BASE" text mark in center - small and subtle
+    ctx.font = 'bold 48px monospace'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'
+    ctx.fillText('BASE', 0, 0)
+
+    ctx.restore()
+
+    // Outer glow - pulse effect aura
+    ctx.strokeStyle = 'rgba(168,85,247,0.4)'
+    ctx.lineWidth = 6
+    ctx.beginPath()
+    ctx.arc(256, 256, 80, 0, Math.PI * 2)
+    ctx.stroke()
+
     return new THREE.CanvasTexture(canvas)
   }, [])
 
   useFrame((state, delta) => {
     elapsed.current += delta
+    const flow = flowRef?.current || { intensity: 1, pulse: 0.3 }
+    // El latido decae; la respiración nunca muere (el núcleo siempre vive)
+    flow.pulse = Math.max(0.25, (flow.pulse || 0) - delta * 1.8)
     if (groupRef.current) {
-      groupRef.current.rotation.y = elapsed.current * 0.2
-      const s = 1 + 0.03 * Math.sin(elapsed.current * 2)
+      groupRef.current.rotation.y = elapsed.current * (0.15 + 0.15 * flow.intensity)
+      groupRef.current.rotation.x = elapsed.current * 0.1
+      const breath = Math.sin(elapsed.current * 1.5)
+      const s = 1 + 0.02 * breath + 0.1 * flow.pulse
       groupRef.current.scale.set(s, s, s)
     }
   })
 
   return (
-    <group ref={groupRef}>
+    <group ref={groupRef} scale={1.3}>
       <sprite scale={[2.2, 0.55, 1]}>
         <spriteMaterial
-          map={texture}
+          map={baseLogoTexture}
           transparent
           blending={THREE.AdditiveBlending}
-          opacity={0.85}
+          opacity={1.0}
           depthWrite={false}
         />
       </sprite>
       <mesh>
         <sphereGeometry args={[0.4, 16, 12]} />
-        <meshBasicMaterial color={0x0052FF} transparent opacity={0.08} />
+        <meshBasicMaterial color={0x0052FF} transparent opacity={0.05} />
       </mesh>
     </group>
   )
 }
 
-// === ENERGY PARTICLES — travel center → wireframe, pulse on impact ===
-function EnergyParticles({ liveData, onImpact }) {
-  const PARTICLE_COUNT = 40
+// === ENERGY PARTICLES — operaciones reales: núcleo → borde interno ===
+// Cada partícula nace en el núcleo BASE y muere al tocar la cáscara (Dyson:
+// la energía se absorbe, nada cruza hacia afuera). El flujo se modula con
+// flowRef (ticker ≤500ms derivado de USDC/mercado): intensidad, velocidad,
+// tamaño y color (verde USDC vs azul→púrpura mercado).
+function EnergyParticles({ liveData, onImpact, flowRef }) {
+  const PARTICLE_COUNT = 56
   const elapsed = useRef(0)
   const pointsRef = useRef()
   const WIRE_RADIUS = 2.2
+  const WIRE_RADIUS_SQ = WIRE_RADIUS * WIRE_RADIUS
+
+  const spawnVelocity = (out) => {
+    const theta = Math.random() * Math.PI * 2
+    const phi = Math.acos(2 * Math.random() - 1)
+    const flow = Math.max(0.5, Math.min(1.8, flowRef?.current?.intensity || 1))
+    const speed = (1.1 + Math.random() * 0.8) * (0.75 + 0.45 * flow)
+    out[0] = Math.sin(phi) * Math.cos(theta) * speed
+    out[1] = Math.sin(phi) * Math.sin(theta) * speed
+    out[2] = Math.cos(phi) * speed
+  }
+
+  // kind 0 = mercado (azul→púrpura), kind 1 = USDC (verde)
+  const paintKind = (col, sz, i) => {
+    if (Math.random() < 0.38) {
+      col[i * 3] = 0.063; col[i * 3 + 1] = 0.725; col[i * 3 + 2] = 0.506
+      sz[i] = 0.03 + Math.random() * 0.035
+    } else {
+      const t = Math.random()
+      col[i * 3] = 0.0 * (1 - t) + 0.659 * t
+      col[i * 3 + 1] = 0.322 * (1 - t) + 0.333 * t
+      col[i * 3 + 2] = 1.0 * (1 - t) + 0.969 * t
+      sz[i] = 0.02 + Math.random() * 0.03
+    }
+  }
 
   const state = useMemo(() => {
     const pos = new Float32Array(PARTICLE_COUNT * 3)
@@ -265,48 +353,59 @@ function EnergyParticles({ liveData, onImpact }) {
     const life = new Float32Array(PARTICLE_COUNT)
     const maxLife = new Float32Array(PARTICLE_COUNT)
     const hit = new Uint8Array(PARTICLE_COUNT) // track if already triggered impact
+    const tmp = [0, 0, 0]
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       pos[i * 3] = (Math.random() - 0.5) * 0.3
       pos[i * 3 + 1] = (Math.random() - 0.5) * 0.3
       pos[i * 3 + 2] = (Math.random() - 0.5) * 0.3
       const theta = Math.random() * Math.PI * 2
       const phi = Math.acos(2 * Math.random() - 1)
-      const speed = 1.0 + Math.random() * 0.7
+      const speed = 1.1 + Math.random() * 0.8
       vel[i * 3] = Math.sin(phi) * Math.cos(theta) * speed
       vel[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed
       vel[i * 3 + 2] = Math.cos(phi) * speed
       const t = Math.random()
-      col[i * 3] = 0.0 * (1 - t) + 0.659 * t
-      col[i * 3 + 1] = 0.322 * (1 - t) + 0.333 * t
-      col[i * 3 + 2] = 1.0 * (1 - t) + 0.969 * t
-      sz[i] = 0.02 + Math.random() * 0.03
+      if (Math.random() < 0.38) {
+        col[i * 3] = 0.063; col[i * 3 + 1] = 0.725; col[i * 3 + 2] = 0.506
+        sz[i] = 0.03 + Math.random() * 0.035
+      } else {
+        col[i * 3] = 0.0 * (1 - t) + 0.659 * t
+        col[i * 3 + 1] = 0.322 * (1 - t) + 0.333 * t
+        col[i * 3 + 2] = 1.0 * (1 - t) + 0.969 * t
+        sz[i] = 0.02 + Math.random() * 0.03
+      }
       life[i] = Math.random() * 3
-      maxLife[i] = 2.5 + Math.random() * 1.5
+      maxLife[i] = 1.6 + Math.random() * 1.0
+      void tmp
     }
     return { positions: pos, velocities: vel, colors: col, sizes: sz, lifetimes: life, maxLifetimes: maxLife, hit }
   }, [])
 
-  const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
+  const uniforms = useMemo(() => ({ time: { value: 0 }, flow: { value: 1 } }), [])
 
   useFrame((context, delta) => {
     elapsed.current += delta
     uniforms.time.value = elapsed.current
-    const { positions, velocities, lifetimes, maxLifetimes, hit } = state
+    const flow = Math.max(0.5, Math.min(1.8, flowRef?.current?.intensity || 1))
+    uniforms.flow.value = flow
+    const { positions, velocities, colors, sizes, lifetimes, maxLifetimes, hit } = state
+    const tmp = [0, 0, 0]
+    let visualsDirty = false
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       lifetimes[i] += delta
       if (lifetimes[i] >= maxLifetimes[i]) {
-        // Reset
+        // Reset — renace en el núcleo con el flujo actual
         positions[i * 3] = (Math.random() - 0.5) * 0.3
         positions[i * 3 + 1] = (Math.random() - 0.5) * 0.3
         positions[i * 3 + 2] = (Math.random() - 0.5) * 0.3
-        const theta = Math.random() * Math.PI * 2
-        const phi = Math.acos(2 * Math.random() - 1)
-        const speed = 1.0 + Math.random() * 0.7
-        velocities[i * 3] = Math.sin(phi) * Math.cos(theta) * speed
-        velocities[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed
-        velocities[i * 3 + 2] = Math.cos(phi) * speed
+        spawnVelocity(tmp)
+        velocities[i * 3] = tmp[0]
+        velocities[i * 3 + 1] = tmp[1]
+        velocities[i * 3 + 2] = tmp[2]
+        paintKind(colors, sizes, i)
+        visualsDirty = true
         lifetimes[i] = 0
-        maxLifetimes[i] = 2.5 + Math.random() * 1.5
+        maxLifetimes[i] = 1.6 + Math.random() * 1.0
         hit[i] = 0
         continue
       }
@@ -314,13 +413,11 @@ function EnergyParticles({ liveData, onImpact }) {
       positions[i * 3 + 1] += velocities[i * 3 + 1] * delta
       positions[i * 3 + 2] += velocities[i * 3 + 2] * delta
 
-      // Check wireframe collision
-      const dist = Math.sqrt(
-        positions[i * 3] ** 2 +
-        positions[i * 3 + 1] ** 2 +
-        positions[i * 3 + 2] ** 2
-      )
-      if (dist >= WIRE_RADIUS && !hit[i]) {
+      // Check wireframe collision using squared distance (faster than Math.sqrt)
+      const distSq = positions[i * 3] * positions[i * 3]
+                    + positions[i * 3 + 1] * positions[i * 3 + 1]
+                    + positions[i * 3 + 2] * positions[i * 3 + 2]
+      if (distSq >= WIRE_RADIUS_SQ && !hit[i]) {
         hit[i] = 1
         if (onImpact) {
           onImpact({
@@ -336,6 +433,10 @@ function EnergyParticles({ liveData, onImpact }) {
     }
     if (pointsRef.current) {
       pointsRef.current.geometry.attributes.position.needsUpdate = true
+      if (visualsDirty) {
+        pointsRef.current.geometry.attributes.aColor.needsUpdate = true
+        pointsRef.current.geometry.attributes.aSize.needsUpdate = true
+      }
     }
   })
 
@@ -350,12 +451,12 @@ function EnergyParticles({ liveData, onImpact }) {
         uniforms={uniforms}
         vertexShader={`
           attribute float aSize; attribute vec3 aColor;
-          varying vec3 vColor; varying float vAlpha; uniform float time;
+          varying vec3 vColor; varying float vAlpha; uniform float time; uniform float flow;
           void main() {
             vColor = aColor;
-            vAlpha = 0.6 + 0.4 * sin(time * 3.0 + position.x * 5.0);
+            vAlpha = (0.55 + 0.45 * sin(time * 3.0 + position.x * 5.0)) * (0.8 + 0.3 * flow);
             vec4 mv = modelViewMatrix * vec4(position, 1.0);
-            gl_PointSize = aSize * (400.0 / -mv.z);
+            gl_PointSize = aSize * (0.75 + 0.5 * flow) * (400.0 / -mv.z);
             gl_Position = projectionMatrix * mv;
           }
         `}
@@ -700,6 +801,32 @@ function GlobeScene({ liveData, paused }) {
     }
   }, [])
 
+  // === FLOW TICKER (≤500ms) — USDC/mercado → intensidad del núcleo ===
+  // El endpoint pesado (base-stats) llega cada ~6s; aquí interpolamos una
+  // señal rápida cada 400ms para que el flujo NUNCA se congele: el núcleo
+  // late y las partículas nacen con el pulso actual. Cambio de bloque = latido.
+  const flowRef = useRef({ intensity: 1, pulse: 0.4, block: null })
+  useEffect(() => {
+    const tick = () => {
+      const d = liveData || {}
+      const vol = parseFloat(String(d.volume || '').replace(/[^0-9.]/g, '')) || 0
+      const gas = parseFloat(String(d.gas || '').replace(/[^0-9.]/g, '')) || 0
+      let f = 0.9 + Math.min(vol / 500, 0.5) + Math.min(gas / 50, 0.25) + Math.random() * 0.15
+      f = Math.max(0.6, Math.min(1.8, f))
+      const cur = flowRef.current
+      cur.intensity = f
+      if (d.block && d.block !== '—' && d.block !== cur.block) {
+        cur.block = d.block
+        cur.pulse = 1 // latido: bloque nuevo = ráfaga de operaciones
+      } else {
+        cur.pulse = Math.max(0.3, (cur.pulse || 0.3) * 0.94)
+      }
+    }
+    tick()
+    const id = setInterval(tick, 400)
+    return () => clearInterval(id)
+  }, [liveData])
+
   // Memoized Canvas props: fresh inline objects on every render would make R3F
   // re-apply them (camera snap) and fight OrbitControls. Stable identities.
   const cameraProps = useMemo(() => ({ position: [0, 0.3, 10.5], fov: 40 }), [])
@@ -719,8 +846,8 @@ function GlobeScene({ liveData, paused }) {
       <ambientLight intensity={0.05} />
       <group scale={1.3}>
         <GlobeImpacts />
-        <BaseCore />
-        <EnergyParticles liveData={liveData} onImpact={handleImpact} />
+        <BaseCore flowRef={flowRef} />
+        <EnergyParticles liveData={liveData} onImpact={handleImpact} flowRef={flowRef} />
         <OuterHalo />
         <AtmosphereGlow />
         <InnerCore />

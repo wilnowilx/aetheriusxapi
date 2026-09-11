@@ -14,8 +14,12 @@ class GlobeBoundary extends React.Component {
   }
 }
 
-// === SUPERNOVA — single fluid explosion ===
-function SupernovaLoader({ onComplete }) {
+// === CRT IGNITION — encendido de TV antiguo ===
+// Secuencia: punto de luz central → línea horizontal → apertura vertical
+// (+scanlines) → colapso en destello → estrella de 4 puntas ✦ → entrega imagen.
+// TOTAL 1800ms. Sonido procedural sincronizado (puerta de sala de mandos).
+// Autoplay-safe: si el AudioContext no está en running, el loader sigue mudo.
+function CRTLoader({ onComplete }) {
   const canvasRef = useRef(null)
   const animRef = useRef(null)
   const overlayRef = useRef(null)
@@ -33,81 +37,185 @@ function SupernovaLoader({ onComplete }) {
     const w = window.innerWidth, h = window.innerHeight
     const cx = w / 2, cy = h / 2
 
+    // --- audio CRT sincronizado (solo si el contexto ya corre) ---
+    let ac = null
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext
+      if (AC) {
+        const test = new AC()
+        if (test.state === 'running') {
+          ac = test
+          const t0 = ac.currentTime
+          const master = ac.createGain()
+          master.gain.value = 0
+          master.connect(ac.destination)
+          master.gain.linearRampToValueAtTime(0.16, t0 + 0.05)
+          // thump de encendido: 62→34Hz
+          const osc = ac.createOscillator()
+          osc.type = 'sine'
+          osc.frequency.setValueAtTime(62, t0)
+          osc.frequency.exponentialRampToValueAtTime(34, t0 + 0.28)
+          const og = ac.createGain()
+          og.gain.setValueAtTime(0.5, t0)
+          og.gain.exponentialRampToValueAtTime(0.001, t0 + 0.3)
+          osc.connect(og); og.connect(master); osc.start(t0); osc.stop(t0 + 0.32)
+          // hum ascendente del tubo
+          const hum = ac.createOscillator()
+          hum.type = 'sawtooth'
+          hum.frequency.setValueAtTime(48, t0 + 0.1)
+          hum.frequency.exponentialRampToValueAtTime(130, t0 + 0.8)
+          const hf = ac.createBiquadFilter()
+          hf.type = 'lowpass'; hf.frequency.value = 320
+          const hg = ac.createGain()
+          hg.gain.setValueAtTime(0.0001, t0 + 0.1)
+          hg.gain.exponentialRampToValueAtTime(0.12, t0 + 0.7)
+          hg.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.2)
+          hum.connect(hf); hf.connect(hg); hg.connect(master)
+          hum.start(t0 + 0.1); hum.stop(t0 + 1.25)
+          // puerta de sala de mandos: whoosh de aire con filtro barriendo
+          const len = Math.floor(ac.sampleRate * 0.8)
+          const buf = ac.createBuffer(1, len, ac.sampleRate)
+          const ch = buf.getChannelData(0)
+          for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1
+          const ns = ac.createBufferSource()
+          ns.buffer = buf
+          const bp = ac.createBiquadFilter()
+          bp.type = 'bandpass'; bp.Q.value = 1.2
+          bp.frequency.setValueAtTime(280, t0 + 0.85)
+          bp.frequency.exponentialRampToValueAtTime(2500, t0 + 1.6)
+          const ng = ac.createGain()
+          ng.gain.setValueAtTime(0.0001, t0 + 0.85)
+          ng.gain.exponentialRampToValueAtTime(0.22, t0 + 1.2)
+          ng.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.7)
+          ns.connect(bp); bp.connect(ng); ng.connect(master)
+          ns.start(t0 + 0.85); ns.stop(t0 + 1.75)
+          // click + ping en el nacimiento de la estrella (~1.12s)
+          const ping = ac.createOscillator()
+          ping.type = 'square'
+          ping.frequency.setValueAtTime(880, t0 + 1.12)
+          ping.frequency.exponentialRampToValueAtTime(1760, t0 + 1.2)
+          const pg = ac.createGain()
+          pg.gain.setValueAtTime(0.12, t0 + 1.12)
+          pg.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.3)
+          ping.connect(pg); pg.connect(master)
+          ping.start(t0 + 1.12); ping.stop(t0 + 1.32)
+          master.gain.setValueAtTime(0.16, t0 + 1.5)
+          master.gain.linearRampToValueAtTime(0.0001, t0 + 1.85)
+        } else {
+          try { test.close() } catch {}
+        }
+      }
+    } catch {
+      ac = null
+    }
+
     let running = true
     const startTime = performance.now()
-    const TOTAL_DURATION = 1500 // ms
+    const TOTAL_DURATION = 1800 // ms — si se siente lento, se ajusta
+    const S = Math.max(w, h) / 800
+
+    const drawSparkle = (R, alpha) => {
+      const waist = R * 0.09
+      ctx.save()
+      ctx.translate(cx, cy)
+      ctx.shadowColor = 'rgba(168,85,247,0.8)'
+      ctx.shadowBlur = 32
+      const bodyGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, R)
+      bodyGrad.addColorStop(0, `rgba(255,255,255,${0.9 * alpha})`)
+      bodyGrad.addColorStop(0.3, `rgba(150,170,255,${0.5 * alpha})`)
+      bodyGrad.addColorStop(0.45, `rgba(212,168,83,${0.3 * alpha})`)
+      bodyGrad.addColorStop(0.65, `rgba(0,82,255,${0.18 * alpha})`)
+      bodyGrad.addColorStop(1, 'rgba(0,82,255,0)')
+      ctx.fillStyle = bodyGrad
+      ctx.beginPath()
+      ctx.moveTo(0, -R)
+      ctx.quadraticCurveTo(waist, -waist, R, 0)
+      ctx.quadraticCurveTo(waist, waist, 0, R)
+      ctx.quadraticCurveTo(-waist, waist, -R, 0)
+      ctx.quadraticCurveTo(-waist, -waist, 0, -R)
+      ctx.closePath()
+      ctx.fill()
+      ctx.restore()
+    }
 
     const draw = (now) => {
       if (!running) return
       const elapsed = now - startTime
-      const t = Math.min(elapsed / TOTAL_DURATION, 1) // 0→1 normalized
+      const t = Math.min(elapsed / TOTAL_DURATION, 1)
+      const flick = 0.92 + 0.08 * Math.sin(elapsed * 0.09)
 
-      ctx.clearRect(0, 0, w, h)
+      ctx.fillStyle = '#010005'
+      ctx.fillRect(0, 0, w, h)
 
-      // --- Phase 1: Implosion (t 0→0.35) — particles contract to center ---
-      if (t < 0.35) {
-        const p = t / 0.35 // 0→1 within this phase
-        const eased = 1 - (1 - p) * (1 - p) // ease-out quad
-        const particleCount = 80
-        for (let i = 0; i < particleCount; i++) {
-          const angle = (i / particleCount) * Math.PI * 2 + eased * 0.8
-          const startDist = 180 + (i % 5) * 40
-          const dist = startDist * (1 - eased)
-          const x = cx + Math.cos(angle) * dist
-          const y = cy + Math.sin(angle) * dist
-          const alpha = eased * 0.8
-          const size = 1 + eased * 1.5
-          ctx.beginPath()
-          ctx.arc(x, y, size, 0, Math.PI * 2)
-          ctx.fillStyle = `rgba(0,82,255,${alpha})`
-          ctx.fill()
+      // --- Fase A: punto → línea horizontal (t 0→0.38) ---
+      if (t < 0.38) {
+        const p = t / 0.38
+        const ease = p * p
+        const halfW = 3 + ease * w * 0.22
+        const dotR = (2 + p * 5) * S
+        const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, dotR * 6)
+        glow.addColorStop(0, `rgba(255,255,255,${0.8 * flick})`)
+        glow.addColorStop(0.4, `rgba(34,211,238,${0.25 * flick})`)
+        glow.addColorStop(1, 'rgba(0,82,255,0)')
+        ctx.fillStyle = glow
+        ctx.beginPath()
+        ctx.arc(cx, cy, dotR * 6, 0, Math.PI * 2)
+        ctx.fill()
+        const lg = ctx.createLinearGradient(cx - halfW, 0, cx + halfW, 0)
+        lg.addColorStop(0, 'rgba(0,82,255,0)')
+        lg.addColorStop(0.25, `rgba(168,85,247,${0.7 * flick})`)
+        lg.addColorStop(0.5, `rgba(255,255,255,${0.95 * flick})`)
+        lg.addColorStop(0.75, `rgba(34,211,238,${0.7 * flick})`)
+        lg.addColorStop(1, 'rgba(0,82,255,0)')
+        ctx.fillStyle = lg
+        ctx.fillRect(cx - halfW, cy - 1.5, halfW * 2, 3)
+      }
+
+      // --- Fase B: apertura vertical + scanlines (t 0.38→0.62) ---
+      if (t >= 0.38 && t < 0.62) {
+        const p = (t - 0.38) / 0.24
+        const ease = 1 - (1 - p) * (1 - p)
+        const halfW = w * 0.22
+        const halfH = 2 + ease * h * 0.24
+        const vg = ctx.createLinearGradient(0, cy - halfH, 0, cy + halfH)
+        vg.addColorStop(0, 'rgba(0,82,255,0)')
+        vg.addColorStop(0.5, `rgba(220,230,255,${0.5 * flick})`)
+        vg.addColorStop(1, 'rgba(0,82,255,0)')
+        ctx.fillStyle = vg
+        ctx.fillRect(cx - halfW, cy - halfH, halfW * 2, halfH * 2)
+        // bordes CRT
+        ctx.fillStyle = `rgba(255,255,255,${0.8 * flick})`
+        ctx.fillRect(cx - halfW, cy - halfH, halfW * 2, 1.5)
+        ctx.fillRect(cx - halfW, cy + halfH - 1.5, halfW * 2, 1.5)
+        // scanlines
+        ctx.fillStyle = `rgba(0,0,0,${0.25 * flick})`
+        for (let y = cy - halfH; y < cy + halfH; y += 4) {
+          ctx.fillRect(cx - halfW, y, halfW * 2, 1)
         }
       }
 
-      // --- Phase 2: 4-point sparkle flash + expansion (✦) ---
-      if (t >= 0.3 && t < 0.85) {
-        const p = (t - 0.3) / 0.55 // 0→1
-
-        // Flash intensity — peaks at p=0.1, fades by p=0.4
-        const flashIntensity = p < 0.1
-          ? p / 0.1 // rise
-          : Math.max(0, 1 - (p - 0.1) / 0.3) // decay
-
-        // 4-point sparkle only (✦) — soft bloom, no hard borders
-        const R = (30 + p * 150) * (Math.max(w, h) / 800)
-        const waist = R * 0.09
-        const starAlpha = flashIntensity * 0.6
-
-        ctx.save()
-        ctx.translate(cx, cy)
-        ctx.shadowColor = 'rgba(120,140,255,0.8)'
-        ctx.shadowBlur = 32
-
-        // Soft sparkle body (white core dissolving into blue, no stroke)
-        const bodyGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, R)
-        bodyGrad.addColorStop(0, `rgba(255,255,255,${0.9 * starAlpha})`)
-        bodyGrad.addColorStop(0.3, `rgba(150,170,255,${0.5 * starAlpha})`)
-        bodyGrad.addColorStop(0.65, `rgba(0,82,255,${0.18 * starAlpha})`)
-        bodyGrad.addColorStop(1, 'rgba(0,82,255,0)')
-        ctx.fillStyle = bodyGrad
-        ctx.beginPath()
-        ctx.moveTo(0, -R)
-        ctx.quadraticCurveTo(waist, -waist, R, 0)
-        ctx.quadraticCurveTo(waist, waist, 0, R)
-        ctx.quadraticCurveTo(-waist, waist, -R, 0)
-        ctx.quadraticCurveTo(-waist, -waist, 0, -R)
-        ctx.closePath()
-        ctx.fill()
-
-        ctx.restore()
+      // --- Fase C: colapso en destello → estrella ✦ (t 0.62→0.85) ---
+      if (t >= 0.62 && t < 0.85) {
+        const p = (t - 0.62) / 0.23
+        const flash = p < 0.15 ? p / 0.15 : Math.max(0, 1 - (p - 0.15) / 0.35)
+        if (flash > 0) {
+          ctx.fillStyle = `rgba(235,240,255,${flash * 0.85 * flick})`
+          ctx.fillRect(0, 0, w, h)
+        }
+        const R = (30 + p * 140) * S
+        drawSparkle(R, Math.min(1, 0.25 + p) * flick)
       }
 
-      // --- Phase 3: Fade out (t 0.7→1.0) ---
-      if (t >= 0.7) {
-        const p = (t - 0.7) / 0.3
-        const fadeAlpha = p * p // accelerating fade
-        ctx.fillStyle = `rgba(1,0,5,${fadeAlpha})`
-        ctx.fillRect(0, 0, w, h)
+      // --- canal brutalista CRT ---
+      if (t < 0.85) {
+        ctx.font = '10px monospace'
+        ctx.fillStyle = `rgba(255,255,255,${0.35 * flick})`
+        ctx.fillText('CH—402 · BASE', 24, h - 24)
+      }
+
+      // --- Fase D: entrega la imagen (t 0.85→1) ---
+      if (t >= 0.85 && overlayRef.current) {
+        overlayRef.current.style.opacity = String(1 - (t - 0.85) / 0.15)
       }
 
       animRef.current = requestAnimationFrame(draw)
@@ -115,14 +223,19 @@ function SupernovaLoader({ onComplete }) {
 
     animRef.current = requestAnimationFrame(draw)
 
-    // Complete after animation
     const timer = setTimeout(() => {
       running = false
       cancelAnimationFrame(animRef.current)
+      try { ac?.close() } catch {}
       onCompleteRef.current?.()
     }, TOTAL_DURATION + 100)
 
-    return () => { running = false; cancelAnimationFrame(animRef.current); clearTimeout(timer) }
+    return () => {
+      running = false
+      cancelAnimationFrame(animRef.current)
+      clearTimeout(timer)
+      try { ac?.close() } catch {}
+    }
   }, [])
 
   return (
@@ -540,9 +653,9 @@ function Hero() {
     return () => { try { tween?.scrollTrigger?.kill(); tween?.kill() } catch {} }
   }, [])
 
-  return (
+return (
     <>
-      {!loaded && <SupernovaLoader onComplete={handleLoaded} />}
+      {!loaded && <CRTLoader onComplete={handleLoaded} />}
       <CosmicSound />
 
       <section id="hero" ref={heroRef} style={{
@@ -550,7 +663,7 @@ function Hero() {
         display: 'flex', flexDirection: 'column',
         justifyContent: 'center', alignItems: 'center',
         position: 'relative', overflow: 'hidden',
-        padding: '80px 0 60px',
+        padding: '80px 24px 60px',
         isolation: 'isolate', zIndex: 0,
       }}>
         <CosmicVoid />
@@ -580,7 +693,7 @@ function Hero() {
               </div>
             </Suspense>
           </GlobeBoundary>
-          ) : (
+        ) : (
             <GlobeCSSFallback />
           )}
         </div>
@@ -596,41 +709,41 @@ function Hero() {
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             padding: '6px 16px', borderRadius: 20,
-            background: 'rgba(0,82,255,0.06)',
-            border: '1px solid rgba(0,82,255,0.12)',
-            marginBottom: 20,
-            backdropFilter: 'blur(10px)',
+            background: 'rgba(168,85,247,0.08)',
+            border: '1px solid rgba(168,85,247,0.2)',
+            marginBottom: 24,
+            backdropFilter: 'blur(12px)',
           }}>
             <span style={{
               fontFamily: "'JetBrains Mono', monospace",
               fontSize: '0.72rem', fontWeight: 700,
-              color: '#0052FF',
+              color: '#a855f7',
               letterSpacing: '0.08em',
             }}>x402</span>
             <span style={{
-              width: 1, height: 12, background: 'rgba(0,82,255,0.2)',
+              width: 1, height: 12, background: 'rgba(168,85,247,0.3)',
             }} />
             <span style={{
               fontFamily: "'JetBrains Mono', monospace",
               fontSize: '0.6rem',
-              color: 'rgba(255,255,255,0.3)',
+              color: '#d946ef',
               letterSpacing: '0.1em',
             }}>PROTOCOL</span>
           </div>
 
           {/* Title */}
           <h1 style={{
-            fontSize: 'clamp(2.2rem, 7.5vw, 6.5rem)',
-            lineHeight: 0.92, letterSpacing: '-0.04em',
-            fontWeight: 300, color: 'rgba(255,255,255,0.9)', margin: 0,
-            textShadow: '0 0 80px rgba(168,85,247,0.12), 0 0 40px rgba(34,211,238,0.06)',
+            fontSize: 'clamp(2.5rem, 8vw, 7rem)',
+            lineHeight: 1.1, letterSpacing: '-0.02em',
+            fontWeight: 400, color: 'rgba(255,255,255,0.95)', margin: 0,
+            textShadow: '0 0 60px rgba(168,85,247,0.15), 0 0 30px rgba(34,211,238,0.08)',
             fontFamily: "'Inter', sans-serif",
           }}>The Marketplace<br/>That Lives</h1>
 
           <div style={{
-            fontSize: 'clamp(0.85rem, 1.8vw, 1.3rem)',
-            marginTop: 16, fontWeight: 300,
-            color: 'rgba(255,255,255,0.35)',
+            fontSize: 'clamp(1rem, 2vw, 1.4rem)',
+            marginTop: 12, fontWeight: 300,
+            color: 'rgba(255,255,255,0.4)',
             letterSpacing: '0.02em',
           }}>API infrastructure for AI agents that pay</div>
 
