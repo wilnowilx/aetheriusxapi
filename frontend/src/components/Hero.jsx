@@ -304,24 +304,24 @@ function Hero() {
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
           padding: '6px 16px', borderRadius: 20,
-          background: 'rgba(168,85,247,0.08)',
-          border: '1px solid rgba(168,85,247,0.15)',
+          background: 'rgba(0,82,255,0.06)',
+          border: '1px solid rgba(0,82,255,0.12)',
           marginBottom: 20,
           backdropFilter: 'blur(10px)',
         }}>
           <span style={{
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: '0.72rem', fontWeight: 700,
-            color: 'var(--purple-light)',
+            color: '#0052FF',
             letterSpacing: '0.08em',
           }}>x402</span>
           <span style={{
-            width: 1, height: 12, background: 'rgba(168,85,247,0.3)',
+            width: 1, height: 12, background: 'rgba(0,82,255,0.2)',
           }} />
           <span style={{
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: '0.6rem',
-            color: 'rgba(255,255,255,0.35)',
+            color: 'rgba(255,255,255,0.3)',
             letterSpacing: '0.1em',
           }}>PROTOCOL</span>
         </div>

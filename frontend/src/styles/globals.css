@@ -20,6 +20,8 @@
   --pink: #ec4899;
   --cyan: #22d3ee;
   --cyan-deep: #0891b2;
+  --base-blue: #0052FF;
+  --base-blue-deep: #003ecc;
   --amber: #d4a853;
   --green: #10b981;
   --orange: #f59e0b;
@@ -242,16 +244,18 @@ nav {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 1000;
-  padding: 20px 0;
-  background: rgba(6,6,14,0.4);
-  backdrop-filter: blur(30px) saturate(1.2);
-  border-bottom: 1px solid transparent;
+  padding: 16px 0;
+  background: rgba(6,6,14,0.15);
+  backdrop-filter: blur(40px) saturate(1.4);
+  -webkit-backdrop-filter: blur(40px) saturate(1.4);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 nav.scrolled {
-  padding: 14px 0;
-  background: rgba(6,6,14,0.88);
-  border-bottom-color: var(--border);
+  padding: 10px 0;
+  background: rgba(6,6,14,0.75);
+  border-bottom-color: rgba(255,255,255,0.06);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.3);
 }
 
 .nav-wrap {
@@ -292,15 +296,18 @@ nav.scrolled {
 .nav-links a.active { color: var(--purple-light); background: rgba(168,85,247,0.1); }
 
 .btn-nav {
-  padding: 12px 24px !important;
-  background: linear-gradient(135deg, var(--purple-deep), var(--magenta)) !important;
+  padding: 10px 22px !important;
+  background: linear-gradient(135deg, #0052FF, #003ecc) !important;
   color: white !important;
   font-weight: 600 !important;
   margin-left: 8px;
   white-space: nowrap !important;
   flex-shrink: 0;
+  border-radius: 10px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 2px 12px rgba(0,82,255,0.25);
 }
-.btn-nav:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(168,85,247,0.4); }
+.btn-nav:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,82,255,0.45) !important; }
 
 /* === MOBILE NAV === */
 .mobile-toggle {

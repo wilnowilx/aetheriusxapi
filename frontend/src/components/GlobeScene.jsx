@@ -232,13 +232,29 @@ function OrbitalData({ liveData }) {
   const groupRef = useRef()
   const spriteRefs = useRef([])
   const elapsed = useRef(0)
+  const [hovered, setHovered] = useState(null)
+
+  const tooltips = useMemo(() => {
+    const d = liveData || {}
+    return [
+      { label: 'x402 Protocol', desc: 'HTTP 402 + USDC micropayments', detail: 'Machine-to-machine commerce standard' },
+      { label: `Block #${d.block || '—'}`, desc: 'Latest Base block', detail: 'Real-time chain state' },
+      { label: `${d.gas || '—'} gwei`, desc: 'Current gas price', detail: 'Sub-cent transaction fees' },
+      { label: d.volume || '$0.00', desc: 'Total volume settled', detail: 'On-chain USDC payments' },
+      { label: 'USDC', desc: 'Stablecoin on Base', detail: 'USD-pegged, instant finality' },
+      { label: 'Base', desc: 'Ethereum L2 by Coinbase', detail: 'RGB 0,0,255 — screen native' },
+    ]
+  }, [liveData])
 
   useFrame((state, delta) => {
     elapsed.current += delta
     if (groupRef.current) groupRef.current.rotation.y = elapsed.current * 0.12
     spriteRefs.current.forEach((sprite, i) => {
       if (sprite) {
-        sprite.material.opacity = 0.3 + 0.2 * Math.sin(elapsed.current * 1.5 + i * 1.2)
+        const isHovered = hovered === i
+        sprite.material.opacity = isHovered ? 0.9 : (0.3 + 0.2 * Math.sin(elapsed.current * 1.5 + i * 1.2))
+        const targetScale = isHovered ? labels[i].size * 2.4 : labels[i].size * 1.8
+        sprite.scale.x += (targetScale - sprite.scale.x) * 0.1
       }
     })
   })
@@ -246,12 +262,12 @@ function OrbitalData({ liveData }) {
   const labels = useMemo(() => {
     const d = liveData || {}
     return [
-      { text: 'x402', color: '#a855f7', size: 1.2 },
-      { text: `#${d.block || '—'}`, color: '#22d3ee', size: 0.65 },
+      { text: 'x402', color: '#c084fc', size: 1.2 },
+      { text: `#${d.block || '—'}`, color: '#0052FF', size: 0.65 },
       { text: `${d.gas || '—'} gwei`, color: '#c084fc', size: 0.55 },
       { text: d.volume || '$0.00', color: '#d946ef', size: 0.6 },
-      { text: 'USDC', color: '#22d3ee', size: 0.7 },
-      { text: 'BASE', color: '#a855f7', size: 0.6 },
+      { text: 'USDC', color: '#10b981', size: 0.7 },
+      { text: 'BASE', color: '#0052FF', size: 0.6 },
     ]
   }, [liveData])
 
@@ -283,6 +299,8 @@ function OrbitalData({ liveData }) {
             ref={el => { spriteRefs.current[i] = el }}
             position={[r * Math.cos(angle), r * Math.sin(angle) * Math.sin(tilt), r * Math.sin(angle) * Math.cos(tilt)]}
             scale={[labels[i].size * 1.8, labels[i].size * 0.45, 1]}
+            onPointerOver={(e) => { e.stopPropagation(); setHovered(i); document.body.style.cursor = 'pointer' }}
+            onPointerOut={() => { setHovered(null); document.body.style.cursor = 'auto' }}
           >
             <spriteMaterial
               map={tex}
@@ -294,6 +312,14 @@ function OrbitalData({ liveData }) {
           </sprite>
         )
       })}
+      {/* HTML tooltip overlay */}
+      {hovered !== null && (
+        <group position={spriteRefs.current[hovered]?.position?.toArray() || [0,0,0]}>
+          <sprite scale={[3.5, 0.9, 1]}>
+            <spriteMaterial transparent opacity={0} depthWrite={false} />
+          </sprite>
+        </group>
+      )}
     </group>
   )
 }
