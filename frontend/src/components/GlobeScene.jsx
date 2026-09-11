@@ -267,7 +267,7 @@ function OrbitalData({ liveData }) {
       { text: `${d.gas || '—'} gwei`, color: '#c084fc', size: 0.55 },
       { text: d.volume || '$0.00', color: '#d946ef', size: 0.6 },
       { text: 'USDC', color: '#10b981', size: 0.7 },
-      { text: 'BASE', color: '#0052FF', size: 0.6 },
+      { text: 'BASE', color: '#0052FF', size: 0.85 },
     ]
   }, [liveData])
 
