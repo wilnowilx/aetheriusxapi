@@ -62,14 +62,6 @@ function SupernovaLoader({ onComplete }) {
           ctx.fillStyle = `rgba(0,82,255,${alpha})`
           ctx.fill()
         }
-        // Central glow building
-        const glowR = 15 + eased * 40
-        const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR)
-        glow.addColorStop(0, `rgba(0,82,255,${eased * 0.6})`)
-        glow.addColorStop(0.5, `rgba(168,85,247,${eased * 0.3})`)
-        glow.addColorStop(1, 'transparent')
-        ctx.fillStyle = glow
-        ctx.fillRect(0, 0, w, h)
       }
 
       // --- Phase 2: 4-point sparkle flash + expansion (✦) ---
@@ -81,30 +73,22 @@ function SupernovaLoader({ onComplete }) {
           ? p / 0.1 // rise
           : Math.max(0, 1 - (p - 0.1) / 0.3) // decay
 
-        // Central glow behind the sparkle (subtle)
-        const glowR = 60 + p * 200
-        const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR)
-        glow.addColorStop(0, `rgba(255,255,255,${flashIntensity * 0.45})`)
-        glow.addColorStop(0.12, `rgba(0,82,255,${flashIntensity * 0.28})`)
-        glow.addColorStop(0.35, `rgba(168,85,247,${flashIntensity * 0.1})`)
-        glow.addColorStop(1, 'transparent')
-        ctx.fillStyle = glow
-        ctx.fillRect(0, 0, w, h)
-
-        // 4-point sparkle — small, thin, subtle (like ✦)
-        const R = (36 + p * 190) * (Math.max(w, h) / 800)
-        const waist = R * 0.07
-        const starAlpha = flashIntensity * 0.7
+        // 4-point sparkle only (✦) — soft bloom, no hard borders
+        const R = (30 + p * 150) * (Math.max(w, h) / 800)
+        const waist = R * 0.09
+        const starAlpha = flashIntensity * 0.6
 
         ctx.save()
         ctx.translate(cx, cy)
+        ctx.shadowColor = 'rgba(120,140,255,0.8)'
+        ctx.shadowBlur = 32
 
-        // Filled sparkle body (white core → blue edge)
+        // Soft sparkle body (white core dissolving into blue, no stroke)
         const bodyGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, R)
-        bodyGrad.addColorStop(0, `rgba(255,255,255,${0.85 * starAlpha})`)
-        bodyGrad.addColorStop(0.25, `rgba(0,82,255,${0.55 * starAlpha})`)
-        bodyGrad.addColorStop(0.6, `rgba(168,85,247,${0.22 * starAlpha})`)
-        bodyGrad.addColorStop(1, 'rgba(168,85,247,0)')
+        bodyGrad.addColorStop(0, `rgba(255,255,255,${0.9 * starAlpha})`)
+        bodyGrad.addColorStop(0.3, `rgba(150,170,255,${0.5 * starAlpha})`)
+        bodyGrad.addColorStop(0.65, `rgba(0,82,255,${0.18 * starAlpha})`)
+        bodyGrad.addColorStop(1, 'rgba(0,82,255,0)')
         ctx.fillStyle = bodyGrad
         ctx.beginPath()
         ctx.moveTo(0, -R)
@@ -115,64 +99,7 @@ function SupernovaLoader({ onComplete }) {
         ctx.closePath()
         ctx.fill()
 
-        // Crisp edge stroke
-        ctx.strokeStyle = `rgba(255,255,255,${0.5 * starAlpha})`
-        ctx.lineWidth = 1.5
-        ctx.stroke()
-
-        // Long lens-flare spikes (vertical + horizontal, subtle)
-        const spikeLen = R * 1.2
-        const spikeW = 1 + (1 - p) * 1.2
-        let lg = ctx.createLinearGradient(0, -spikeLen, 0, spikeLen)
-        lg.addColorStop(0, 'rgba(0,82,255,0)')
-        lg.addColorStop(0.5, `rgba(255,255,255,${0.55 * starAlpha})`)
-        lg.addColorStop(1, 'rgba(0,82,255,0)')
-        ctx.strokeStyle = lg
-        ctx.lineWidth = spikeW
-        ctx.beginPath()
-        ctx.moveTo(0, -spikeLen)
-        ctx.lineTo(0, spikeLen)
-        ctx.stroke()
-        lg = ctx.createLinearGradient(-spikeLen, 0, spikeLen, 0)
-        lg.addColorStop(0, 'rgba(168,85,247,0)')
-        lg.addColorStop(0.5, `rgba(255,255,255,${0.4 * starAlpha})`)
-        lg.addColorStop(1, 'rgba(168,85,247,0)')
-        ctx.strokeStyle = lg
-        ctx.lineWidth = spikeW * 0.8
-        ctx.beginPath()
-        ctx.moveTo(-spikeLen, 0)
-        ctx.lineTo(spikeLen, 0)
-        ctx.stroke()
-
         ctx.restore()
-
-        // One faint expanding ring (continuity into the globe reveal)
-        const ringRadius = p * Math.max(w, h) * 0.55
-        const ringAlpha = Math.max(0, 0.18 * (1 - p * p)) * flashIntensity
-        ctx.beginPath()
-        ctx.arc(cx, cy, ringRadius, 0, Math.PI * 2)
-        ctx.strokeStyle = `rgba(0,82,255,${ringAlpha})`
-        ctx.lineWidth = 1 + (1 - p) * 2.5
-        ctx.stroke()
-
-        // Scattered particles from center
-        const scattered = 40
-        for (let i = 0; i < scattered; i++) {
-          const angle = (i / scattered) * Math.PI * 2 + p * 0.3
-          const dist = p * (150 + (i % 7) * 80)
-          const x = cx + Math.cos(angle) * dist
-          const y = cy + Math.sin(angle) * dist
-          const alpha = Math.max(0, (1 - p) * 0.5)
-          const size = 0.8 + (1 - p) * 1.2
-          ctx.beginPath()
-          ctx.arc(x, y, size, 0, Math.PI * 2)
-          ctx.fillStyle = i % 3 === 0
-            ? `rgba(0,82,255,${alpha})`
-            : i % 3 === 1
-            ? `rgba(168,85,247,${alpha * 0.7})`
-            : `rgba(217,70,239,${alpha * 0.5})`
-          ctx.fill()
-        }
       }
 
       // --- Phase 3: Fade out (t 0.7→1.0) ---

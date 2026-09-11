@@ -192,7 +192,7 @@ function VisibleWireframe({ impactPoints }) {
             vec3 impactCol = mix(vec3(0.0, 0.322, 1.0), vec3(1.0, 1.0, 1.0), 0.6);
             vec3 col = mix(baseCol, impactCol, impacts * 0.7);
 
-            float alpha = 0.02 * pulse * fade + impacts * 0.15;
+            float alpha = 0.045 * pulse * fade + impacts * 0.15;
             gl_FragColor = vec4(col, alpha);
           }
         `}
@@ -271,7 +271,7 @@ function EnergyParticles({ liveData, onImpact }) {
       pos[i * 3 + 2] = (Math.random() - 0.5) * 0.3
       const theta = Math.random() * Math.PI * 2
       const phi = Math.acos(2 * Math.random() - 1)
-      const speed = 0.8 + Math.random() * 0.6
+      const speed = 1.0 + Math.random() * 0.7
       vel[i * 3] = Math.sin(phi) * Math.cos(theta) * speed
       vel[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed
       vel[i * 3 + 2] = Math.cos(phi) * speed
@@ -279,7 +279,7 @@ function EnergyParticles({ liveData, onImpact }) {
       col[i * 3] = 0.0 * (1 - t) + 0.659 * t
       col[i * 3 + 1] = 0.322 * (1 - t) + 0.333 * t
       col[i * 3 + 2] = 1.0 * (1 - t) + 0.969 * t
-      sz[i] = 0.015 + Math.random() * 0.02
+      sz[i] = 0.02 + Math.random() * 0.03
       life[i] = Math.random() * 3
       maxLife[i] = 2.5 + Math.random() * 1.5
     }
@@ -301,7 +301,7 @@ function EnergyParticles({ liveData, onImpact }) {
         positions[i * 3 + 2] = (Math.random() - 0.5) * 0.3
         const theta = Math.random() * Math.PI * 2
         const phi = Math.acos(2 * Math.random() - 1)
-        const speed = 0.8 + Math.random() * 0.6
+        const speed = 1.0 + Math.random() * 0.7
         velocities[i * 3] = Math.sin(phi) * Math.cos(theta) * speed
         velocities[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed
         velocities[i * 3 + 2] = Math.cos(phi) * speed
@@ -496,7 +496,7 @@ function OrbitalData({ liveData }) {
     spriteRefs.current.forEach((sprite, i) => {
       if (sprite) {
         const isHovered = hovered === i
-        sprite.material.opacity = isHovered ? 0.9 : (0.3 + 0.2 * Math.sin(elapsed.current * 1.5 + i * 1.2))
+        sprite.material.opacity = isHovered ? 0.9 : (0.45 + 0.2 * Math.sin(elapsed.current * 1.5 + i * 1.2))
         const targetScale = isHovered ? labels[i].size * 2.4 : labels[i].size * 1.8
         sprite.scale.x += (targetScale - sprite.scale.x) * 0.1
       }
@@ -697,7 +697,7 @@ function GlobeScene({ liveData, paused }) {
         <Stars radius={10} depth={20} count={250} factor={2} saturation={0.25} fade speed={0.15} />
       )}
       <OrbitControls
-        autoRotate autoRotateSpeed={0.5}
+        autoRotate autoRotateSpeed={1.0}
         enableZoom={false} enablePan={false}
         enableDamping dampingFactor={0.08}
         rotateSpeed={0.5}
