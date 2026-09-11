@@ -110,143 +110,194 @@ function InnerCore() {
   )
 }
 
-// === DYSON SPHERE — energy reticule megastructure ===
-function DysonSphere() {
+// === WIREFRAME — visible structure (polished) ===
+function VisibleWireframe() {
   const ref = useRef()
   const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
   useFrame((state, delta) => { uniforms.time.value += delta * 0.5 })
   return (
     <mesh ref={ref}>
-      <sphereGeometry args={[2.2, 48, 32]} />
+      <sphereGeometry args={[2.2, 36, 24]} />
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={`
-          varying vec3 vPos; varying vec3 vWorldPos; varying vec2 vUv;
+          varying vec3 vPos; varying vec3 vWorldPos;
           uniform float time;
           void main() {
             vPos = position;
             vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
-            vUv = uv;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           }
         `}
         fragmentShader={`
-          varying vec3 vPos; varying vec3 vWorldPos; varying vec2 vUv;
+          varying vec3 vPos; varying vec3 vWorldPos;
           uniform float time;
-
           void main() {
-            // Latitude lines (horizontal rings)
-            float lat = abs(sin(vUv.y * 3.14159 * 16.0));
-            float latLine = smoothstep(0.97, 1.0, lat);
-
-            // Longitude lines (vertical meridians)
-            float lon = abs(sin(vUv.x * 3.14159 * 24.0));
-            float lonLine = smoothstep(0.97, 1.0, lon);
-
-            // Combine into grid
-            float grid = max(latLine, lonLine);
-
-            // Energy pulse traveling along lines
-            float pulse1 = sin(time * 1.2 + vWorldPos.y * 4.0) * 0.5 + 0.5;
-            float pulse2 = sin(time * 0.8 + vWorldPos.x * 3.0 + vWorldPos.z * 2.0) * 0.5 + 0.5;
-            float energy = pulse1 * 0.6 + pulse2 * 0.4;
-
-            // Intersection nodes (bright spots where lat/lon cross)
-            float nodeLat = abs(sin(vUv.y * 3.14159 * 16.0));
-            float nodeLon = abs(sin(vUv.x * 3.14159 * 24.0));
-            float node = smoothstep(0.92, 1.0, nodeLat) * smoothstep(0.92, 1.0, nodeLon);
-            float nodeGlow = node * (0.7 + 0.3 * sin(time * 2.0 + vWorldPos.x * 5.0));
-
-            // Color: Coinbase Blue base + purple energy + white nodes
-            vec3 blueBase = vec3(0.0, 0.322, 1.0);     // #0052FF
-            vec3 purpleEnergy = vec3(0.659, 0.333, 0.969); // purple
-            vec3 whiteNode = vec3(0.9, 0.95, 1.0);
-
-            vec3 col = mix(blueBase, purpleEnergy, energy * 0.4);
-            col = mix(col, whiteNode, nodeGlow * 0.8);
-
-            // Fresnel edge fade
-            float fresnel = pow(1.0 - abs(dot(normalize(vWorldPos), vec3(0.0, 0.0, 1.0))), 1.5);
-            float alpha = grid * (0.15 + energy * 0.1) + nodeGlow * 0.4;
-            alpha *= (0.6 + fresnel * 0.4);
-
-            gl_FragColor = vec4(col, alpha);
+            float pulse = 0.6 + 0.4 * sin(time * 0.5 + vWorldPos.y * 2.0);
+            float fade = smoothstep(0.0, 0.3, abs(vPos.y));
+            vec3 col = mix(vec3(0.659, 0.333, 0.969), vec3(0.133, 0.827, 0.933), 0.3 + 0.2 * sin(time * 0.3));
+            gl_FragColor = vec4(col, 0.02 * pulse * fade);
           }
         `}
-        transparent depthWrite={false} side={THREE.DoubleSide}
+        wireframe transparent depthWrite={false}
       />
     </mesh>
   )
 }
 
-// === DYSON POLE BEAMS — energy columns from poles ===
-function DysonPoleBeams() {
+// === BASE CORE — 3D nucleus emitting energy ===
+function BaseCore() {
   const groupRef = useRef()
-  const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
-  useFrame((state, delta) => { uniforms.time.value += delta * 0.3 })
+  const elapsed = useRef(0)
 
-  const { positions, colors, sizes } = useMemo(() => {
-    const count = 60
-    const pos = new Float32Array(count * 3)
-    const col = new Float32Array(count * 3)
-    const sz = new Float32Array(count)
-    for (let i = 0; i < count; i++) {
-      const t = i / count
-      const angle = t * Math.PI * 2
-      // Top pole beam
-      if (i < 30) {
-        const r = 0.1 + t * 0.3
-        pos[i * 3] = r * Math.cos(angle * 8)
-        pos[i * 3 + 1] = 2.2 + t * 1.8
-        pos[i * 3 + 2] = r * Math.sin(angle * 8)
-        col[i * 3] = 0.0; col[i * 3 + 1] = 0.322; col[i * 3 + 2] = 1.0
-      } else {
-        // Bottom pole beam
-        const r = 0.1 + (t - 0.5) * 0.3
-        pos[i * 3] = r * Math.cos(angle * 8)
-        pos[i * 3 + 1] = -2.2 - (t - 0.5) * 1.8
-        pos[i * 3 + 2] = r * Math.sin(angle * 8)
-        col[i * 3] = 0.659; col[i * 3 + 1] = 0.333; col[i * 3 + 2] = 0.969
-      }
-      sz[i] = 0.02 + Math.random() * 0.03
-    }
-    return { positions: pos, colors: col, sizes: sz }
+  // Create "BASE" text as canvas texture
+  const texture = useMemo(() => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 512; canvas.height = 128
+    const ctx = canvas.getContext('2d')
+    ctx.clearRect(0, 0, 512, 128)
+    ctx.font = 'bold 72px monospace'
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+    ctx.fillStyle = '#0052FF'
+    ctx.shadowColor = '#0052FF'; ctx.shadowBlur = 30
+    ctx.fillText('BASE', 256, 64)
+    ctx.shadowBlur = 0
+    ctx.fillText('BASE', 256, 64)
+    return new THREE.CanvasTexture(canvas)
   }, [])
+
+  useFrame((state, delta) => {
+    elapsed.current += delta
+    if (groupRef.current) {
+      groupRef.current.rotation.y = elapsed.current * 0.2
+      // Subtle pulse scale
+      const s = 1 + 0.03 * Math.sin(elapsed.current * 2)
+      groupRef.current.scale.set(s, s, s)
+    }
+  })
 
   return (
     <group ref={groupRef}>
-      <points>
-        <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-          <bufferAttribute attach="attributes-aColor" args={[colors, 3]} />
-          <bufferAttribute attach="attributes-aSize" args={[sizes, 1]} />
-        </bufferGeometry>
-        <shaderMaterial
-          uniforms={uniforms}
-          vertexShader={`
-            attribute float aSize; attribute vec3 aColor;
-            varying vec3 vColor; varying float vAlpha; uniform float time;
-            void main() {
-              vColor = aColor;
-              vAlpha = 0.3 + 0.7 * abs(sin(time * 2.0 + position.y * 1.5));
-              vec4 mv = modelViewMatrix * vec4(position, 1.0);
-              gl_PointSize = aSize * (300.0 / -mv.z);
-              gl_Position = projectionMatrix * mv;
-            }
-          `}
-          fragmentShader={`
-            varying vec3 vColor; varying float vAlpha;
-            void main() {
-              float d = length(gl_PointCoord - vec2(0.5));
-              if (d > 0.5) discard;
-              float glow = pow(1.0 - d * 2.0, 2.0);
-              gl_FragColor = vec4(vColor, glow * vAlpha * 0.6);
-            }
-          `}
-          transparent depthWrite={false} blending={THREE.AdditiveBlending}
+      {/* BASE text sprite */}
+      <sprite scale={[2.2, 0.55, 1]}>
+        <spriteMaterial
+          map={texture}
+          transparent
+          blending={THREE.AdditiveBlending}
+          opacity={0.85}
+          depthWrite={false}
         />
-      </points>
+      </sprite>
+      {/* Inner glow sphere */}
+      <mesh>
+        <sphereGeometry args={[0.4, 16, 12]} />
+        <meshBasicMaterial color={0x0052FF} transparent opacity={0.08} />
+      </mesh>
     </group>
+  )
+}
+
+// === ENERGY PARTICLES — real data traveling from core to wireframe ===
+function EnergyParticles({ liveData }) {
+  const PARTICLE_COUNT = 40
+  const elapsed = useRef(0)
+  const pointsRef = useRef()
+
+  const { positions, velocities, colors, sizes, lifetimes, maxLifetimes } = useMemo(() => {
+    const pos = new Float32Array(PARTICLE_COUNT * 3)
+    const vel = new Float32Array(PARTICLE_COUNT * 3)
+    const col = new Float32Array(PARTICLE_COUNT * 3)
+    const sz = new Float32Array(PARTICLE_COUNT)
+    const life = new Float32Array(PARTICLE_COUNT)
+    const maxLife = new Float32Array(PARTICLE_COUNT)
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      // Start from center
+      pos[i * 3] = (Math.random() - 0.5) * 0.3
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 0.3
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 0.3
+      // Random direction outward
+      const theta = Math.random() * Math.PI * 2
+      const phi = Math.acos(2 * Math.random() - 1)
+      const speed = 0.8 + Math.random() * 0.6
+      vel[i * 3] = Math.sin(phi) * Math.cos(theta) * speed
+      vel[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed
+      vel[i * 3 + 2] = Math.cos(phi) * speed
+      // Color: mix of Coinbase Blue and purple
+      const t = Math.random()
+      col[i * 3] = 0.0 * (1 - t) + 0.659 * t
+      col[i * 3 + 1] = 0.322 * (1 - t) + 0.333 * t
+      col[i * 3 + 2] = 1.0 * (1 - t) + 0.969 * t
+      sz[i] = 0.015 + Math.random() * 0.02
+      life[i] = Math.random() * 3
+      maxLife[i] = 2.5 + Math.random() * 1.5
+    }
+    return { positions: pos, velocities: vel, colors: col, sizes: sz, lifetimes: life, maxLifetimes: maxLife }
+  }, [])
+
+  const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
+
+  useFrame((state, delta) => {
+    elapsed.current += delta
+    uniforms.time.value = elapsed.current
+    // Update particle positions
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      lifetimes[i] += delta
+      if (lifetimes[i] >= maxLifetimes[i]) {
+        // Reset particle to center
+        positions[i * 3] = (Math.random() - 0.5) * 0.3
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 0.3
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 0.3
+        const theta = Math.random() * Math.PI * 2
+        const phi = Math.acos(2 * Math.random() - 1)
+        const speed = 0.8 + Math.random() * 0.6
+        velocities[i * 3] = Math.sin(phi) * Math.cos(theta) * speed
+        velocities[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed
+        velocities[i * 3 + 2] = Math.cos(phi) * speed
+        lifetimes[i] = 0
+        maxLifetimes[i] = 2.5 + Math.random() * 1.5
+      }
+      positions[i * 3] += velocities[i * 3] * delta
+      positions[i * 3 + 1] += velocities[i * 3 + 1] * delta
+      positions[i * 3 + 2] += velocities[i * 3 + 2] * delta
+    }
+    // Update buffer attribute
+    if (pointsRef.current) {
+      pointsRef.current.geometry.attributes.position.needsUpdate = true
+    }
+  })
+
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-aColor" args={[colors, 3]} />
+        <bufferAttribute attach="attributes-aSize" args={[sizes, 1]} />
+      </bufferGeometry>
+      <shaderMaterial
+        uniforms={uniforms}
+        vertexShader={`
+          attribute float aSize; attribute vec3 aColor;
+          varying vec3 vColor; varying float vAlpha; uniform float time;
+          void main() {
+            vColor = aColor;
+            vAlpha = 0.6 + 0.4 * sin(time * 3.0 + position.x * 5.0);
+            vec4 mv = modelViewMatrix * vec4(position, 1.0);
+            gl_PointSize = aSize * (400.0 / -mv.z);
+            gl_Position = projectionMatrix * mv;
+          }
+        `}
+        fragmentShader={`
+          varying vec3 vColor; varying float vAlpha;
+          void main() {
+            float d = length(gl_PointCoord - vec2(0.5));
+            if (d > 0.5) discard;
+            float glow = pow(1.0 - d * 2.0, 2.0);
+            gl_FragColor = vec4(vColor, glow * vAlpha * 0.8);
+          }
+        `}
+        transparent depthWrite={false} blending={THREE.AdditiveBlending}
+      />
+    </points>
   )
 }
 
@@ -518,8 +569,9 @@ function GlobeScene({ liveData, paused }) {
     >
       <ambientLight intensity={0.05} />
       <group scale={1.3}>
-        <DysonSphere />
-        <DysonPoleBeams />
+        <VisibleWireframe />
+        <BaseCore />
+        <EnergyParticles liveData={liveData} />
         <OuterHalo />
         <AtmosphereGlow />
         <InnerCore />
