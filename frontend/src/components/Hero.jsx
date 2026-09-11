@@ -19,6 +19,8 @@ function SupernovaLoader({ onComplete }) {
   const canvasRef = useRef(null)
   const animRef = useRef(null)
   const overlayRef = useRef(null)
+  const onCompleteRef = useRef(onComplete)
+  onCompleteRef.current = onComplete
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -70,7 +72,7 @@ function SupernovaLoader({ onComplete }) {
         ctx.fillRect(0, 0, w, h)
       }
 
-      // --- Phase 2: Star of David flash + expansion ---
+      // --- Phase 2: 4-point sparkle flash + expansion (✦) ---
       if (t >= 0.3 && t < 0.85) {
         const p = (t - 0.3) / 0.55 // 0→1
 
@@ -79,7 +81,7 @@ function SupernovaLoader({ onComplete }) {
           ? p / 0.1 // rise
           : Math.max(0, 1 - (p - 0.1) / 0.3) // decay
 
-        // Central glow behind the star
+        // Central glow behind the sparkle
         const glowR = 80 + p * 300
         const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR)
         glow.addColorStop(0, `rgba(255,255,255,${flashIntensity * 0.7})`)
@@ -89,43 +91,69 @@ function SupernovaLoader({ onComplete }) {
         ctx.fillStyle = glow
         ctx.fillRect(0, 0, w, h)
 
-        // Star of David — two interlocked triangles
-        const triRadius = (60 + p * 320) * (Math.max(w, h) / 800)
-        const triAlpha = flashIntensity * 0.9
-        const triWidth = 2.5 + (1 - p) * 4
+        // 4-point sparkle — long thin points, concave waist (like ✦)
+        const R = (60 + p * 340) * (Math.max(w, h) / 800)
+        const waist = R * 0.10
+        const starAlpha = flashIntensity
 
         ctx.save()
         ctx.translate(cx, cy)
 
-        // Triangle 1 (pointing up)
+        // Filled sparkle body (white core → blue edge)
+        const bodyGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, R)
+        bodyGrad.addColorStop(0, `rgba(255,255,255,${0.95 * starAlpha})`)
+        bodyGrad.addColorStop(0.25, `rgba(0,82,255,${0.75 * starAlpha})`)
+        bodyGrad.addColorStop(0.6, `rgba(168,85,247,${0.35 * starAlpha})`)
+        bodyGrad.addColorStop(1, 'rgba(168,85,247,0)')
+        ctx.fillStyle = bodyGrad
         ctx.beginPath()
-        for (let i = 0; i < 3; i++) {
-          const angle = (i / 3) * Math.PI * 2 - Math.PI / 2
-          const x = Math.cos(angle) * triRadius
-          const y = Math.sin(angle) * triRadius
-          if (i === 0) ctx.moveTo(x, y)
-          else ctx.lineTo(x, y)
-        }
+        ctx.moveTo(0, -R)
+        ctx.quadraticCurveTo(waist, -waist, R, 0)
+        ctx.quadraticCurveTo(waist, waist, 0, R)
+        ctx.quadraticCurveTo(-waist, waist, -R, 0)
+        ctx.quadraticCurveTo(-waist, -waist, 0, -R)
         ctx.closePath()
-        ctx.strokeStyle = `rgba(0,82,255,${triAlpha})`
-        ctx.lineWidth = triWidth
+        ctx.fill()
+
+        // Crisp edge stroke
+        ctx.strokeStyle = `rgba(255,255,255,${0.5 * starAlpha})`
+        ctx.lineWidth = 1.5
         ctx.stroke()
 
-        // Triangle 2 (pointing down)
+        // Long lens-flare spikes (vertical + horizontal)
+        const spikeLen = R * 1.5
+        const spikeW = 2 + (1 - p) * 2
+        let lg = ctx.createLinearGradient(0, -spikeLen, 0, spikeLen)
+        lg.addColorStop(0, 'rgba(0,82,255,0)')
+        lg.addColorStop(0.5, `rgba(255,255,255,${0.55 * starAlpha})`)
+        lg.addColorStop(1, 'rgba(0,82,255,0)')
+        ctx.strokeStyle = lg
+        ctx.lineWidth = spikeW
         ctx.beginPath()
-        for (let i = 0; i < 3; i++) {
-          const angle = (i / 3) * Math.PI * 2 + Math.PI / 2
-          const x = Math.cos(angle) * triRadius
-          const y = Math.sin(angle) * triRadius
-          if (i === 0) ctx.moveTo(x, y)
-          else ctx.lineTo(x, y)
-        }
-        ctx.closePath()
-        ctx.strokeStyle = `rgba(168,85,247,${triAlpha * 0.75})`
-        ctx.lineWidth = triWidth * 0.85
+        ctx.moveTo(0, -spikeLen)
+        ctx.lineTo(0, spikeLen)
+        ctx.stroke()
+        lg = ctx.createLinearGradient(-spikeLen, 0, spikeLen, 0)
+        lg.addColorStop(0, 'rgba(168,85,247,0)')
+        lg.addColorStop(0.5, `rgba(255,255,255,${0.4 * starAlpha})`)
+        lg.addColorStop(1, 'rgba(168,85,247,0)')
+        ctx.strokeStyle = lg
+        ctx.lineWidth = spikeW * 0.8
+        ctx.beginPath()
+        ctx.moveTo(-spikeLen, 0)
+        ctx.lineTo(spikeLen, 0)
         ctx.stroke()
 
         ctx.restore()
+
+        // One faint expanding ring (continuity into the globe reveal)
+        const ringRadius = p * Math.max(w, h) * 0.55
+        const ringAlpha = Math.max(0, 0.35 * (1 - p * p)) * flashIntensity
+        ctx.beginPath()
+        ctx.arc(cx, cy, ringRadius, 0, Math.PI * 2)
+        ctx.strokeStyle = `rgba(0,82,255,${ringAlpha})`
+        ctx.lineWidth = 2 + (1 - p) * 5
+        ctx.stroke()
 
         // Scattered particles from center
         const scattered = 40
@@ -164,11 +192,11 @@ function SupernovaLoader({ onComplete }) {
     const timer = setTimeout(() => {
       running = false
       cancelAnimationFrame(animRef.current)
-      onComplete?.()
+      onCompleteRef.current?.()
     }, TOTAL_DURATION + 100)
 
     return () => { running = false; cancelAnimationFrame(animRef.current); clearTimeout(timer) }
-  }, [onComplete])
+  }, [])
 
   return (
     <div ref={overlayRef} style={{
@@ -510,6 +538,16 @@ function Hero() {
     return () => observer.disconnect()
   }, [])
 
+  // Stable loader callback (inline arrow would restart the canvas effect)
+  const handleLoaded = useCallback(() => setLoaded(true), [])
+
+  // Safety: never trap the page behind the loader — force reveal after 4s
+  useEffect(() => {
+    if (loaded) return
+    const t = setTimeout(() => setLoaded(true), 4000)
+    return () => clearTimeout(t)
+  }, [loaded])
+
   useEffect(() => {
     let tween
     try {
@@ -524,7 +562,7 @@ function Hero() {
 
   return (
     <>
-      {!loaded && <SupernovaLoader onComplete={() => setLoaded(true)} />}
+      {!loaded && <SupernovaLoader onComplete={handleLoaded} />}
       <CosmicSound />
 
       <section id="hero" ref={heroRef} style={{
@@ -556,8 +594,8 @@ function Hero() {
                 background: 'radial-gradient(circle, rgba(168,85,247,0.06) 0%, transparent 70%)',
                 animation: 'pulse 3s ease-in-out infinite' }} />
             }>
-              <div style={{ position: 'absolute', inset: '-12%', pointerEvents: 'none' }}>
-                <GlobeScene liveData={liveData} paused={globePaused} />
+              <div style={{ position: 'absolute', inset: '-12%', pointerEvents: 'auto' }}>
+                <GlobeScene liveData={liveData} paused={false} />
               </div>
             </Suspense>
           </GlobeBoundary>
