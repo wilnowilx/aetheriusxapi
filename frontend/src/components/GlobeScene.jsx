@@ -133,7 +133,7 @@ function VisibleWireframe({ impactPoints }) {
       for (let i = 0; i < 8 && i < impactPoints.length; i++) {
         const pt = impactPoints[i]
         uniforms[`impact${i}`].value.copy(pt.position)
-        uniforms[`${i}t`].value = pt.intensity
+        uniforms[`i${i}t`].value = pt.intensity
       }
     }
   })
