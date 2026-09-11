@@ -1,5 +1,5 @@
 import React, { useRef, useMemo, useEffect, useState, useCallback } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Stars, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
@@ -110,11 +110,34 @@ function InnerCore() {
   )
 }
 
-// === WIREFRAME — visible structure (polished) ===
-function VisibleWireframe() {
+// === WIREFRAME — visible structure with pulse-on-impact ===
+function VisibleWireframe({ impactPoints }) {
   const ref = useRef()
-  const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
-  useFrame((state, delta) => { uniforms.time.value += delta * 0.5 })
+  const uniforms = useMemo(() => ({
+    time: { value: 0 },
+    // 8 impact slots: position (xyz) + intensity + decay
+    impact0: { value: new THREE.Vector3(0, 0, 0) }, i0t: { value: 0 },
+    impact1: { value: new THREE.Vector3(0, 0, 0) }, i1t: { value: 0 },
+    impact2: { value: new THREE.Vector3(0, 0, 0) }, i2t: { value: 0 },
+    impact3: { value: new THREE.Vector3(0, 0, 0) }, i3t: { value: 0 },
+    impact4: { value: new THREE.Vector3(0, 0, 0) }, i4t: { value: 0 },
+    impact5: { value: new THREE.Vector3(0, 0, 0) }, i5t: { value: 0 },
+    impact6: { value: new THREE.Vector3(0, 0, 0) }, i6t: { value: 0 },
+    impact7: { value: new THREE.Vector3(0, 0, 0) }, i7t: { value: 0 },
+  }), [])
+
+  useFrame((state, delta) => {
+    uniforms.time.value += delta * 0.5
+    // Feed impact points into shader
+    if (impactPoints) {
+      for (let i = 0; i < 8 && i < impactPoints.length; i++) {
+        const pt = impactPoints[i]
+        uniforms[`impact${i}`].value.copy(pt.position)
+        uniforms[`${i}t`].value = pt.intensity
+      }
+    }
+  })
+
   return (
     <mesh ref={ref}>
       <sphereGeometry args={[2.2, 36, 24]} />
@@ -123,6 +146,8 @@ function VisibleWireframe() {
         vertexShader={`
           varying vec3 vPos; varying vec3 vWorldPos;
           uniform float time;
+          uniform vec3 impact0, impact1, impact2, impact3, impact4, impact5, impact6, impact7;
+          uniform float i0t, i1t, i2t, i3t, i4t, i5t, i6t, i7t;
           void main() {
             vPos = position;
             vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
@@ -132,11 +157,43 @@ function VisibleWireframe() {
         fragmentShader={`
           varying vec3 vPos; varying vec3 vWorldPos;
           uniform float time;
+          uniform vec3 impact0, impact1, impact2, impact3, impact4, impact5, impact6, impact7;
+          uniform float i0t, i1t, i2t, i3t, i4t, i5t, i6t, i7t;
+
+          float impactPulse(vec3 worldPos, vec3 impactPos, float intensity) {
+            float dist = length(worldPos - impactPos);
+            // Expanding ring from impact point
+            float ring = abs(dist - time * 1.5 * intensity);
+            float ringPulse = exp(-ring * 3.0) * intensity;
+            // Proximity glow
+            float prox = exp(-dist * 1.8) * intensity * 0.5;
+            return ringPulse + prox;
+          }
+
           void main() {
             float pulse = 0.6 + 0.4 * sin(time * 0.5 + vWorldPos.y * 2.0);
             float fade = smoothstep(0.0, 0.3, abs(vPos.y));
-            vec3 col = mix(vec3(0.659, 0.333, 0.969), vec3(0.133, 0.827, 0.933), 0.3 + 0.2 * sin(time * 0.3));
-            gl_FragColor = vec4(col, 0.02 * pulse * fade);
+
+            // Accumulate impact pulses
+            float impacts = 0.0;
+            impacts += impactPulse(vWorldPos, impact0, i0t);
+            impacts += impactPulse(vWorldPos, impact1, i1t);
+            impacts += impactPulse(vWorldPos, impact2, i2t);
+            impacts += impactPulse(vWorldPos, impact3, i3t);
+            impacts += impactPulse(vWorldPos, impact4, i4t);
+            impacts += impactPulse(vWorldPos, impact5, i5t);
+            impacts += impactPulse(vWorldPos, impact6, i6t);
+            impacts += impactPulse(vWorldPos, impact7, i7t);
+            impacts = clamp(impacts, 0.0, 1.5);
+
+            // Base wireframe color (purple → cyan)
+            vec3 baseCol = mix(vec3(0.659, 0.333, 0.969), vec3(0.133, 0.827, 0.933), 0.3 + 0.2 * sin(time * 0.3));
+            // Impact color (white-blue flash)
+            vec3 impactCol = mix(vec3(0.0, 0.322, 1.0), vec3(1.0, 1.0, 1.0), 0.6);
+            vec3 col = mix(baseCol, impactCol, impacts * 0.7);
+
+            float alpha = 0.02 * pulse * fade + impacts * 0.15;
+            gl_FragColor = vec4(col, alpha);
           }
         `}
         wireframe transparent depthWrite={false}
@@ -150,7 +207,6 @@ function BaseCore() {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Create "BASE" text as canvas texture
   const texture = useMemo(() => {
     const canvas = document.createElement('canvas')
     canvas.width = 512; canvas.height = 128
@@ -170,7 +226,6 @@ function BaseCore() {
     elapsed.current += delta
     if (groupRef.current) {
       groupRef.current.rotation.y = elapsed.current * 0.2
-      // Subtle pulse scale
       const s = 1 + 0.03 * Math.sin(elapsed.current * 2)
       groupRef.current.scale.set(s, s, s)
     }
@@ -178,7 +233,6 @@ function BaseCore() {
 
   return (
     <group ref={groupRef}>
-      {/* BASE text sprite */}
       <sprite scale={[2.2, 0.55, 1]}>
         <spriteMaterial
           map={texture}
@@ -188,7 +242,6 @@ function BaseCore() {
           depthWrite={false}
         />
       </sprite>
-      {/* Inner glow sphere */}
       <mesh>
         <sphereGeometry args={[0.4, 16, 12]} />
         <meshBasicMaterial color={0x0052FF} transparent opacity={0.08} />
@@ -197,32 +250,31 @@ function BaseCore() {
   )
 }
 
-// === ENERGY PARTICLES — real data traveling from core to wireframe ===
-function EnergyParticles({ liveData }) {
+// === ENERGY PARTICLES — travel center → wireframe, pulse on impact ===
+function EnergyParticles({ liveData, onImpact }) {
   const PARTICLE_COUNT = 40
   const elapsed = useRef(0)
   const pointsRef = useRef()
+  const WIRE_RADIUS = 2.2
 
-  const { positions, velocities, colors, sizes, lifetimes, maxLifetimes } = useMemo(() => {
+  const state = useMemo(() => {
     const pos = new Float32Array(PARTICLE_COUNT * 3)
     const vel = new Float32Array(PARTICLE_COUNT * 3)
     const col = new Float32Array(PARTICLE_COUNT * 3)
     const sz = new Float32Array(PARTICLE_COUNT)
     const life = new Float32Array(PARTICLE_COUNT)
     const maxLife = new Float32Array(PARTICLE_COUNT)
+    const hit = new Uint8Array(PARTICLE_COUNT) // track if already triggered impact
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      // Start from center
       pos[i * 3] = (Math.random() - 0.5) * 0.3
       pos[i * 3 + 1] = (Math.random() - 0.5) * 0.3
       pos[i * 3 + 2] = (Math.random() - 0.5) * 0.3
-      // Random direction outward
       const theta = Math.random() * Math.PI * 2
       const phi = Math.acos(2 * Math.random() - 1)
       const speed = 0.8 + Math.random() * 0.6
       vel[i * 3] = Math.sin(phi) * Math.cos(theta) * speed
       vel[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed
       vel[i * 3 + 2] = Math.cos(phi) * speed
-      // Color: mix of Coinbase Blue and purple
       const t = Math.random()
       col[i * 3] = 0.0 * (1 - t) + 0.659 * t
       col[i * 3 + 1] = 0.322 * (1 - t) + 0.333 * t
@@ -231,19 +283,19 @@ function EnergyParticles({ liveData }) {
       life[i] = Math.random() * 3
       maxLife[i] = 2.5 + Math.random() * 1.5
     }
-    return { positions: pos, velocities: vel, colors: col, sizes: sz, lifetimes: life, maxLifetimes: maxLife }
+    return { positions: pos, velocities: vel, colors: col, sizes: sz, lifetimes: life, maxLifetimes: maxLife, hit }
   }, [])
 
   const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
 
-  useFrame((state, delta) => {
+  useFrame((context, delta) => {
     elapsed.current += delta
     uniforms.time.value = elapsed.current
-    // Update particle positions
+    const { positions, velocities, lifetimes, maxLifetimes, hit } = state
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       lifetimes[i] += delta
       if (lifetimes[i] >= maxLifetimes[i]) {
-        // Reset particle to center
+        // Reset
         positions[i * 3] = (Math.random() - 0.5) * 0.3
         positions[i * 3 + 1] = (Math.random() - 0.5) * 0.3
         positions[i * 3 + 2] = (Math.random() - 0.5) * 0.3
@@ -255,12 +307,33 @@ function EnergyParticles({ liveData }) {
         velocities[i * 3 + 2] = Math.cos(phi) * speed
         lifetimes[i] = 0
         maxLifetimes[i] = 2.5 + Math.random() * 1.5
+        hit[i] = 0
+        continue
       }
       positions[i * 3] += velocities[i * 3] * delta
       positions[i * 3 + 1] += velocities[i * 3 + 1] * delta
       positions[i * 3 + 2] += velocities[i * 3 + 2] * delta
+
+      // Check wireframe collision
+      const dist = Math.sqrt(
+        positions[i * 3] ** 2 +
+        positions[i * 3 + 1] ** 2 +
+        positions[i * 3 + 2] ** 2
+      )
+      if (dist >= WIRE_RADIUS && !hit[i]) {
+        hit[i] = 1
+        if (onImpact) {
+          onImpact({
+            position: new THREE.Vector3(
+              positions[i * 3],
+              positions[i * 3 + 1],
+              positions[i * 3 + 2]
+            ),
+            intensity: 1.0
+          })
+        }
+      }
     }
-    // Update buffer attribute
     if (pointsRef.current) {
       pointsRef.current.geometry.attributes.position.needsUpdate = true
     }
@@ -269,9 +342,9 @@ function EnergyParticles({ liveData }) {
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-        <bufferAttribute attach="attributes-aColor" args={[colors, 3]} />
-        <bufferAttribute attach="attributes-aSize" args={[sizes, 1]} />
+        <bufferAttribute attach="attributes-position" args={[state.positions, 3]} />
+        <bufferAttribute attach="attributes-aColor" args={[state.colors, 3]} />
+        <bufferAttribute attach="attributes-aSize" args={[state.sizes, 1]} />
       </bufferGeometry>
       <shaderMaterial
         uniforms={uniforms}
@@ -390,31 +463,6 @@ function OrbitalData({ liveData }) {
   const elapsed = useRef(0)
   const [hovered, setHovered] = useState(null)
 
-  const tooltips = useMemo(() => {
-    const d = liveData || {}
-    return [
-      { label: 'x402 Protocol', desc: 'HTTP 402 + USDC micropayments', detail: 'Machine-to-machine commerce standard' },
-      { label: `Block #${d.block || '—'}`, desc: 'Latest Base block', detail: 'Real-time chain state' },
-      { label: `${d.gas || '—'} gwei`, desc: 'Current gas price', detail: 'Sub-cent transaction fees' },
-      { label: d.volume || '$0.00', desc: 'Total volume settled', detail: 'On-chain USDC payments' },
-      { label: 'USDC', desc: 'Stablecoin on Base', detail: 'USD-pegged, instant finality' },
-      { label: 'Base', desc: 'Ethereum L2 by Coinbase', detail: 'RGB 0,0,255 — screen native' },
-    ]
-  }, [liveData])
-
-  useFrame((state, delta) => {
-    elapsed.current += delta
-    if (groupRef.current) groupRef.current.rotation.y = elapsed.current * 0.12
-    spriteRefs.current.forEach((sprite, i) => {
-      if (sprite) {
-        const isHovered = hovered === i
-        sprite.material.opacity = isHovered ? 0.9 : (0.3 + 0.2 * Math.sin(elapsed.current * 1.5 + i * 1.2))
-        const targetScale = isHovered ? labels[i].size * 2.4 : labels[i].size * 1.8
-        sprite.scale.x += (targetScale - sprite.scale.x) * 0.1
-      }
-    })
-  })
-
   const labels = useMemo(() => {
     const d = liveData || {}
     return [
@@ -442,6 +490,19 @@ function OrbitalData({ liveData }) {
     })
   , [labels])
 
+  useFrame((state, delta) => {
+    elapsed.current += delta
+    if (groupRef.current) groupRef.current.rotation.y = elapsed.current * 0.12
+    spriteRefs.current.forEach((sprite, i) => {
+      if (sprite) {
+        const isHovered = hovered === i
+        sprite.material.opacity = isHovered ? 0.9 : (0.3 + 0.2 * Math.sin(elapsed.current * 1.5 + i * 1.2))
+        const targetScale = isHovered ? labels[i].size * 2.4 : labels[i].size * 1.8
+        sprite.scale.x += (targetScale - sprite.scale.x) * 0.1
+      }
+    })
+  })
+
   return (
     <group ref={groupRef}>
       {textures.map((tex, i) => {
@@ -468,14 +529,6 @@ function OrbitalData({ liveData }) {
           </sprite>
         )
       })}
-      {/* HTML tooltip overlay */}
-      {hovered !== null && (
-        <group position={spriteRefs.current[hovered]?.position?.toArray() || [0,0,0]}>
-          <sprite scale={[3.5, 0.9, 1]}>
-            <spriteMaterial transparent opacity={0} depthWrite={false} />
-          </sprite>
-        </group>
-      )}
     </group>
   )
 }
@@ -505,7 +558,6 @@ function DataStream() {
       pos[i * 3 + 1] = r * Math.sin(angle) * Math.sin(tilt)
       pos[i * 3 + 2] = r * Math.sin(angle) * Math.cos(tilt)
       const t = i / count
-      // purple → cyan → magenta gradient
       col[i * 3] = 0.659 * (1 - t) + 0.133 * t
       col[i * 3 + 1] = 0.333 * (1 - t) + 0.827 * t
       col[i * 3 + 2] = 0.969 * (1 - t) + 0.933 * t
@@ -551,11 +603,71 @@ function DataStream() {
   )
 }
 
+// === IMPACT MANAGER — manages 8 impact slots ===
+function ImpactManager({ onImpactsReady }) {
+  const impactQueue = useRef([])
+  const impactSlots = useRef(
+    Array.from({ length: 8 }, () => ({
+      position: new THREE.Vector3(),
+      intensity: 0,
+      active: false,
+      age: 0,
+    }))
+  )
+
+  useFrame((state, delta) => {
+    // Process queue
+    while (impactQueue.current.length > 0 && impactSlots.current.some(s => !s.active)) {
+      const pt = impactQueue.current.shift()
+      const slot = impactSlots.current.find(s => !s.active)
+      if (slot) {
+        slot.position.copy(pt.position)
+        slot.intensity = pt.intensity
+        slot.active = true
+        slot.age = 0
+      }
+    }
+    // Decay active impacts
+    const decaySpeed = 1.5
+    impactSlots.current.forEach(slot => {
+      if (slot.active) {
+        slot.age += delta
+        slot.intensity = Math.max(0, 1.0 - slot.age * decaySpeed)
+        if (slot.intensity <= 0) {
+          slot.active = false
+        }
+      }
+    })
+    // Pass to parent
+    onImpactsReady(impactSlots.current.filter(s => s.active).map(s => ({
+      position: s.position,
+      intensity: s.intensity,
+    })))
+  })
+
+  // Expose addImpact
+  useEffect(() => {
+    window.__aetherius_addImpact = (pt) => {
+      impactQueue.current.push(pt)
+    }
+    return () => { delete window.__aetherius_addImpact }
+  }, [])
+
+  return null
+}
+
 // === MAIN GLOBE SCENE ===
 function GlobeScene({ liveData, paused }) {
+  const [impactPoints, setImpactPoints] = useState([])
   const isMobile = useMemo(() => {
     if (typeof window === 'undefined') return false
     return window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768
+  }, [])
+
+  const handleImpact = useCallback((pt) => {
+    if (window.__aetherius_addImpact) {
+      window.__aetherius_addImpact(pt)
+    }
   }, [])
 
   return (
@@ -569,9 +681,10 @@ function GlobeScene({ liveData, paused }) {
     >
       <ambientLight intensity={0.05} />
       <group scale={1.3}>
-        <VisibleWireframe />
+        <VisibleWireframe impactPoints={impactPoints} />
         <BaseCore />
-        <EnergyParticles liveData={liveData} />
+        <EnergyParticles liveData={liveData} onImpact={handleImpact} />
+        <ImpactManager onImpactsReady={setImpactPoints} />
         <OuterHalo />
         <AtmosphereGlow />
         <InnerCore />
