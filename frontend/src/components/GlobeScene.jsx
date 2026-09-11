@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useEffect } from 'react'
+import React, { useRef, useMemo, useEffect, useState, useCallback } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Stars, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
@@ -10,10 +10,10 @@ function OuterHalo() {
     colorA: { value: new THREE.Color(0xa855f7) },
     colorB: { value: new THREE.Color(0xd946ef) },
   }), [])
-  useFrame((state) => { uniforms.time.value = state.clock.elapsedTime })
+  useFrame((state, delta) => { uniforms.time.value += delta * 0.4 })
   return (
     <mesh scale={1.4}>
-      <sphereGeometry args={[2.2, 32, 32]} />
+      <sphereGeometry args={[2.2, 24, 18]} />
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={`
@@ -48,10 +48,10 @@ function AtmosphereGlow() {
     colorA: { value: new THREE.Color(0x22d3ee) },
     colorB: { value: new THREE.Color(0xa855f7) },
   }), [])
-  useFrame((state) => { uniforms.time.value = state.clock.elapsedTime })
+  useFrame((state, delta) => { uniforms.time.value += delta * 0.8 })
   return (
     <mesh scale={1.15}>
-      <sphereGeometry args={[2.2, 48, 48]} />
+      <sphereGeometry args={[2.2, 32, 24]} />
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={`
@@ -82,7 +82,7 @@ function AtmosphereGlow() {
 // === INNER CORE ===
 function InnerCore() {
   const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
-  useFrame((state) => { uniforms.time.value = state.clock.elapsedTime })
+  useFrame((state, delta) => { uniforms.time.value += delta * 0.4 })
   return (
     <mesh scale={0.85}>
       <sphereGeometry args={[2.2, 32, 32]} />
@@ -114,10 +114,10 @@ function InnerCore() {
 function VisibleWireframe() {
   const ref = useRef()
   const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
-  useFrame((state) => { uniforms.time.value = state.clock.elapsedTime })
+  useFrame((state, delta) => { uniforms.time.value += delta * 0.5 })
   return (
     <mesh ref={ref}>
-      <sphereGeometry args={[2.2, 36, 24]} />
+      <sphereGeometry args={[2.2, 28, 18]} />
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={`
@@ -171,7 +171,7 @@ function AgentNodes() {
     return { positions: pos, colors: col, sizes: sz }
   }, [])
   const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
-  useFrame((state) => { uniforms.time.value = state.clock.elapsedTime })
+  useFrame((state, delta) => { uniforms.time.value += delta * 1.5 })
   return (
     <points>
       <bufferGeometry>
@@ -187,8 +187,8 @@ function AgentNodes() {
           void main() {
             vColor = aColor;
             vec3 pos = position;
-            pos += normalize(position) * sin(time * 1.5 + position.x * 2.5) * 0.025;
-            vAlpha = 0.5 + 0.5 * sin(time * 2.5 + position.y * 1.8);
+            pos += normalize(position) * sin(time * 1.0 + position.x * 2.5) * 0.025;
+            vAlpha = 0.5 + 0.5 * sin(time * 1.6 + position.y * 1.8);
             vec4 mv = modelViewMatrix * vec4(pos, 1.0);
             gl_PointSize = aSize * (360.0 / -mv.z);
             gl_Position = projectionMatrix * mv;
@@ -231,12 +231,14 @@ function OrbitRings() {
 function OrbitalData({ liveData }) {
   const groupRef = useRef()
   const spriteRefs = useRef([])
+  const elapsed = useRef(0)
 
-  useFrame((state) => {
-    if (groupRef.current) groupRef.current.rotation.y = state.clock.elapsedTime * 0.12
+  useFrame((state, delta) => {
+    elapsed.current += delta
+    if (groupRef.current) groupRef.current.rotation.y = elapsed.current * 0.12
     spriteRefs.current.forEach((sprite, i) => {
       if (sprite) {
-        sprite.material.opacity = 0.3 + 0.2 * Math.sin(state.clock.elapsedTime * 1.5 + i * 1.2)
+        sprite.material.opacity = 0.3 + 0.2 * Math.sin(elapsed.current * 1.5 + i * 1.2)
       }
     })
   })
@@ -300,9 +302,11 @@ function OrbitalData({ liveData }) {
 function DataStream() {
   const groupRef = useRef()
   const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
-  useFrame((state) => {
-    uniforms.time.value = state.clock.elapsedTime
-    if (groupRef.current) groupRef.current.rotation.y = state.clock.elapsedTime * 0.06
+  const elapsed = useRef(0)
+  useFrame((state, delta) => {
+    elapsed.current += delta
+    uniforms.time.value = elapsed.current
+    if (groupRef.current) groupRef.current.rotation.y = elapsed.current * 0.06
   })
 
   const { positions, colors, sizes } = useMemo(() => {
@@ -366,7 +370,7 @@ function DataStream() {
 }
 
 // === MAIN GLOBE SCENE ===
-function GlobeScene({ liveData }) {
+function GlobeScene({ liveData, paused }) {
   const isMobile = useMemo(() => {
     if (typeof window === 'undefined') return false
     return window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768
@@ -379,6 +383,7 @@ function GlobeScene({ liveData }) {
       onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: 'transparent' }}
       dpr={[1, 1.5]}
+      frameloop={paused ? 'demand' : 'always'}
     >
       <ambientLight intensity={0.05} />
       <group scale={1.3}>
@@ -392,7 +397,7 @@ function GlobeScene({ liveData }) {
         <DataStream />
       </group>
       {!isMobile && (
-        <Stars radius={10} depth={30} count={400} factor={2} saturation={0.25} fade speed={0.2} />
+        <Stars radius={10} depth={20} count={250} factor={2} saturation={0.25} fade speed={0.15} />
       )}
       <OrbitControls
         autoRotate autoRotateSpeed={0.5}

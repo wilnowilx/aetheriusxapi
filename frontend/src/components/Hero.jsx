@@ -230,6 +230,19 @@ function useLiveData() {
 // === MAIN HERO ===
 function Hero() {
   const liveData = useLiveData()
+  const [globePaused, setGlobePaused] = useState(false)
+  const heroRef = useRef(null)
+
+  // IntersectionObserver: pause globe when hero scrolls off-screen
+  useEffect(() => {
+    if (!heroRef.current) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setGlobePaused(!entry.isIntersecting),
+      { threshold: 0.05 }
+    )
+    observer.observe(heroRef.current)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     let tween
@@ -244,7 +257,7 @@ function Hero() {
   }, [])
 
   return (
-    <section id="hero" style={{
+    <section id="hero" ref={heroRef} style={{
       minHeight: '100vh',
       display: 'flex', flexDirection: 'column',
       justifyContent: 'center', alignItems: 'center',
@@ -274,7 +287,7 @@ function Hero() {
               animation: 'pulse 3s ease-in-out infinite' }} />
           }>
             <div style={{ position: 'absolute', inset: '-12%', pointerEvents: 'none' }}>
-              <GlobeScene liveData={liveData} />
+              <GlobeScene liveData={liveData} paused={globePaused} />
             </div>
           </Suspense>
         </GlobeBoundary>
