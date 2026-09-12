@@ -632,6 +632,55 @@ async def oracle_verified():
     return resp
 
 
+@app.get("/v1/oracle/risk/{address}")
+@app.get("/api/v1/oracle/risk/{address}")
+async def oracle_risk(address: str):
+    """FREE: Real-time agent risk score for x402 settlement trust.
+
+    Any API provider can query this BEFORE accepting a payment proof.
+    Returns velocity, settlement history, risk score, and block status.
+
+    This is the anti-fraud shield: check here first, then decide.
+    """
+    from credit_velocity import get_credit_velocity
+    cv = get_credit_velocity()
+    risk = cv.get_agent_risk(address)
+
+    # Also check if agent is currently blocked
+    agent = cv._agents.get(address.lower())
+    blocked = False
+    block_remaining = 0.0
+    if agent and agent.blocked:
+        now = time.time()
+        if now < agent.blocked_until:
+            blocked = True
+            block_remaining = round(agent.blocked_until - now, 1)
+
+    body = {
+        "address": address,
+        "risk_score": risk.get("risk_score", 0.0),
+        "risk_level": risk.get("risk_level", "unknown"),
+        "velocity": risk.get("velocity", 0.0),
+        "settlement_rate": risk.get("settlement_rate", 1.0),
+        "total_requests": risk.get("total_requests", 0),
+        "total_settled": risk.get("total_settled", 0),
+        "total_volume_usd": risk.get("total_volume_usd", 0.0),
+        "blocked": blocked,
+        "block_remaining_s": block_remaining,
+        "block_reason": agent.block_reason if agent and blocked else "",
+        "recommendation": "accept" if not blocked and risk.get("risk_score", 0) < 30
+                          else "reject" if blocked
+                          else "review",
+        "timestamp": _now(),
+    }
+    resp = JSONResponse(content=body)
+    resp.headers["X-AETHERIUS-Oracle"] = "true"
+    resp.headers["X-AETHERIUS-Risk-Score"] = str(body["risk_score"])
+    resp.headers["X-AETHERIUS-Risk-Level"] = body["risk_level"]
+    resp.headers["X-AETHERIUS-Version"] = VERSION
+    return resp
+
+
 @app.get("/")
 async def root():
     return {"service": "aetheriusxAPI", "version": VERSION,
@@ -639,6 +688,7 @@ async def root():
             "telemetry": "/v1/telemetry",
             "oracle": "/v1/oracle/status",
             "oracle_verified": "/v1/oracle/verified",
+            "oracle_risk": "/v1/oracle/risk/{address}",
             "anti_replay": "/v1/antireplay/stats"}
 
 

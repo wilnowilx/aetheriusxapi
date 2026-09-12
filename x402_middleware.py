@@ -423,7 +423,8 @@ class SimulatedX402Middleware(BaseHTTPMiddleware):
             response = await call_next(request)
             latency_ms = (time.monotonic() - start) * 1000
             success = response.status_code == 200
-            record_call(canonical, success, latency_ms)
+            agent_risk = velocity_check.get("risk_score")
+            record_call(canonical, success, latency_ms, agent_risk=agent_risk)
             record_settlement(canonical, True)
             response.headers[SETTLED_HEADER] = "collected"
             response.headers["X-PAYMENT-COLLECTED"] = "true"
@@ -434,7 +435,8 @@ class SimulatedX402Middleware(BaseHTTPMiddleware):
             response = await call_next(request)
             latency_ms = (time.monotonic() - start) * 1000
             success = response.status_code == 200
-            record_call(canonical, success, latency_ms)
+            agent_risk = velocity_check.get("risk_score")
+            record_call(canonical, success, latency_ms, agent_risk=agent_risk)
             record_settlement(canonical, True)
             response.headers[SETTLED_HEADER] = "simulated"
             return response
