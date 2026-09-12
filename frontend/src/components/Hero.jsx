@@ -298,8 +298,8 @@ function CosmicVoid() {
         @keyframes voidTwinkle { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
         .void-aurora {
-          position: absolute; width: 130%; height: 40%; left: -15%;
-          filter: blur(90px); mix-blend-mode: screen; opacity: 0;
+          position: absolute; width: 130%; height: 45%; left: -15%;
+          filter: blur(110px); mix-blend-mode: screen; opacity: 0;
           animation: auroraBreath 20s ease-in-out infinite;
         }
         .void-aurora--1 {
@@ -366,22 +366,22 @@ function CosmicVoid() {
 
         .void-nebula {
           position: absolute; border-radius: 50%;
-          filter: blur(120px); mix-blend-mode: screen;
+          filter: blur(160px); mix-blend-mode: screen;
           opacity: 0; animation: nebulaPulse 22s ease-in-out infinite;
         }
         .void-nebula--1 {
-          width: 900px; height: 550px; top: -12%; left: -8%;
-          background: radial-gradient(ellipse, rgba(168,85,247,0.12) 0%, rgba(217,70,239,0.08) 40%, transparent 70%);
+          width: 1000px; height: 600px; top: -14%; left: -10%;
+          background: radial-gradient(ellipse, rgba(168,85,247,0.16) 0%, rgba(217,70,239,0.10) 40%, transparent 70%);
           animation-delay: 0s; animation-duration: 26s;
         }
         .void-nebula--2 {
-          width: 700px; height: 480px; top: 20%; right: -8%;
-          background: radial-gradient(ellipse, rgba(34,211,238,0.08) 0%, rgba(168,85,247,0.06) 45%, transparent 70%);
+          width: 800px; height: 520px; top: 18%; right: -10%;
+          background: radial-gradient(ellipse, rgba(34,211,238,0.12) 0%, rgba(168,85,247,0.08) 45%, transparent 70%);
           animation-delay: -9s; animation-duration: 22s;
         }
         .void-nebula--3 {
-          width: 600px; height: 400px; bottom: 8%; left: 15%;
-          background: radial-gradient(ellipse, rgba(236,72,153,0.08) 0%, rgba(217,70,239,0.04) 50%, transparent 70%);
+          width: 700px; height: 450px; bottom: 6%; left: 12%;
+          background: radial-gradient(ellipse, rgba(236,72,153,0.12) 0%, rgba(217,70,239,0.06) 50%, transparent 70%);
           animation-delay: -15s; animation-duration: 30s;
         }
         @keyframes nebulaPulse {

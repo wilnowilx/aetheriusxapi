@@ -241,31 +241,38 @@ function UnifiedHalo() {
   }), [])
   useFrame((state, delta) => { uniforms.time.value += delta * 0.6 })
   return (
-    <mesh scale={1.15}>
-      <sphereGeometry args={[2.2, 28, 20]} />
+    <mesh>
+      <sphereGeometry args={[2.65, 28, 20]} />
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={`
-          varying vec3 vNormal; varying vec3 vWorldPos;
+          varying vec3 vPos; varying vec3 vNormal; varying vec3 vWorldPos;
           void main() {
+            vPos = position;
             vNormal = normalize(normalMatrix * normal);
             vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           }
         `}
         fragmentShader={`
-          varying vec3 vNormal; varying vec3 vWorldPos;
+          varying vec3 vPos; varying vec3 vNormal; varying vec3 vWorldPos;
           uniform float time; uniform vec3 colorA; uniform vec3 colorB; uniform vec3 colorC;
           void main() {
-            float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 1.8);
-            float pulse = 0.85 + 0.15 * sin(time * 0.6 + vWorldPos.y * 1.5);
-            float wave = 0.5 + 0.5 * sin(time * 0.4 + vWorldPos.x * 2.0 + vWorldPos.z * 1.2);
+            float dist = length(vPos) / 2.65;
+            float radial = pow(1.0 - dist, 2.0);
+            // Sombra que emana hacia afuera desde la superficie, sin borde contenido
+            float pulse = 0.7 + 0.3 * sin(time * 0.5 + vWorldPos.y * 1.2);
+            float wave = 0.5 + 0.5 * sin(time * 0.3 + vWorldPos.x * 1.5);
+            float polar = pow(abs(vPos.y / 2.65), 2.0);
             vec3 col = mix(colorA, colorB, wave * 0.3);
             col = mix(col, colorC, 0.15 * sin(time * 0.3 + vWorldPos.y));
-            gl_FragColor = vec4(col, fresnel * pulse * 0.08);
+            col += polar * vec3(0.2, 0.08, 0.35) * 0.5;
+            float alpha = radial * 0.10 * pulse * (1.0 + polar * 0.8);
+            alpha *= smoothstep(1.0, 0.3, dist);
+            gl_FragColor = vec4(col, alpha);
           }
         `}
-        side={THREE.BackSide} transparent depthWrite={false} blending={THREE.AdditiveBlending}
+        side={THREE.FrontSide} transparent depthWrite={false} blending={THREE.AdditiveBlending}
       />
     </mesh>
   )
@@ -359,6 +366,9 @@ function VisibleWireframe({ impactPoints }) {
             float prox = exp(-dist * 0.9) * intensity * 0.7;
             return (ringPulse*0.6 + prox) * intensity;
           }
+          float polarGlow(vec3 pos) {
+            return pow(abs(pos.y / 2.2), 2.5) * 0.6;
+          }
 
           void main() {
             float pulse = 0.6 + 0.4 * sin(time * 0.5 + vWorldPos.y * 2.0);
@@ -378,12 +388,14 @@ function VisibleWireframe({ impactPoints }) {
 
             // Base wireframe color (purple → cyan)
             vec3 baseCol = mix(vec3(0.659, 0.333, 0.969), vec3(0.133, 0.827, 0.933), 0.3 + 0.2 * sin(time * 0.3));
+            float polar = polarGlow(vPos);
+            baseCol += polar * vec3(0.25, 0.1, 0.4);
             // Impact color (white-blue flash)
             vec3 impactCol = mix(vec3(0.0, 0.322, 1.0), vec3(1.0, 1.0, 1.0), 0.6);
             vec3 col = mix(baseCol, impactCol, impacts * 0.7);
-            col += vec3(0.10, 0.06, 0.015) * impacts; // filo ámbar duna en la captura
+            col += vec3(0.10, 0.06, 0.015) * impacts;
 
-            float alpha = 0.045 * pulse * fade + impacts * 0.38;
+            float alpha = (0.045 + polar * 0.025) * pulse * fade + impacts * 0.38;
             gl_FragColor = vec4(col, alpha);
           }
         `}
