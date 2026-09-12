@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AETHERIUS — Settlement Window Attack Demo</title>
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<style>
+:root{--bg:#06060e;--purple:#a855f7;--magenta:#d946ef;--pink:#ec4899;--green:#10b981;--orange:#f59e0b;--red:#ef4444;--text:#f0f0f5;--sec:#8a8a9a;--surface:#0e0e18;--border:rgba(168,85,247,.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:radial-gradient(1000px 500px at 50% -10%,rgba(168,85,247,.18),transparent 60%),var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;text-align:center}
+.wrap{width:100%;max-width:920px;text-align:center}
+h1{font-size:clamp(18px,3vw,26px);text-align:center}
+h1 .grad{background:linear-gradient(90deg,#a855f7,#d946ef,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--sec);font-size:14px;margin:8px 0 12px;text-align:center}
+.sub a{color:#c084fc}
+.stats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.stat{border:1px solid var(--border);background:rgba(168,85,247,.07);border-radius:20px;padding:5px 14px;font-size:12px;letter-spacing:.06em;color:#e9d5ff;font-family:ui-monospace,monospace}
+
+/* TERMINAL CHROME */
+.termchrome{display:flex;align-items:center;gap:8px;background:#101018;border:1px solid rgba(168,85,247,.4);border-bottom:none;border-radius:12px 12px 0 0;padding:9px 14px;font-family:ui-monospace,monospace;font-size:12px;color:var(--sec);text-align:left}
+.termchrome .title{margin:0 auto;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:center}
+.termchrome .icons{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.termchrome .icons button{width:18px;height:18px;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:background .15s,color .15s}
+.termchrome .icons button:hover{background:var(--purple)}
+.termchrome .icons .ic-close{background:var(--purple);color:var(--purple)}
+.termchrome .icons .ic-close:hover{background:var(--purple);color:var(--text)}
+.termchrome .icons .ic-min{background:transparent}
+.termchrome .icons .ic-min:hover{background:var(--purple);color:var(--text)}
+.termchrome .icons .ic-max{background:transparent}
+.termchrome .icons .ic-max:hover{background:var(--purple);color:var(--text)}
+.termchrome .icons button svg{width:10px;height:10px}
+.ic-close svg{stroke:#4a0000;stroke-width:2;fill:none}
+.ic-min svg{stroke:#5a3800;stroke-width:2;fill:none}
+.ic-max svg{stroke:#003a12;stroke-width:2;fill:none}
+
+/* PROGRESS */
+.progress{height:3px;background:rgba(255,255,255,.06);border-left:1px solid rgba(168,85,247,.4);border-right:1px solid rgba(168,85,247,.4)}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--orange),var(--green));transition:width .3s}
+
+/* TERMINAL BODY */
+.term{background:rgba(4,4,10,.92);border:1px solid rgba(168,85,247,.4);border-top:none;border-radius:0 0 12px 12px;text-align:left;
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;line-height:1.65;
+  padding:20px 22px;height:52vh;min-height:420px;max-height:640px;overflow-y:auto;box-shadow:0 0 60px rgba(168,85,247,.15);overflow-x:hidden;white-space:pre-wrap;word-break:break-word;position:relative;padding-bottom:60px}
+.term{scrollbar-width:none;-ms-overflow-style:none}
+.term::-webkit-scrollbar{display:none;width:0;height:0}
+.term .banner{color:var(--purple);font-weight:700}
+.term .ok{color:var(--green)} .term .warn{color:var(--orange)} .term .danger{color:var(--red)} .term .dim{color:var(--sec)}
+.cursor{display:inline-block;width:9px;height:17px;background:var(--purple);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* CONTROLS */
+.controls{margin:16px 0 0;display:flex;gap:24px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+.controls button,.controls .btnlink{min-width:130px;text-align:center}
+.controls button{background:linear-gradient(90deg,var(--purple),var(--magenta));color:#fff;border:none;
+  border-radius:9px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;min-height:44px}
+.controls button.ghost{background:transparent;border:1px solid rgba(255,255,255,.2)}
+.back{margin-top:14px;font-size:13px;color:var(--sec);text-align:center} .back a{color:#c084fc}
+.btnlink{display:inline-block;text-decoration:none;border-radius:9px;padding:10px 20px;font-size:13.5px;font-weight:700;cursor:pointer;min-height:44px;line-height:24px;background:linear-gradient(90deg,var(--purple),var(--magenta));color:#fff !important;transition:transform .3s,box-shadow .3s}
+.btnlink.ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--text) !important}
+
+/* PLASMA BG */
+#plasma-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
+.plasma-blob{position:absolute;border-radius:42% 58% 63% 37%/45% 42% 58% 55%;filter:blur(90px);mix-blend-mode:screen;animation:plasmaFloat 14s ease-in-out infinite alternate,auroraMorph 19s ease-in-out infinite alternate}
+.plasma-blob:nth-child(1){width:560px;height:560px;background:radial-gradient(circle,rgba(168,85,247,.5) 0%,transparent 70%);top:-12%;left:-8%;animation-duration:16s}
+.plasma-blob:nth-child(2){width:480px;height:480px;background:radial-gradient(circle,rgba(239,68,68,.35) 0%,transparent 70%);top:35%;right:-10%;animation-duration:13s;animation-delay:-5s}
+.plasma-blob:nth-child(3){width:420px;height:420px;background:radial-gradient(circle,rgba(16,185,129,.35) 0%,transparent 70%);bottom:-8%;left:25%;animation-duration:15s;animation-delay:-9s}
+@keyframes plasmaFloat{0%{transform:translate(0,0) scale(1)}25%{transform:translate(80px,-55px) scale(1.14)}50%{transform:translate(-45px,70px) scale(.94)}75%{transform:translate(60px,25px) scale(1.06)}100%{transform:translate(-30px,-45px) scale(1)}}
+@keyframes auroraMorph{0%,100%{border-radius:42% 58% 63% 37%/45% 42% 58% 55%}33%{border-radius:63% 37% 42% 58%/55% 58% 42% 45%}66%{border-radius:37% 63% 55% 45%/42% 55% 45% 58%}}
+@media (prefers-reduced-motion: reduce){.cursor{animation:none}}
+</style>
+</head>
+<body>
+<div id="plasma-bg"><div class="plasma-blob"></div><div class="plasma-blob"></div><div class="plasma-blob"></div></div>
+<div class="wrap">
+<h1><span class="grad">AETHERIUS</span> — Settlement Window Attack Defense</h1>
+<p class="sub">How bots exploit the gap between payment proof and L2 finality — and how the oracle stops them.</p>
+<div class="stats"><span class="stat">CREDIT VELOCITY</span><span class="stat">SETTLEMENT WINDOW</span><span class="stat">REAL-TIME SCORING</span><span class="stat">45S REPLAY</span></div>
+
+<div class="termchrome">
+  <span class="title">aetheriusxapi — oracle-defense.cast</span>
+  <span class="icons">
+    <button class="ic-close" title="Close"><svg viewBox="0 0 10 10"><line x1="2" y1="2" x2="8" y2="8"/><line x1="8" y1="2" x2="2" y2="8"/></svg></button>
+    <button class="ic-min" title="Minimize"><svg viewBox="0 0 10 10"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
+    <button class="ic-max" title="Fullscreen"><svg viewBox="0 0 10 10"><rect x2="2" y2="2" width="6" height="6" rx="1"/></svg></button>
+  </span>
+</div>
+<div class="progress"><i id="pbar"></i></div>
+<div class="term" id="term"></div>
+
+<div class="controls">
+  <button id="btnPlay">▶ Play</button>
+  <button id="btnReplay" class="ghost">↻ Replay</button>
+  <a class="btnlink ghost" href="https://wilnowilx.github.io/aetheriusxapi/">← back</a>
+  <a class="btnlink" href="./oracle-attack.cast" download>⬇ .cast</a>
+</div>
+</div>
+
+<script>
+(function(){
+var term = document.getElementById('term');
+var pbar = document.getElementById('pbar');
+var btnPlay = document.getElementById('btnPlay');
+var btnReplay = document.getElementById('btnReplay');
+
+var EQ = '========================================================================';
+function B(t){return '<div class="banner">'+EQ+'</div><div class="banner">'+t+'</div><div class="banner">'+EQ+'</div>';}
+
+var S = [
+  // Scene 1: THE ATTACK
+  {h: B('  [SCENE 1] THE ATTACK'), g: 600},
+  {t: 'A bot swarm floods an x402 API with 10 requests/second.', g: 500},
+  {t: 'Each request carries a payment proof. The API processes them.', g: 500},
+  {t: 'But between proof submission and L2 finality (1-2s on Base)...', g: 500},
+  {t: '...the same proof can be reused. Free data. No settlement.', c: 'danger', g: 700},
+  {t: '', g: 300},
+  {t: 'Bot wallet: 0xDEAD...BEEF', g: 400},
+  {t: 'Target: /v1/email/validate ($0.005/call)', g: 400},
+  {t: 'Strategy: flood with same proof before L2 confirms', g: 600},
+  {t: '', g: 200},
+  {t: 'Request  1 → 200 OK   (proof accepted, settlement deferred)', c: 'ok', g: 300},
+  {t: 'Request  2 → 200 OK   (same proof, not yet confirmed on-chain)', c: 'ok', g: 300},
+  {t: 'Request  3 → 200 OK   (still in the optimism window)', c: 'ok', g: 300},
+  {t: 'Request  4 → 200 OK  (bot collecting free data)', c: 'ok', g: 300},
+  {t: 'Request  5 → 200 OK  (velocity: 5.0 req/s)', c: 'ok', g: 300},
+  {t: 'Request  6 → 200 OK  (velocity: 6.0 req/s)', c: 'ok', g: 300},
+  {t: 'Request  7 → 200 OK  (velocity: 7.0 req/s)', c: 'ok', g: 300},
+  {t: 'Request  8 → 200 OK  (velocity: 8.0 req/s)', c: 'ok', g: 300},
+  {t: 'Request  9 → 200 OK  (velocity: 9.0 req/s)', c: 'ok', g: 300},
+  {t: 'Request 10 → 200 OK  (velocity: 10.0 req/s)', c: 'ok', g: 500},
+  {t: '', g: 300},
+  {t: '10 requests. 10 payments. But settlement hasn\'t confirmed.', g: 500},
+  {t: 'If the bot stops here, all 10 proofs fail on-chain.', c: 'warn', g: 500},
+  {t: 'The API served $0.05 of data. Received $0.00.', c: 'danger', g: 800},
+
+  // Scene 2: THE ORACLE DETECTS
+  {h: B('  [SCENE 2] THE ORACLE DETECTS'), g: 600},
+  {t: 'AETHERIUS Credit Velocity tracks per-agent nonce submission rates.', g: 500},
+  {t: 'The moment velocity exceeds threshold, the oracle acts.', g: 600},
+  {t: '', g: 300},
+  {t: '$ curl /v1/oracle/risk/0xDEAD...BEEF', c: 'dim', g: 400},
+  {t: '{', g: 300},
+  {t: '  "address": "0xDEAD...BEEF",', g: 250},
+  {t: '  "risk_score": 72.5,', c: 'warn', g: 250},
+  {t: '  "risk_level": "danger",', c: 'danger', g: 250},
+  {t: '  "velocity": 8.3,', c: 'warn', g: 250},
+  {t: '  "settlement_rate": 0.0,', c: 'danger', g: 250},
+  {t: '  "total_requests": 10,', g: 250},
+  {t: '  "total_settled": 0,', c: 'danger', g: 250},
+  {t: '  "blocked": true,', c: 'danger', g: 250},
+  {t: '  "block_remaining_s": 12.0,', g: 250},
+  {t: '  "recommendation": "reject"', c: 'danger', g: 400},
+  {t: '}', g: 500},
+  {t: '', g: 300},
+  {t: 'Settlement rate: 0.0 — zero confirmations on-chain.', c: 'danger', g: 500},
+  {t: 'The oracle flagged this agent as fraudulent.', c: 'danger', g: 800},
+
+  // Scene 3: THE BLOCK
+  {h: B('  [SCENE 3] THE BLOCK'), g: 600},
+  {t: 'Request 11 → 429 Rate Limited', c: 'danger', g: 400},
+  {t: '{', g: 250},
+  {t: '  "error": "Rate limited: settlement velocity exceeded",', c: 'danger', g: 250},
+  {t: '  "risk_score": 72.5,', c: 'warn', g: 250},
+  {t: '  "risk_level": "danger",', c: 'danger', g: 250},
+  {t: '  "velocity": 8.3,', g: 250},
+  {t: '  "settlement_rate": 0.0,', c: 'danger', g: 250},
+  {t: '  "block_remaining_s": 12.0,', g: 250},
+  {t: '  "hint": "Wait for pending settlements to confirm."', c: 'dim', g: 400},
+  {t: '}', g: 400},
+  {t: '', g: 200},
+  {t: 'Request 12 → 429 Rate Limited', c: 'danger', g: 300},
+  {t: 'Request 13 → 429 Rate Limited', c: 'danger', g: 300},
+  {t: 'Request 14 → 429 Rate Limited', c: 'danger', g: 300},
+  {t: 'Request 15 → 429 Rate Limited', c: 'danger', g: 500},
+  {t: '', g: 300},
+  {t: '5 more attempts. All blocked. Zero data served.', c: 'ok', g: 500},
+  {t: 'The bot\'s attack window: 10 seconds.', g: 400},
+  {t: 'The oracle\'s response time: < 100ms.', c: 'ok', g: 800},
+
+  // Scene 4: THE DEFENSE IS LIVE
+  {h: B('  [SCENE 4] THE DEFENSE IS LIVE'), g: 600},
+  {t: 'This isn\'t a simulation. This is production code.', g: 500},
+  {t: 'Every endpoint on AETHERIUS runs credit velocity scoring.', g: 500},
+  {t: 'Every agent is tracked. Every settlement is verified.', g: 600},
+  {t: '', g: 300},
+  {t: 'Attackers see: 429 + risk_score + block timer.', c: 'danger', g: 400},
+  {t: 'Honest agents see: 200 + data + settlement confirmation.', c: 'ok', g: 400},
+  {t: 'API providers see: reputation scores factored by agent trust.', c: 'ok', g: 800},
+
+  // Scene 5: WHAT THIS MEANS
+  {h: B('  [SCENE 5] WHAT THIS MEANS'), g: 600},
+  {t: 'x402 enables M2M commerce. But without trust, it\'s chaos.', g: 500},
+  {t: 'AETHERIUS is the trust layer.', c: 'ok', g: 600},
+  {t: '', g: 300},
+  {t: 'For agents:    discover verified endpoints, pay per call.', g: 400},
+  {t: 'For providers: query agent risk BEFORE accepting payment.', g: 400},
+  {t: 'For the network: reputation that compounds with usage.', g: 500},
+  {t: '', g: 300},
+  {t: 'APIs agents can trust. Payments providers can verify.', c: 'ok', g: 500},
+  {t: 'The oracle layer for x402 commerce on Base.', c: 'ok', g: 700},
+  {t: '', g: 300},
+  {t: '  github.com/wilnowilx/aetheriusxapi', g: 400},
+  {t: '  /v1/oracle/risk/{address}  — live now', c: 'ok', g: 500}
+];
+
+var timers = [], playing = false, total = S.length, done = 0;
+var PCHAR = 8;
+var cur = document.createElement('span');
+cur.className = 'cursor';
+
+function scroll(){ term.scrollTop = term.scrollHeight; }
+function prog(){ pbar.style.width = Math.round(done / total * 100) + '%'; }
+
+function runStep(idx){
+  if(!playing || idx >= S.length){
+    playing = false; btnPlay.textContent = '▶ Play';
+    return;
+  }
+  var s = S[idx];
+  function advance(){
+    done = idx + 1; prog();
+    term.appendChild(cur);
+    timers.push(setTimeout(function(){ runStep(idx + 1); }, s.g || 850));
+  }
+  if(s.h){
+    term.insertAdjacentHTML('beforeend', s.h);
+    scroll(); advance();
+  } else {
+    var d = document.createElement('div');
+    if(s.c) d.className = s.c;
+    d.appendChild(cur);
+    term.appendChild(d);
+    var full = s.t, i = 0;
+    (function type(){
+      if(!playing) return;
+      cur.before(document.createTextNode(full[i]));
+      scroll();
+      i++;
+      if(i < full.length){ timers.push(setTimeout(type, PCHAR)); }
+      else { advance(); }
+    })();
+  }
+}
+
+function clear(){ timers.forEach(clearTimeout); timers = []; }
+function play(){
+  clear(); term.innerHTML = ''; done = 0; prog();
+  playing = true; btnPlay.textContent = '⏸ Pause';
+  runStep(0);
+}
+
+btnPlay.onclick = function(){
+  if(playing){ clear(); playing = false; btnPlay.textContent = '▶ Play'; }
+  else { play(); }
+};
+btnReplay.onclick = function(){ play(); };
+play();
+})();
+</script>
+</body>
+</html>

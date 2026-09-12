@@ -41,9 +41,9 @@ except ImportError:
 # CONFIG
 # ============================================
 
-BOT_TOKEN = os.environ.get("TELEGRAM_TOKEN", "8885939094:AAEq6Sz0JYWyCnV1ERc1ScXhuy6VdtEHe-g")
-CHANNEL_ID = os.environ.get("TELEGRAM_CHANNEL_ID", "-1004315249717")  # @aetherius_xAPI
-GROUP_ID = os.environ.get("TELEGRAM_GROUP_ID", "-1004320337418")  # @aetheriusxAPI_global supergroup
+BOT_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
+CHANNEL_ID = os.environ.get("TELEGRAM_CHANNEL_ID", "")
+GROUP_ID = os.environ.get("TELEGRAM_GROUP_ID", "")
 
 # ============================================
 # LOGGING

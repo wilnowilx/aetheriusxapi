@@ -45,6 +45,7 @@
 - [🏗️ Architecture](#%EF%B8%8F-architecture)
 - [📡 Live Status](#-live-status)
 - [🎬 Live Demo](#-live-demo)
+- [🛡️ Settlement Window Attack](#%EF%B8%8F-settlement-window-attack--how-aetherius-stops-bot-swarms)
 - [🐍 SDKs](#-sdks)
 - [🚀 Quick Start](#-quick-start)
 - [🎛️ Dashboard](#%EF%B8%8F-dashboard)
@@ -262,6 +263,16 @@ What you see is exactly what a paying client gets.
 The replay shows the full x402 loop against live mainnet endpoints — discovery, payment challenge, settlement, data. No cuts. The telemetry you see on the dashboard updates live.
 
 **[Dashboard](https://wilnowilx.github.io/aetheriusxapi/dashboard/)** · [raw .cast](https://wilnowilx.github.io/aetheriusxapi/docs/demo/take-1.cast) · [script](docs/demo/demo_90s.py)
+
+---
+
+### 🛡️ Settlement Window Attack — How AETHERIUS stops bot swarms
+
+The Settlement Optimism Window (1-2s on Base) is the blind spot in x402 commerce. Between proof submission and L2 finality, bots can flood endpoints with the same proof — free data, no settlement.
+
+**[▶ Watch the defense demo](https://wilnowilx.github.io/aetheriusxapi/docs/demo/oracle-player.html)** · [raw .cast](https://wilnowilx.github.io/aetheriusxapi/docs/demo/oracle-attack.cast)
+
+The replay shows: a 10-req/s bot flood → oracle detects → risk score climbs → 429 blocks → attack stopped in <100ms. Real code. Real defense. Live on Base.
 
 ---
 
