@@ -53,43 +53,52 @@ const TextBandRings = ({ liveData }) => {
     ]
   }, [liveData])
 
-  // Canvas texture: 2048px ancho × 128px alto. Texto repetido para tap无缝
+  // Canvas texture: 4096px ancho × 160px alto — ultra nítido, sin espejado atrás
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
-      canvas.width = 2048
-      canvas.height = 128
+      canvas.width = 4096
+      canvas.height = 160
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      const font = `bold ${ring.fontSize}px 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace`
+      const font = `900 ${ring.fontSize * 1.35}px 'JetBrains Mono', 'Fira Code', monospace`
       ctx.font = font
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
 
-      // Medir frase y repetir para llenar toda la circunferencia
       const phrase = ring.text
       const phraseW = ctx.measureText(phrase).width
       const repeats = Math.ceil((canvas.width + phraseW) / phraseW)
       const startOffset = (canvas.width - phraseW * repeats) / 2 + phraseW / 2
 
-      // Primera pasada: glow (sombra)
+      // Triple pasada: glow + sólido + highlight para nitidez brutal
       ctx.fillStyle = ring.color
       ctx.shadowColor = ring.color
-      ctx.shadowBlur = 24
-      for (let i = 0; i < repeats; i++) {
-        ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      }
-
-      // Segunda pasada: nitidez (sin sombra)
+      ctx.shadowBlur = 32
+      for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
+      ctx.shadowBlur = 16
+      for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       ctx.shadowBlur = 0
-      for (let i = 0; i < repeats; i++) {
-        ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
+      ctx.fillStyle = '#ffffff'
+      // Solo el anillo blanco lleva highlight blanco puro, los demás su color
+      if (ring.color === '#ffffff') {
+        for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
+      } else {
+        ctx.fillStyle = ring.color
+        for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       }
 
-      return new THREE.CanvasTexture(canvas)
+      const tex = new THREE.CanvasTexture(canvas)
+      tex.anisotropy = 8
+      tex.minFilter = THREE.LinearFilter
+      tex.magFilter = THREE.LinearFilter
+      return tex
     })
   , [ringsConfig])
+
+  // Interactivo: hover pausa el anillo
+  const [hoveredRing, setHoveredRing] = useState(null)
 
   useFrame((state, delta) => {
     elapsed.current += delta
@@ -97,7 +106,8 @@ const TextBandRings = ({ liveData }) => {
       ringsConfig.forEach((ring, i) => {
         const ringGroup = groupRef.current.children[i]
         if (ringGroup) {
-          ringGroup.rotation.y = elapsed.current * ring.speed
+          const paused = hoveredRing === i
+          if (!paused) ringGroup.rotation.y += delta * ring.speed
         }
       })
     }
@@ -107,14 +117,18 @@ const TextBandRings = ({ liveData }) => {
     <group ref={groupRef}>
       {ringsConfig.map((ring, ringIdx) => (
         <group key={ringIdx} position={[0, ring.yOffset, 0]} rotation={[ring.tilt, 0, 0]}>
-          {/* BANDA de texto — CylinderGeometry: el texto ES el anillo */}
-          <mesh>
+          {/* BANDA de texto — CylinderGeometry: el texto ES el anillo (FrontSide = sin espejado) */}
+          <mesh
+            onPointerOver={(e) => { e.stopPropagation(); setHoveredRing(ringIdx); document.body.style.cursor = 'pointer' }}
+            onPointerOut={() => { setHoveredRing(null); document.body.style.cursor = 'auto' }}
+            onClick={() => { if (window.__aetherius_addImpact) window.__aetherius_addImpact({ position: new THREE.Vector3(ring.radius, ring.yOffset, 0), intensity: 0.8 }) }}
+          >
             <cylinderGeometry args={[ring.radius, ring.radius, ring.bandWidth, 128, 1, true]} />
             <meshBasicMaterial
               map={ringTextures[ringIdx]}
               transparent
-              opacity={ring.opacity}
-              side={THREE.DoubleSide}
+              opacity={hoveredRing === ringIdx ? 1 : ring.opacity}
+              side={THREE.FrontSide}
               depthWrite={false}
               blending={THREE.AdditiveBlending}
             />
@@ -386,13 +400,18 @@ function BaseCore({ flowRef }) {
           map={baseLogoTexture}
           transparent
           blending={THREE.AdditiveBlending}
-          opacity={0.85}
+          opacity={0.9}
           depthWrite={false}
         />
       </sprite>
+      {/* Núcleo energía pulsante — esfera partículas como las refs */}
       <mesh>
-        <sphereGeometry args={[0.4, 16, 12]} />
-        <meshBasicMaterial color={0x0052FF} transparent opacity={0.08} />
+        <sphereGeometry args={[0.42, 20, 16]} />
+        <meshBasicMaterial color={0x0052FF} transparent opacity={0.14} depthWrite={false} blending={THREE.AdditiveBlending} />
+      </mesh>
+      <mesh scale={1.6}>
+        <sphereGeometry args={[0.42, 16, 12]} />
+        <meshBasicMaterial color={0x22d3ee} transparent opacity={0.04} depthWrite={false} blending={THREE.AdditiveBlending} />
       </mesh>
     </group>
   )
@@ -420,17 +439,17 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
     out[2] = Math.cos(phi) * speed
   }
 
-  // kind 0 = mercado (azul→púrpura), kind 1 = USDC (verde)
+  // Partículas visibles: más grandes, con estela. Verde USDC vs azul→púrpura mercado
   const paintKind = (col, sz, i) => {
-    if (Math.random() < 0.38) {
-      col[i * 3] = 0.063; col[i * 3 + 1] = 0.725; col[i * 3 + 2] = 0.506
-      sz[i] = 0.03 + Math.random() * 0.035
+    if (Math.random() < 0.42) {
+      col[i * 3] = 0.08; col[i * 3 + 1] = 0.85; col[i * 3 + 2] = 0.55
+      sz[i] = 0.055 + Math.random() * 0.045
     } else {
       const t = Math.random()
-      col[i * 3] = 0.0 * (1 - t) + 0.659 * t
-      col[i * 3 + 1] = 0.322 * (1 - t) + 0.333 * t
-      col[i * 3 + 2] = 1.0 * (1 - t) + 0.969 * t
-      sz[i] = 0.02 + Math.random() * 0.03
+      col[i * 3] = 0.15 * (1 - t) + 0.78 * t
+      col[i * 3 + 1] = 0.45 * (1 - t) + 0.35 * t
+      col[i * 3 + 2] = 1.0 * (1 - t) + 0.97 * t
+      sz[i] = 0.04 + Math.random() * 0.04
     }
   }
 
