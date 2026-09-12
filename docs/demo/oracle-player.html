@@ -17,7 +17,7 @@ h1 .grad{background:linear-gradient(90deg,#a855f7,#d946ef,#ec4899);-webkit-backg
 .stats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
 .stat{border:1px solid var(--border);background:rgba(168,85,247,.07);border-radius:20px;padding:5px 14px;font-size:12px;letter-spacing:.06em;color:#e9d5ff;font-family:ui-monospace,monospace}
 
-/* TERMINAL CHROME */
+/* TERMINAL CHROME — icons RIGHT, standard Windows order */
 .termchrome{display:flex;align-items:center;gap:8px;background:#101018;border:1px solid rgba(168,85,247,.4);border-bottom:none;border-radius:12px 12px 0 0;padding:9px 14px;font-family:ui-monospace,monospace;font-size:12px;color:var(--sec);text-align:left}
 .termchrome .title{margin:0 auto;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:center}
 .termchrome .icons{display:flex;gap:6px;align-items:center;flex-shrink:0}
@@ -34,7 +34,7 @@ h1 .grad{background:linear-gradient(90deg,#a855f7,#d946ef,#ec4899);-webkit-backg
 .ic-min svg{stroke:#5a3800;stroke-width:2;fill:none}
 .ic-max svg{stroke:#003a12;stroke-width:2;fill:none}
 
-/* PROGRESS */
+/* PROGRESS BAR */
 .progress{height:3px;background:rgba(255,255,255,.06);border-left:1px solid rgba(168,85,247,.4);border-right:1px solid rgba(168,85,247,.4)}
 .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--orange),var(--green));transition:width .3s}
 
@@ -49,7 +49,18 @@ h1 .grad{background:linear-gradient(90deg,#a855f7,#d946ef,#ec4899);-webkit-backg
 .cursor{display:inline-block;width:9px;height:17px;background:var(--purple);vertical-align:-3px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 
-/* CONTROLS */
+/* === WIKI TOOLTIPS === */
+.wiki-zone{position:relative;cursor:help;border-bottom:1px dashed rgba(168,85,247,.3);transition:border-color .2s;padding-bottom:6px}
+.wiki-zone:hover{border-bottom-color:var(--magenta)}
+.wiki{position:fixed;z-index:9999;max-width:380px;min-width:260px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-family:Inter,system-ui,sans-serif;font-size:13px;line-height:1.55;color:var(--text);box-shadow:0 12px 48px rgba(0,0,0,.6),0 0 24px rgba(168,85,247,.15);pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .35s,transform .35s}
+.wiki.show{opacity:1;transform:translateY(0)}
+.wiki.auto{transition:opacity .75s ease,transform .75s ease}
+@media(max-width:1300px){.wiki.auto{max-width:340px}}
+.wiki .wk{color:var(--purple);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.wiki .wt{font-weight:600;margin-bottom:4px}
+.wiki .wd{color:var(--sec)}
+
+/* CONTROLS — RIGHT ALIGNED, spaced */
 .controls{margin:16px 0 0;display:flex;gap:24px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
 .controls button,.controls .btnlink{min-width:130px;text-align:center}
 .controls button{background:linear-gradient(90deg,var(--purple),var(--magenta));color:#fff;border:none;
@@ -58,6 +69,8 @@ h1 .grad{background:linear-gradient(90deg,#a855f7,#d946ef,#ec4899);-webkit-backg
 .back{margin-top:14px;font-size:13px;color:var(--sec);text-align:center} .back a{color:#c084fc}
 .btnlink{display:inline-block;text-decoration:none;border-radius:9px;padding:10px 20px;font-size:13.5px;font-weight:700;cursor:pointer;min-height:44px;line-height:24px;background:linear-gradient(90deg,var(--purple),var(--magenta));color:#fff !important;transition:transform .3s,box-shadow .3s}
 .btnlink.ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--text) !important}
+#btnCast.big{transform:scale(1.18);box-shadow:0 0 34px rgba(217,70,239,.75);animation:castPulse 1.6s ease-in-out infinite}
+@keyframes castPulse{0%,100%{transform:scale(1.18)}50%{transform:scale(1.3);box-shadow:0 0 50px rgba(236,72,153,.9)}}
 
 /* PLASMA BG */
 #plasma-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
@@ -92,71 +105,146 @@ h1 .grad{background:linear-gradient(90deg,#a855f7,#d946ef,#ec4899);-webkit-backg
   <button id="btnPlay">▶ Play</button>
   <button id="btnReplay" class="ghost">↻ Replay</button>
   <a class="btnlink ghost" href="https://wilnowilx.github.io/aetheriusxapi/">← back</a>
-  <a class="btnlink" href="./oracle-attack.cast" download>⬇ .cast</a>
+  <a class="btnlink" id="btnCast" href="./oracle-attack.cast" download>⬇ .cast</a>
 </div>
 </div>
 
+<!-- WIKI TOOLTIP CONTAINER -->
+<div class="wiki" id="wiki"></div>
+
+<script>window.AEX_FX={n:45,speed:.7};</script>
+<script src="../../fx.js"></script>
 <script>
 (function(){
 var term = document.getElementById('term');
 var pbar = document.getElementById('pbar');
 var btnPlay = document.getElementById('btnPlay');
 var btnReplay = document.getElementById('btnReplay');
+var castBtn = document.getElementById('btnCast');
+var wiki = document.getElementById('wiki');
 
+/* === WIKI SYSTEM === */
+var autoWikiVisible = false;
+var WIKI = {
+  attack:     {k:'ATTACK',         t:'Settlement window exploitation',      d:'Between payment proof submission and L2 finality on Base (~1-2 seconds), the same proof can be reused. The API served data believing it was paid, but settlement never confirms. The bot gets free data.'},
+  bot:        {k:'BOT WALLET',     t:'Attacker agent address',              d:'The bot uses a disposable wallet (0xDEAD...BEEF) to submit payment proofs. In the real attack, the bot would generate fresh wallets per attack to avoid detection — unless the oracle tracks velocity patterns.'},
+  velocity:   {k:'VELOCITY',       t:'Requests per second tracking',        d:'Credit Velocity tracks how many payment proofs an agent submits per second. Threshold: >2 req/s triggers tracking, >5 triggers danger, >10 triggers auto-block. Honest agents rarely exceed 1-2 req/s.'},
+  optimism:   {k:'OPTIMISM WINDOW', t:'The L2 settlement gap',              d:'Base (OP Stack) has a ~1-2 second window between transaction inclusion and finality. During this window, the payment is "optimistically accepted" but not yet confirmed. Bots exploit this gap to reuse proofs.'},
+  flood:      {k:'FLOOD',          t:'10 requests, 10 seconds',             d:'The bot sends 10 requests in 10 seconds with the same payment proof. Each request returns 200 OK because the proof hasn\'t been checked against L2 yet. If the bot stops here, all 10 proofs fail on-chain.'},
+  risk:       {k:'RISK SCORE',     t:'0-100 composite risk',                d:'The oracle computes a risk score from four signals: velocity (40%), settlement rate (30%), agent age (15%), volume (15%). Score >30 = warning, >50 = danger, >70 = auto-block.'},
+  settle_rate:{k:'SETTLEMENT RATE', t:'Proof → on-chain confirmations',     d:'The ratio of payment proofs that actually confirmed on-chain vs. total submissions. A bot exploiting the window will have 0% settlement rate — proofs submitted but never settled.'},
+  block:      {k:'BLOCK',          t:'Auto-block with timer',               d:'When risk score exceeds threshold, the agent is blocked for 15 seconds. During this window, all requests return 429 with detailed risk data. The block timer is visible in the response.'},
+  reputation: {k:'REPUTATION',     t:'Endpoint trust scoring',              d:'Reputation scores factor in agent trust. Endpoints serving high-risk agents get penalized. If >5% of calls come from blocked agents, the endpoint score caps at 0.3. This creates a market incentive to use the oracle.'},
+  providers:  {k:'FOR PROVIDERS',  t:'Pre-payment risk check',              d:'Before accepting a payment proof, API providers can query /v1/oracle/risk/{address}. If risk > 50, reject. If blocked, deny. This turns the oracle into a mandatory trust layer — no provider wants to be exploited.'},
+  defense:    {k:'DEFENSE',        t:'<100ms response time',                d:'The Credit Velocity check runs in-memory with no external dependencies. Response time: <100ms. This is fast enough to sit in the middleware path — every request is scored before processing.'},
+  cta:        {k:'LIVE NOW',       t:'Production code, not simulation',     d:'The oracle layer is deployed on Base Mainnet. /v1/oracle/risk/{address} is a free endpoint. Any API provider can integrate it today. The defense is not theoretical — it\'s live.'}
+};
+
+function wikiHTML(key){
+  var w = WIKI[key]; if(!w) return null;
+  return '<div class="wk">'+w.k+'</div><div class="wt">'+w.t+'</div><div class="wd">'+w.d+'</div>';
+}
+/* AUTO: siempre a la DERECHA del terminal, nunca encima del contenido */
+function showWikiAuto(key){
+  var html = wikiHTML(key); if(!html) return;
+  wiki.innerHTML = html;
+  wiki.classList.add('auto');
+  var tr = term.getBoundingClientRect();
+  var ww = Math.min(380, window.innerWidth - 32);
+  var wx = tr.right + 16;
+  /* si no cabe a la derecha, anclar al borde derecho del viewport */
+  if(wx + ww + 16 > window.innerWidth) wx = window.innerWidth - ww - 16;
+  if(wx < 16) wx = 16;
+  var wy = tr.top + 24;
+  if(wy + 230 > window.innerHeight) wy = Math.max(8, window.innerHeight - 240);
+  wiki.style.left = wx + 'px';
+  wiki.style.top = wy + 'px';
+  void wiki.offsetWidth;
+  wiki.classList.add('show');
+}
+/* HOVER manual: al lado del elemento, solo cuando NO hay auto visible */
+function showWikiHover(e, key){
+  if(autoWikiVisible) return;
+  var html = wikiHTML(key); if(!html) return;
+  wiki.innerHTML = html;
+  var r = e.target.getBoundingClientRect();
+  var wx = r.right + 14;
+  if(wx + 400 > window.innerWidth) wx = r.left - 400;
+  if(wx < 8) wx = 8;
+  var wy = r.top - 20;
+  if(wy + 180 > window.innerHeight) wy = window.innerHeight - 200;
+  if(wy < 8) wy = 8;
+  wiki.style.left = wx + 'px';
+  wiki.style.top = wy + 'px';
+  wiki.classList.add('show');
+}
+function hideWikiHover(){
+  if(autoWikiVisible) return;
+  wiki.classList.remove('show');
+}
+term.addEventListener('mouseover', function(e){
+  var z = e.target.closest('.wiki-zone');
+  if(z) showWikiHover(e, z.getAttribute('data-wiki'));
+});
+term.addEventListener('mouseout', function(e){
+  var z = e.target.closest('.wiki-zone');
+  if(z && !z.contains(e.relatedTarget)) hideWikiHover();
+});
+
+/* === TERMINAL STEPS === */
 var EQ = '========================================================================';
 function B(t){return '<div class="banner">'+EQ+'</div><div class="banner">'+t+'</div><div class="banner">'+EQ+'</div>';}
-
 var S = [
-  // Scene 1: THE ATTACK
-  {h: B('  [SCENE 1] THE ATTACK'), g: 600},
+  /* ── SCENE 1: THE ATTACK ── */
+  {h: B('  [1/5] THE ATTACK'), g: 700, wiki:'attack'},
   {t: 'A bot swarm floods an x402 API with 10 requests/second.', g: 500},
   {t: 'Each request carries a payment proof. The API processes them.', g: 500},
-  {t: 'But between proof submission and L2 finality (1-2s on Base)...', g: 500},
+  {t: 'Between proof submission and L2 finality (1-2s on Base)...', g: 500, wiki:'optimism'},
   {t: '...the same proof can be reused. Free data. No settlement.', c: 'danger', g: 700},
-  {t: '', g: 300},
-  {t: 'Bot wallet: 0xDEAD...BEEF', g: 400},
+  {t: '', g: 200},
+  {t: 'Bot wallet: 0xDEAD...BEEF', g: 400, wiki:'bot'},
   {t: 'Target: /v1/email/validate ($0.005/call)', g: 400},
-  {t: 'Strategy: flood with same proof before L2 confirms', g: 600},
+  {t: 'Strategy: flood with same proof before L2 confirms', g: 600, wiki:'optimism'},
   {t: '', g: 200},
   {t: 'Request  1 → 200 OK   (proof accepted, settlement deferred)', c: 'ok', g: 300},
-  {t: 'Request  2 → 200 OK   (same proof, not yet confirmed on-chain)', c: 'ok', g: 300},
+  {t: 'Request  2 → 200 OK   (same proof, not yet confirmed)', c: 'ok', g: 300},
   {t: 'Request  3 → 200 OK   (still in the optimism window)', c: 'ok', g: 300},
   {t: 'Request  4 → 200 OK  (bot collecting free data)', c: 'ok', g: 300},
-  {t: 'Request  5 → 200 OK  (velocity: 5.0 req/s)', c: 'ok', g: 300},
+  {t: 'Request  5 → 200 OK  (velocity: 5.0 req/s)', c: 'ok', g: 300, wiki:'velocity'},
   {t: 'Request  6 → 200 OK  (velocity: 6.0 req/s)', c: 'ok', g: 300},
   {t: 'Request  7 → 200 OK  (velocity: 7.0 req/s)', c: 'ok', g: 300},
   {t: 'Request  8 → 200 OK  (velocity: 8.0 req/s)', c: 'ok', g: 300},
   {t: 'Request  9 → 200 OK  (velocity: 9.0 req/s)', c: 'ok', g: 300},
-  {t: 'Request 10 → 200 OK  (velocity: 10.0 req/s)', c: 'ok', g: 500},
-  {t: '', g: 300},
+  {t: 'Request 10 → 200 OK  (velocity: 10.0 req/s)', c: 'ok', g: 500, wiki:'flood'},
+  {t: '', g: 200},
   {t: '10 requests. 10 payments. But settlement hasn\'t confirmed.', g: 500},
   {t: 'If the bot stops here, all 10 proofs fail on-chain.', c: 'warn', g: 500},
   {t: 'The API served $0.05 of data. Received $0.00.', c: 'danger', g: 800},
 
-  // Scene 2: THE ORACLE DETECTS
-  {h: B('  [SCENE 2] THE ORACLE DETECTS'), g: 600},
-  {t: 'AETHERIUS Credit Velocity tracks per-agent nonce submission rates.', g: 500},
+  /* ── SCENE 2: THE ORACLE DETECTS ── */
+  {h: B('  [2/5] THE ORACLE DETECTS'), g: 600, wiki:'risk'},
+  {t: 'AETHERIUS Credit Velocity tracks per-agent submission rates.', g: 500, wiki:'velocity'},
   {t: 'The moment velocity exceeds threshold, the oracle acts.', g: 600},
-  {t: '', g: 300},
+  {t: '', g: 200},
   {t: '$ curl /v1/oracle/risk/0xDEAD...BEEF', c: 'dim', g: 400},
   {t: '{', g: 300},
-  {t: '  "address": "0xDEAD...BEEF",', g: 250},
-  {t: '  "risk_score": 72.5,', c: 'warn', g: 250},
+  {t: '  "address": "0xDEAD...BEEF",', g: 250, wiki:'bot'},
+  {t: '  "risk_score": 72.5,', c: 'warn', g: 250, wiki:'risk'},
   {t: '  "risk_level": "danger",', c: 'danger', g: 250},
-  {t: '  "velocity": 8.3,', c: 'warn', g: 250},
-  {t: '  "settlement_rate": 0.0,', c: 'danger', g: 250},
+  {t: '  "velocity": 8.3,', c: 'warn', g: 250, wiki:'velocity'},
+  {t: '  "settlement_rate": 0.0,', c: 'danger', g: 250, wiki:'settle_rate'},
   {t: '  "total_requests": 10,', g: 250},
   {t: '  "total_settled": 0,', c: 'danger', g: 250},
-  {t: '  "blocked": true,', c: 'danger', g: 250},
+  {t: '  "blocked": true,', c: 'danger', g: 250, wiki:'block'},
   {t: '  "block_remaining_s": 12.0,', g: 250},
   {t: '  "recommendation": "reject"', c: 'danger', g: 400},
   {t: '}', g: 500},
-  {t: '', g: 300},
-  {t: 'Settlement rate: 0.0 — zero confirmations on-chain.', c: 'danger', g: 500},
+  {t: '', g: 200},
+  {t: 'Settlement rate: 0.0 — zero confirmations on-chain.', c: 'danger', g: 500, wiki:'settle_rate'},
   {t: 'The oracle flagged this agent as fraudulent.', c: 'danger', g: 800},
 
-  // Scene 3: THE BLOCK
-  {h: B('  [SCENE 3] THE BLOCK'), g: 600},
+  /* ── SCENE 3: THE BLOCK ── */
+  {h: B('  [3/5] THE BLOCK'), g: 600, wiki:'block'},
   {t: 'Request 11 → 429 Rate Limited', c: 'danger', g: 400},
   {t: '{', g: 250},
   {t: '  "error": "Rate limited: settlement velocity exceeded",', c: 'danger', g: 250},
@@ -165,57 +253,77 @@ var S = [
   {t: '  "velocity": 8.3,', g: 250},
   {t: '  "settlement_rate": 0.0,', c: 'danger', g: 250},
   {t: '  "block_remaining_s": 12.0,', g: 250},
-  {t: '  "hint": "Wait for pending settlements to confirm."', c: 'dim', g: 400},
+  {t: '  "hint": "Wait for pending settlements."', c: 'dim', g: 400},
   {t: '}', g: 400},
   {t: '', g: 200},
   {t: 'Request 12 → 429 Rate Limited', c: 'danger', g: 300},
   {t: 'Request 13 → 429 Rate Limited', c: 'danger', g: 300},
   {t: 'Request 14 → 429 Rate Limited', c: 'danger', g: 300},
   {t: 'Request 15 → 429 Rate Limited', c: 'danger', g: 500},
-  {t: '', g: 300},
+  {t: '', g: 200},
   {t: '5 more attempts. All blocked. Zero data served.', c: 'ok', g: 500},
   {t: 'The bot\'s attack window: 10 seconds.', g: 400},
-  {t: 'The oracle\'s response time: < 100ms.', c: 'ok', g: 800},
+  {t: 'The oracle\'s response time: < 100ms.', c: 'ok', g: 800, wiki:'defense'},
 
-  // Scene 4: THE DEFENSE IS LIVE
-  {h: B('  [SCENE 4] THE DEFENSE IS LIVE'), g: 600},
-  {t: 'This isn\'t a simulation. This is production code.', g: 500},
-  {t: 'Every endpoint on AETHERIUS runs credit velocity scoring.', g: 500},
-  {t: 'Every agent is tracked. Every settlement is verified.', g: 600},
-  {t: '', g: 300},
-  {t: 'Attackers see: 429 + risk_score + block timer.', c: 'danger', g: 400},
-  {t: 'Honest agents see: 200 + data + settlement confirmation.', c: 'ok', g: 400},
-  {t: 'API providers see: reputation scores factored by agent trust.', c: 'ok', g: 800},
+  /* ── SCENE 4: REPUTATION AFFECTS PROVIDERS ── */
+  {h: B('  [4/5] REPUTATION TRAVELS'), g: 600, wiki:'reputation'},
+  {t: 'The attack doesn\'t just block the bot — it poisons the endpoint.', g: 500},
+  {t: '', g: 200},
+  {t: '$ curl /v1/oracle/status | jq .verified_endpoints', c: 'dim', g: 400},
+  {t: '  {', g: 250},
+  {t: '    "route": "/v1/email/validate",', g: 250},
+  {t: '    "agent_trust_score": 0.34,', c: 'warn', g: 250, wiki:'reputation'},
+  {t: '    "high_risk_pct": 0.40,', c: 'danger', g: 250},
+  {t: '    "blocked_pct": 0.25,', c: 'danger', g: 250},
+  {t: '    "verified": false', c: 'danger', g: 400},
+  {t: '  }', g: 300},
+  {t: '', g: 200},
+  {t: 'Endpoint reputation dropped because it served risky agents.', g: 500},
+  {t: 'Other providers see this. They check risk before accepting.', g: 500, wiki:'providers'},
+  {t: 'The attack is visible. The attacker is marked. Trust travels.', c: 'ok', g: 800},
 
-  // Scene 5: WHAT THIS MEANS
-  {h: B('  [SCENE 5] WHAT THIS MEANS'), g: 600},
+  /* ── SCENE 5: WHAT THIS MEANS ── */
+  {h: B('  [5/5] WHAT THIS MEANS'), g: 600},
   {t: 'x402 enables M2M commerce. But without trust, it\'s chaos.', g: 500},
   {t: 'AETHERIUS is the trust layer.', c: 'ok', g: 600},
-  {t: '', g: 300},
+  {t: '', g: 200},
   {t: 'For agents:    discover verified endpoints, pay per call.', g: 400},
-  {t: 'For providers: query agent risk BEFORE accepting payment.', g: 400},
-  {t: 'For the network: reputation that compounds with usage.', g: 500},
-  {t: '', g: 300},
+  {t: 'For providers: query agent risk BEFORE accepting payment.', g: 400, wiki:'providers'},
+  {t: 'For the network: reputation that compounds with usage.', g: 500, wiki:'reputation'},
+  {t: '', g: 200},
   {t: 'APIs agents can trust. Payments providers can verify.', c: 'ok', g: 500},
-  {t: 'The oracle layer for x402 commerce on Base.', c: 'ok', g: 700},
-  {t: '', g: 300},
+  {t: 'The oracle layer for x402 commerce on Base.', c: 'ok', g: 700, wiki:'cta'},
+  {t: '', g: 200},
   {t: '  github.com/wilnowilx/aetheriusxapi', g: 400},
   {t: '  /v1/oracle/risk/{address}  — live now', c: 'ok', g: 500}
 ];
 
 var timers = [], playing = false, total = S.length, done = 0;
+var reduced = false;
+try{ reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+function scroll(){ term.scrollTop = term.scrollHeight; }
+function prog(){ pbar.style.width = Math.round(done / total * 100) + '%'; }
 var PCHAR = 8;
 var cur = document.createElement('span');
 cur.className = 'cursor';
 
-function scroll(){ term.scrollTop = term.scrollHeight; }
-function prog(){ pbar.style.width = Math.round(done / total * 100) + '%'; }
-
+var autoFadeTimer = null;
+function hideWikiAuto(){
+  wiki.classList.remove('show');
+  clearTimeout(autoFadeTimer);
+  autoFadeTimer = setTimeout(function(){
+    if(!autoWikiVisible) wiki.classList.remove('auto');
+  }, 800);
+}
 function runStep(idx){
   if(!playing || idx >= S.length){
-    playing = false; btnPlay.textContent = '▶ Play';
+    playing = false; btnPlay.textContent = '▶ Play'; autoWikiVisible = false;
+    hideWikiAuto();
+    if(castBtn) castBtn.classList.add('big');
     return;
   }
+  if(autoWikiVisible) hideWikiAuto();
+  autoWikiVisible = false;
   var s = S[idx];
   function advance(){
     done = idx + 1; prog();
@@ -223,13 +331,24 @@ function runStep(idx){
     timers.push(setTimeout(function(){ runStep(idx + 1); }, s.g || 850));
   }
   if(s.h){
-    term.insertAdjacentHTML('beforeend', s.h);
+    var html = s.h;
+    if(s.wiki) html = '<div class="wiki-zone" data-wiki="'+s.wiki+'">' + html + '</div>';
+    term.insertAdjacentHTML('beforeend', html);
+    if(s.wiki && playing){
+      autoWikiVisible = true;
+      showWikiAuto(s.wiki);
+    }
     scroll(); advance();
   } else {
     var d = document.createElement('div');
     if(s.c) d.className = s.c;
+    if(s.wiki){ d.className += ' wiki-zone'; d.setAttribute('data-wiki', s.wiki); }
     d.appendChild(cur);
     term.appendChild(d);
+    if(s.wiki && playing){
+      autoWikiVisible = true;
+      showWikiAuto(s.wiki);
+    }
     var full = s.t, i = 0;
     (function type(){
       if(!playing) return;
@@ -245,16 +364,33 @@ function runStep(idx){
 function clear(){ timers.forEach(clearTimeout); timers = []; }
 function play(){
   clear(); term.innerHTML = ''; done = 0; prog();
+  if(castBtn) castBtn.classList.remove('big');
   playing = true; btnPlay.textContent = '⏸ Pause';
   runStep(0);
 }
+function renderAll(){
+  clear(); term.innerHTML = ''; done = total; prog();
+  S.forEach(function(s){
+    if(s.h){
+      var html = s.h;
+      if(s.wiki) html = '<div class="wiki-zone" data-wiki="'+s.wiki+'">' + html + '</div>';
+      term.innerHTML += html;
+    } else {
+      var cls = s.c || '';
+      if(s.wiki) cls += ' wiki-zone';
+      var attr = s.wiki ? ' data-wiki="'+s.wiki+'"' : '';
+      term.innerHTML += '<div class="'+cls.trim()+'"'+attr+'>'+s.t.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</div>';
+    }
+  });
+  playing = false; btnPlay.textContent = '▶ Play';
+}
 
 btnPlay.onclick = function(){
-  if(playing){ clear(); playing = false; btnPlay.textContent = '▶ Play'; }
+  if(playing){ clear(); playing = false; btnPlay.textContent = '▶ Play'; autoWikiVisible = false; hideWikiAuto(); }
   else { play(); }
 };
 btnReplay.onclick = function(){ play(); };
-play();
+if(reduced){ renderAll(); } else { play(); }
 })();
 </script>
 </body>
