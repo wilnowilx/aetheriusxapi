@@ -361,10 +361,10 @@ function VisibleWireframe({ impactPoints }) {
 
           float impactPulse(vec3 worldPos, vec3 impactPos, float intensity) {
             float dist = length(worldPos - impactPos);
-            float ring = abs(dist - time * 0.9 * intensity);
-            float ringPulse = exp(-ring * 1.5) * intensity;
-            float prox = exp(-dist * 0.9) * intensity * 0.7;
-            return (ringPulse*0.6 + prox) * intensity;
+            float ring = abs(dist - time * 0.5 * intensity);
+            float ringPulse = exp(-ring * 0.8) * intensity;
+            float prox = exp(-dist * 1.2) * intensity * 0.5;
+            return (ringPulse*0.4 + prox) * intensity;
           }
           float polarGlow(vec3 pos) {
             return pow(abs(pos.y / 2.2), 2.5) * 0.6;
@@ -432,17 +432,17 @@ function BaseCore({ flowRef }) {
   useFrame((state, delta) => {
     elapsed.current += delta
     const flow = flowRef?.current || { intensity: 1, pulse: 0.3 }
-    // El latido decae; la respiración nunca muere (el núcleo siempre vive)
-    flow.pulse = Math.max(0.25, (flow.pulse || 0) - delta * 1.8)
+    flow.pulse = Math.max(0.25, (flow.pulse || 0) - delta * 1.6)
     if (groupRef.current) {
-      groupRef.current.rotation.y = elapsed.current * (0.15 + 0.15 * flow.intensity)
-      groupRef.current.rotation.x = elapsed.current * 0.1
-      const breath = Math.sin(elapsed.current * 1.8)
-      const s = 1 + 0.06 * breath + 0.22 * flow.pulse
+      // Parallax: núcleo suspendido, no pegado a la malla
+      groupRef.current.rotation.y = elapsed.current * 0.08
+      groupRef.current.rotation.x = Math.sin(elapsed.current * 0.12) * 0.08
+      const breath = Math.sin(elapsed.current * 1.5)
+      const beat = flow.pulse
+      const s = 1 + 0.04 * breath + 0.18 * beat
       groupRef.current.scale.set(s, s, s)
-      // Brillo del sprite también pulsa
       const spriteMat = groupRef.current.children[0]?.material
-      if (spriteMat) spriteMat.opacity = 0.75 + 0.2 * breath + 0.15 * flow.pulse
+      if (spriteMat) spriteMat.opacity = 0.7 + 0.18 * breath + 0.18 * beat
     }
   })
 
@@ -457,13 +457,33 @@ function BaseCore({ flowRef }) {
 
   return (
     <group ref={groupRef} scale={1.3}>
-      <sprite scale={[2.2, 0.55, 1]}>
+      {/* Fog interior: bruma entre BASE y malla, hace que BASE se vea contenido */}
+      <mesh>
+        <sphereGeometry args={[1.4, 20, 16]} />
+        <shaderMaterial
+          uniforms={gasUniforms}
+          vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
+          fragmentShader={`
+            varying vec3 vPos; uniform float time; uniform float pulse;
+            void main(){
+              float dist = length(vPos) / 1.4;
+              float fog = pow(dist, 1.5) * (1.0 - dist) * 2.0;
+              float beat = 0.5 + 0.5*pulse;
+              vec3 col = vec3(0.08,0.25,0.7);
+              float alpha = fog * 0.04 * beat;
+              gl_FragColor = vec4(col, alpha);
+            }`}
+          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.BackSide}
+        />
+      </mesh>
+      <sprite scale={[2.2, 0.55, 1]} renderOrder={-1}>
         <spriteMaterial
           map={baseLogoTexture}
           transparent
           blending={THREE.AdditiveBlending}
-          opacity={0.9}
+          opacity={0.85}
           depthWrite={false}
+          depthTest={true}
         />
       </sprite>
       {/* BASE galaxia: núcleo denso pequeño con swirl — se diluye en la malla */}
@@ -484,7 +504,7 @@ function BaseCore({ flowRef }) {
               vec3 coreCyan = vec3(0.08,0.6,1.0);
               vec3 col = mix(deepBlue, coreCyan, (1.0-dist)*0.6 + noise*0.15);
               col += vec3(0.25,0.08,0.45) * (1.0-dist) * 0.4;
-              float alpha = radial * 0.75 * noise * (0.75 + 0.4*flow) * beat;
+              float alpha = radial * 0.88 * noise * (0.75 + 0.4*flow) * beat;
               alpha *= smoothstep(1.0, 0.5, dist);
               gl_FragColor = vec4(col, alpha);
             }`}

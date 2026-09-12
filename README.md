@@ -226,7 +226,175 @@ If payment authorization and API access are expressed in the same HTTP interacti
 
 ## 🏗️ Architecture
 
-![Architecture](https://mermaid.ink/svg/JSV7aW5pdDogeyd0aGVtZSc6ICdkYXJrJ319JSUKZmxvd2NoYXJ0IFRCCiAgICBQWVtQeXRob24gU0RLXSAtLT4gTlgKICAgIEpTW0pTIFNES10gLS0-IE5YCiAgICBHT1tHbyBTREtdIC0tPiBOWAogICAgUlNbUnVzdCBTREtdIC0tPiBOWAogICAgTlhbTmdpbnggLSByYXRlIGxpbWl0LCBTU0wsIHJvdXRpbmddIC0tPiBGV1tGYXN0QVBJIC0gYXV0aCwgeDQwMiwgcm91dGVyXQogICAgRlcgLS0-IFVQW1Vwc3RyZWFtIC0gT1NNLCBDb2luR2Vja28sIE9wZW4tTWV0ZW8sIFJQQ3NdCiAgICBGVyAtLT4gVEVMW1RlbGVtZXRyeSAtIFNRTGl0ZSwgL3YxL3RlbGVtZXRyeV0KICAgIE5YIC0tPiBGQUNbRmFjaWxpdGF0b3IgLSBDb2luYmFzZSBDRFBdCiAgICBGQUMgLS0-IEJBU0VbQmFzZSBMMiAtIFVTREMgc2V0dGxlbWVudF0=)
+```mermaid
+flowchart TB
+    subgraph "Clients"
+        PY[Python SDK]
+        JS[JS SDK]
+        AGENT[AI Agent]
+    end
+
+    subgraph "Ingress"
+        NGINX[Nginx Proxy<br/>Rate Limit + SSL]
+    end
+
+    subgraph "API Layer"
+        FAST[FastAPI Server<br/>x402 Middleware]
+        ROUTER[Router<br/>100 Endpoints]
+    end
+
+    subgraph "Oracle Layer"
+        CATALOG[Verified Catalog<br/>/v1/oracle/verified]
+        CB[Circuit Breaker<br/>/v1/oracle/status]
+        RISK[Risk Validator<br/>/v1/oracle/risk]
+    end
+
+    subgraph "Research Layer"
+        AXIOMS[Axioms API<br/>/v1/axioms]
+        ONTO[Ontology API<br/>/v1/ontology]
+        MCP_AXIOM[MCP Axioms<br/>stdio + SSE]
+    end
+
+    subgraph "MCP Bridge"
+        MCP_ORACLE[Oracle MCP<br/>stdio + SSE]
+        MCP_AXIOMS[Research MCP<br/>stdio + SSE]
+    end
+
+    subgraph "External"
+        CDP[Coinbase CDP<br/>USDC Settlement]
+        UPSTREAM[Upstreams<br/>CoinGecko, OSM, etc.]
+    end
+
+    PY --> NX
+    JS --> NX
+    AGENT --> NX
+    NX[NGINX] --> FAST
+    FAST --> ROUTER
+    ROUTER --> CATALOG
+    ROUTER --> CB
+    ROUTER --> RISK
+    ROUTER --> AXIOMS
+    ROUTER --> ONTO
+    CATALOG --> CDP
+    CB --> CDP
+    RISK --> CDP
+    AXIOMS --> CDP
+    ONTO --> CDP
+    MCP_AXIOM --> CDP
+    MCP_AXIOMS --> CDP
+    MCP_ORACLE --> CDP
+    MCP_AXIOMS --> CDP
+    ROUTER --> UPSTREAM
+
+    style FAST fill:#8B5CF6,color:#fff
+    style CATALOG fill:#10B981,color:#fff
+    style CB fill:#F59E0B,color:#fff
+    style RISK fill:#EF4444,color:#fff
+    style AXIOMS fill:#8B5CF6,color:#fff
+    style ONTO fill:#EC4899,color:#fff
+    style MCP_ORACLE fill:#06B6D4,color:#fff
+    style MCP_AXIOMS fill:#06B6D4,color:#fff
+```
+
+---
+
+## 🧿 Oracle Layer — The Trust Infrastructure
+
+The Oracle Layer is AETHERIUS' trust infrastructure for x402 agent commerce. It provides three interconnected services:
+
+| Layer | Endpoint | Purpose |
+|-------|----------|---------|
+| **Verified Catalog** | `GET /v1/oracle/verified` | Live registry of 100+ verified x402 endpoints with health checks |
+| **Circuit Breaker** | `GET /v1/oracle/status` | System health, anti-replay stats, circuit breaker state |
+| **Risk Validator** | `GET /v1/oracle/risk/{address}` | Credit Velocity scoring — detects settlement window abuse |
+
+### Credit Velocity: Predictive Solvency Scoring
+
+The Oracle doesn't just verify payments — it predicts solvency:
+
+```
+Risk Score = Velocity(40%) + Settlement Rate(30%) + Agent Age(15%) + Volume Exposure(15%)
+```
+
+| Signal | Weight | Thresholds |
+|--------|--------|------------|
+| **Velocity** (req/s) | 40% | <2 normal, 2-5 tracking, 5-10 danger, >10 blocked |
+| **Settlement Rate** | 30% | >0.8 trusted, <0.2 danger, 0.0 blocked |
+| **Agent Age** | 15% | <1h high risk, >7d trusted |
+| **Volume Exposure** | 15% | >10x unsettled = danger |
+
+**Defense activates in <2 seconds.** Attack profitability reduced by **97%** ($144/hr → $4.20/hr).
+
+### Reputation System with Agent Trust
+
+Endpoints earn reputation through honest service:
+
+```
+Reputation = Uptime(30%) + Settlement(30%) + Latency(15%) + Agent Trust(25%)
+```
+
+> **Hard penalty:** >5% blocked agent calls → score capped at 0.3
+
+This creates a **market incentive** for providers to use the Oracle: higher reputation → more agent traffic → more revenue.
+
+---
+
+## 🧿 Research Layer — The Axiomatic Foundation
+
+AETHERIUS isn't just infrastructure — it's formalized knowledge. The Research Layer codifies the laws governing M2M commerce settlement windows.
+
+### Three Fundamental Axioms
+
+| ID | Law | Formula | Domain |
+|----|-----|---------|--------|
+| **axiom-001** | Settlement Window Law | `E_p = (V_r / C_g) × L_f` | M2M Commerce |
+| **axiom-002** | Velocity Exploitation Law | `N_max = min(V_r / C_g, T_d)` | M2M Security |
+| **axiom-003** | Defense Temporal Law | `T_defense < T_window` | M2M Defense |
+
+**Axioms are formalized as JSON-LD at `/v1/axioms`** — machine-readable, M2M-native.
+
+### Ontology
+
+The AETHERIUS ontology (`/v1/ontology`) defines 9 classes, 11 properties, 4 individuals in RDF/Turtle:
+
+| Class | Description |
+|-------|-------------|
+| `Axiom` | Fundamental law governing M2M commerce |
+| `SettlementWindow` | Time interval between proof submission and L2 finality |
+| `Agent` | Autonomous entity submitting payment proofs |
+| `Endpoint` | API endpoint accepting x402 payments |
+| `RiskScore` | Composite risk assessment (0-100) |
+| `Defense` | Mechanism protecting against settlement window exploitation |
+
+**Ontology available at `/v1/ontology` (RDF/Turtle + JSON-LD)**
+
+### Research Note #001: The Settlement Optimism Window
+
+Formal technical analysis with:
+- Mathematical formalization (definitions, inequalities, probability bounds)
+- 3 axiom proofs with ECDSA/Keccak collision resistance
+- Empirical validation: `T_defense = 0.08ms < T_window = 1-2s`
+- Attack economics: $144/hr without defense → $4.20/hr with defense (97% reduction)
+- Cross-endpoint nonce sharing gap analysis
+- Comparison with MEV (L1 timing attacks)
+
+**Full paper:** [`research/001-settlement-window.md`](research/001-settlement-window.md)
+
+### MCP Server for Axioms
+
+The Research Layer is exposed via MCP (Model Context Protocol):
+
+| Tool | Description |
+|------|-------------|
+| `get_axioms` | Returns all 3 fundamental axioms |
+| `get_axiom` | Returns specific axiom by ID |
+| `get_ontology` | Returns full ontology (classes, properties, individuals) |
+| `query_axiom` | Query by domain, keyword, or applicable system |
+| `validate_axiom_application` | Check which axioms apply to a system description |
+
+**MCP Server:** `aether_axioms_mcp` (stdio + SSE/HTTP on port 8080)
+
+> **Philosophy:** AETHERIUS doesn't just solve the settlement window — it formalizes the *laws* that govern it. The axioms are the Rosetta Stone for M2M commerce security.
 
 ---
 
@@ -243,13 +411,19 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | Live API | `https://34-156-149-38.sslip.io/aetherapi` |
 | Oracle Status | `GET /v1/oracle/status` — circuit breaker, anti-replay, system health |
 | Oracle Verified | `GET /v1/oracle/verified` — verified endpoint catalog for agents |
-| Version | v2.0.0 · 100 live endpoints · Oracle Layer · 39 tests · Python SDK v2.0 |
+| Oracle Risk | `GET /v1/oracle/risk/{address}` — agent risk score (Credit Velocity) |
+| **Axioms** | `GET /v1/axioms` — 3 fundamental axioms (JSON-LD, M2M-native) |
+| **Ontology** | `GET /v1/ontology` — RDF ontology (9 classes, 11 properties) |
+| Version | v2.0.0 · 100 live endpoints · Oracle Layer · Research Layer · 39 tests · Python SDK v2.0 |
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 mainnet USDC |
+| MCP SSE | `https://34-156-149-38.sslip.io/aetherapi/mcp/sse` — Agent-native MCP bridge |
 
 🚀 **Sep 5, 2026:** Deployed to Base Mainnet! Real USDC payments now live.
 🔥 **Sep 10, 2026:** Canary LIVE — `/v1/data/uuid` settling real $0.001 USDC via CDP facilitator.
 💵 **Wallet:** `0x677B483128D0399bCD0A5AB36eE990C0246d7f61` (receiving real payments)
 📡 **MCP Discovery:** `https://34-156-149-38.sslip.io/aetherapi/mcp/discovery` (Bazaar-ready)
+📡 **MCP SSE:** `https://34-156-149-38.sslip.io/aetherapi/mcp/sse` (Agent-native, SSE transport)
+🧿 **Research:** `research/001-settlement-window.md` — Formal proof of Settlement Optimism Window
 
 ---
 
@@ -269,6 +443,28 @@ The replay shows the full x402 loop against live mainnet endpoints — discovery
 ### 🛡️ Settlement Window Attack — How AETHERIUS stops bot swarms
 
 The Settlement Optimism Window (1-2s on Base) is the blind spot in x402 commerce. Between proof submission and L2 finality, bots can flood endpoints with the same proof — free data, no settlement.
+
+```mermaid
+sequenceDiagram
+    participant Bot as Bot Swarm
+    participant API as API + Oracle
+    participant Chain as Base L2
+
+    Bot->>API: 1. Submit proof P to Endpoint A
+    API->>Bot: 200 OK (data served)
+    Bot->>API: 2. Submit same proof P to Endpoint B
+    API->>Bot: 200 OK (data served)
+    Bot->>API: 3. Submit same proof P to Endpoint C
+    API->>Bot: 200 OK (data served)
+    Note right of Bot: 10 req/s flood<br/>Cross-endpoint reuse
+    Bot->>API: ... flood continues
+    API->>Oracle: Check Credit Velocity
+    Oracle->>Oracle: velocity > 10 req/s<br/>settlement_rate = 0.0
+    Oracle->>API: RISK SCORE: 95 (BLOCKED)
+    API->>Bot: 429 BLOCKED (risk_score=95)
+    Chain-->>API: Settlement fails (nonce collision)
+    Note over Bot,API: Attack stopped<br/>Profit: $4.20/hr (was $144/hr)
+```
 
 **[▶ Watch the defense demo](https://wilnowilx.github.io/aetheriusxapi/docs/demo/oracle-player.html)** · [raw .cast](https://wilnowilx.github.io/aetheriusxapi/docs/demo/oracle-attack.cast)
 
@@ -611,6 +807,9 @@ Every response carries the `X-AETHERIUS-Fingerprint: quantumxbrain-v1` header.
 | **Dashboard** | Vanilla JS | Zero-build interactive control room |
 | **Landing** | React 19 + R3F 9 + Vite 6 + GSAP + Lenis | 3D globe, 20 sections, playground (`frontend/`) |
 | **SDKs** | Python + JavaScript | Agent integration libraries |
+| **Oracle Layer** | `aether-oracle` (pip) + `aether_oracle_mcp` | Verified catalog, circuit breaker, risk validator |
+| **Research Layer** | `research/` + `aether_axioms_mcp` | Axioms, ontology, MCP server (stdio + SSE) |
+| **MCP Bridge** | `aether_oracle_mcp` + `aether_axioms_mcp` | Agent-native discovery (stdio + SSE/HTTP) |
 
 ---
 
@@ -873,7 +1072,11 @@ MIT License — see [LICENSE](LICENSE) for details.
 | **Live API** | [https://34-156-149-38.sslip.io/aetherapi](https://34-156-149-38.sslip.io/aetherapi) |
 | **Live API (TLS)** | [34-156-149-38.sslip.io](https://34-156-149-38.sslip.io/aetherapi) |
 | **Oracle** | `pip install aether-oracle` — discover verified x402 endpoints |
-| **Oracle MCP** | `aether_oracle_mcp` — agent discovery via MCP protocol |
+| **Oracle MCP** | `aether_oracle_mcp` — agent discovery via MCP protocol (stdio + SSE) |
+| **Research MCP** | `aether_axioms_mcp` — axioms & ontology via MCP (stdio + SSE) |
+| **Axioms API** | `GET /v1/axioms` — 3 fundamental axioms (JSON-LD) |
+| **Ontology API** | `GET /v1/ontology` — RDF ontology (9 classes, 11 properties) |
+| **Research Note #1** | [`research/001-settlement-window.md`](research/001-settlement-window.md) — Formal proof |
 
 ---
 

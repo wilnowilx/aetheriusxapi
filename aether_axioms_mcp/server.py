@@ -3,11 +3,12 @@
 AETHERIUS Axioms MCP Server
 
 Exposes AETHERIUS fundamental axioms and ontology via Model Context Protocol.
-Supports stdio transport.
+Supports stdio and SSE/HTTP transports.
 """
 
 import json
 import sys
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -16,6 +17,17 @@ from mcp import types
 from mcp.server.stdio import stdio_server
 from pydantic import BaseModel, Field
 from rdflib import Graph, URIRef, RDFS, OWL, RDF
+
+# Optional imports for HTTP/SSE transport
+try:
+    from mcp.server.sse import SseServerTransport
+    from starlette.applications import Starlette
+    from starlette.routing import Mount, Route
+    from starlette.responses import Response
+    import uvicorn
+    HTTP_AVAILABLE = True
+except ImportError:
+    HTTP_AVAILABLE = False
 
 # ─── Constants ──────────────────────────────────────────────────────────────
 RESEARCH_DIR = Path(__file__).parent.parent / "research"
@@ -435,11 +447,111 @@ server.add_request_handler("tools/list", types.ListToolsRequest, handle_list_too
 server.add_request_handler("tools/call", types.CallToolRequest, handle_call_tool)
 
 
-# ─── Entry Point ────────────────────────────────────────────────────────────
-async def main():
+# ─── HTTP/SSE Transport ─────────────────────────────────────────────────────
+if HTTP_AVAILABLE:
+    from starlette.applications import Starlette
+    from starlette.routing import Mount, Route
+    from starlette.responses import Response
+    import uvicorn
+
+    sse_transport = SseServerTransport("/mcp/messages")
+
+    async def handle_sse(request):
+        """Handle SSE connection for MCP."""
+        async with sse_transport.connect_sse(
+            request.scope, request.receive, request._send
+        ) as (read_stream, write_stream):
+            await server.run(
+                read_stream, write_stream, server.create_initialization_options()
+            )
+
+    async def handle_messages(request):
+        """Handle incoming messages via HTTP POST."""
+        return await sse_transport.handle_post_message(request)
+
+    # Starlette app with SSE and message endpoints
+    mcp_app = Starlette(
+        routes=[
+            Route("/mcp/sse", handle_sse, methods=["GET"]),
+            Route("/mcp/messages", handle_messages, methods=["POST"]),
+            Mount("/mcp", app=sse_transport),
+        ]
+    )
+
+    async def run_http(host: str = "0.0.0.0", port: int = 8080):
+        """Run MCP server over HTTP/SSE."""
+        config = uvicorn.Config(mcp_app, host=host, port=port, log_level="info")
+        server_instance = uvicorn.Server(config)
+        await server_instance.serve()
+
+
+# ─── Entry Points ───────────────────────────────────────────────────────────
+async def run_stdio():
     """Run MCP server over stdio."""
     async with stdio_server() as (read_stream, write_stream):
         await server.run(read_stream, write_stream, server.create_initialization_options())
+
+
+async def run_http(host: str = "0.0.0.0", port: int = 8080):
+    """Run MCP server over HTTP/SSE."""
+    if not HTTP_AVAILABLE:
+        raise RuntimeError("HTTP transport not available. Install starlette, uvicorn, sse-starlette")
+    
+    from starlette.applications import Starlette
+    from starlette.routing import Mount, Route
+    import uvicorn
+    from mcp.server.sse import SseServerTransport
+
+    sse_transport = SseServerTransport("/mcp/messages")
+
+    async def handle_sse(request):
+        async with sse_transport.connect_sse(
+            request.scope, request.receive, request._send
+        ) as (read_stream, write_stream):
+            await server.run(
+                read_stream, write_stream, server.create_initialization_options()
+            )
+
+    async def handle_messages(request):
+        return await sse_transport.handle_post_message(request.scope, request.receive, request._send)
+
+    # Starlette app with SSE and message endpoints
+    mcp_app = Starlette(
+        routes=[
+            Route("/mcp/sse", handle_sse, methods=["GET"]),
+            Route("/mcp/messages", handle_messages, methods=["POST"]),
+        ]
+    )
+
+    config = uvicorn.Config(mcp_app, host=host, port=port, log_level="info")
+    server_instance = uvicorn.Server(config)
+    await server_instance.serve()
+
+
+async def main():
+    """Main entry point - auto-detects transport mode."""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="AETHERIUS Axioms MCP Server")
+    parser.add_argument(
+        "--transport", 
+        choices=["stdio", "http", "sse"], 
+        default="stdio",
+        help="Transport mode (default: stdio)"
+    )
+    parser.add_argument("--host", default="0.0.0.0", help="Host for HTTP transport")
+    parser.add_argument("--port", type=int, default=8080, help="Port for HTTP transport")
+    
+    args = parser.parse_args()
+    
+    if args.transport in ("http", "sse"):
+        if not HTTP_AVAILABLE:
+            print("ERROR: HTTP transport requires starlette, uvicorn, sse-starlette")
+            print("Install with: pip install starlette uvicorn sse-starlette")
+            sys.exit(1)
+        await run_http(args.host, args.port)
+    else:
+        await run_stdio()
 
 
 if __name__ == "__main__":
