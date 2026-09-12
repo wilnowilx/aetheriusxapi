@@ -1,0 +1,6 @@
+httpx>=0.24
+starlette>=0.36
+
+[dev]
+pytest
+pytest-asyncio

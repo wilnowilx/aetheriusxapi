@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aether-oracle"
+version = "0.1.0"
+description = "The oracle layer for x402 agent commerce on Base — discover, verify, and call paid API endpoints with micropayments"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "AETHERIUS", email = "wil@nowilx.com" },
+]
+keywords = ["x402", "micropayments", "base", "agent", "oracle", "ai", "commerce"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Office/Business :: Financial",
+]
+dependencies = [
+    "httpx>=0.24",
+    "starlette>=0.36",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio"]
+
+[project.urls]
+Homepage = "https://github.com/aetheriusxAPI/aetheriusxapi"
+Documentation = "https://github.com/aetheriusxAPI/aetheriusxapi#readme"
+Repository = "https://github.com/aetheriusxAPI/aetheriusxapi"
+Issues = "https://github.com/aetheriusxAPI/aetheriusxapi/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["aether_oracle*"]

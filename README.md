@@ -112,6 +112,7 @@ timeline
     Sep 10 : Canary flip : /v1/data/uuid LIVE on Base Mainnet : real $0.001 USDC settled via CDP
     Sep 10 : Bazaar discovery : /mcp/discovery manifest : 10 MCP tools over HTTPS SSE
     Sep 10 : Fail-open fix : canary complement stays simulated : 0 unguarded routes
+    Sep 11 : Oracle layer : verified catalog : circuit breaker : anti-replay : MCP discovery : pip package
 ```
 
 | Phase | Work | Time | Verify |
@@ -239,7 +240,9 @@ If payment authorization and API access are expressed in the same HTTP interacti
 | Playground | [`/`](https://wilnowilx.github.io/aetheriusxapi/) — interactive endpoint testing |
 | Dashboard | [`/dashboard/`](https://wilnowilx.github.io/aetheriusxapi/dashboard/) + backend bar |
 | Live API | `https://34-156-149-38.sslip.io/aetherapi` |
-| Version | v2.0.0 · 100 live endpoints (60 paid + 40 free: 20 x402 Intelligence + 20 QuantumXBrain, all verified 200) · 39 tests · Python SDK v2.0 |
+| Oracle Status | `GET /v1/oracle/status` — circuit breaker, anti-replay, system health |
+| Oracle Verified | `GET /v1/oracle/verified` — verified endpoint catalog for agents |
+| Version | v2.0.0 · 100 live endpoints · Oracle Layer · 39 tests · Python SDK v2.0 |
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 mainnet USDC |
 
 🚀 **Sep 5, 2026:** Deployed to Base Mainnet! Real USDC payments now live.
@@ -342,6 +345,24 @@ print(stats)
 # Paid endpoint — auto-handles 402 challenge
 weather = client.data.weather(lat=10.5, lon=-66.9)
 print(weather)
+```
+
+### For Oracle Users (Discovery)
+
+```bash
+# Install the oracle client
+pip install aether-oracle
+```
+
+```python
+from aether_oracle import VerifiedCatalog
+
+# Discover all verified x402 endpoints
+async with VerifiedCatalog(base_url="https://34-156-149-38.sslip.io/aetherapi") as catalog:
+    endpoints = await catalog.discover()
+    status = await catalog.get_status()
+    print(f"Verified: {len(endpoints)} endpoints")
+    print(f"Health: {status['system_health']['uptime_percentage']:.1%}")
 ```
 
 ### For API Providers (Sellers)
@@ -649,6 +670,7 @@ Every response carries the `X-AETHERIUS-Fingerprint: quantumxbrain-v1` header.
 - [x] MCP SSE server (Sep 10) — 10 tools over HTTPS, Bazaar discovery manifest
 - [x] **Canary LIVE** (Sep 10) — `/v1/data/uuid` settling real $0.001 USDC on Base Mainnet via CDP
 - [x] Fail-open fix (Sep 10) — canary complement stays simulated, 0 unguarded routes
+- [x] **Oracle Layer** (Sep 11) — verified catalog, circuit breaker, anti-replay, background health checks, `aether-oracle` pip package, MCP oracle server
 - [ ] Base Ecosystem Fund application
 
 ### Phase 2: Scale (Post-Grant)
@@ -839,6 +861,8 @@ MIT License — see [LICENSE](LICENSE) for details.
 | **Base** | [base.org](https://base.org) |
 | **Live API** | [https://34-156-149-38.sslip.io/aetherapi](https://34-156-149-38.sslip.io/aetherapi) |
 | **Live API (TLS)** | [34-156-149-38.sslip.io](https://34-156-149-38.sslip.io/aetherapi) |
+| **Oracle** | `pip install aether-oracle` — discover verified x402 endpoints |
+| **Oracle MCP** | `aether_oracle_mcp` — agent discovery via MCP protocol |
 
 ---
 

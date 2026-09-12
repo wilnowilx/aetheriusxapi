@@ -42,6 +42,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from x402_middleware import SimulatedX402Middleware
 from telemetry import Tracker, TelemetryMiddleware
+from verified_catalog import VerifiedCatalog, set_prices, verify_all_endpoints, get_verified_catalog, get_system_health
 
 # === CONFIG (env-overridable, safe defaults) ===
 PAY_TO = os.getenv(
@@ -278,6 +279,14 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _route_category(route: str) -> str:
+    """Classify a route into a category for the verified catalog."""
+    parts = route.strip("/").split("/")
+    if len(parts) >= 2:
+        return parts[1]
+    return "general"
+
+
 _fetch_cache: dict[str, tuple[float, tuple]] = {}
 _FETCH_CACHE_TTL = 15  # seconds — balances freshness vs latency
 _FETCH_CACHE_MAX = 300  # max cached entries (prevent memory growth)
@@ -362,6 +371,35 @@ def _paid_routes_for_sdk(prefix: str) -> dict:
 tracker = Tracker(prices=PRICES,
                     db_path=os.getenv("AETHERIUS_DB_PATH") or None)
 
+set_prices(PRICES)
+
+
+async def _health_check_loop():
+    """Background task: verify all endpoints every 30 seconds.
+    Uses asyncio.gather with semaphore to avoid blocking the event loop."""
+    while True:
+        await asyncio.sleep(30)
+        try:
+            await verify_all_endpoints()
+        except Exception:
+            pass  # don't crash the background task
+
+
+@app.on_event("startup")
+async def startup_health_check():
+    """Fire-and-forget: wait for server to settle, then start health verification."""
+    asyncio.create_task(_deferred_health_init())
+
+
+async def _deferred_health_init():
+    """Wait for server to be ready, then run first health check and start loop."""
+    await asyncio.sleep(3)  # let uvicorn fully bind
+    try:
+        await verify_all_endpoints()
+    except Exception:
+        pass
+    asyncio.create_task(_health_check_loop())
+
 if X402_MODE == "real":
     try:
         from x402.http import FacilitatorConfig, HTTPFacilitatorClient
@@ -437,10 +475,10 @@ app.add_middleware(
 
 # === FREE ROUTES ===
 
-@app.get("/health")
+@app.get("/v1/health")
 @app.get("/api/v1/health")
 async def health():
-    return {
+    body = {
         "status": "alive",
         "service": "aetheriusxAPI",
         "version": VERSION,
@@ -449,6 +487,10 @@ async def health():
         "currency": CURRENCY,
         "wallet": PAY_TO,
         "timestamp": _now(),
+        "oracle": {
+            "status": "/v1/oracle/status",
+            "catalog": "/v1/oracle/verified",
+        },
         "endpoints": {
             **{k: f"{v}/call - {DESCRIPTIONS[k]}" for k, v in PRICES.items()},
             # x402 Intelligence — ALL FREE
@@ -472,8 +514,42 @@ async def health():
             "/v1/x402/bridge": "FREE - Cross-chain bridge activity",
             "/v1/x402/defi-pulse": "FREE - DeFi protocol activity on Base",
             "/v1/x402/network": "FREE - Full network health dashboard",
+            # === NEW: Persistent Anti-Replay Stats ===
+            "/v1/x402/antireplay/stats": "FREE - Persistent anti-replay nonce cache stats",
         },
     }
+    resp = JSONResponse(content=body)
+    resp.headers["X-AETHERIUS-Oracle"] = "true"
+    resp.headers["X-AETHERIUS-Version"] = VERSION
+    resp.headers["Link"] = '</v1/oracle/status>; rel="status", </v1/oracle/verified>; rel="catalog"'
+    return resp
+
+
+@app.get("/v1/antireplay/stats")
+@app.get("/api/v1/antireplay/stats")
+async def anti_replay_stats():
+    """FREE: Anti-replay nonce cache stats for monitoring.
+
+    Shows active nonces, TTL, and cache health. Useful for dashboard
+    monitoring and verifying TOCTOU protection is active.
+    """
+    from x402_middleware import _persistent_storage
+    return {
+        "service": "aetheriusxAPI",
+        "protection": "TOCTOU anti-replay",
+        "status": "active",
+        **_persistent_storage.stats(),
+    }
+
+
+@app.get("/health")
+async def health_legacy():
+    return await health()
+
+
+@app.get("/api/v1/health")
+async def health_legacy_api():
+    return await health()
 
 
 @app.get("/v1/telemetry")
@@ -484,28 +560,86 @@ async def telemetry():
                             currency=CURRENCY, version=VERSION, wallet=PAY_TO)
 
 
-@app.get("/v1/anti-replay/stats")
-@app.get("/api/v1/anti-replay/stats")
-async def anti_replay_stats():
-    """FREE: Anti-replay nonce cache stats for monitoring.
+@app.get("/v1/oracle/status")
+@app.get("/api/v1/oracle/status")
+async def oracle_status():
+    """FREE: Oracle health and circuit breaker status.
 
-    Shows active nonces, TTL, and cache health. Useful for dashboard
-    monitoring and verifying TOCTOU protection is active.
+    Returns the current state of the anti-replay system, circuit breaker,
+    and verified catalog health. Used by agent clients to verify the
+    marketplace is operational before making paid requests.
     """
-    from x402_middleware import _nonce_cache
-    return {
+    from x402_middleware import _circuit_breaker, _persistent_storage, COLLECT_FIRST_ENABLED
+    cb = _circuit_breaker
+    stats = _persistent_storage.stats()
+    health = get_system_health()
+    body = {
         "service": "aetheriusxAPI",
-        "protection": "TOCTOU anti-replay",
-        "status": "active",
-        **_nonce_cache.stats(),
+        "oracle": "verified-discovery-layer",
+        "status": "operational",
+        "circuit_breaker": {
+            "state": cb.state,
+            "failure_count": cb.failure_count,
+            "recovery_timeout_seconds": cb.recovery_timeout,
+        },
+        "anti_replay": {
+            **stats,
+            "persistent": stats["type"] != "memory",
+        },
+        "collect_first_enabled": COLLECT_FIRST_ENABLED,
+        "system_health": health,
+        "timestamp": _now(),
     }
+    resp = JSONResponse(content=body)
+    # M2M headers: agents can parse these without reading JSON
+    resp.headers["X-AETHERIUS-Oracle"] = "true"
+    resp.headers["X-AETHERIUS-Version"] = VERSION
+    resp.headers["X-AETHERIUS-Network"] = NETWORK
+    resp.headers["Link"] = '</v1/oracle/verified>; rel="catalog", </health>; rel="health"'
+    return resp
+
+
+@app.get("/v1/oracle/verified")
+@app.get("/api/v1/oracle/verified")
+async def oracle_verified():
+    """FREE: Machine-readable verified catalog of live endpoints.
+
+    Returns endpoints that have passed health checks and are confirmed
+    operational. Agents can use this to discover capabilities before
+    paying. Zero-cost, always available, updated in real-time.
+    """
+    from x402_middleware import _persistent_storage, _circuit_breaker
+    cb = _circuit_breaker
+    stats = _persistent_storage.stats()
+    catalog = get_verified_catalog()
+    body = {
+        "service": "aetheriusxAPI",
+        "oracle": "verified-discovery-layer",
+        "verified_endpoints": catalog,
+        "system_health": {
+            "circuit_breaker": cb.state,
+            "storage": stats["type"],
+            "active_nonces": stats.get("active", stats.get("active_nonces", 0)),
+        },
+        "timestamp": _now(),
+    }
+    resp = JSONResponse(content=body)
+    # M2M headers: agents can parse these without reading JSON
+    resp.headers["X-AETHERIUS-Oracle"] = "true"
+    resp.headers["X-AETHERIUS-Catalog-Size"] = str(len(catalog))
+    resp.headers["X-AETHERIUS-Version"] = VERSION
+    resp.headers["Link"] = '</v1/oracle/status>; rel="status", </health>; rel="health"'
+    return resp
 
 
 @app.get("/")
 async def root():
     return {"service": "aetheriusxAPI", "version": VERSION,
             "docs": "/docs", "health": "/health", "dashboard": "/dashboard/",
-            "telemetry": "/v1/telemetry"}
+            "telemetry": "/v1/telemetry",
+            "oracle": "/v1/oracle/status",
+            "oracle_verified": "/v1/oracle/verified",
+            "anti_replay": "/v1/antireplay/stats"}
 
 
 # Control-room dashboard (static, no build step). Mounted only if present
@@ -1129,8 +1263,9 @@ async def email_validate(email: str = Query(..., description="Email address")):
     if not result["has_mx"]:
         # Fallback: DNS-over-HTTPS (stub resolvers often fail MX lookups).
         try:
-            dr = httpx.get("https://dns.google/resolve",
-                           params={"name": domain, "type": "MX"}, timeout=10)
+            async with httpx.AsyncClient(timeout=10) as _hc:
+                dr = await _hc.get("https://dns.google/resolve",
+                                   params={"name": domain, "type": "MX"})
             if dr.status_code == 200 and (dr.json().get("Answer") or []):
                 result["has_mx"] = True
         except Exception:

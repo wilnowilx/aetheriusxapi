@@ -1,0 +1,63 @@
+Metadata-Version: 2.4
+Name: aether-oracle
+Version: 0.1.0
+Summary: The oracle layer for x402 agent commerce on Base — discover, verify, and call paid API endpoints with micropayments
+Author-email: AETHERIUS <wil@nowilx.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/aetheriusxAPI/aetheriusxapi
+Project-URL: Documentation, https://github.com/aetheriusxAPI/aetheriusxapi#readme
+Project-URL: Repository, https://github.com/aetheriusxAPI/aetheriusxapi
+Project-URL: Issues, https://github.com/aetheriusxAPI/aetheriusxapi/issues
+Keywords: x402,micropayments,base,agent,oracle,ai,commerce
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Office/Business :: Financial
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: httpx>=0.24
+Requires-Dist: starlette>=0.36
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-asyncio; extra == "dev"
+
+# aether-oracle
+
+The oracle layer for x402 agent commerce on Base.
+
+## Installation
+
+```bash
+pip install aether-oracle
+```
+
+## Usage
+
+```python
+from aether_oracle import AetherMiddleware, VerifiedCatalog, discover, get_oracle_status
+
+# Middleware for FastAPI/Starlette apps
+middleware = AetherMiddleware(
+    prices={"ETH": 3500.0},
+    pay_to="0x...",
+    network="base",
+    currency="USDC",
+)
+
+# Discover verified endpoints
+catalog = VerifiedCatalog(base_url="https://oracle.example.com")
+endpoints = await catalog.discover()
+
+# Check oracle health
+status = await catalog.get_status()
+```
+
+## CLI
+
+```bash
+python -m aether_oracle
+```

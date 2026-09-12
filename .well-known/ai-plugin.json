@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "AETHERIUS",
+  "name_for_model": "aetheriusxapi",
+  "description_for_human": "100+ APIs where AI agents pay per request in USDC on Base. No accounts, no keys.",
+  "description_for_model": "AETHERIUS is an x402 API marketplace. Autonomous AI agents discover endpoints via /v1/oracle/verified, call them with X-PAYMENT header containing x402 payment proof, and receive data. Payments settle USDC on Base Mainnet. Free endpoints available without payment. Use the oracle to discover all verified endpoints with prices, categories, and health scores.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://34-156-149-38.sslip.io/aetherapi/openapi.json"
+  },
+  "logo_url": "https://wilnowilx.github.io/aetheriusxapi/favicon.svg",
+  "contact_email": "wil@nowilx.com",
+  "legal_info_url": "https://github.com/wilnowilx/aetheriusxapi/blob/main/TERMS.md"
+}
