@@ -702,38 +702,40 @@ return (
           )}
         </div>
 
-        {/* Content — minimal: badge + scroll cue only. Text lives in orbital rings now. */}
+        {/* x402 badge — arriba, fuera del centro del globo */}
+        <div style={{
+          position: 'absolute', top: 90, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 15,
+          display: 'inline-flex', alignItems: 'center', gap: 8,
+          padding: '6px 16px', borderRadius: 20,
+          background: 'rgba(168,85,247,0.06)',
+          border: '1px solid rgba(168,85,247,0.15)',
+          backdropFilter: 'blur(12px)',
+        }}>
+          <span style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.72rem', fontWeight: 700,
+            color: '#a855f7',
+            letterSpacing: '0.08em',
+          }}>x402</span>
+          <span style={{
+            width: 1, height: 12, background: 'rgba(168,85,247,0.3)',
+          }} />
+          <span style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.6rem',
+            color: '#d946ef',
+            letterSpacing: '0.1em',
+          }}>PROTOCOL</span>
+        </div>
+
+        {/* Content — minimal: scroll cue only. Text lives in orbital bands now. */}
         <div className="hero-fade" style={{
           position: 'relative', zIndex: 10,
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', textAlign: 'center',
           padding: '0 24px', gap: 0,
         }}>
-          {/* x402 badge */}
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            padding: '6px 16px', borderRadius: 20,
-            background: 'rgba(168,85,247,0.08)',
-            border: '1px solid rgba(168,85,247,0.2)',
-            marginBottom: 24,
-            backdropFilter: 'blur(12px)',
-          }}>
-            <span style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '0.72rem', fontWeight: 700,
-              color: '#a855f7',
-              letterSpacing: '0.08em',
-            }}>x402</span>
-            <span style={{
-              width: 1, height: 12, background: 'rgba(168,85,247,0.3)',
-            }} />
-            <span style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '0.6rem',
-              color: '#d946ef',
-              letterSpacing: '0.1em',
-            }}>PROTOCOL</span>
-          </div>
         </div>
 
         {/* Scroll cue */}

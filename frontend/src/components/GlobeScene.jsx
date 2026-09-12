@@ -3,80 +3,88 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Stars, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
-// === DUAL ORBITAL RINGS — 2 anillos con texto legible y continuo ===
-// Anillo 1 (radio 3.2, blanco, speed 0.035): "THE MARKETPLACE THAT LIVES" en BLANCO
-// Anillo 2 (radio 2.6, magenta, speed 0.055): "API INFRASTRUCTURE FOR AI AGENTS THAT PAY" en MAGENTA
-// Anillo 3 (radio 2.2, cian, speed 0.075): métricas vivas en CIAN
-const DualOrbitalRings = ({ liveData }) => {
+// === TEXT BAND RINGS — Saturno: el texto ES el anillo, banda ancha ===
+// CylinderGeometry con canvas texture envuelto. El texto fluye SOBRE la banda,
+// no flota disperso. Cada anillo es una banda visible con el texto pintado.
+const TextBandRings = ({ liveData }) => {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Configuración: 3 anillos con frases completas legibles
   const ringsConfig = useMemo(() => {
     const d = liveData || {}
     return [
-      // ANILLO 1 EXTERIOR: Título principal en BLANCO - radio mayor, más lento
+      // ANILLO 1 EXTERIOR: "THE MARKETPLACE THAT LIVES" — banda blanca
       {
         radius: 3.4,
-        tilt: Math.PI / 2.2,  // Menos tilt = más legible
+        tilt: Math.PI / 2.2,
         speed: 0.03,
+        bandWidth: 0.55,
         color: '#ffffff',
-        opacity: 0.85,
-        fontSize: 1.4,
-        // Frases completas en lugar de palabras sueltas
-        segments: ['THE MARKETPLACE', 'THAT LIVES'],
+        opacity: 0.82,
+        fontSize: 44,
+        text: 'THE MARKETPLACE   THAT LIVES   ',
       },
-      // ANILLO 2 INTERMEDIO: Subtítulo en MAGENTA
+      // ANILLO 2 INTERMEDIO: subtítulo — banda magenta
       {
         radius: 2.85,
         tilt: Math.PI / 2.1,
         speed: 0.05,
-        color: '#d946ef', // MAGENTA
-        opacity: 0.75,
-        fontSize: 1.05,
-        segments: ['API INFRASTRUCTURE', 'FOR AI AGENTS', 'THAT PAY'],
+        bandWidth: 0.45,
+        color: '#d946ef',
+        opacity: 0.72,
+        fontSize: 36,
+        text: 'API INFRASTRUCTURE   FOR AI AGENTS   THAT PAY   ',
       },
-      // ANILLO 3 INTERIOR: Métricas vivas en CIAN
+      // ANILLO 3 INTERIOR: métricas vivas — banda cian
       {
         radius: 2.35,
         tilt: Math.PI / 2,
         speed: 0.07,
-        color: '#22d3ee', // CIAN
-        opacity: 0.7,
-        fontSize: 0.75,
-        segments: [
-          `${d.endpoints || '100+'} ENDPOINTS`,
-          `${d.freeEndpoints || '40'} FREE`,
-          `${d.latency || '—'}`
-        ],
+        bandWidth: 0.38,
+        color: '#22d3ee',
+        opacity: 0.62,
+        fontSize: 30,
+        text: `${d.endpoints || '100+'} ENDPOINTS   ${d.freeEndpoints || '40'} FREE   ${d.latency || '—'}   `,
       },
     ]
   }, [liveData])
 
-  // Texturas: canvas más grande, fuentes más grandes, mejor contraste
-  const ringsTextures = useMemo(() =>
-    ringsConfig.map(ring =>
-      ring.segments.map((seg, segIdx) => {
-        const isDot = seg === '·'
-        const canvas = document.createElement('canvas')
-        canvas.width = 768  // Canvas más ancho para frases completas
-        canvas.height = 160
-        const ctx = canvas.getContext('2d')
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        const size = Math.round(ring.fontSize * 100)  // Fuente más grande
-        ctx.font = `bold ${size}px 'JetBrains Mono', monospace`
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.fillStyle = ring.color
-        ctx.shadowColor = ring.color
-        ctx.shadowBlur = 32
-        // Doble pasada para más nitidez
-        ctx.fillText(seg, canvas.width / 2, canvas.height / 2)
-        ctx.shadowBlur = 0
-        ctx.fillText(seg, canvas.width / 2, canvas.height / 2)
-        return new THREE.CanvasTexture(canvas)
-      })
-    )
+  // Canvas texture: 2048px ancho × 128px alto. Texto repetido para tap无缝
+  const ringTextures = useMemo(() =>
+    ringsConfig.map(ring => {
+      const canvas = document.createElement('canvas')
+      canvas.width = 2048
+      canvas.height = 128
+      const ctx = canvas.getContext('2d')
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      const font = `bold ${ring.fontSize}px 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace`
+      ctx.font = font
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+
+      // Medir frase y repetir para llenar toda la circunferencia
+      const phrase = ring.text
+      const phraseW = ctx.measureText(phrase).width
+      const repeats = Math.ceil((canvas.width + phraseW) / phraseW)
+      const startOffset = (canvas.width - phraseW * repeats) / 2 + phraseW / 2
+
+      // Primera pasada: glow (sombra)
+      ctx.fillStyle = ring.color
+      ctx.shadowColor = ring.color
+      ctx.shadowBlur = 24
+      for (let i = 0; i < repeats; i++) {
+        ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
+      }
+
+      // Segunda pasada: nitidez (sin sombra)
+      ctx.shadowBlur = 0
+      for (let i = 0; i < repeats; i++) {
+        ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
+      }
+
+      return new THREE.CanvasTexture(canvas)
+    })
   , [ringsConfig])
 
   useFrame((state, delta) => {
@@ -95,44 +103,25 @@ const DualOrbitalRings = ({ liveData }) => {
     <group ref={groupRef}>
       {ringsConfig.map((ring, ringIdx) => (
         <group key={ringIdx} rotation={[ring.tilt, 0, 0]}>
-          {ring.segments.map((seg, segIdx) => {
-            // Espaciado uniforme con padding entre frases
-            const totalSegments = ring.segments.length
-            const angle = (segIdx / totalSegments) * Math.PI * 2
-            // Offset inicial para centrar mejor
-            const offset = -Math.PI / totalSegments
-            const finalAngle = angle + offset
-            return (
-              <sprite
-                key={`${ringIdx}-${segIdx}`}
-                position={[
-                  ring.radius * Math.cos(finalAngle),
-                  ring.radius * Math.sin(finalAngle) * Math.sin(ring.tilt),
-                  ring.radius * Math.sin(finalAngle) * Math.cos(ring.tilt),
-                ]}
-                scale={[
-                  ring.fontSize * 2.8,  // Más ancho para frases completas
-                  ring.fontSize * 0.6,  // Alto proporcional
-                  1,
-                ]}
-              >
-                <spriteMaterial
-                  map={ringsTextures[ringIdx][segIdx]}
-                  transparent
-                  blending={THREE.AdditiveBlending}
-                  opacity={ring.opacity}
-                  depthWrite={false}
-                />
-              </sprite>
-            )
-          })}
-          {/* Línea toroidal fina por anillo */}
+          {/* BANDA de texto — CylinderGeometry: el texto ES el anillo */}
           <mesh>
-            <torusGeometry args={[ring.radius, 0.0015, 8, 160]} />
+            <cylinderGeometry args={[ring.radius, ring.radius, ring.bandWidth, 128, 1, true]} />
+            <meshBasicMaterial
+              map={ringTextures[ringIdx]}
+              transparent
+              opacity={ring.opacity}
+              side={THREE.DoubleSide}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+          {/* Borde de brillo sutil en los bordes de la banda */}
+          <mesh>
+            <torusGeometry args={[ring.radius, ring.bandWidth * 0.06, 6, 128]} />
             <meshBasicMaterial
               color={ring.color}
               transparent
-              opacity={ring.opacity * 0.1}
+              opacity={ring.opacity * 0.12}
               depthWrite={false}
             />
           </mesh>
@@ -944,7 +933,7 @@ function GlobeScene({ liveData, paused }) {
         <UnifiedHalo />
         <InnerCore />
         <AgentNodes />
-        <DualOrbitalRings liveData={liveData} />
+        <TextBandRings liveData={liveData} />
         <DataStream />
       </group>
       {!isMobile && (
