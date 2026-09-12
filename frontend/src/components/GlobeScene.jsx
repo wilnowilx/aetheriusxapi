@@ -434,11 +434,13 @@ function BaseCore({ flowRef }) {
     }
   })
 
-  // Gas cósmico shaders — materia difusa, no sólido
-  const gasUniforms = useMemo(() => ({ time: { value: 0 }, flow: { value: 1 } }), [])
+  // Gas sincronizado: pulsa con el mismo flowRef del núcleo
+  const gasUniforms = useMemo(() => ({ time: { value: 0 }, flow: { value: 1 }, pulse: { value: 0 } }), [])
   useFrame((_, delta) => {
     gasUniforms.time.value += delta * 0.5
     gasUniforms.flow.value = flowRef?.current?.intensity || 1
+    // Pulsación sincronizada con el latido del BASE (0.25→1.0)
+    gasUniforms.pulse.value = flowRef?.current?.pulse || 0.3
   })
 
   return (
@@ -452,65 +454,67 @@ function BaseCore({ flowRef }) {
           depthWrite={false}
         />
       </sprite>
-      {/* Gas 1: núcleo denso → transparente hacia afuera (sin borde) */}
+      {/* Gas 1: núcleo profundo — azul cobalto con profundidad, sincronizado al latido */}
       <mesh>
-        <sphereGeometry args={[0.85, 32, 24]} />
+        <sphereGeometry args={[0.75, 32, 24]} />
         <shaderMaterial
           uniforms={gasUniforms}
-          vertexShader={`varying vec3 vPos; varying vec3 vNormal; void main(){ vPos=position; vNormal=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
+          vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
-            varying vec3 vPos; varying vec3 vNormal; uniform float time; uniform float flow;
+            varying vec3 vPos; uniform float time; uniform float flow; uniform float pulse;
             void main(){
-              float dist = length(vPos) / 0.85;
-              float radial = pow(1.0 - dist, 2.2);
-              float noise = sin(vPos.x*5.0+time*0.7)*0.5+0.5;
-              noise *= sin(vPos.y*4.0+time*0.4)*0.5+0.5;
-              noise = 0.7 + 0.3*noise;
-              float pulse = 0.75 + 0.25*sin(time*1.1);
-              vec3 col = mix(vec3(0.02,0.32,1.0), vec3(0.55,0.3,1.0), dist*0.5 + noise*0.15);
-              float alpha = radial * 0.38 * pulse * noise * (0.85+0.3*flow);
-              // Suaviza el borde externo a cero absoluto
-              alpha *= smoothstep(1.0, 0.65, dist);
+              float dist = length(vPos) / 0.75;
+              float radial = pow(1.0 - dist, 1.9);
+              float swirl = sin(vPos.x*6.0+time*0.6)*sin(vPos.y*5.0+time*0.4)*sin(vPos.z*4.0+time*0.5);
+              float noise = 0.75 + 0.25*swirl;
+              float beat = 0.55 + 0.45*pulse;
+              vec3 deepBlue = vec3(0.0,0.18,0.85);
+              vec3 coreCyan = vec3(0.1,0.65,1.0);
+              vec3 col = mix(deepBlue, coreCyan, (1.0-dist)*0.5 + noise*0.2);
+              // Profundidad: centro más saturado, borde más frío
+              col += vec3(0.2,0.1,0.4) * (1.0-dist) * 0.3;
+              float alpha = radial * 0.52 * noise * (0.7 + 0.5*flow) * beat;
+              alpha *= smoothstep(1.0, 0.55, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
-      {/* Gas 2: aura media — color→transparente, se difumina */}
+      {/* Gas 2: manto medio — turquesa→violeta con latido */}
       <mesh>
-        <sphereGeometry args={[1.25, 24, 18]} />
+        <sphereGeometry args={[1.15, 24, 18]} />
         <shaderMaterial
           uniforms={gasUniforms}
           vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
-            varying vec3 vPos; uniform float time; uniform float flow;
+            varying vec3 vPos; uniform float time; uniform float flow; uniform float pulse;
             void main(){
-              float dist = length(vPos) / 1.25;
-              float radial = pow(1.0 - dist, 1.8);
-              float pulse = 0.65 + 0.35*sin(time*0.8+1.2);
-              vec3 col = vec3(0.12,0.5,1.0);
-              float alpha = radial * 0.16 * pulse * (0.75+0.35*flow);
-              alpha *= smoothstep(1.0, 0.5, dist);
+              float dist = length(vPos) / 1.15;
+              float radial = pow(1.0 - dist, 2.0);
+              float pulse = 0.6 + 0.4*pulse;
+              vec3 col = mix(vec3(0.08,0.45,0.95), vec3(0.55,0.25,0.92), dist*0.6);
+              float alpha = radial * 0.20 * pulse * (0.7+0.4*flow);
+              alpha *= smoothstep(1.0, 0.45, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
-      {/* Gas 3: halo exterior púrpura — solo centro visible, borde invisible */}
+      {/* Gas 3: velo exterior — amatista profundo que se pierde */}
       <mesh>
-        <sphereGeometry args={[1.65, 16, 12]} />
+        <sphereGeometry args={[1.55, 16, 12]} />
         <shaderMaterial
           uniforms={gasUniforms}
           vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
-            varying vec3 vPos; uniform float time;
+            varying vec3 vPos; uniform float time; uniform float pulse;
             void main(){
-              float dist = length(vPos) / 1.65;
-              float radial = pow(1.0 - dist, 2.8);
-              float pulse = 0.5 + 0.5*sin(time*0.5+2.5);
-              vec3 col = vec3(0.65,0.33,0.97);
-              float alpha = radial * 0.10 * pulse;
-              alpha *= smoothstep(1.0, 0.4, dist);
+              float dist = length(vPos) / 1.55;
+              float radial = pow(1.0 - dist, 3.0);
+              float beat = 0.45 + 0.55*pulse;
+              vec3 col = mix(vec3(0.5,0.2,0.9), vec3(0.8,0.3,0.7), dist*0.4);
+              float alpha = radial * 0.12 * beat;
+              alpha *= smoothstep(1.0, 0.35, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
@@ -637,21 +641,32 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
       positions[i * 3 + 1] += velocities[i * 3 + 1] * delta
       positions[i * 3 + 2] += velocities[i * 3 + 2] * delta
 
-      // Check wireframe collision using squared distance (faster than Math.sqrt)
+      // Choque EXACTO contra borde interno Dyson (r=2.2) — clamp a superficie y difumina
       const distSq = positions[i * 3] * positions[i * 3]
                     + positions[i * 3 + 1] * positions[i * 3 + 1]
                     + positions[i * 3 + 2] * positions[i * 3 + 2]
-      if (distSq >= WIRE_RADIUS_SQ && !hit[i]) {
-        hit[i] = 1
-        if (onImpact) {
-          onImpact({
-            position: new THREE.Vector3(
-              positions[i * 3],
-              positions[i * 3 + 1],
-              positions[i * 3 + 2]
-            ),
-            intensity: 1.0
-          })
+      if (distSq >= WIRE_RADIUS_SQ) {
+        if (!hit[i]) {
+          hit[i] = 1
+          // Clamp exacto a la superficie interna
+          const d = Math.sqrt(distSq)
+          const s = WIRE_RADIUS / d
+          positions[i * 3] *= s
+          positions[i * 3 + 1] *= s
+          positions[i * 3 + 2] *= s
+          velocities[i * 3] = 0; velocities[i * 3 + 1] = 0; velocities[i * 3 + 2] = 0
+          if (onImpact) {
+            onImpact({
+              position: new THREE.Vector3(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]),
+              intensity: 1.0
+            })
+          }
+          // Vida corta para disiparse en la red (no fiesta superior)
+          lifetimes[i] = maxLifetimes[i] - 0.35
+        } else {
+          // Ya impactada: se expande y se desvanece contra la malla
+          sizes[i] *= 1.06
+          // No se mueve más
         }
       }
     }
