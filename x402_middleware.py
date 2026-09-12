@@ -372,6 +372,51 @@ class SimulatedX402Middleware(BaseHTTPMiddleware):
         _circuit_breaker.record_success()
         # ─────────────────────────────────────────────────────────────────
 
+        # ── CREDIT VELOCITY CHECK (Settlement Optimism Window) ──
+        # Before processing payment, check agent velocity to prevent
+        # exploitation of the L2 settlement window (1-2s on Base).
+        from credit_velocity import get_credit_velocity
+        _credit_vel = get_credit_velocity()
+
+        # Extract agent identity: prefer X-AGENT-ADDRESS header,
+        # fallback to nonce hash as proxy for simulated mode
+        agent_address = request.headers.get("X-AGENT-ADDRESS", nonce_hash[:16])
+
+        # Parse amount from price string
+        price_str = self.prices[canonical].replace("$", "")
+        try:
+            amount_usd = float(price_str)
+        except ValueError:
+            amount_usd = 0.0
+
+        velocity_check = _credit_vel.check_agent(
+            address=agent_address,
+            nonce=nonce_hash,
+            amount_usd=amount_usd,
+        )
+
+        if not velocity_check["allowed"]:
+            _circuit_breaker.record_failure()
+            record_call(canonical, False, 0.0)
+            return JSONResponse(
+                status_code=429,
+                content={
+                    "error": "Rate limited: settlement velocity exceeded",
+                    "detail": velocity_check["reason"],
+                    "risk_score": velocity_check["risk_score"],
+                    "risk_level": velocity_check["risk_level"],
+                    "velocity": velocity_check["velocity"],
+                    "settlement_rate": velocity_check["settlement_rate"],
+                    "block_remaining_s": velocity_check["block_remaining_s"],
+                    "hint": "Too many concurrent requests in the settlement window. "
+                            "Wait for pending settlements to confirm before retrying.",
+                },
+            )
+
+        # Record settlement attempt (will be confirmed later by watcher)
+        _credit_vel.record_settlement(agent_address, confirmed=True, amount_usd=amount_usd)
+        # ─────────────────────────────────────────────────────────────────
+
         start = time.monotonic()
         if use_collect_first:
             _circuit_breaker.record_success()
