@@ -14,12 +14,10 @@ class GlobeBoundary extends React.Component {
   }
 }
 
-// === CRT IGNITION — encendido de TV antiguo ===
-// Secuencia: punto de luz central → línea horizontal → apertura vertical
-// (+scanlines) → colapso en destello → estrella de 4 puntas ✦ → entrega imagen.
-// TOTAL 1800ms. Sonido procedural sincronizado (puerta de sala de mandos).
-// Autoplay-safe: si el AudioContext no está en running, el loader sigue mudo.
-function CRTLoader({ onComplete }) {
+// === ORGANIC IGNITION — encendido orgánico, sin fases duras ===
+// Curva ease continua: punto → línea → elipse respira → destello suave → estrella ✦ → entrega.
+// TOTAL 2000ms. Sonido sincronizado minimalista. Autoplay-safe.
+function OrganicLoader({ onComplete }) {
   const canvasRef = useRef(null)
   const animRef = useRef(null)
   const overlayRef = useRef(null)
@@ -37,7 +35,7 @@ function CRTLoader({ onComplete }) {
     const w = window.innerWidth, h = window.innerHeight
     const cx = w / 2, cy = h / 2
 
-    // --- audio CRT sincronizado (solo si el contexto ya corre) ---
+    // --- audio orgánico minimalista (solo si contexto running) ---
     let ac = null
     try {
       const AC = window.AudioContext || window.webkitAudioContext
@@ -49,77 +47,75 @@ function CRTLoader({ onComplete }) {
           const master = ac.createGain()
           master.gain.value = 0
           master.connect(ac.destination)
-          master.gain.linearRampToValueAtTime(0.16, t0 + 0.05)
-          // thump de encendido: 62→34Hz
+          // thump suave: 55→30Hz
           const osc = ac.createOscillator()
           osc.type = 'sine'
-          osc.frequency.setValueAtTime(62, t0)
-          osc.frequency.exponentialRampToValueAtTime(34, t0 + 0.28)
+          osc.frequency.setValueAtTime(55, t0)
+          osc.frequency.exponentialRampToValueAtTime(30, t0 + 0.35)
           const og = ac.createGain()
-          og.gain.setValueAtTime(0.5, t0)
-          og.gain.exponentialRampToValueAtTime(0.001, t0 + 0.3)
-          osc.connect(og); og.connect(master); osc.start(t0); osc.stop(t0 + 0.32)
-          // hum ascendente del tubo
+          og.gain.setValueAtTime(0.3, t0)
+          og.gain.exponentialRampToValueAtTime(0.001, t0 + 0.4)
+          osc.connect(og); og.connect(master); osc.start(t0); osc.stop(t0 + 0.4)
+          // hum cálido: 65→90Hz
           const hum = ac.createOscillator()
-          hum.type = 'sawtooth'
-          hum.frequency.setValueAtTime(48, t0 + 0.1)
-          hum.frequency.exponentialRampToValueAtTime(130, t0 + 0.8)
+          hum.type = 'triangle'
+          hum.frequency.setValueAtTime(65, t0 + 0.15)
+          hum.frequency.exponentialRampToValueAtTime(90, t0 + 1.0)
           const hf = ac.createBiquadFilter()
-          hf.type = 'lowpass'; hf.frequency.value = 320
+          hf.type = 'lowpass'; hf.frequency.value = 200
           const hg = ac.createGain()
-          hg.gain.setValueAtTime(0.0001, t0 + 0.1)
-          hg.gain.exponentialRampToValueAtTime(0.12, t0 + 0.7)
-          hg.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.2)
+          hg.gain.setValueAtTime(0.0001, t0 + 0.15)
+          hg.gain.exponentialRampToValueAtTime(0.06, t0 + 0.8)
+          hg.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.5)
           hum.connect(hf); hf.connect(hg); hg.connect(master)
-          hum.start(t0 + 0.1); hum.stop(t0 + 1.25)
-          // puerta de sala de mandos: whoosh de aire con filtro barriendo
-          const len = Math.floor(ac.sampleRate * 0.8)
+          hum.start(t0 + 0.15); hum.stop(t0 + 1.55)
+          // whoosh de aire al abrirse (t~1.1s)
+          const len = Math.floor(ac.sampleRate * 0.6)
           const buf = ac.createBuffer(1, len, ac.sampleRate)
           const ch = buf.getChannelData(0)
-          for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1
+          for (let i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * 0.3
           const ns = ac.createBufferSource()
           ns.buffer = buf
           const bp = ac.createBiquadFilter()
-          bp.type = 'bandpass'; bp.Q.value = 1.2
-          bp.frequency.setValueAtTime(280, t0 + 0.85)
-          bp.frequency.exponentialRampToValueAtTime(2500, t0 + 1.6)
+          bp.type = 'bandpass'; bp.Q.value = 0.8
+          bp.frequency.setValueAtTime(300, t0 + 1.1)
+          bp.frequency.exponentialRampToValueAtTime(1800, t0 + 1.5)
           const ng = ac.createGain()
-          ng.gain.setValueAtTime(0.0001, t0 + 0.85)
-          ng.gain.exponentialRampToValueAtTime(0.22, t0 + 1.2)
-          ng.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.7)
+          ng.gain.setValueAtTime(0.0001, t0 + 1.1)
+          ng.gain.exponentialRampToValueAtTime(0.12, t0 + 1.35)
+          ng.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.65)
           ns.connect(bp); bp.connect(ng); ng.connect(master)
-          ns.start(t0 + 0.85); ns.stop(t0 + 1.75)
-          // click + ping en el nacimiento de la estrella (~1.12s)
+          ns.start(t0 + 1.1); ns.stop(t0 + 1.7)
+          // ping cristalino en estrella (t~1.3s)
           const ping = ac.createOscillator()
-          ping.type = 'square'
-          ping.frequency.setValueAtTime(880, t0 + 1.12)
-          ping.frequency.exponentialRampToValueAtTime(1760, t0 + 1.2)
+          ping.type = 'sine'
+          ping.frequency.setValueAtTime(1320, t0 + 1.3)
+          ping.frequency.exponentialRampToValueAtTime(2640, t0 + 1.35)
           const pg = ac.createGain()
-          pg.gain.setValueAtTime(0.12, t0 + 1.12)
-          pg.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.3)
+          pg.gain.setValueAtTime(0.08, t0 + 1.3)
+          pg.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.4)
           ping.connect(pg); pg.connect(master)
-          ping.start(t0 + 1.12); ping.stop(t0 + 1.32)
-          master.gain.setValueAtTime(0.16, t0 + 1.5)
-          master.gain.linearRampToValueAtTime(0.0001, t0 + 1.85)
-        } else {
-          try { test.close() } catch {}
-        }
+          ping.start(t0 + 1.3); ping.stop(t0 + 1.4)
+          master.gain.setValueAtTime(0.12, t0 + 1.5)
+          master.gain.linearRampToValueAtTime(0.0001, t0 + 1.95)
+        } else { try { test.close() } catch {} }
       }
-    } catch {
-      ac = null
-    }
+    } catch { ac = null }
 
     let running = true
     const startTime = performance.now()
-    const TOTAL_DURATION = 1800 // ms — si se siente lento, se ajusta
+    const TOTAL_DURATION = 2000 // ms — curva orgánica 2s
     const S = Math.max(w, h) / 800
+
+    // Ease orgánica: smoothstep cúbico continuo, sin fases duras
+    const ease = (t) => t * t * t * (t * (t * 6 - 15) + 10) // quintic smoothstep
 
     const drawSparkle = (R, alpha) => {
       const waist = R * 0.09
       ctx.save()
       ctx.translate(cx, cy)
-      ctx.shadowColor = 'rgba(168,85,247,0.8)'
-      ctx.shadowBlur = 32
+      ctx.shadowColor = 'rgba(168,85,247,0.7)'
+      ctx.shadowBlur = 28
       const bodyGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, R)
       bodyGrad.addColorStop(0, `rgba(255,255,255,${0.9 * alpha})`)
       bodyGrad.addColorStop(0.3, `rgba(150,170,255,${0.5 * alpha})`)
@@ -142,121 +138,93 @@ function CRTLoader({ onComplete }) {
       if (!running) return
       const elapsed = now - startTime
       const t = Math.min(elapsed / TOTAL_DURATION, 1)
-      const flick = 0.92 + 0.08 * Math.sin(elapsed * 0.09)
+      const et = ease(t) // curva orgánica única
+      const flick = 0.95 + 0.05 * Math.sin(elapsed * 0.06) // respiración suave
 
       ctx.fillStyle = '#010005'
       ctx.fillRect(0, 0, w, h)
 
-      // --- Fase A: punto → línea horizontal con profundidad (t 0→0.5) ---
-      if (t < 0.5) {
-        const p = t / 0.5
-        const ease = p * p
-        const halfW = 3 + ease * w * 0.24
-        const dotR = (2 + p * 5) * S
-        // halo profundo: la línea respira sobre un aura elíptica
-        const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, halfW * 1.4)
-        halo.addColorStop(0, `rgba(150,170,255,${0.22 * flick})`)
-        halo.addColorStop(0.5, `rgba(168,85,247,${0.12 * flick})`)
+      // 0→0.35: punto → línea horizontal con aura
+      if (et < 0.35) {
+        const p = et / 0.35
+        const q = p * p * (3 - 2 * p) // smoothstep
+        const halfW = 3 + q * w * 0.26
+        const dotR = (2 + q * 6) * S
+        // aura elíptica
+        const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, halfW * 1.5)
+        halo.addColorStop(0, `rgba(150,170,255,${0.2 * flick})`)
+        halo.addColorStop(0.5, `rgba(168,85,247,${0.1 * flick})`)
         halo.addColorStop(1, 'rgba(0,82,255,0)')
         ctx.fillStyle = halo
-        ctx.beginPath()
-        ctx.arc(cx, cy, halfW * 1.4, 0, Math.PI * 2)
-        ctx.fill()
-        // punto de ignición
+        ctx.beginPath(); ctx.arc(cx, cy, halfW * 1.5, 0, Math.PI * 2); ctx.fill()
+        // punto
         const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, dotR * 6)
         glow.addColorStop(0, `rgba(255,255,255,${0.8 * flick})`)
-        glow.addColorStop(0.4, `rgba(34,211,238,${0.25 * flick})`)
+        glow.addColorStop(0.4, `rgba(34,211,238,${0.2 * flick})`)
         glow.addColorStop(1, 'rgba(0,82,255,0)')
         ctx.fillStyle = glow
-        ctx.beginPath()
-        ctx.arc(cx, cy, dotR * 6, 0, Math.PI * 2)
-        ctx.fill()
-        // cuerpo de la línea: franja púrpura→núcleo blanco→cian
+        ctx.beginPath(); ctx.arc(cx, cy, dotR * 6, 0, Math.PI * 2); ctx.fill()
+        // línea con gradiente
         const lg = ctx.createLinearGradient(cx - halfW, 0, cx + halfW, 0)
         lg.addColorStop(0, 'rgba(0,82,255,0)')
-        lg.addColorStop(0.25, `rgba(168,85,247,${0.7 * flick})`)
-        lg.addColorStop(0.5, `rgba(255,255,255,${0.95 * flick})`)
-        lg.addColorStop(0.75, `rgba(34,211,238,${0.7 * flick})`)
+        lg.addColorStop(0.25, `rgba(168,85,247,${0.6 * flick})`)
+        lg.addColorStop(0.5, `rgba(255,255,255,${0.9 * flick})`)
+        lg.addColorStop(0.75, `rgba(34,211,238,${0.6 * flick})`)
         lg.addColorStop(1, 'rgba(0,82,255,0)')
         ctx.fillStyle = lg
         ctx.fillRect(cx - halfW, cy - 2, halfW * 2, 4)
-        // núcleo caliente de 1px
-        ctx.fillStyle = `rgba(255,255,255,${0.9 * flick})`
+        ctx.fillStyle = `rgba(255,255,255,${0.85 * flick})`
         ctx.fillRect(cx - halfW, cy - 0.5, halfW * 2, 1)
-        // reflejos tenues arriba/abajo: la línea flota en vidrio
-        const rg = ctx.createLinearGradient(0, cy - 26 * S, 0, cy + 26 * S)
-        rg.addColorStop(0, 'rgba(34,211,238,0)')
-        rg.addColorStop(0.5, `rgba(150,170,255,${0.10 * flick})`)
-        rg.addColorStop(1, 'rgba(168,85,247,0)')
-        ctx.fillStyle = rg
-        ctx.fillRect(cx - halfW, cy - 26 * S, halfW * 2, 52 * S)
-        // shimmer viajero: un brillo recorre la línea
-        const sx = cx - halfW + (0.5 + 0.5 * Math.sin(elapsed * 0.006)) * halfW * 2
-        const shim = ctx.createRadialGradient(sx, cy, 0, sx, cy, 26 * S)
-        shim.addColorStop(0, `rgba(255,255,255,${0.55 * flick})`)
-        shim.addColorStop(1, 'rgba(255,255,255,0)')
-        ctx.fillStyle = shim
-        ctx.beginPath()
-        ctx.arc(sx, cy, 26 * S, 0, Math.PI * 2)
-        ctx.fill()
       }
 
-      // --- Fase B: la línea respira y barre antes del destello (t 0.5→0.6) ---
-      if (t >= 0.5 && t < 0.6) {
-        const q = (t - 0.5) / 0.1
-        const halfW = w * 0.24
-        const breathe = 0.85 + 0.15 * Math.sin(elapsed * 0.02)
-        const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, halfW * 1.4)
-        halo.addColorStop(0, `rgba(150,170,255,${0.22 * flick * breathe})`)
-        halo.addColorStop(0.5, `rgba(168,85,247,${0.12 * flick * breathe})`)
+      // 0.35→0.55: línea → elipse que respira
+      if (et >= 0.35 && et < 0.55) {
+        const q = (et - 0.35) / 0.2
+        const breathe = 0.88 + 0.12 * Math.sin(elapsed * 0.025)
+        const halfW = w * 0.26
+        const halfH = 2 + q * h * 0.18
+        // aura
+        const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, halfW * 1.5)
+        halo.addColorStop(0, `rgba(150,170,255,${0.18 * flick * breathe})`)
+        halo.addColorStop(0.5, `rgba(168,85,247,${0.08 * flick * breathe})`)
         halo.addColorStop(1, 'rgba(0,82,255,0)')
         ctx.fillStyle = halo
-        ctx.beginPath()
-        ctx.arc(cx, cy, halfW * 1.4, 0, Math.PI * 2)
-        ctx.fill()
-        const lg = ctx.createLinearGradient(cx - halfW, 0, cx + halfW, 0)
-        lg.addColorStop(0, 'rgba(0,82,255,0)')
-        lg.addColorStop(0.25, `rgba(168,85,247,${0.7 * flick * breathe})`)
-        lg.addColorStop(0.5, `rgba(255,255,255,${0.95 * flick * breathe})`)
-        lg.addColorStop(0.75, `rgba(34,211,238,${0.7 * flick * breathe})`)
-        lg.addColorStop(1, 'rgba(0,82,255,0)')
-        ctx.fillStyle = lg
-        ctx.fillRect(cx - halfW, cy - 2, halfW * 2, 4)
-        ctx.fillStyle = `rgba(255,255,255,${0.9 * flick * breathe})`
-        ctx.fillRect(cx - halfW, cy - 0.5, halfW * 2, 1)
-        // barrido final de izquierda a derecha: carga el destello
-        const sx = cx - halfW + q * halfW * 2
-        const shim = ctx.createRadialGradient(sx, cy, 0, sx, cy, 34 * S)
-        shim.addColorStop(0, `rgba(255,255,255,${0.7 * flick})`)
-        shim.addColorStop(1, 'rgba(255,255,255,0)')
-        ctx.fillStyle = shim
-        ctx.beginPath()
-        ctx.arc(sx, cy, 34 * S, 0, Math.PI * 2)
-        ctx.fill()
+        ctx.beginPath(); ctx.arc(cx, cy, halfW * 1.5, 0, Math.PI * 2); ctx.fill()
+        // elipse vertical
+        const vg = ctx.createLinearGradient(0, cy - halfH, 0, cy + halfH)
+        vg.addColorStop(0, 'rgba(0,82,255,0)')
+        vg.addColorStop(0.5, `rgba(220,230,255,${0.4 * flick * breathe})`)
+        vg.addColorStop(1, 'rgba(0,82,255,0)')
+        ctx.fillStyle = vg
+        ctx.fillRect(cx - halfW, cy - halfH, halfW * 2, halfH * 2)
+        // bordes
+        ctx.fillStyle = `rgba(255,255,255,${0.7 * flick * breathe})`
+        ctx.fillRect(cx - halfW, cy - halfH, halfW * 2, 1.5)
+        ctx.fillRect(cx - halfW, cy + halfH - 1.5, halfW * 2, 1.5)
       }
 
-      // --- Fase C: colapso en destello → estrella ✦ (t 0.6→0.85) ---
-      if (t >= 0.6 && t < 0.85) {
-        const p = (t - 0.6) / 0.25
-        const flash = p < 0.15 ? p / 0.15 : Math.max(0, 1 - (p - 0.15) / 0.35)
+      // 0.55→0.8: colapso suave → estrella ✦
+      if (et >= 0.55 && et < 0.8) {
+        const q = (et - 0.55) / 0.25
+        const flash = q < 0.2 ? q / 0.2 : Math.max(0, 1 - (q - 0.2) / 0.5)
         if (flash > 0) {
-          ctx.fillStyle = `rgba(235,240,255,${flash * 0.85 * flick})`
+          ctx.fillStyle = `rgba(235,240,255,${flash * 0.8 * flick})`
           ctx.fillRect(0, 0, w, h)
         }
-        const R = (30 + p * 140) * S
-        drawSparkle(R, Math.min(1, 0.25 + p) * flick)
+        const R = (30 + q * 150) * S
+        drawSparkle(R, Math.min(1, 0.2 + q * 0.8) * flick)
       }
 
-      // --- canal brutalista CRT ---
-      if (t < 0.85) {
+      // 0.8→1: fade out entrega imagen
+      if (et >= 0.8 && overlayRef.current) {
+        overlayRef.current.style.opacity = String(1 - (et - 0.8) / 0.2)
+      }
+
+      // canal brutalista sutil
+      if (et < 0.8) {
         ctx.font = '10px monospace'
-        ctx.fillStyle = `rgba(255,255,255,${0.35 * flick})`
+        ctx.fillStyle = `rgba(255,255,255,${0.25 * flick})`
         ctx.fillText('CH—402 · BASE', 24, h - 24)
-      }
-
-      // --- Fase D: entrega la imagen (t 0.85→1) ---
-      if (t >= 0.85 && overlayRef.current) {
-        overlayRef.current.style.opacity = String(1 - (t - 0.85) / 0.15)
       }
 
       animRef.current = requestAnimationFrame(draw)
@@ -271,12 +239,7 @@ function CRTLoader({ onComplete }) {
       onCompleteRef.current?.()
     }, TOTAL_DURATION + 100)
 
-    return () => {
-      running = false
-      cancelAnimationFrame(animRef.current)
-      clearTimeout(timer)
-      try { ac?.close() } catch {}
-    }
+    return () => { running = false; cancelAnimationFrame(animRef.current); clearTimeout(timer); try { ac?.close() } catch {} }
   }, [])
 
   return (
@@ -696,7 +659,7 @@ function Hero() {
 
 return (
     <>
-      {!loaded && <CRTLoader onComplete={handleLoaded} />}
+      {!loaded && <OrganicLoader onComplete={handleLoaded} />}
       <CosmicSound />
 
       <section id="hero" ref={heroRef} style={{

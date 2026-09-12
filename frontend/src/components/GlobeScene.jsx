@@ -3,142 +3,101 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Stars, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
-// === ORBITAL TEXT RINGS — Saturn-like rings with readable text ===
-// Tres anillos concéntricos con texto legible que orbitan la esfera.
-// Cada anillo es una frase completa dividida en segmentos (sprites)
-// que rotan juntos. Los sprites hacen billboard para legibilidad,
-// === ORBITAL TEXT RINGS — Saturn-like rings with readable text ===
-// Tres anillos concéntricos con texto legible que orbitan la esfera.
-// Cada anillo es una frase completa dividida en segmentos (sprites)
-// que rotan juntos. Los sprites hacen billboard para legibilidad,
-// pero el grupo rota como anillo sólido.
-// @__NO_SIDE_EFFECTS__ (prevent tree-shaking)
-SYNTAX ERROR const OrbitalTextRings = ({ liveData }) => {
+// === SINGLE ORBITAL RING — un solo anillo con todo el texto fluido ===
+// Un solo anillo a radio 3.0, speed 0.05, con texto concatenado legible.
+// Color degradado púrpura→magenta→cian. Sprites billboard siempre legibles.
+const SingleOrbitalRing = ({ liveData }) => {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Anillo 1: título principal — radio mayor, más lento, más grande
-  // Anillo 2: subtítulo — radio medio
-  // Anillo 3: métricas vivas — radio menor, más rápido
-  const ringsConfig = useMemo(() => {
+  // Texto concatenado: título + subtítulo + métricas en un solo flujo
+  const fullText = useMemo(() => {
     const d = liveData || {}
     return [
-      {
-        radius: 3.2,
-        tilt: Math.PI / 2,
-        speed: 0.04,
-        color: '#c084fc',
-        opacity: 0.55,
-        fontSize: 1.15,
-        segments: ['THE', 'MARKETPLACE', 'THAT', 'LIVES'],
-      },
-      {
-        radius: 2.75,
-        tilt: Math.PI / 2 + 0.15,
-        speed: 0.06,
-        color: '#d946ef',
-        opacity: 0.45,
-        fontSize: 0.75,
-        segments: ['API', 'INFRASTRUCTURE', 'FOR', 'AI', 'AGENTS', 'THAT', 'PAY'],
-      },
-      {
-        radius: 2.35,
-        tilt: Math.PI / 2 + 0.28,
-        speed: 0.09,
-        color: '#22d3ee',
-        opacity: 0.5,
-        fontSize: 0.55,
-        segments: [
-          `${d.endpoints || '100+'}`,
-          'ENDPOINTS',
-          '·',
-          `${d.freeEndpoints || '40'}`,
-          'FREE',
-          '·',
-          `${d.latency || '—'}`,
-        ],
-      },
+      'THE', 'MARKETPLACE', 'THAT', 'LIVES',
+      '•',
+      'API', 'INFRASTRUCTURE', 'FOR', 'AI', 'AGENTS', 'THAT', 'PAY',
+      '•',
+      `${d.endpoints || '100+'}`, 'ENDPOINTS',
+      '•',
+      `${d.freeEndpoints || '40'}`, 'FREE',
+      '•',
+      `${d.latency || '—'}`
     ]
   }, [liveData])
 
-  // Crear texturas para cada segmento
-  const ringsTextures = useMemo(() =>
-    ringsConfig.map(ring =>
-      ring.segments.map(seg => {
-        const canvas = document.createElement('canvas')
-        const isDot = seg === '·'
-        canvas.width = isDot ? 128 : 512
-        canvas.height = 128
-        const ctx = canvas.getContext('2d')
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        const size = Math.round(ring.fontSize * (isDot ? 60 : 80))
-        ctx.font = `bold ${size}px 'JetBrains Mono', monospace`
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.fillStyle = ring.color
-        ctx.shadowColor = ring.color
-        ctx.shadowBlur = isDot ? 8 : 20
-        ctx.fillText(seg, canvas.width / 2, canvas.height / 2)
-        return new THREE.CanvasTexture(canvas)
-      })
-    )
-  , [ringsConfig])
+  // Texturas: color degradado púrpura→magenta→cian por posición
+  const textures = useMemo(() =>
+    fullText.map((seg, idx) => {
+      const isDot = seg === '•'
+      const canvas = document.createElement('canvas')
+      canvas.width = isDot ? 128 : 512
+      canvas.height = 128
+      const ctx = canvas.getContext('2d')
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      const size = Math.round(1.1 * (isDot ? 60 : 80))
+      ctx.font = `bold ${size}px 'JetBrains Mono', monospace`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      // Degradado por posición en el anillo
+      const t = idx / fullText.length
+      const r = Math.round(200 + 55 * Math.sin(t * Math.PI * 2))
+      const g = Math.round(133 + 84 * Math.sin(t * Math.PI * 2 + 2.1))
+      const b = Math.round(247 - 58 * Math.sin(t * Math.PI * 2 + 4.2))
+      const color = `rgb(${r},${g},${b})`
+      ctx.fillStyle = color
+      ctx.shadowColor = color
+      ctx.shadowBlur = isDot ? 8 : 20
+      ctx.fillText(seg, canvas.width / 2, canvas.height / 2)
+      return new THREE.CanvasTexture(canvas)
+    })
+  , [fullText])
 
   useFrame((state, delta) => {
     elapsed.current += delta
     if (groupRef.current) {
-      // Cada anillo rota a su velocidad, creando paralaje
-      ringsConfig.forEach((ring, i) => {
-        const ringGroup = groupRef.current.children[i]
-        if (ringGroup) {
-          ringGroup.rotation.y = elapsed.current * ring.speed
-        }
-      })
+      groupRef.current.rotation.y = elapsed.current * 0.05
     }
   })
 
   return (
-    <group ref={groupRef}>
-      {ringsConfig.map((ring, ringIdx) => (
-        <group key={ringIdx} rotation={[ring.tilt, 0, 0]}>
-          {ring.segments.map((seg, segIdx) => {
-            const angle = (segIdx / ring.segments.length) * Math.PI * 2
-            return (
-              <sprite
-                key={`${ringIdx}-${segIdx}`}
-                position={[
-                  ring.radius * Math.cos(angle),
-                  ring.radius * Math.sin(angle) * Math.sin(ring.tilt),
-                  ring.radius * Math.sin(angle) * Math.cos(ring.tilt),
-                ]}
-                scale={[
-                  ring.fontSize * (seg === '·' ? 0.6 : 1.8),
-                  ring.fontSize * 0.45,
-                  1,
-                ]}
-              >
-                <spriteMaterial
-                  map={ringsTextures[ringIdx][segIdx]}
-                  transparent
-                  blending={THREE.AdditiveBlending}
-                  opacity={ring.opacity}
-                  depthWrite={false}
-                />
-              </sprite>
-            )
-          })}
-          {/* Thin visual ring line for structure */}
-          <mesh>
-            <torusGeometry args={[ring.radius, 0.0025, 8, 160]} />
-            <meshBasicMaterial
-              color={ring.color}
+    <group ref={groupRef} rotation={[Math.PI / 2, 0, 0]}>
+      {fullText.map((seg, idx) => {
+        const angle = (idx / fullText.length) * Math.PI * 2
+        return (
+          <sprite
+            key={idx}
+            position={[
+              3.0 * Math.cos(angle),
+              3.0 * Math.sin(angle),
+              0,
+            ]}
+            scale={[
+              1.1 * (seg === '•' ? 0.6 : 1.8),
+              1.1 * 0.45,
+              1,
+            ]}
+          >
+            <spriteMaterial
+              map={textures[idx]}
               transparent
-              opacity={ring.opacity * 0.15}
+              blending={THREE.AdditiveBlending}
+              opacity={0.55}
               depthWrite={false}
             />
-          </mesh>
-        </group>
-      ))}
+          </sprite>
+        )
+      })}
+      {/* Línea toroidal fina para estructura */}
+      <mesh>
+        <torusGeometry args={[3.0, 0.002, 8, 160]} />
+        <meshBasicMaterial
+          color={0xa855f7}
+          transparent
+          opacity={0.08}
+          depthWrite={false}
+        />
+      </mesh>
     </group>
   )
 }
@@ -181,17 +140,19 @@ function OuterHalo() {
   )
 }
 
-// === ATMOSPHERE GLOW ===
-function AtmosphereGlow() {
+// === UNIFIED HALO — fusión de OuterHalo + AtmosphereGlow para performance ===
+// Un solo mesh con shader unificado: fresnel + pulse + wave. Un draw call menos.
+function UnifiedHalo() {
   const uniforms = useMemo(() => ({
     time: { value: 0 },
     colorA: { value: new THREE.Color(0x22d3ee) },
     colorB: { value: new THREE.Color(0xa855f7) },
+    colorC: { value: new THREE.Color(0xd946ef) },
   }), [])
-  useFrame((state, delta) => { uniforms.time.value += delta * 0.8 })
+  useFrame((state, delta) => { uniforms.time.value += delta * 0.6 })
   return (
     <mesh scale={1.15}>
-      <sphereGeometry args={[2.2, 32, 24]} />
+      <sphereGeometry args={[2.2, 28, 20]} />
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={`
@@ -204,13 +165,14 @@ function AtmosphereGlow() {
         `}
         fragmentShader={`
           varying vec3 vNormal; varying vec3 vWorldPos;
-          uniform float time; uniform vec3 colorA; uniform vec3 colorB;
+          uniform float time; uniform vec3 colorA; uniform vec3 colorB; uniform vec3 colorC;
           void main() {
-            float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 1.4);
-            float pulse = 0.88 + 0.12 * sin(time * 0.8 + vWorldPos.y * 2.0);
-            float wave = 0.5 + 0.5 * sin(time * 0.5 + vWorldPos.x * 2.2 + vWorldPos.z * 1.3);
-            vec3 col = mix(colorA, colorB, wave * 0.25);
-            gl_FragColor = vec4(col, fresnel * pulse * 0.1);
+            float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 1.8);
+            float pulse = 0.85 + 0.15 * sin(time * 0.6 + vWorldPos.y * 1.5);
+            float wave = 0.5 + 0.5 * sin(time * 0.4 + vWorldPos.x * 2.0 + vWorldPos.z * 1.2);
+            vec3 col = mix(colorA, colorB, wave * 0.3);
+            col = mix(col, colorC, 0.15 * sin(time * 0.3 + vWorldPos.y));
+            gl_FragColor = vec4(col, fresnel * pulse * 0.08);
           }
         `}
         side={THREE.BackSide} transparent depthWrite={false} blending={THREE.AdditiveBlending}
@@ -404,9 +366,9 @@ function BaseCore({ flowRef }) {
 // Cada partícula nace en el núcleo BASE y muere al tocar la cáscara (Dyson:
 // la energía se absorbe, nada cruza hacia afuera). El flujo se modula con
 // flowRef (ticker ≤500ms derivado de USDC/mercado): intensidad, velocidad,
-// tamaño y color (verde USDC vs azul→púrpura mercado).
+// tamaño y color (verde USDC vs azul→púrpura mercado). 36 pts para 60fps.
 function EnergyParticles({ liveData, onImpact, flowRef }) {
-  const PARTICLE_COUNT = 56
+  const PARTICLE_COUNT = 36
   const elapsed = useRef(0)
   const pointsRef = useRef()
   const WIRE_RADIUS = 2.2
@@ -939,12 +901,11 @@ function GlobeScene({ liveData, paused }) {
         <GlobeImpacts />
         <BaseCore flowRef={flowRef} />
         <EnergyParticles liveData={liveData} onImpact={handleImpact} flowRef={flowRef} />
-        <OuterHalo />
-        <AtmosphereGlow />
+        <UnifiedHalo />
         <InnerCore />
         <AgentNodes />
         <OrbitRings />
-        <OrbitalTextRings liveData={liveData} />
+        <SingleOrbitalRing liveData={liveData} />
         <OrbitalData liveData={liveData} />
         <DataStream />
       </group>
