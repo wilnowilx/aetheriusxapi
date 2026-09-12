@@ -53,7 +53,7 @@ const TextBandRings = ({ liveData }) => {
     ]
   }, [liveData])
 
-  // Canvas texture: 4096px ancho × 160px alto — ultra nítido, sin espejado atrás
+  // Canvas 4096×160 — neon premium: bloom real + nítido frontal
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
@@ -61,34 +61,29 @@ const TextBandRings = ({ liveData }) => {
       canvas.height = 160
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-
       const font = `900 ${ring.fontSize * 1.35}px 'JetBrains Mono', 'Fira Code', monospace`
       ctx.font = font
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-
       const phrase = ring.text
       const phraseW = ctx.measureText(phrase).width
       const repeats = Math.ceil((canvas.width + phraseW) / phraseW)
       const startOffset = (canvas.width - phraseW * repeats) / 2 + phraseW / 2
-
-      // Triple pasada: glow + sólido + highlight para nitidez brutal
-      ctx.fillStyle = ring.color
+      // Neon layers: bloom externo + bloom medio + núcleo sólido
       ctx.shadowColor = ring.color
-      ctx.shadowBlur = 32
+      ctx.shadowBlur = 48
+      ctx.fillStyle = ring.color
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      ctx.shadowBlur = 16
+      ctx.shadowBlur = 22
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       ctx.shadowBlur = 0
+      ctx.fillStyle = ring.color === '#ffffff' ? '#ffffff' : ring.color
+      for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
+      // Highlight central ultra fino para legibilidad
       ctx.fillStyle = '#ffffff'
-      // Solo el anillo blanco lleva highlight blanco puro, los demás su color
-      if (ring.color === '#ffffff') {
-        for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      } else {
-        ctx.fillStyle = ring.color
-        for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      }
-
+      ctx.globalAlpha = 0.85
+      for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
+      ctx.globalAlpha = 1
       const tex = new THREE.CanvasTexture(canvas)
       tex.anisotropy = 8
       tex.minFilter = THREE.LinearFilter
@@ -97,17 +92,51 @@ const TextBandRings = ({ liveData }) => {
     })
   , [ringsConfig])
 
-  // Interactivo: hover pausa el anillo
+  // Textura espejo: mismo texto pero desenfocado y tenue — reflejo elegante
+  const mirrorTextures = useMemo(() =>
+    ringsConfig.map(ring => {
+      const canvas = document.createElement('canvas')
+      canvas.width = 4096
+      canvas.height = 160
+      const ctx = canvas.getContext('2d')
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.font = `900 ${ring.fontSize * 1.35}px 'JetBrains Mono', 'Fira Code', monospace`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      const phrase = ring.text
+      const phraseW = ctx.measureText(phrase).width
+      const repeats = Math.ceil((canvas.width + phraseW) / phraseW)
+      const startOffset = (canvas.width - phraseW * repeats) / 2 + phraseW / 2
+      ctx.shadowColor = ring.color
+      ctx.shadowBlur = 28
+      ctx.fillStyle = ring.color
+      ctx.globalAlpha = 0.35
+      for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
+      ctx.globalAlpha = 1
+      const tex = new THREE.CanvasTexture(canvas)
+      tex.anisotropy = 4
+      return tex
+    })
+  , [ringsConfig])
+
   const [hoveredRing, setHoveredRing] = useState(null)
+  const neonPulse = useRef(0)
 
   useFrame((state, delta) => {
     elapsed.current += delta
+    neonPulse.current += delta
     if (groupRef.current) {
       ringsConfig.forEach((ring, i) => {
         const ringGroup = groupRef.current.children[i]
         if (ringGroup) {
           const paused = hoveredRing === i
           if (!paused) ringGroup.rotation.y += delta * ring.speed
+          // Neon respira: opacidad del material pulsa sutil
+          const frontMesh = ringGroup.children[0]
+          if (frontMesh?.material) {
+            const breath = 0.88 + 0.12 * Math.sin(neonPulse.current * 0.7 + i * 1.2)
+            frontMesh.material.opacity = (hoveredRing === i ? 1 : ring.opacity) * breath
+          }
         }
       })
     }
@@ -117,7 +146,7 @@ const TextBandRings = ({ liveData }) => {
     <group ref={groupRef}>
       {ringsConfig.map((ring, ringIdx) => (
         <group key={ringIdx} position={[0, ring.yOffset, 0]} rotation={[ring.tilt, 0, 0]}>
-          {/* BANDA de texto — CylinderGeometry: el texto ES el anillo (FrontSide = sin espejado) */}
+          {/* Cara frontal nítida + reflejo trasero blur elegante */}
           <mesh
             onPointerOver={(e) => { e.stopPropagation(); setHoveredRing(ringIdx); document.body.style.cursor = 'pointer' }}
             onPointerOut={() => { setHoveredRing(null); document.body.style.cursor = 'auto' }}
@@ -127,10 +156,24 @@ const TextBandRings = ({ liveData }) => {
             <meshBasicMaterial
               map={ringTextures[ringIdx]}
               transparent
-              opacity={hoveredRing === ringIdx ? 1 : ring.opacity}
+              opacity={ring.opacity}
               side={THREE.FrontSide}
               depthWrite={false}
               blending={THREE.AdditiveBlending}
+              toneMapped={false}
+            />
+          </mesh>
+          {/* Reflejo trasero: espejo desenfocado tenue */}
+          <mesh>
+            <cylinderGeometry args={[ring.radius, ring.radius, ring.bandWidth, 128, 1, true]} />
+            <meshBasicMaterial
+              map={mirrorTextures[ringIdx]}
+              transparent
+              opacity={0.22}
+              side={THREE.BackSide}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+              toneMapped={false}
             />
           </mesh>
           {/* Borde de brillo sutil en los bordes de la banda */}
@@ -404,14 +447,18 @@ function BaseCore({ flowRef }) {
           depthWrite={false}
         />
       </sprite>
-      {/* Núcleo energía pulsante — esfera partículas como las refs */}
+      {/* Corona de fuego — esfera + aura que respira con el flujo */}
       <mesh>
         <sphereGeometry args={[0.42, 20, 16]} />
-        <meshBasicMaterial color={0x0052FF} transparent opacity={0.14} depthWrite={false} blending={THREE.AdditiveBlending} />
+        <meshBasicMaterial color={0x0052FF} transparent opacity={0.18} depthWrite={false} blending={THREE.AdditiveBlending} />
       </mesh>
-      <mesh scale={1.6}>
+      <mesh scale={1.9}>
         <sphereGeometry args={[0.42, 16, 12]} />
-        <meshBasicMaterial color={0x22d3ee} transparent opacity={0.04} depthWrite={false} blending={THREE.AdditiveBlending} />
+        <meshBasicMaterial color={0x0052FF} transparent opacity={0.06} depthWrite={false} blending={THREE.AdditiveBlending} />
+      </mesh>
+      <mesh scale={2.6}>
+        <sphereGeometry args={[0.42, 12, 10]} />
+        <meshBasicMaterial color={0xa855f7} transparent opacity={0.025} depthWrite={false} blending={THREE.AdditiveBlending} />
       </mesh>
     </group>
   )
@@ -429,11 +476,12 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
   const WIRE_RADIUS = 2.2
   const WIRE_RADIUS_SQ = WIRE_RADIUS * WIRE_RADIUS
 
+  // Erupción solar: velocidad radial alta, depende del flujo
   const spawnVelocity = (out) => {
     const theta = Math.random() * Math.PI * 2
     const phi = Math.acos(2 * Math.random() - 1)
     const flow = Math.max(0.5, Math.min(1.8, flowRef?.current?.intensity || 1))
-    const speed = (1.1 + Math.random() * 0.8) * (0.75 + 0.45 * flow)
+    const speed = (3.5 + Math.random() * 2.5) * (0.85 + 0.5 * flow)
     out[0] = Math.sin(phi) * Math.cos(theta) * speed
     out[1] = Math.sin(phi) * Math.sin(theta) * speed
     out[2] = Math.cos(phi) * speed
@@ -460,52 +508,48 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
     const sz = new Float32Array(PARTICLE_COUNT)
     const life = new Float32Array(PARTICLE_COUNT)
     const maxLife = new Float32Array(PARTICLE_COUNT)
-    const hit = new Uint8Array(PARTICLE_COUNT) // track if already triggered impact
-    const tmp = [0, 0, 0]
+    const hit = new Uint8Array(PARTICLE_COUNT)
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 0.3
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 0.3
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 0.3
+      pos[i * 3] = (Math.random() - 0.5) * 0.25
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 0.25
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 0.25
       const theta = Math.random() * Math.PI * 2
       const phi = Math.acos(2 * Math.random() - 1)
-      const speed = 1.1 + Math.random() * 0.8
+      const speed = 3.5 + Math.random() * 2.5
       vel[i * 3] = Math.sin(phi) * Math.cos(theta) * speed
       vel[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed
       vel[i * 3 + 2] = Math.cos(phi) * speed
-      const t = Math.random()
-      if (Math.random() < 0.38) {
-        col[i * 3] = 0.063; col[i * 3 + 1] = 0.725; col[i * 3 + 2] = 0.506
-        sz[i] = 0.03 + Math.random() * 0.035
-      } else {
-        col[i * 3] = 0.0 * (1 - t) + 0.659 * t
-        col[i * 3 + 1] = 0.322 * (1 - t) + 0.333 * t
-        col[i * 3 + 2] = 1.0 * (1 - t) + 0.969 * t
-        sz[i] = 0.02 + Math.random() * 0.03
-      }
-      life[i] = Math.random() * 3
-      maxLife[i] = 1.6 + Math.random() * 1.0
-      void tmp
+      paintKind(col, sz, i)
+      life[i] = Math.random() * 2
+      maxLife[i] = 0.9 + Math.random() * 0.5
     }
     return { positions: pos, velocities: vel, colors: col, sizes: sz, lifetimes: life, maxLifetimes: maxLife, hit }
   }, [])
 
   const uniforms = useMemo(() => ({ time: { value: 0 }, flow: { value: 1 } }), [])
 
+  // Burst: cuando pulse === 1 (nuevo bloque) lanzar ráfaga
+  const lastBurst = useRef(0)
   useFrame((context, delta) => {
     elapsed.current += delta
     uniforms.time.value = elapsed.current
     const flow = Math.max(0.5, Math.min(1.8, flowRef?.current?.intensity || 1))
     uniforms.flow.value = flow
+    const isBurst = flowRef?.current?.pulse > 0.95 && elapsed.current - lastBurst.current > 1.2
+    if (isBurst) lastBurst.current = elapsed.current
     const { positions, velocities, colors, sizes, lifetimes, maxLifetimes, hit } = state
     const tmp = [0, 0, 0]
     let visualsDirty = false
+    let burstCount = isBurst ? 8 : 0
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       lifetimes[i] += delta
-      if (lifetimes[i] >= maxLifetimes[i]) {
-        // Reset — renace en el núcleo con el flujo actual
-        positions[i * 3] = (Math.random() - 0.5) * 0.3
-        positions[i * 3 + 1] = (Math.random() - 0.5) * 0.3
-        positions[i * 3 + 2] = (Math.random() - 0.5) * 0.3
+      // Burst fuerza respawn inmediato en varias partículas
+      const forceRespawn = burstCount > 0 && lifetimes[i] > 0.15
+      if (lifetimes[i] >= maxLifetimes[i] || forceRespawn) {
+        if (forceRespawn) burstCount--
+        positions[i * 3] = (Math.random() - 0.5) * 0.2
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 0.2
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 0.2
         spawnVelocity(tmp)
         velocities[i * 3] = tmp[0]
         velocities[i * 3 + 1] = tmp[1]
@@ -513,7 +557,7 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
         paintKind(colors, sizes, i)
         visualsDirty = true
         lifetimes[i] = 0
-        maxLifetimes[i] = 1.6 + Math.random() * 1.0
+        maxLifetimes[i] = 0.9 + Math.random() * 0.5
         hit[i] = 0
         continue
       }
