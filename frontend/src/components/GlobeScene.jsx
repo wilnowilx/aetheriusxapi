@@ -354,12 +354,10 @@ function VisibleWireframe({ impactPoints }) {
 
           float impactPulse(vec3 worldPos, vec3 impactPos, float intensity) {
             float dist = length(worldPos - impactPos);
-            // Expanding ring from impact point
-            float ring = abs(dist - time * 1.5 * intensity);
-            float ringPulse = exp(-ring * 3.0) * intensity;
-            // Proximity glow
-            float prox = exp(-dist * 1.8) * intensity * 0.5;
-            return ringPulse + prox;
+            float ring = abs(dist - time * 0.9 * intensity);
+            float ringPulse = exp(-ring * 1.5) * intensity;
+            float prox = exp(-dist * 0.9) * intensity * 0.7;
+            return (ringPulse*0.6 + prox) * intensity;
           }
 
           void main() {
@@ -385,7 +383,7 @@ function VisibleWireframe({ impactPoints }) {
             vec3 col = mix(baseCol, impactCol, impacts * 0.7);
             col += vec3(0.10, 0.06, 0.015) * impacts; // filo ámbar duna en la captura
 
-            float alpha = 0.045 * pulse * fade + impacts * 0.15;
+            float alpha = 0.045 * pulse * fade + impacts * 0.38;
             gl_FragColor = vec4(col, alpha);
           }
         `}
@@ -454,60 +452,68 @@ function BaseCore({ flowRef }) {
           depthWrite={false}
         />
       </sprite>
-      {/* Gas cósmico 1: nube interna densa — fresnel + ruido */}
+      {/* Gas 1: núcleo denso → transparente hacia afuera (sin borde) */}
       <mesh>
-        <sphereGeometry args={[0.52, 32, 24]} />
+        <sphereGeometry args={[0.85, 32, 24]} />
         <shaderMaterial
           uniforms={gasUniforms}
-          vertexShader={`varying vec3 vNormal; varying vec3 vPos; void main(){ vNormal=normalize(normalMatrix*normal); vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
+          vertexShader={`varying vec3 vPos; varying vec3 vNormal; void main(){ vPos=position; vNormal=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
-            varying vec3 vNormal; varying vec3 vPos; uniform float time; uniform float flow;
+            varying vec3 vPos; varying vec3 vNormal; uniform float time; uniform float flow;
             void main(){
-              float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0,0,1))), 2.2);
-              float noise = sin(vPos.x*4.0+time*0.8)*0.5+0.5;
-              noise *= sin(vPos.y*3.0+time*0.5)*0.5+0.5;
-              float pulse = 0.7 + 0.3*sin(time*1.2);
-              vec3 col = mix(vec3(0.0,0.32,1.0), vec3(0.5,0.3,1.0), noise*0.4);
-              float alpha = fresnel * 0.22 * pulse * (0.8+0.3*flow) * (0.6+0.4*noise);
+              float dist = length(vPos) / 0.85;
+              float radial = pow(1.0 - dist, 2.2);
+              float noise = sin(vPos.x*5.0+time*0.7)*0.5+0.5;
+              noise *= sin(vPos.y*4.0+time*0.4)*0.5+0.5;
+              noise = 0.7 + 0.3*noise;
+              float pulse = 0.75 + 0.25*sin(time*1.1);
+              vec3 col = mix(vec3(0.02,0.32,1.0), vec3(0.55,0.3,1.0), dist*0.5 + noise*0.15);
+              float alpha = radial * 0.38 * pulse * noise * (0.85+0.3*flow);
+              // Suaviza el borde externo a cero absoluto
+              alpha *= smoothstep(1.0, 0.65, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
-          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.BackSide}
+          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
-      {/* Gas cósmico 2: aura exterior difusa que se difumina al borde */}
-      <mesh scale={1.8}>
-        <sphereGeometry args={[0.52, 24, 18]} />
+      {/* Gas 2: aura media — color→transparente, se difumina */}
+      <mesh>
+        <sphereGeometry args={[1.25, 24, 18]} />
         <shaderMaterial
           uniforms={gasUniforms}
-          vertexShader={`varying vec3 vNormal; void main(){ vNormal=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
+          vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
-            varying vec3 vNormal; uniform float time; uniform float flow;
+            varying vec3 vPos; uniform float time; uniform float flow;
             void main(){
-              float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0,0,1))), 3.0);
-              float pulse = 0.6 + 0.4*sin(time*0.9+1.0);
-              vec3 col = vec3(0.15,0.55,1.0);
-              float alpha = fresnel * 0.10 * pulse * (0.7+0.4*flow);
+              float dist = length(vPos) / 1.25;
+              float radial = pow(1.0 - dist, 1.8);
+              float pulse = 0.65 + 0.35*sin(time*0.8+1.2);
+              vec3 col = vec3(0.12,0.5,1.0);
+              float alpha = radial * 0.16 * pulse * (0.75+0.35*flow);
+              alpha *= smoothstep(1.0, 0.5, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
-          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.BackSide}
+          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
-      {/* Gas cósmico 3: halo púrpura ultra tenue, el borde se pierde */}
-      <mesh scale={2.8}>
-        <sphereGeometry args={[0.52, 16, 12]} />
+      {/* Gas 3: halo exterior púrpura — solo centro visible, borde invisible */}
+      <mesh>
+        <sphereGeometry args={[1.65, 16, 12]} />
         <shaderMaterial
           uniforms={gasUniforms}
-          vertexShader={`varying vec3 vNormal; void main(){ vNormal=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
+          vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
-            varying vec3 vNormal; uniform float time;
+            varying vec3 vPos; uniform float time;
             void main(){
-              float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0,0,1))), 4.0);
-              float pulse = 0.5 + 0.5*sin(time*0.6+2.0);
+              float dist = length(vPos) / 1.65;
+              float radial = pow(1.0 - dist, 2.8);
+              float pulse = 0.5 + 0.5*sin(time*0.5+2.5);
               vec3 col = vec3(0.65,0.33,0.97);
-              float alpha = fresnel * 0.06 * pulse;
+              float alpha = radial * 0.10 * pulse;
+              alpha *= smoothstep(1.0, 0.4, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
-          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.BackSide}
+          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
     </group>
@@ -614,9 +620,18 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
         paintKind(colors, sizes, i)
         visualsDirty = true
         lifetimes[i] = 0
-        maxLifetimes[i] = 0.9 + Math.random() * 0.5
+        maxLifetimes[i] = 1.8 + Math.random() * 0.8
         hit[i] = 0
         continue
+      }
+      // Difuminar al acercarse al borde: desacelerar y expandir
+      const d = Math.sqrt(positions[i * 3]*positions[i * 3]+positions[i * 3+1]*positions[i * 3+1]+positions[i * 3+2]*positions[i * 3+2])
+      const nearEdge = d > 1.6 ? (d - 1.6) / 0.6 : 0
+      if (nearEdge > 0) {
+        velocities[i * 3] *= (1 - nearEdge * 0.08)
+        velocities[i * 3 + 1] *= (1 - nearEdge * 0.08)
+        velocities[i * 3 + 2] *= (1 - nearEdge * 0.08)
+        sizes[i] = sizes[i] * (1 + nearEdge * 0.8)
       }
       positions[i * 3] += velocities[i * 3] * delta
       positions[i * 3 + 1] += velocities[i * 3 + 1] * delta
@@ -665,10 +680,11 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
             vColor = aColor;
             float dist = length(position);
             float travel = clamp(dist / 2.2, 0.0, 1.0);
-            // Más brillante al nacer y al impactar, estela visible en medio
-            vAlpha = (0.7 + 0.3 * sin(time * 2.0 + dist * 4.0)) * (0.9 + 0.25 * flow) * (0.6 + 0.4 * (1.0 - travel));
+            float edgeDissolve = 1.0 - smoothstep(0.65, 1.0, travel);
+            vAlpha = (0.7 + 0.3 * sin(time * 2.0 + dist * 4.0)) * (0.9 + 0.25 * flow) * (0.3 + 0.7 * edgeDissolve);
             vec4 mv = modelViewMatrix * vec4(position, 1.0);
-            gl_PointSize = aSize * (0.9 + 0.6 * flow) * (480.0 / -mv.z);
+            float sz = aSize * (1.0 + travel * 1.2);
+            gl_PointSize = sz * (0.9 + 0.6 * flow) * (480.0 / -mv.z);
             gl_Position = projectionMatrix * mv;
           }
         `}

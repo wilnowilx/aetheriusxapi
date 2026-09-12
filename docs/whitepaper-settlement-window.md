@@ -48,11 +48,13 @@ canonical_url: https://wilnowilx.github.io/aetheriusxapi/
 
 ## Abstract
 
-The x402 protocol enables machine-to-machine (M2M) commerce by allowing AI agents to pay per API call in USDC on Base without accounts, API keys, or human intervention. However, x402 introduces a critical vulnerability at the intersection of HTTP semantics and L2 finality: the **Settlement Optimism Window**.
+The x402 protocol enables machine-to-machine (M2M) commerce by allowing AI agents to pay per API call in USDC on Base without accounts, API keys, or human intervention. However, x402's `authorization` flow (the dominant pattern for real-time APIs) introduces a critical vulnerability at the intersection of HTTP semantics and L2 finality: the **Settlement Optimism Window**.
 
 Between the moment an agent submits a payment proof and the moment that proof is confirmed on-chain (~1-2 seconds on Base), the API provider must either (a) trust the proof optimistically and serve data, or (b) delay serving data until finality — destroying the real-time utility of the API.
 
-This paper formalizes this vulnerability, demonstrates a practical exploitation strategy, and presents the **AETHERIUS oracle architecture** — a predictive credit velocity scoring system that detects and blocks settlement window abuse in real-time with <100ms latency.
+The x402 specification (v2) defines an `upfront` flow that settles BEFORE serving data, eliminating this window. **But it adds 1-2 seconds of latency to every API call**, making it unsuitable for latency-sensitive applications (chatbots, trading, IoT, real-time feeds).
+
+This paper formalizes the vulnerability in the `authorization` flow, demonstrates a practical exploitation strategy, and presents the **AETHERIUS oracle architecture** — a predictive credit velocity scoring system that detects and blocks settlement window abuse in real-time with <100ms latency.
 
 The system has been deployed on Base Mainnet since September 2026, processing live x402 settlements with zero successful exploitation attempts.
 
@@ -129,14 +131,27 @@ The API provider faces a fundamental timing dilemma:
 | **Wait for finality** | 1-2s | None | Degraded |
 | **Serve + verify async** | ~0ms + async | Window exploit | Instant (exploitable) |
 
-Every production x402 implementation chooses **Option 3**: serve immediately and verify settlement asynchronously. This is the only viable choice for real-time APIs. A 1-2 second delay on every API call is unacceptable for:
+### x402 v2 Flow Models
 
-- Real-time data feeds (prices, weather, news)
-- conversational AI (chatbot latency budget: ~500ms)
-- Autonomous trading agents (latency = alpha)
-- IoT sensor pipelines (millisecond budgets)
+The x402 specification (v2) defines multiple flow models:
 
-But Option 3 creates the Settlement Optimism Window.
+| Flow | Order | Latency | Risk |
+|------|-------|---------|------|
+| **`upfront`** | settle → resource → respond | +1-2s per call | None |
+| **`authorization`** | verify → resource → settle → respond | ~0ms | Settlement window |
+
+The `upfront` flow settles BEFORE serving data, eliminating the settlement window. **But it adds 1-2 seconds of latency to every API call.**
+
+For real-time APIs, this is unacceptable:
+
+- Real-time data feeds (prices, weather, news): 1-2s delay = stale data
+- Conversational AI (chatbot latency budget: ~500ms): 1-2s delay = unusable
+- Autonomous trading agents (latency = alpha): 1-2s delay = lost trades
+- IoT sensor pipelines (millisecond budgets): 1-2s delay = missed events
+
+**Therefore, the `authorization` flow (optimistic) is the only viable choice for latency-sensitive applications.** This is not an assumption — it is a constraint imposed by the use case.
+
+The Settlement Optimism Window exists specifically in the `authorization` flow, which is the dominant pattern for real-time APIs.
 
 ---
 
@@ -467,7 +482,19 @@ t=1.6s  Bot has received 15+ API responses for free
 
 ### Why Anti-Replay Is Not Enough
 
-A naive defense is nonce tracking: hash each proof, reject duplicates. AETHERIUS implements this (see Section 6). But anti-replay only prevents **reusing the same proof**. It does not prevent:
+A naive defense is nonce tracking: hash each proof, reject duplicates. The x402 specification (via EIP-3009) includes nonces and temporal windows (validAfter/validBefore) for exactly this purpose.
+
+**But nonce tracking has a critical limitation: it is per-endpoint.**
+
+The x402 spec does not mandate cross-endpoint nonce sharing. Each API provider maintains its own nonce cache. An attacker can:
+
+1. Submit proof P to Endpoint A → 200 OK (data served)
+2. Submit proof P to Endpoint B → 200 OK (data served) — Endpoint B doesn't know A already saw it
+3. Submit proof P to Endpoint C → 200 OK (data served) — Endpoint C doesn't know A or B saw it
+
+Each endpoint sees a "fresh" proof because nonce tracking is local.
+
+Additionally, anti-replay does not prevent:
 
 - **Proof rotation**: Generate N unique proofs, submit each once. Each proof is "fresh" but settlement will fail for most.
 - **Velocity flooding**: Submit 10 different proofs in 1 second. All are unique. Most will fail on-chain, but the API already served the data.
@@ -1111,6 +1138,48 @@ Comparison:
 
 ---
 
+## x402 v2 Flow Models: The Latency Tradeoff
+
+### The Upfront Flow Alternative
+
+The x402 specification (v2) defines an `upfront` flow that settles BEFORE serving data:
+
+```
+Agent → "I want data" → API
+API → "402: Pay $0.005" → Agent
+Agent → [submits payment proof] → API
+API → [settle on-chain] → 200 OK + data (after 1-2s)
+```
+
+This eliminates the settlement window entirely. **But it adds 1-2 seconds of latency to every API call.**
+
+### Why Upfront Doesn't Solve the Problem
+
+| Use Case | Latency Budget | Upfront Feasible? |
+|----------|---------------|-------------------|
+| Real-time data feeds | <100ms | ❌ No |
+| Conversational AI | <500ms | ❌ No |
+| Autonomous trading | <10ms | ❌ No |
+| IoT sensor pipelines | <10ms | ❌ No |
+| Background data sync | 1-2s OK | ✅ Yes |
+| Batch processing | 1-2s OK | ✅ Yes |
+
+**For latency-sensitive applications, the `authorization` flow (optimistic) is the only viable choice.** The Settlement Optimism Window exists specifically in this flow.
+
+### The Precise Claim
+
+Our claim is NOT:
+
+> "x402 has a critical vulnerability that affects all implementations."
+
+Our claim IS:
+
+> "The `authorization` flow in x402 (which is the dominant pattern for real-time APIs) creates a settlement window that can be exploited for velocity flooding attacks. The `upfront` flow eliminates this window but adds unacceptable latency for latency-sensitive use cases."
+
+This is a precise, defensible claim about a specific flow pattern, not a blanket statement about the protocol.
+
+---
+
 ## Comparison with Existing Approaches
 
 | Approach | Latency Impact | Exploitation Resistance | Complexity | Adoption Friction |
@@ -1122,6 +1191,8 @@ Comparison:
 | **AETHERIUS** | ~0.08ms | High (predictive) | Medium | Low (HTTP middleware) |
 
 The key advantage of AETHERIUS over stake-based approaches: **no capital is locked**. The system uses behavioral analysis (velocity, settlement rate, age) rather than economic penalties. This makes adoption trivial — providers add a middleware layer, not a smart contract.
+
+> **⚠️ Disclaimer:** AETHERIUS is one possible defense against settlement window attacks, not the only one. Other valid approaches include: cross-endpoint nonce sharing, stake-based collateral, or using the `upfront` flow for non-latency-sensitive use cases. The vulnerability exists regardless of which defense is deployed.
 
 ---
 

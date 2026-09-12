@@ -131,7 +131,27 @@ The API provider faces a fundamental timing dilemma:
 | **Wait for finality** | 1-2s | None | Degraded |
 | **Serve + verify async** | ~0ms + async | Window exploit | Instant (exploitable) |
 
-Every production x402 implementation chooses **Option 3**: serve immediately and verify settlement asynchronously. This is the only viable choice for real-time APIs.
+### x402 v2 Flow Models
+
+The x402 specification (v2) defines multiple flow models:
+
+| Flow | Order | Latency | Risk |
+|------|-------|---------|------|
+| **`upfront`** | settle → resource → respond | +1-2s per call | None |
+| **`authorization`** | verify → resource → settle → respond | ~0ms | Settlement window |
+
+The `upfront` flow settles BEFORE serving data, eliminating the settlement window. **But it adds 1-2 seconds of latency to every API call.**
+
+For real-time APIs, this is unacceptable:
+
+- **Real-time data feeds**: 1-2s delay = stale data
+- **Conversational AI**: 1-2s delay = unusable
+- **Autonomous trading**: 1-2s delay = lost trades
+- **IoT sensor pipelines**: 1-2s delay = missed events
+
+**Therefore, the `authorization` flow (optimistic) is the only viable choice for latency-sensitive applications.** This is not an assumption — it is a constraint imposed by the use case.
+
+The Settlement Optimism Window exists specifically in the `authorization` flow, which is the dominant pattern for real-time APIs.
 
 A 1-2 second delay on every API call is unacceptable for:
 
@@ -484,7 +504,17 @@ t=1.6s  Bot has received 15+ API responses for free
 
 ### Why Anti-Replay Is Not Enough
 
-A naive defense is nonce tracking: hash each proof, reject duplicates. AETHERIUS implements this. But anti-replay only prevents **reusing the same proof**. It does not prevent:
+The x402 specification (via EIP-3009) includes nonces and temporal windows (validAfter/validBefore) for replay protection. **But nonce tracking has a critical limitation: it is per-endpoint.**
+
+The x402 spec does not mandate cross-endpoint nonce sharing. Each API provider maintains its own nonce cache. An attacker can:
+
+1. Submit proof P to Endpoint A → 200 OK (data served)
+2. Submit proof P to Endpoint B → 200 OK (data served) — Endpoint B doesn't know A already saw it
+3. Submit proof P to Endpoint C → 200 OK (data served) — Endpoint C doesn't know A or B saw it
+
+Each endpoint sees a "fresh" proof because nonce tracking is local.
+
+Additionally, anti-replay does not prevent:
 
 | Attack Vector | Description | Anti-Replay Defends? |
 |---------------|-------------|---------------------|
@@ -1158,6 +1188,8 @@ Comparison:
 | **AETHERIUS** | ~0.08ms | High (predictive) | Medium | Low (HTTP middleware) |
 
 The key advantage of AETHERIUS over stake-based approaches: **no capital is locked**. The system uses behavioral analysis (velocity, settlement rate, age) rather than economic penalties. This makes adoption trivial — providers add a middleware layer, not a smart contract.
+
+> **⚠️ Disclaimer:** AETHERIUS is one possible defense against settlement window attacks, not the only one. Other valid approaches include: cross-endpoint nonce sharing, stake-based collateral, or using the `upfront` flow for non-latency-sensitive use cases. The vulnerability exists regardless of which defense is deployed.
 
 ---
 
