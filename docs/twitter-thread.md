@@ -150,9 +150,9 @@ Published the first formal analysis:
 
 ## Tweet 15 (CTA)
 
-The Settlement Optimism Window is real. It's exploitable. And it's being exploited right now.
+The Settlement Optimism Window in x402's `authorization` flow is real. It's exploitable. And it's being exploited right now.
 
-AETHERIUS is the first defense. Open source. MIT licensed. Live on Base Mainnet.
+AETHERIUS is one defense. Open source. MIT licensed. Live on Base Mainnet.
 
 Source: https://github.com/wilnowilx/aetheriusxapi
 

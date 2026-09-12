@@ -1,7 +1,7 @@
 ---
-title: "The Settlement Optimism Window: A Critical Vulnerability in x402 Agent Commerce"
+title: "The Settlement Optimism Window: A Vulnerability in x402's Authorization Flow"
 published: true
-description: "A technical deep-dive into a novel attack vector in x402 micropayment protocols on Base — and the oracle architecture that solves it."
+description: "A technical deep-dive into a novel attack vector in x402's authorization flow on Base — and the oracle architecture that detects it."
 tags: web3, ai, security, blockchain
 series: "AETHERIUS"
 canonical_url: https://wilnowilx.github.io/aetheriusxapi/
@@ -10,17 +10,17 @@ cover_image: https://dev-to-uploads.s3.amazonaws.com/uploads/articles/your-cover
 
 # The Settlement Optimism Window
 
-## A Critical Vulnerability in x402 Agent Commerce — and the Oracle That Stops It
+## A Vulnerability in x402's Authorization Flow — and the Oracle That Detects It
 
 **AETHERIUS Research · September 2026**
 
 *Authors: AETHERIUS Core Team*
 *Classification: Public Technical Whitepaper*
-*Version: 2.0*
+*Version: 2.0 (Updated after technical review)*
 
 ---
 
-> **⚠️ This is the first formal analysis of L2 micropayment settlement window attacks. As of September 2026, no published research exists on this vulnerability.**
+> **⚠️ This is the first formal analysis of L2 micropayment settlement window attacks in x402's authorization flow. As of September 2026, no published research exists on this vulnerability.**
 
 > **🔴 Live Demo:** [Watch the Settlement Window Attack Defense](https://wilnowilx.github.io/aetheriusxapi/docs/demo/oracle-player.html) — 45-second terminal replay showing a live bot flood being detected and blocked in real-time.
 
@@ -522,9 +522,9 @@ Additionally, anti-replay does not prevent:
 | **Velocity flooding** | Submit 10 different proofs in 1 second | ❌ No |
 | **Wallet cycling** | Use different wallets for each batch | ❌ No |
 
-Anti-replay is necessary but insufficient. The API needs **predictive scoring**: detect the *pattern* of abuse before the settlement fails.
+Anti-replay is necessary but insufficient for the `authorization` flow. The API needs **predictive scoring**: detect the *pattern* of abuse before the settlement fails.
 
-> **⚠️ Key Insight:** Anti-replay catches *copy-paste* attacks. Credit Velocity catches *behavioral* attacks. You need both.
+> **⚠️ Key Insight:** Anti-replay catches *copy-paste* attacks on a single endpoint. Credit Velocity catches *behavioral* attacks across endpoints. You need both.
 
 ---
 
@@ -1182,14 +1182,15 @@ Comparison:
 | Approach | Latency Impact | Exploitation Resistance | Complexity | Adoption Friction |
 |----------|---------------|------------------------|------------|-------------------|
 | **No defense** | 0ms | None | None | None |
-| **Nonce tracking only** | ~0.02ms | Proof reuse only | Low | Low |
-| **Wait for finality** | 1-2s | Full | None | High (UX degraded) |
+| **Nonce tracking only** | ~0.02ms | Proof reuse only (per-endpoint) | Low | Low |
+| **Use `upfront` flow** | +1-2s | Full | None | High (UX degraded) |
+| **Cross-endpoint nonce sharing** | ~0.05ms | High (requires coordination) | Medium | Medium |
 | **Stake-based** | ~0ms | High | High (smart contracts) | High (capital locked) |
 | **AETHERIUS** | ~0.08ms | High (predictive) | Medium | Low (HTTP middleware) |
 
 The key advantage of AETHERIUS over stake-based approaches: **no capital is locked**. The system uses behavioral analysis (velocity, settlement rate, age) rather than economic penalties. This makes adoption trivial — providers add a middleware layer, not a smart contract.
 
-> **⚠️ Disclaimer:** AETHERIUS is one possible defense against settlement window attacks, not the only one. Other valid approaches include: cross-endpoint nonce sharing, stake-based collateral, or using the `upfront` flow for non-latency-sensitive use cases. The vulnerability exists regardless of which defense is deployed.
+> **⚠️ Disclaimer:** AETHERIUS is one possible defense against settlement window attacks in the `authorization` flow, not the only one. Other valid approaches include: cross-endpoint nonce sharing, stake-based collateral, or using the `upfront` flow for non-latency-sensitive use cases. The vulnerability exists regardless of which defense is deployed.
 
 ---
 

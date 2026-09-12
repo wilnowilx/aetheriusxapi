@@ -1,7 +1,7 @@
 ---
-title: "The Settlement Optimism Window: A Critical Vulnerability in x402 Agent Commerce and the Oracle Defense"
+title: "The Settlement Optimism Window: A Vulnerability in x402's Authorization Flow and the Oracle Defense"
 published: true
-description: "A technical whitepaper analyzing the Settlement Optimism Window vulnerability in x402 micropayment protocols on Base (OP Stack), and the AETHERIUS oracle architecture that solves it through predictive credit velocity scoring."
+description: "A technical whitepaper analyzing the Settlement Optimism Window vulnerability in x402's authorization flow on Base (OP Stack), and the AETHERIUS oracle architecture that detects it through predictive credit velocity scoring."
 tags: web3, ai, security, blockchain
 series: "AETHERIUS Whitepapers"
 canonical_url: https://wilnowilx.github.io/aetheriusxapi/
@@ -9,13 +9,13 @@ canonical_url: https://wilnowilx.github.io/aetheriusxapi/
 
 # The Settlement Optimism Window
 
-## A Critical Vulnerability in x402 Agent Commerce and the Oracle Defense
+## A Vulnerability in x402's Authorization Flow and the Oracle Defense
 
 **AETHERIUS Research · September 2026**
 
 *Authors: AETHERIUS Core Team*
 *Classification: Public Technical Whitepaper*
-*Version: 1.0*
+*Version: 2.0 (Updated after technical review)*
 
 ---
 
@@ -24,6 +24,7 @@ canonical_url: https://wilnowilx.github.io/aetheriusxapi/
 1. [Abstract](#abstract)
 2. [Introduction: The M2M Commerce Problem](#introduction-the-m2m-commerce-problem)
 3. [The x402 Protocol: How It Works](#the-x402-protocol-how-it-works)
+   - [x402 v2 Flow Models: The Latency Tradeoff](#x402-v2-flow-models-the-latency-tradeoff)
 4. [The Settlement Optimism Window Vulnerability](#the-settlement-optimism-window-vulnerability)
    - [Formal Mathematical Model](#formal-mathematical-model)
    - [MEV Parallel](#mev-parallel-why-this-matters-beyond-x402)
@@ -96,7 +97,7 @@ API → [verifies on-chain] → "200: Here's your data"
 
 No accounts. No API keys. No subscriptions. No invoices. Just wallet-to-wallet payment per call.
 
-This is transformative for the API economy. But it introduces a vulnerability that does not exist in traditional payment systems.
+This is transformative for the API economy. But depending on the flow model, it may introduce a vulnerability that does not exist in traditional payment systems.
 
 ---
 
@@ -166,6 +167,8 @@ The **Settlement Optimism Window** is the time interval between:
 
 During this window, the API has served data but has not received confirmed payment. The proof is "optimistically accepted" — it *will* settle, but hasn't yet.
 
+**This vulnerability exists specifically in x402's `authorization` flow.** The `upfront` flow eliminates this window by settling before serving data, but adds 1-2 seconds of latency.
+
 ### Formal Model
 
 ```
@@ -198,18 +201,20 @@ x402 optimism exploit:
   If settlement fails for API-2 (nonce collision), API-2 served data for free
 ```
 
-The critical difference: in Bitcoin, double-spend detection is the core consensus mechanism. In x402, **nobody is checking for it** during the optimism window.
+The critical difference: in Bitcoin, double-spend detection is the core consensus mechanism. In x402's `authorization` flow, **nobody is checking for it** during the optimism window.
 
 ### Impact Assessment
 
 | Scenario | Exploitation Difficulty | Potential Loss | Affected Parties |
 |----------|------------------------|----------------|------------------|
-| **Proof reuse across endpoints** | Low | Unlimited free API calls | API providers |
+| **Proof reuse across endpoints** | Low | Unlimited free API calls | API providers using `authorization` flow |
 | **Velocity flooding** | Low | Service degradation + data theft | API providers + honest agents |
-| **Wallet insolvency exploit** | Medium | Free data until proof fails | API providers |
+| **Wallet insolvency exploit** | Medium | Free data until proof fails | API providers using `authorization` flow |
 | **Cross-chain replay** | High | Cross-network data theft | API providers on multiple chains |
 
 The most practical and damaging scenario is **velocity flooding**: a bot swarm submitting the same proof to a single endpoint at high frequency, extracting maximum data before settlement fails.
+
+**Note:** These attacks only affect providers using the `authorization` flow. Providers using the `upfront` flow are not vulnerable, but face 1-2 seconds of additional latency per call.
 
 ### Formal Mathematical Model
 
@@ -301,7 +306,7 @@ The Settlement Optimism Window is structurally identical to **MEV (Miner/Maximal
 | **Economic impact** | $B/year on Ethereum | Unknown (x402 is nascent) |
 | **Detection** | Mempool monitoring | Credit velocity scoring |
 
-The critical difference: MEV is studied by hundreds of researchers. The L2 micropayment settlement window has **zero published research** (as of September 2026). This paper is the first formal analysis.
+The critical difference: MEV is studied by hundreds of researchers. The L2 micropayment settlement window in x402's `authorization` flow has **zero published research** (as of September 2026). This paper is the first formal analysis of this specific attack vector.
 
 ### Why MEV Defenses Don't Apply
 
@@ -310,7 +315,7 @@ MEV defenses focus on **transaction ordering** (how transactions are ordered in 
 - MEV: "My transaction was front-run in the same block"
 - x402: "My payment proof was accepted but never settled on-chain"
 
-MEV defenses (commit-reveal, fair ordering) solve ordering problems. They do not solve the problem of **accepting unconfirmed payment proofs**. AETHERIUS is the first system designed specifically for this.
+MEV defenses (commit-reveal, fair ordering) solve ordering problems. They do not solve the problem of **accepting unconfirmed payment proofs** in the `authorization` flow. AETHERIUS is the first system designed specifically for this.
 
 ---
 
@@ -366,7 +371,7 @@ Benefit = Avoided_theft + Reputation_score + Competitive_advantage
 
 ### Nash Equilibrium
 
-When all providers adopt the oracle:
+When all providers using the `authorization` flow adopt the oracle:
 
 - Attackers cannot profitably attack any endpoint
 - Honest agents face no competition from bots
@@ -375,11 +380,11 @@ When all providers adopt the oracle:
 
 When no providers adopt:
 
-- Attackers extract value freely
+- Attackers extract value freely from `authorization` flow endpoints
 - Honest agents are priced out (providers raise prices to compensate)
 - Race to the bottom: only the most expensive APIs survive
 
-**The AETHERIUS oracle is a coordination mechanism that moves the ecosystem from the bad equilibrium to the good one.**
+**The AETHERIUS oracle is a coordination mechanism that moves the ecosystem from the bad equilibrium to the good one — specifically for providers using the `authorization` flow.**
 
 ---
 
@@ -1185,14 +1190,15 @@ This is a precise, defensible claim about a specific flow pattern, not a blanket
 | Approach | Latency Impact | Exploitation Resistance | Complexity | Adoption Friction |
 |----------|---------------|------------------------|------------|-------------------|
 | **No defense** | 0ms | None | None | None |
-| **Nonce tracking only** | ~0.02ms | Proof reuse only | Low | Low |
-| **Wait for finality** | 1-2s | Full | None | High (UX degraded) |
+| **Nonce tracking only** | ~0.02ms | Proof reuse only (per-endpoint) | Low | Low |
+| **Use `upfront` flow** | +1-2s | Full | None | High (UX degraded) |
+| **Cross-endpoint nonce sharing** | ~0.05ms | High (requires coordination) | Medium | Medium |
 | **Stake-based** | ~0ms | High | High (smart contracts) | High (capital locked) |
 | **AETHERIUS** | ~0.08ms | High (predictive) | Medium | Low (HTTP middleware) |
 
 The key advantage of AETHERIUS over stake-based approaches: **no capital is locked**. The system uses behavioral analysis (velocity, settlement rate, age) rather than economic penalties. This makes adoption trivial — providers add a middleware layer, not a smart contract.
 
-> **⚠️ Disclaimer:** AETHERIUS is one possible defense against settlement window attacks, not the only one. Other valid approaches include: cross-endpoint nonce sharing, stake-based collateral, or using the `upfront` flow for non-latency-sensitive use cases. The vulnerability exists regardless of which defense is deployed.
+> **⚠️ Disclaimer:** AETHERIUS is one possible defense against settlement window attacks in the `authorization` flow, not the only one. Other valid approaches include: cross-endpoint nonce sharing, stake-based collateral, or using the `upfront` flow for non-latency-sensitive use cases. The vulnerability exists regardless of which defense is deployed.
 
 ---
 

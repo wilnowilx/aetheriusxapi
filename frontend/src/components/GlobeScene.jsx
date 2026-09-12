@@ -454,67 +454,86 @@ function BaseCore({ flowRef }) {
           depthWrite={false}
         />
       </sprite>
-      {/* Gas 1: núcleo profundo — azul cobalto con profundidad, sincronizado al latido */}
+      {/* BASE galaxia: núcleo denso pequeño con swirl — se diluye en la malla */}
       <mesh>
-        <sphereGeometry args={[0.75, 32, 24]} />
+        <sphereGeometry args={[0.38, 32, 24]} />
         <shaderMaterial
           uniforms={gasUniforms}
           vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
             varying vec3 vPos; uniform float time; uniform float flow; uniform float pulse;
             void main(){
-              float dist = length(vPos) / 0.75;
-              float radial = pow(1.0 - dist, 1.9);
-              float swirl = sin(vPos.x*6.0+time*0.6)*sin(vPos.y*5.0+time*0.4)*sin(vPos.z*4.0+time*0.5);
-              float noise = 0.75 + 0.25*swirl;
+              float dist = length(vPos) / 0.38;
+              float radial = pow(1.0 - dist, 3.0);
+              float swirl = sin(vPos.x*8.0+time*0.8)*sin(vPos.y*6.0+time*0.5)*sin(vPos.z*5.0+time*0.6);
+              float noise = 0.7 + 0.3*swirl;
+              float beat = 0.6 + 0.4*pulse;
+              vec3 deepBlue = vec3(0.0,0.15,0.9);
+              vec3 coreCyan = vec3(0.08,0.6,1.0);
+              vec3 col = mix(deepBlue, coreCyan, (1.0-dist)*0.6 + noise*0.15);
+              col += vec3(0.25,0.08,0.45) * (1.0-dist) * 0.4;
+              float alpha = radial * 0.75 * noise * (0.75 + 0.4*flow) * beat;
+              alpha *= smoothstep(1.0, 0.5, dist);
+              gl_FragColor = vec4(col, alpha);
+            }`}
+          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
+        />
+      </mesh>
+      {/* Gas 2: manto medio sutil — turquesa→violeta, muere en 1/3 a la malla */}
+      <mesh>
+        <sphereGeometry args={[0.62, 24, 18]} />
+        <shaderMaterial
+          uniforms={gasUniforms}
+          vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
+          fragmentShader={`
+            varying vec3 vPos; uniform float time; uniform float flow; uniform float pulse;
+            void main(){
+              float dist = length(vPos) / 0.62;
+              float radial = pow(1.0 - dist, 2.4);
               float beat = 0.55 + 0.45*pulse;
-              vec3 deepBlue = vec3(0.0,0.18,0.85);
-              vec3 coreCyan = vec3(0.1,0.65,1.0);
-              vec3 col = mix(deepBlue, coreCyan, (1.0-dist)*0.5 + noise*0.2);
-              // Profundidad: centro más saturado, borde más frío
-              col += vec3(0.2,0.1,0.4) * (1.0-dist) * 0.3;
-              float alpha = radial * 0.52 * noise * (0.7 + 0.5*flow) * beat;
-              alpha *= smoothstep(1.0, 0.55, dist);
+              vec3 col = mix(vec3(0.06,0.42,0.92), vec3(0.5,0.22,0.88), dist*0.5);
+              float alpha = radial * 0.28 * beat * (0.7+0.35*flow);
+              alpha *= smoothstep(1.0, 0.4, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
-      {/* Gas 2: manto medio — turquesa→violeta con latido */}
+      {/* Gas 3: velo galaxia exterior tenue */}
       <mesh>
-        <sphereGeometry args={[1.15, 24, 18]} />
-        <shaderMaterial
-          uniforms={gasUniforms}
-          vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
-          fragmentShader={`
-            varying vec3 vPos; uniform float time; uniform float flow; uniform float pulse;
-            void main(){
-              float dist = length(vPos) / 1.15;
-              float radial = pow(1.0 - dist, 2.0);
-              float pulse = 0.6 + 0.4*pulse;
-              vec3 col = mix(vec3(0.08,0.45,0.95), vec3(0.55,0.25,0.92), dist*0.6);
-              float alpha = radial * 0.20 * pulse * (0.7+0.4*flow);
-              alpha *= smoothstep(1.0, 0.45, dist);
-              gl_FragColor = vec4(col, alpha);
-            }`}
-          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
-        />
-      </mesh>
-      {/* Gas 3: velo exterior — amatista profundo que se pierde */}
-      <mesh>
-        <sphereGeometry args={[1.55, 16, 12]} />
+        <sphereGeometry args={[0.88, 16, 12]} />
         <shaderMaterial
           uniforms={gasUniforms}
           vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
             varying vec3 vPos; uniform float time; uniform float pulse;
             void main(){
-              float dist = length(vPos) / 1.55;
-              float radial = pow(1.0 - dist, 3.0);
-              float beat = 0.45 + 0.55*pulse;
-              vec3 col = mix(vec3(0.5,0.2,0.9), vec3(0.8,0.3,0.7), dist*0.4);
-              float alpha = radial * 0.12 * beat;
-              alpha *= smoothstep(1.0, 0.35, dist);
+              float dist = length(vPos) / 0.88;
+              float radial = pow(1.0 - dist, 3.2);
+              float beat = 0.5 + 0.5*pulse;
+              vec3 col = mix(vec3(0.45,0.2,0.85), vec3(0.75,0.28,0.65), dist*0.4);
+              float alpha = radial * 0.14 * beat;
+              alpha *= smoothstep(1.0, 0.3, dist);
+              gl_FragColor = vec4(col, alpha);
+            }`}
+          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
+        />
+      </mesh>
+      {/* Aura intermedia 3D: entre gas y malla */}
+      <mesh>
+        <sphereGeometry args={[1.45, 20, 16]} />
+        <shaderMaterial
+          uniforms={gasUniforms}
+          vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
+          fragmentShader={`
+            varying vec3 vPos; uniform float time; uniform float pulse;
+            void main(){
+              float dist = length(vPos) / 1.45;
+              float radial = pow(1.0 - dist, 2.0) * pow(dist, 0.3);
+              float beat = 0.4 + 0.6*pulse;
+              float phase = sin(time*0.4 + 2.0)*0.5+0.5;
+              vec3 col = mix(vec3(0.12,0.3,0.8), vec3(0.45,0.2,0.75), dist*0.5+phase*0.15);
+              float alpha = radial * 0.07 * beat;
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
