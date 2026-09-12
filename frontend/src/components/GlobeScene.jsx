@@ -436,6 +436,13 @@ function BaseCore({ flowRef }) {
     }
   })
 
+  // Gas cósmico shaders — materia difusa, no sólido
+  const gasUniforms = useMemo(() => ({ time: { value: 0 }, flow: { value: 1 } }), [])
+  useFrame((_, delta) => {
+    gasUniforms.time.value += delta * 0.5
+    gasUniforms.flow.value = flowRef?.current?.intensity || 1
+  })
+
   return (
     <group ref={groupRef} scale={1.3}>
       <sprite scale={[2.2, 0.55, 1]}>
@@ -447,18 +454,61 @@ function BaseCore({ flowRef }) {
           depthWrite={false}
         />
       </sprite>
-      {/* Corona de fuego — esfera + aura que respira con el flujo */}
+      {/* Gas cósmico 1: nube interna densa — fresnel + ruido */}
       <mesh>
-        <sphereGeometry args={[0.42, 20, 16]} />
-        <meshBasicMaterial color={0x0052FF} transparent opacity={0.18} depthWrite={false} blending={THREE.AdditiveBlending} />
+        <sphereGeometry args={[0.52, 32, 24]} />
+        <shaderMaterial
+          uniforms={gasUniforms}
+          vertexShader={`varying vec3 vNormal; varying vec3 vPos; void main(){ vNormal=normalize(normalMatrix*normal); vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
+          fragmentShader={`
+            varying vec3 vNormal; varying vec3 vPos; uniform float time; uniform float flow;
+            void main(){
+              float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0,0,1))), 2.2);
+              float noise = sin(vPos.x*4.0+time*0.8)*0.5+0.5;
+              noise *= sin(vPos.y*3.0+time*0.5)*0.5+0.5;
+              float pulse = 0.7 + 0.3*sin(time*1.2);
+              vec3 col = mix(vec3(0.0,0.32,1.0), vec3(0.5,0.3,1.0), noise*0.4);
+              float alpha = fresnel * 0.22 * pulse * (0.8+0.3*flow) * (0.6+0.4*noise);
+              gl_FragColor = vec4(col, alpha);
+            }`}
+          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.BackSide}
+        />
       </mesh>
-      <mesh scale={1.9}>
-        <sphereGeometry args={[0.42, 16, 12]} />
-        <meshBasicMaterial color={0x0052FF} transparent opacity={0.06} depthWrite={false} blending={THREE.AdditiveBlending} />
+      {/* Gas cósmico 2: aura exterior difusa que se difumina al borde */}
+      <mesh scale={1.8}>
+        <sphereGeometry args={[0.52, 24, 18]} />
+        <shaderMaterial
+          uniforms={gasUniforms}
+          vertexShader={`varying vec3 vNormal; void main(){ vNormal=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
+          fragmentShader={`
+            varying vec3 vNormal; uniform float time; uniform float flow;
+            void main(){
+              float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0,0,1))), 3.0);
+              float pulse = 0.6 + 0.4*sin(time*0.9+1.0);
+              vec3 col = vec3(0.15,0.55,1.0);
+              float alpha = fresnel * 0.10 * pulse * (0.7+0.4*flow);
+              gl_FragColor = vec4(col, alpha);
+            }`}
+          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.BackSide}
+        />
       </mesh>
-      <mesh scale={2.6}>
-        <sphereGeometry args={[0.42, 12, 10]} />
-        <meshBasicMaterial color={0xa855f7} transparent opacity={0.025} depthWrite={false} blending={THREE.AdditiveBlending} />
+      {/* Gas cósmico 3: halo púrpura ultra tenue, el borde se pierde */}
+      <mesh scale={2.8}>
+        <sphereGeometry args={[0.52, 16, 12]} />
+        <shaderMaterial
+          uniforms={gasUniforms}
+          vertexShader={`varying vec3 vNormal; void main(){ vNormal=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
+          fragmentShader={`
+            varying vec3 vNormal; uniform float time;
+            void main(){
+              float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0,0,1))), 4.0);
+              float pulse = 0.5 + 0.5*sin(time*0.6+2.0);
+              vec3 col = vec3(0.65,0.33,0.97);
+              float alpha = fresnel * 0.06 * pulse;
+              gl_FragColor = vec4(col, alpha);
+            }`}
+          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.BackSide}
+        />
       </mesh>
     </group>
   )
@@ -476,12 +526,12 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
   const WIRE_RADIUS = 2.2
   const WIRE_RADIUS_SQ = WIRE_RADIUS * WIRE_RADIUS
 
-  // Erupción solar: velocidad radial alta, depende del flujo
+  // Erupción solar: nace EXACTO del sprite, velocidad para llegar al borde en ~1.2s
   const spawnVelocity = (out) => {
     const theta = Math.random() * Math.PI * 2
     const phi = Math.acos(2 * Math.random() - 1)
     const flow = Math.max(0.5, Math.min(1.8, flowRef?.current?.intensity || 1))
-    const speed = (3.5 + Math.random() * 2.5) * (0.85 + 0.5 * flow)
+    const speed = (1.6 + Math.random() * 1.0) * (0.9 + 0.3 * flow)
     out[0] = Math.sin(phi) * Math.cos(theta) * speed
     out[1] = Math.sin(phi) * Math.sin(theta) * speed
     out[2] = Math.cos(phi) * speed
@@ -510,18 +560,22 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
     const maxLife = new Float32Array(PARTICLE_COUNT)
     const hit = new Uint8Array(PARTICLE_COUNT)
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 0.25
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 0.25
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 0.25
+      // Nace pegado al sprite (radio 0.08)
+      const r0 = Math.random() * 0.08
+      const th0 = Math.random() * Math.PI * 2
+      const ph0 = Math.acos(2 * Math.random() - 1)
+      pos[i * 3] = r0 * Math.sin(ph0) * Math.cos(th0)
+      pos[i * 3 + 1] = r0 * Math.sin(ph0) * Math.sin(th0)
+      pos[i * 3 + 2] = r0 * Math.cos(ph0)
       const theta = Math.random() * Math.PI * 2
       const phi = Math.acos(2 * Math.random() - 1)
-      const speed = 3.5 + Math.random() * 2.5
+      const speed = 1.6 + Math.random() * 1.0
       vel[i * 3] = Math.sin(phi) * Math.cos(theta) * speed
       vel[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed
       vel[i * 3 + 2] = Math.cos(phi) * speed
       paintKind(col, sz, i)
-      life[i] = Math.random() * 2
-      maxLife[i] = 0.9 + Math.random() * 0.5
+      life[i] = Math.random() * 1.5
+      maxLife[i] = 1.8 + Math.random() * 0.8
     }
     return { positions: pos, velocities: vel, colors: col, sizes: sz, lifetimes: life, maxLifetimes: maxLife, hit }
   }, [])
@@ -547,9 +601,12 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
       const forceRespawn = burstCount > 0 && lifetimes[i] > 0.15
       if (lifetimes[i] >= maxLifetimes[i] || forceRespawn) {
         if (forceRespawn) burstCount--
-        positions[i * 3] = (Math.random() - 0.5) * 0.2
-        positions[i * 3 + 1] = (Math.random() - 0.5) * 0.2
-        positions[i * 3 + 2] = (Math.random() - 0.5) * 0.2
+        const rr = Math.random() * 0.08
+        const tth = Math.random() * Math.PI * 2
+        const pph = Math.acos(2 * Math.random() - 1)
+        positions[i * 3] = rr * Math.sin(pph) * Math.cos(tth)
+        positions[i * 3 + 1] = rr * Math.sin(pph) * Math.sin(tth)
+        positions[i * 3 + 2] = rr * Math.cos(pph)
         spawnVelocity(tmp)
         velocities[i * 3] = tmp[0]
         velocities[i * 3 + 1] = tmp[1]
@@ -606,9 +663,12 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
           varying vec3 vColor; varying float vAlpha; uniform float time; uniform float flow;
           void main() {
             vColor = aColor;
-            vAlpha = (0.55 + 0.45 * sin(time * 3.0 + position.x * 5.0)) * (0.8 + 0.3 * flow);
+            float dist = length(position);
+            float travel = clamp(dist / 2.2, 0.0, 1.0);
+            // Más brillante al nacer y al impactar, estela visible en medio
+            vAlpha = (0.7 + 0.3 * sin(time * 2.0 + dist * 4.0)) * (0.9 + 0.25 * flow) * (0.6 + 0.4 * (1.0 - travel));
             vec4 mv = modelViewMatrix * vec4(position, 1.0);
-            gl_PointSize = aSize * (0.75 + 0.5 * flow) * (400.0 / -mv.z);
+            gl_PointSize = aSize * (0.9 + 0.6 * flow) * (480.0 / -mv.z);
             gl_Position = projectionMatrix * mv;
           }
         `}
@@ -617,8 +677,10 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
           void main() {
             float d = length(gl_PointCoord - vec2(0.5));
             if (d > 0.5) discard;
-            float glow = pow(1.0 - d * 2.0, 2.0);
-            gl_FragColor = vec4(vColor, glow * vAlpha * 0.8);
+            float glow = pow(1.0 - d * 2.0, 1.4);
+            float core = 1.0 - smoothstep(0.0, 0.3, d);
+            vec3 col = vColor + core * 0.6;
+            gl_FragColor = vec4(col, glow * vAlpha);
           }
         `}
         transparent depthWrite={false} blending={THREE.AdditiveBlending}
