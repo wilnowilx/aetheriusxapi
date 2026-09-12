@@ -10,40 +10,44 @@ const TextBandRings = ({ liveData }) => {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
+  // Horizontales subyacentes, ángulos distintos que NO convergen — como Saturno visto de frente
   const ringsConfig = useMemo(() => {
     const d = liveData || {}
     return [
-      // ANILLO 1 EXTERIOR: "THE MARKETPLACE THAT LIVES" — banda blanca
+      // ANILLO 1 EXTERIOR: "THE MARKETPLACE THAT LIVES" — banda blanca, casi horizontal
       {
-        radius: 3.4,
-        tilt: Math.PI / 2.2,
-        speed: 0.03,
-        bandWidth: 0.55,
+        radius: 3.6,
+        tilt: 0.18, // ~10° — casi horizontal
+        yOffset: 0.45,
+        speed: 0.025,
+        bandWidth: 0.42,
         color: '#ffffff',
-        opacity: 0.82,
+        opacity: 0.9,
         fontSize: 44,
         text: 'THE MARKETPLACE   THAT LIVES   ',
       },
-      // ANILLO 2 INTERMEDIO: subtítulo — banda magenta
+      // ANILLO 2 INTERMEDIO: subtítulo — banda magenta, ángulo distinto
       {
-        radius: 2.85,
-        tilt: Math.PI / 2.1,
-        speed: 0.05,
-        bandWidth: 0.45,
+        radius: 3.05,
+        tilt: 0.32, // ~18° — ligeramente más inclinado
+        yOffset: -0.15,
+        speed: -0.035, // dirección opuesta para dinamismo
+        bandWidth: 0.36,
         color: '#d946ef',
-        opacity: 0.72,
-        fontSize: 36,
+        opacity: 0.78,
+        fontSize: 34,
         text: 'API INFRASTRUCTURE   FOR AI AGENTS   THAT PAY   ',
       },
-      // ANILLO 3 INTERIOR: métricas vivas — banda cian
+      // ANILLO 3 INTERIOR: métricas vivas — banda cian, otro ángulo
       {
-        radius: 2.35,
-        tilt: Math.PI / 2,
-        speed: 0.07,
-        bandWidth: 0.38,
+        radius: 2.55,
+        tilt: 0.12, // ~7° — casi plano
+        yOffset: -0.55,
+        speed: 0.04,
+        bandWidth: 0.32,
         color: '#22d3ee',
-        opacity: 0.62,
-        fontSize: 30,
+        opacity: 0.68,
+        fontSize: 28,
         text: `${d.endpoints || '100+'} ENDPOINTS   ${d.freeEndpoints || '40'} FREE   ${d.latency || '—'}   `,
       },
     ]
@@ -102,7 +106,7 @@ const TextBandRings = ({ liveData }) => {
   return (
     <group ref={groupRef}>
       {ringsConfig.map((ring, ringIdx) => (
-        <group key={ringIdx} rotation={[ring.tilt, 0, 0]}>
+        <group key={ringIdx} position={[0, ring.yOffset, 0]} rotation={[ring.tilt, 0, 0]}>
           {/* BANDA de texto — CylinderGeometry: el texto ES el anillo */}
           <mesh>
             <cylinderGeometry args={[ring.radius, ring.radius, ring.bandWidth, 128, 1, true]} />
@@ -366,9 +370,12 @@ function BaseCore({ flowRef }) {
     if (groupRef.current) {
       groupRef.current.rotation.y = elapsed.current * (0.15 + 0.15 * flow.intensity)
       groupRef.current.rotation.x = elapsed.current * 0.1
-      const breath = Math.sin(elapsed.current * 1.5)
-      const s = 1 + 0.02 * breath + 0.1 * flow.pulse
+      const breath = Math.sin(elapsed.current * 1.8)
+      const s = 1 + 0.06 * breath + 0.22 * flow.pulse
       groupRef.current.scale.set(s, s, s)
+      // Brillo del sprite también pulsa
+      const spriteMat = groupRef.current.children[0]?.material
+      if (spriteMat) spriteMat.opacity = 0.75 + 0.2 * breath + 0.15 * flow.pulse
     }
   })
 
@@ -397,7 +404,7 @@ function BaseCore({ flowRef }) {
 // flowRef (ticker ≤500ms derivado de USDC/mercado): intensidad, velocidad,
 // tamaño y color (verde USDC vs azul→púrpura mercado). 36 pts para 60fps.
 function EnergyParticles({ liveData, onImpact, flowRef }) {
-  const PARTICLE_COUNT = 36
+  const PARTICLE_COUNT = 52
   const elapsed = useRef(0)
   const pointsRef = useRef()
   const WIRE_RADIUS = 2.2
@@ -870,6 +877,61 @@ function GlobeImpacts() {
   )
 }
 
+// === COSMIC COMETS — estelas fugaces brutalismo cósmico ===
+function CosmicComets() {
+  const ref = useRef()
+  const elapsed = useRef(0)
+  const { positions, colors, sizes } = useMemo(() => {
+    const count = 8
+    const pos = new Float32Array(count * 3)
+    const col = new Float32Array(count * 3)
+    const sz = new Float32Array(count)
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 + Math.random() * 0.5
+      const r = 4 + Math.random() * 2
+      pos[i * 3] = r * Math.cos(angle)
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 3
+      pos[i * 3 + 2] = r * Math.sin(angle)
+      // Comet colors: cyan / magenta / amber
+      const t = Math.random()
+      if (t < 0.4) { col[i * 3] = 0.13; col[i * 3 + 1] = 0.82; col[i * 3 + 2] = 0.93 }
+      else if (t < 0.7) { col[i * 3] = 0.84; col[i * 3 + 1] = 0.27; col[i * 3 + 2] = 0.93 }
+      else { col[i * 3] = 0.83; col[i * 3 + 1] = 0.66; col[i * 3 + 2] = 0.32 }
+      sz[i] = 0.08 + Math.random() * 0.06
+    }
+    return { positions: pos, colors: col, sizes: sz }
+  }, [])
+  const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
+  useFrame((_, delta) => {
+    elapsed.current += delta
+    uniforms.time.value = elapsed.current
+    if (ref.current) ref.current.rotation.y = elapsed.current * 0.02
+    // Comet flicker
+    const sz = ref.current?.geometry?.attributes?.aSize
+    if (sz) {
+      for (let i = 0; i < 8; i++) {
+        sz.array[i] = 0.06 + 0.05 * Math.sin(elapsed.current * 2 + i * 1.5)
+      }
+      sz.needsUpdate = true
+    }
+  })
+  return (
+    <points ref={ref}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-aColor" args={[colors, 3]} />
+        <bufferAttribute attach="attributes-aSize" args={[sizes, 1]} />
+      </bufferGeometry>
+      <shaderMaterial
+        uniforms={uniforms}
+        vertexShader={`attribute float aSize; attribute vec3 aColor; varying vec3 vColor; varying float vAlpha; uniform float time; void main(){vColor=aColor; vAlpha=0.6+0.4*sin(time*1.2+position.x*2.0); vec4 mv=modelViewMatrix*vec4(position,1.0); gl_PointSize=aSize*(500.0/-mv.z); gl_Position=projectionMatrix*mv;}`}
+        fragmentShader={`varying vec3 vColor; varying float vAlpha; void main(){ float d=length(gl_PointCoord-vec2(0.5)); if(d>0.5)discard; float g=pow(1.0-d*2.0,1.5); gl_FragColor=vec4(vColor,g*vAlpha);}`}
+        transparent depthWrite={false} blending={THREE.AdditiveBlending}
+      />
+    </points>
+  )
+}
+
 // === MAIN GLOBE SCENE ===
 function GlobeScene({ liveData, paused }) {
   const isMobile = useMemo(() => {
@@ -937,7 +999,11 @@ function GlobeScene({ liveData, paused }) {
         <DataStream />
       </group>
       {!isMobile && (
-        <Stars radius={10} depth={20} count={250} factor={2} saturation={0.25} fade speed={0.15} />
+        <>
+          <Stars radius={12} depth={30} count={600} factor={3} saturation={0.3} fade speed={0.12} />
+          <Stars radius={8} depth={15} count={300} factor={1.5} saturation={0.5} fade speed={0.08} />
+          <CosmicComets />
+        </>
       )}
       <OrbitControls
         autoRotate autoRotateSpeed={1.0}

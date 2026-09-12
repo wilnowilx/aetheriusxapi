@@ -86,53 +86,20 @@ function FluidLoader({ onComplete }) {
           ng.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.65)
           ns.connect(bp); bp.connect(ng); ng.connect(master)
           ns.start(t0 + 1.1); ns.stop(t0 + 1.7)
-          // ping cristalino en estrella (t~1.3s)
-          const ping = ac.createOscillator()
-          ping.type = 'sine'
-          ping.frequency.setValueAtTime(1320, t0 + 1.3)
-          ping.frequency.exponentialRampToValueAtTime(2640, t0 + 1.35)
-          const pg = ac.createGain()
-          pg.gain.setValueAtTime(0.08, t0 + 1.3)
-          pg.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.4)
-          ping.connect(pg); pg.connect(master)
-          ping.start(t0 + 1.3); ping.stop(t0 + 1.4)
-          master.gain.setValueAtTime(0.12, t0 + 1.5)
-          master.gain.linearRampToValueAtTime(0.0001, t0 + 1.95)
+          master.gain.setValueAtTime(0.12, t0 + 0.6)
+          master.gain.linearRampToValueAtTime(0.0001, t0 + 1.05)
         } else { try { test.close() } catch {} }
       }
     } catch { ac = null }
 
     let running = true
     const startTime = performance.now()
-    const TOTAL_DURATION = 2000 // ms — curva orgánica 2s
+    const TOTAL_DURATION = 1100 // ms — rápido, cinematográfico
     const S = Math.max(w, h) / 800
 
     // Ease orgánica: smoothstep cúbico continuo, sin fases duras
     const ease = (t) => t * t * t * (t * (t * 6 - 15) + 10) // quintic smoothstep
 
-    const drawSparkle = (R, alpha) => {
-      const waist = R * 0.09
-      ctx.save()
-      ctx.translate(cx, cy)
-      ctx.shadowColor = 'rgba(168,85,247,0.7)'
-      ctx.shadowBlur = 28
-      const bodyGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, R)
-      bodyGrad.addColorStop(0, `rgba(255,255,255,${0.9 * alpha})`)
-      bodyGrad.addColorStop(0.3, `rgba(150,170,255,${0.5 * alpha})`)
-      bodyGrad.addColorStop(0.45, `rgba(212,168,83,${0.3 * alpha})`)
-      bodyGrad.addColorStop(0.65, `rgba(0,82,255,${0.18 * alpha})`)
-      bodyGrad.addColorStop(1, 'rgba(0,82,255,0)')
-      ctx.fillStyle = bodyGrad
-      ctx.beginPath()
-      ctx.moveTo(0, -R)
-      ctx.quadraticCurveTo(waist, -waist, R, 0)
-      ctx.quadraticCurveTo(waist, waist, 0, R)
-      ctx.quadraticCurveTo(-waist, waist, -R, 0)
-      ctx.quadraticCurveTo(-waist, -waist, 0, -R)
-      ctx.closePath()
-      ctx.fill()
-      ctx.restore()
-    }
 
     const draw = (now) => {
       if (!running) return
@@ -203,25 +170,30 @@ function FluidLoader({ onComplete }) {
         ctx.fillRect(cx - halfW, cy + halfH - 1.5, halfW * 2, 1.5)
       }
 
-      // 0.55→0.8: colapso suave → estrella ✦
-      if (et >= 0.55 && et < 0.8) {
-        const q = (et - 0.55) / 0.25
-        const flash = q < 0.2 ? q / 0.2 : Math.max(0, 1 - (q - 0.2) / 0.5)
-        if (flash > 0) {
-          ctx.fillStyle = `rgba(235,240,255,${flash * 0.8 * flick})`
-          ctx.fillRect(0, 0, w, h)
+      // 0.55→1: línea se expande sutil → disuelve al hero (sin estrella)
+      if (et >= 0.55) {
+        const q = (et - 0.55) / 0.45
+        const fadeOut = 1 - q
+        // Línea final se ensancha y se desvanece como respiración
+        const alpha = fadeOut * 0.5 * flick
+        if (alpha > 0.01) {
+          const grad = ctx.createLinearGradient(cx - w * 0.3, 0, cx + w * 0.3, 0)
+          grad.addColorStop(0, 'rgba(0,82,255,0)')
+          grad.addColorStop(0.5, `rgba(255,255,255,${alpha})`)
+          grad.addColorStop(1, 'rgba(0,82,255,0)')
+          ctx.fillStyle = grad
+          const h2 = 1 + q * 3
+          ctx.fillRect(cx - w * 0.3, cy - h2 / 2, w * 0.6, h2)
         }
-        const R = (30 + q * 150) * S
-        drawSparkle(R, Math.min(1, 0.2 + q * 0.8) * flick)
-      }
-
-      // 0.8→1: fade out entrega imagen
-      if (et >= 0.8 && overlayRef.current) {
-        overlayRef.current.style.opacity = String(1 - (et - 0.8) / 0.2)
+        if (overlayRef.current) {
+          // Fade del overlay en los últimos 300ms
+          const overlayFade = q > 0.55 ? 1 - (q - 0.55) / 0.45 : 1
+          overlayRef.current.style.opacity = String(Math.max(0, overlayFade))
+        }
       }
 
       // canal brutalista sutil
-      if (et < 0.8) {
+      if (et < 0.55) {
         ctx.font = '10px monospace'
         ctx.fillStyle = `rgba(255,255,255,${0.25 * flick})`
         ctx.fillText('CH—402 · BASE', 24, h - 24)
@@ -259,6 +231,13 @@ function CosmicVoid() {
       <div className="void-stars void-stars--far" />
       <div className="void-stars void-stars--mid" />
       <div className="void-stars void-stars--near" />
+      <div className="void-comets">
+        <div className="void-comet void-comet--1" />
+        <div className="void-comet void-comet--2" />
+        <div className="void-comet void-comet--3" />
+      </div>
+      <div className="void-pulse void-pulse--1" />
+      <div className="void-pulse void-pulse--2" />
       <div className="void-aurora void-aurora--1" />
       <div className="void-aurora void-aurora--2" />
       <div className="void-aurora void-aurora--3" />
@@ -417,6 +396,33 @@ function CosmicVoid() {
             transparent 25%, rgba(1,0,5,0.3) 55%,
             rgba(1,0,5,0.7) 80%, rgba(1,0,5,0.92) 100%);
         }
+        .void-comets { position: absolute; inset: 0; overflow: hidden; }
+        .void-comet {
+          position: absolute; height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(34,211,238,0.8) 40%, rgba(255,255,255,0.9) 70%, transparent);
+          filter: blur(0.5px); opacity: 0;
+        }
+        .void-comet--1 { top: 22%; width: 180px; animation: cometShoot 18s linear infinite; animation-delay: 0s; }
+        .void-comet--2 { top: 58%; width: 140px; animation: cometShoot 22s linear infinite; animation-delay: -7s; }
+        .void-comet--3 { top: 38%; width: 200px; animation: cometShoot 16s linear infinite; animation-delay: -12s; }
+        @keyframes cometShoot {
+          0% { transform: translateX(-200px); opacity: 0; }
+          5% { opacity: 0.7; }
+          15% { opacity: 0.3; }
+          20%, 100% { transform: translateX(120vw); opacity: 0; }
+        }
+        .void-pulse {
+          position: absolute; border-radius: 50%; border: 1px solid;
+          left: 50%; top: 50%; width: 300px; height: 300px;
+          transform: translate(-50%,-50%) scale(0.5); opacity: 0;
+        }
+        .void-pulse--1 { border-color: rgba(168,85,247,0.15); animation: voidPulse 12s ease-out infinite; }
+        .void-pulse--2 { border-color: rgba(34,211,238,0.12); animation: voidPulse 12s ease-out infinite 6s; }
+        @keyframes voidPulse {
+          0% { transform: translate(-50%,-50%) scale(0.5); opacity: 0.4; }
+          100% { transform: translate(-50%,-50%) scale(3.5); opacity: 0; }
+        }
+
         .void-dust {
           position: absolute; inset: 0; opacity: 0.04;
           mix-blend-mode: soft-light;
