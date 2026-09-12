@@ -1,0 +1,136 @@
+@prefix aetherius: <https://aetherius.dev/ontology#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <http://schema.org/> .
+
+# AETHERIUS Ontology v1.0
+# Fundamental concepts for M2M commerce and settlement window analysis
+
+aetherius: a owl:Ontology ;
+    rdfs:label "AETHERIUS Ontology" ;
+    rdfs:comment "Ontology for M2M commerce settlement window analysis and defense" ;
+    owl:versionInfo "1.0.0" ;
+    schema:dateCreated "2026-09-12" ;
+    schema:author "AETHERIUS Research" .
+
+# Core Classes
+
+aetherius:Axiom a owl:Class ;
+    rdfs:label "Axiom" ;
+    rdfs:comment "A fundamental law governing M2M commerce" .
+
+aetherius:SettlementWindow a owl:Class ;
+    rdfs:label "Settlement Window" ;
+    rdfs:comment "The time interval between proof submission and L2 finality" .
+
+aetherius:PaymentProof a owl:Class ;
+    rdfs:label "Payment Proof" ;
+    rdfs:comment "Cryptographic proof of payment submission" .
+
+aetherius:Agent a owl:Class ;
+    rdfs:label "Agent" ;
+    rdfs:comment "Autonomous entity submitting payment proofs" .
+
+aetherius:Endpoint a owl:Class ;
+    rdfs:label "API Endpoint" ;
+    rdfs:comment "API endpoint accepting x402 payments" .
+
+aetherius:VelocityScore a owl:Class ;
+    rdfs:label "Velocity Score" ;
+    rdfs:comment "Rate of payment proof submissions per second" .
+
+aetherius:SettlementRate a owl:Class ;
+    rdfs:label "Settlement Rate" ;
+    rdfs:comment "Ratio of confirmed settlements to total submissions" .
+
+aetherius:RiskScore a owl:Class ;
+    rdfs:label "Risk Score" ;
+    rdfs:comment "Composite risk assessment (0-100)" .
+
+aetherius:Defense a owl:Class ;
+    rdfs:label "Defense" ;
+    rdfs:comment "Mechanism protecting against settlement window exploitation" .
+
+# Properties
+
+aetherius:hasStatement a owl:DatatypeProperty ;
+    rdfs:domain aetherius:Axiom ;
+    rdfs:range xsd:string ;
+    rdfs:label "has statement" .
+
+aetherius:hasFormula a owl:DatatypeProperty ;
+    rdfs:domain aetherius:Axiom ;
+    rdfs:range xsd:string ;
+    rdfs:label "has formula" .
+
+aetherius:exploitationPotential a owl:DatatypeProperty ;
+    rdfs:domain aetherius:SettlementWindow ;
+    rdfs:range xsd:float ;
+    rdfs:label "exploitation potential" .
+
+aetherius:windowDuration a owl:DatatypeProperty ;
+    rdfs:domain aetherius:SettlementWindow ;
+    rdfs:range xsd:float ;
+    rdfs:label "window duration (seconds)" .
+
+aetherius:hasVelocity a owl:DatatypeProperty ;
+    rdfs:domain aetherius:Agent ;
+    rdfs:range xsd:float ;
+    rdfs:label "has velocity" .
+
+aetherius:hasSettlementRate a owl:DatatypeProperty ;
+    rdfs:domain aetherius:Agent ;
+    rdfs:range xsd:float ;
+    rdfs:label "has settlement rate" .
+
+aetherius:hasRiskScore a owl:DatatypeProperty ;
+    rdfs:domain aetherius:Agent ;
+    rdfs:range xsd:float ;
+    rdfs:label "has risk score" .
+
+aetherius:isBlocked a owl:DatatypeProperty ;
+    rdfs:domain aetherius:Agent ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "is blocked" .
+
+aetherius:operatesIn a owl:ObjectProperty ;
+    rdfs:domain aetherius:SettlementWindow ;
+    rdfs:range aetherius:Endpoint ;
+    rdfs:label "operates in" .
+
+aetherius:submitsTo a owl:ObjectProperty ;
+    rdfs:domain aetherius:Agent ;
+    rdfs:range aetherius:Endpoint ;
+    rdfs:label "submits to" .
+
+aetherius:defendsAgainst a owl:ObjectProperty ;
+    rdfs:domain aetherius:Defense ;
+    rdfs:range aetherius:SettlementWindow ;
+    rdfs:label "defends against" .
+
+aetherius:proves a owl:ObjectProperty ;
+    rdfs:domain aetherius:Axiom ;
+    rdfs:range aetherius:SettlementWindow ;
+    rdfs:label "proves" .
+
+# Individuals (from AETHERIUS)
+
+aetherius:SettlementWindowLaw a aetherius:Axiom ;
+    rdfs:label "Settlement Window Law" ;
+    aetherius:hasStatement "Any payment system that serves resources before confirming settlement creates an exploitation window proportional to finality latency and inversely proportional to gas cost." ;
+    aetherius:hasFormula "E_p = (V_r / C_g) × L_f" .
+
+aetherius:VelocityExploitationLaw a aetherius:Axiom ;
+    rdfs:label "Velocity Exploitation Law" ;
+    aetherius:hasStatement "A malicious agent maximizes extraction by sending N proofs per second, where N = min(resource_value / gas_cost, detection_threshold)." ;
+    aetherius:hasFormula "N_max = min(V_r / C_g, T_d)" .
+
+aetherius:DefenseTemporalLaw a aetherius:Axiom ;
+    rdfs:label "Defense Temporal Law" ;
+    aetherius:hasStatement "Any defense against settlement window exploitation must operate faster than the window itself, or it will inevitably fail." ;
+    aetherius:hasFormula "T_defense < T_window" .
+
+aetherius:AETHERIUSDefense a aetherius:Defense ;
+    rdfs:label "AETHERIUS Credit Velocity Defense" ;
+    aetherius:defendsAgainst aetherius:SettlementWindowLaw .

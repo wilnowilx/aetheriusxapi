@@ -227,6 +227,9 @@ DESCRIPTIONS = {
     "/v1/data/translate": "Text translation via free API",
     "/v1/data/summarize": "Text summarizer - extract key sentences",
     "/v1/crypto/dominance": "Crypto dominance indices - BTC, ETH, altcoin shares",
+    # === AETHERIUS Axioms & Ontology (FREE) ===
+    "/v1/axioms": "AETHERIUS fundamental axioms governing M2M commerce settlement windows",
+    "/v1/ontology": "AETHERIUS ontology for M2M commerce settlement window analysis",
     # === x402 Intelligence (EXCLUSIVE — reads Base blockchain) ===
     "/v1/x402/payments/recent": "Recent USDC transfers on Base - on-chain micropayment analytics",
     "/v1/x402/agent/{address}": "Wallet intelligence - spending patterns, counterparties, net flow",
@@ -516,6 +519,9 @@ async def health():
             "/v1/x402/network": "FREE - Full network health dashboard",
             # === NEW: Persistent Anti-Replay Stats ===
             "/v1/x402/antireplay/stats": "FREE - Persistent anti-replay nonce cache stats",
+            # === AETHERIUS Axioms & Ontology ===
+            "/v1/axioms": "FREE - AETHERIUS fundamental axioms (JSON-LD, M2M-native)",
+            "/v1/ontology": "FREE - AETHERIUS ontology for M2M commerce (JSON-LD)",
         },
     }
     resp = JSONResponse(content=body)
@@ -681,6 +687,143 @@ async def oracle_risk(address: str):
     return resp
 
 
+@app.get("/v1/axioms")
+@app.get("/api/v1/axioms")
+async def get_axioms():
+    """Return AETHERIUS fundamental axioms in JSON-LD format.
+
+    These are the fundamental laws governing M2M commerce settlement windows.
+    Designed for consumption by autonomous agents (M2M-native).
+    """
+    body = {
+        "@context": {
+            "@vocab": "https://aetherius.dev/ontology#",
+            "xsd": "http://www.w3.org/2001/XMLSchema#"
+        },
+        "@type": "AxiomCollection",
+        "id": "aetherius-axioms-v1",
+        "name": "AETHERIUS Fundamental Axioms",
+        "version": "1.0.0",
+        "created": "2026-09-12",
+        "author": "AETHERIUS Research",
+        "description": "Fundamental laws governing M2M commerce settlement windows",
+        "axioms": [
+            {
+                "id": "axiom-001",
+                "name": "Settlement Window Law",
+                "statement": "Any payment system that serves resources before confirming settlement creates an exploitation window proportional to finality latency and inversely proportional to gas cost.",
+                "formula": {
+                    "symbolic": "E_p = (V_r / C_g) × L_f",
+                    "variables": {
+                        "E_p": "exploitation_potential (dimensionless)",
+                        "V_r": "resource_value (USD)",
+                        "C_g": "gas_cost (USD)",
+                        "L_f": "finality_latency (seconds)"
+                    }
+                },
+                "domain": "M2M Commerce",
+                "proven": True
+            },
+            {
+                "id": "axiom-002",
+                "name": "Velocity Exploitation Law",
+                "statement": "A malicious agent maximizes extraction by sending N proofs per second, where N = min(resource_value / gas_cost, detection_threshold).",
+                "formula": {
+                    "symbolic": "N_max = min(V_r / C_g, T_d)",
+                    "variables": {
+                        "N_max": "max_proofs_per_second (proofs/s)",
+                        "V_r": "resource_value (USD)",
+                        "C_g": "gas_cost (USD)",
+                        "T_d": "detection_threshold (proofs/s)"
+                    }
+                },
+                "domain": "M2M Security",
+                "proven": True
+            },
+            {
+                "id": "axiom-003",
+                "name": "Defense Temporal Law",
+                "statement": "Any defense against settlement window exploitation must operate faster than the window itself, or it will inevitably fail.",
+                "formula": {
+                    "symbolic": "T_defense < T_window",
+                    "variables": {
+                        "T_defense": "defense_latency (seconds)",
+                        "T_window": "settlement_window (seconds)"
+                    }
+                },
+                "domain": "M2M Defense",
+                "proven": True
+            }
+        ]
+    }
+    resp = JSONResponse(content=body)
+    resp.headers["X-AETHERIUS-Oracle"] = "true"
+    resp.headers["X-AETHERIUS-Version"] = VERSION
+    resp.headers["X-AETHERIUS-Network"] = NETWORK
+    resp.headers["Content-Type"] = "application/ld+json"
+    return resp
+
+
+@app.get("/v1/ontology")
+@app.get("/api/v1/ontology")
+async def get_ontology():
+    """Return AETHERIUS ontology in JSON-LD format.
+
+    Defines the core concepts, relationships, and properties for M2M commerce
+    settlement window analysis. Designed for machine consumption.
+    """
+    body = {
+        "@context": {
+            "@vocab": "https://aetherius.dev/ontology#",
+            "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+            "owl": "http://www.w3.org/2002/07/owl#",
+            "xsd": "http://www.w3.org/2001/XMLSchema#"
+        },
+        "@type": "Ontology",
+        "id": "aetherius-ontology-v1",
+        "name": "AETHERIUS Ontology",
+        "version": "1.0.0",
+        "created": "2026-09-12",
+        "description": "Ontology for M2M commerce settlement window analysis and defense",
+        "classes": [
+            {"name": "Axiom", "description": "A fundamental law governing M2M commerce"},
+            {"name": "SettlementWindow", "description": "Time interval between proof submission and L2 finality"},
+            {"name": "PaymentProof", "description": "Cryptographic proof of payment submission"},
+            {"name": "Agent", "description": "Autonomous entity submitting payment proofs"},
+            {"name": "Endpoint", "description": "API endpoint accepting x402 payments"},
+            {"name": "VelocityScore", "description": "Rate of payment proof submissions per second"},
+            {"name": "SettlementRate", "description": "Ratio of confirmed settlements to total submissions"},
+            {"name": "RiskScore", "description": "Composite risk assessment (0-100)"},
+            {"name": "Defense", "description": "Mechanism protecting against settlement window exploitation"}
+        ],
+        "properties": [
+            {"name": "hasStatement", "domain": "Axiom", "range": "string"},
+            {"name": "hasFormula", "domain": "Axiom", "range": "string"},
+            {"name": "exploitationPotential", "domain": "SettlementWindow", "range": "float"},
+            {"name": "windowDuration", "domain": "SettlementWindow", "range": "float"},
+            {"name": "hasVelocity", "domain": "Agent", "range": "float"},
+            {"name": "hasSettlementRate", "domain": "Agent", "range": "float"},
+            {"name": "hasRiskScore", "domain": "Agent", "range": "float"},
+            {"name": "isBlocked", "domain": "Agent", "range": "boolean"},
+            {"name": "operatesIn", "domain": "SettlementWindow", "range": "Endpoint"},
+            {"name": "submitsTo", "domain": "Agent", "range": "Endpoint"},
+            {"name": "defendsAgainst", "domain": "Defense", "range": "SettlementWindow"}
+        ],
+        "individuals": [
+            "SettlementWindowLaw",
+            "VelocityExploitationLaw",
+            "DefenseTemporalLaw",
+            "AETHERIUSDefense"
+        ]
+    }
+    resp = JSONResponse(content=body)
+    resp.headers["X-AETHERIUS-Oracle"] = "true"
+    resp.headers["X-AETHERIUS-Version"] = VERSION
+    resp.headers["X-AETHERIUS-Network"] = NETWORK
+    resp.headers["Content-Type"] = "application/ld+json"
+    return resp
+
+
 @app.get("/")
 async def root():
     return {"service": "aetheriusxAPI", "version": VERSION,
@@ -689,6 +832,8 @@ async def root():
             "oracle": "/v1/oracle/status",
             "oracle_verified": "/v1/oracle/verified",
             "oracle_risk": "/v1/oracle/risk/{address}",
+            "axioms": "/v1/axioms",
+            "ontology": "/v1/ontology",
             "anti_replay": "/v1/antireplay/stats"}
 
 
