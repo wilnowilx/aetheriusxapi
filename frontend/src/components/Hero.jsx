@@ -14,10 +14,10 @@ class GlobeBoundary extends React.Component {
   }
 }
 
-// === ORGANIC IGNITION — encendido orgánico, sin fases duras ===
-// Curva ease continua: punto → línea → elipse respira → destello suave → estrella ✦ → entrega.
-// TOTAL 2000ms. Sonido sincronizado minimalista. Autoplay-safe.
-function OrganicLoader({ onComplete }) {
+// === FLUID IGNITION — encendido fluido, una sola curva orgánica ===
+// Una sola curva ease: punto → línea respirando → florece en estrella ✦ → entrega.
+// TOTAL 1800ms. Sin fases duras, todo es una sola curva ease.
+function FluidLoader({ onComplete }) {
   const canvasRef = useRef(null)
   const animRef = useRef(null)
   const overlayRef = useRef(null)
@@ -659,7 +659,7 @@ function Hero() {
 
 return (
     <>
-      {!loaded && <OrganicLoader onComplete={handleLoaded} />}
+      {!loaded && <FluidLoader onComplete={handleLoaded} />}
       <CosmicSound />
 
       <section id="hero" ref={heroRef} style={{

@@ -3,101 +3,135 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Stars, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
-// === SINGLE ORBITAL RING — un solo anillo con todo el texto fluido ===
-// Un solo anillo a radio 3.0, speed 0.05, con texto concatenado legible.
-// Color degradado púrpura→magenta→cian. Sprites billboard siempre legibles.
-const SingleOrbitalRing = ({ liveData }) => {
+// === DUAL ORBITAL RINGS — 2 anillos con estructura semántica correcta ===
+// Anillo 1 exterior (radio 3.2, blanco, speed 0.04): "THE MARKETPLACE THAT LIVES" en BLANCO
+// Anillo 1 interior (radio 2.75, magenta, speed 0.06): "API INFRASTRUCTURE FOR AI AGENTS THAT PAY" en MAGENTA
+// Anillo 2 (radio 2.35, cian, speed 0.09): métricas vivas en CIAN
+const DualOrbitalRings = ({ liveData }) => {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Texto concatenado: título + subtítulo + métricas en un solo flujo
-  const fullText = useMemo(() => {
+  // Configuración de los 2 anillos con estructura semántica
+  const ringsConfig = useMemo(() => {
     const d = liveData || {}
     return [
-      'THE', 'MARKETPLACE', 'THAT', 'LIVES',
-      '•',
-      'API', 'INFRASTRUCTURE', 'FOR', 'AI', 'AGENTS', 'THAT', 'PAY',
-      '•',
-      `${d.endpoints || '100+'}`, 'ENDPOINTS',
-      '•',
-      `${d.freeEndpoints || '40'}`, 'FREE',
-      '•',
-      `${d.latency || '—'}`
+      // ANILLO 1 EXTERIOR: Título principal en BLANCO
+      {
+        radius: 3.2,
+        tilt: Math.PI / 2,
+        speed: 0.04,
+        color: '#ffffff', // BLANCO puro
+        opacity: 0.7,
+        fontSize: 1.15,
+        segments: ['THE', 'MARKETPLACE', 'THAT', 'LIVES'],
+      },
+      // ANILLO 1 INTERIOR: Subtítulo en MAGENTA
+      {
+        radius: 2.75,
+        tilt: Math.PI / 2,
+        speed: 0.06,
+        color: '#d946ef', // MAGENTA
+        opacity: 0.65,
+        fontSize: 0.85,
+        segments: ['API', 'INFRASTRUCTURE', 'FOR', 'AI', 'AGENTS', 'THAT', 'PAY'],
+      },
+      // ANILLO 2: Métricas vivas en CIAN
+      {
+        radius: 2.35,
+        tilt: Math.PI / 2 + 0.15,
+        speed: 0.09,
+        color: '#22d3ee', // CIAN
+        opacity: 0.6,
+        fontSize: 0.6,
+        segments: [
+          `${d.endpoints || '100+'}`, 'ENDPOINTS',
+          '·',
+          `${d.freeEndpoints || '40'}`, 'FREE',
+          '·',
+          `${d.latency || '—'}`
+        ],
+      },
     ]
   }, [liveData])
 
-  // Texturas: color degradado púrpura→magenta→cian por posición
-  const textures = useMemo(() =>
-    fullText.map((seg, idx) => {
-      const isDot = seg === '•'
-      const canvas = document.createElement('canvas')
-      canvas.width = isDot ? 128 : 512
-      canvas.height = 128
-      const ctx = canvas.getContext('2d')
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      const size = Math.round(1.1 * (isDot ? 60 : 80))
-      ctx.font = `bold ${size}px 'JetBrains Mono', monospace`
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      // Degradado por posición en el anillo
-      const t = idx / fullText.length
-      const r = Math.round(200 + 55 * Math.sin(t * Math.PI * 2))
-      const g = Math.round(133 + 84 * Math.sin(t * Math.PI * 2 + 2.1))
-      const b = Math.round(247 - 58 * Math.sin(t * Math.PI * 2 + 4.2))
-      const color = `rgb(${r},${g},${b})`
-      ctx.fillStyle = color
-      ctx.shadowColor = color
-      ctx.shadowBlur = isDot ? 8 : 20
-      ctx.fillText(seg, canvas.width / 2, canvas.height / 2)
-      return new THREE.CanvasTexture(canvas)
-    })
-  , [fullText])
+  // Texturas para cada segmento con colores correctos por anillo
+  const ringsTextures = useMemo(() =>
+    ringsConfig.map(ring =>
+      ring.segments.map((seg, segIdx) => {
+        const isDot = seg === '·'
+        const canvas = document.createElement('canvas')
+        canvas.width = isDot ? 128 : 512
+        canvas.height = 128
+        const ctx = canvas.getContext('2d')
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        const size = Math.round(ring.fontSize * (isDot ? 60 : 90))
+        ctx.font = `bold ${size}px 'JetBrains Mono', monospace`
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillStyle = ring.color
+        ctx.shadowColor = ring.color
+        ctx.shadowBlur = isDot ? 8 : 24
+        ctx.fillText(seg, canvas.width / 2, canvas.height / 2)
+        return new THREE.CanvasTexture(canvas)
+      })
+    )
+  , [ringsConfig])
 
   useFrame((state, delta) => {
     elapsed.current += delta
     if (groupRef.current) {
-      groupRef.current.rotation.y = elapsed.current * 0.05
+      // Cada anillo rota a su velocidad creando paralaje natural
+      ringsConfig.forEach((ring, i) => {
+        const ringGroup = groupRef.current.children[i]
+        if (ringGroup) {
+          ringGroup.rotation.y = elapsed.current * ring.speed
+        }
+      })
     }
   })
 
   return (
-    <group ref={groupRef} rotation={[Math.PI / 2, 0, 0]}>
-      {fullText.map((seg, idx) => {
-        const angle = (idx / fullText.length) * Math.PI * 2
-        return (
-          <sprite
-            key={idx}
-            position={[
-              3.0 * Math.cos(angle),
-              3.0 * Math.sin(angle),
-              0,
-            ]}
-            scale={[
-              1.1 * (seg === '•' ? 0.6 : 1.8),
-              1.1 * 0.45,
-              1,
-            ]}
-          >
-            <spriteMaterial
-              map={textures[idx]}
+    <group ref={groupRef}>
+      {ringsConfig.map((ring, ringIdx) => (
+        <group key={ringIdx} rotation={[ring.tilt, 0, 0]}>
+          {ring.segments.map((seg, segIdx) => {
+            const angle = (segIdx / ring.segments.length) * Math.PI * 2
+            return (
+              <sprite
+                key={`${ringIdx}-${segIdx}`}
+                position={[
+                  ring.radius * Math.cos(angle),
+                  ring.radius * Math.sin(angle) * Math.sin(ring.tilt),
+                  ring.radius * Math.sin(angle) * Math.cos(ring.tilt),
+                ]}
+                scale={[
+                  ring.fontSize * (seg === '·' ? 0.5 : 2.0),
+                  ring.fontSize * 0.4,
+                  1,
+                ]}
+              >
+                <spriteMaterial
+                  map={ringsTextures[ringIdx][segIdx]}
+                  transparent
+                  blending={THREE.AdditiveBlending}
+                  opacity={ring.opacity}
+                  depthWrite={false}
+                />
+              </sprite>
+            )
+          })}
+          {/* Línea toroidal fina por anillo */}
+          <mesh>
+            <torusGeometry args={[ring.radius, 0.0018, 8, 160]} />
+            <meshBasicMaterial
+              color={ring.color}
               transparent
-              blending={THREE.AdditiveBlending}
-              opacity={0.55}
+              opacity={ring.opacity * 0.12}
               depthWrite={false}
             />
-          </sprite>
-        )
-      })}
-      {/* Línea toroidal fina para estructura */}
-      <mesh>
-        <torusGeometry args={[3.0, 0.002, 8, 160]} />
-        <meshBasicMaterial
-          color={0xa855f7}
-          transparent
-          opacity={0.08}
-          depthWrite={false}
-        />
-      </mesh>
+          </mesh>
+        </group>
+      ))}
     </group>
   )
 }
@@ -528,9 +562,9 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
   )
 }
 
-// === AGENT NODES — 100 endpoints ===
+// === AGENT NODES — 60 endpoints (optimizado 100→60 para 60fps) ===
 function AgentNodes() {
-  const NODE_COUNT = 100
+  const NODE_COUNT = 60
   const { positions, colors, sizes } = useMemo(() => {
     const pos = new Float32Array(NODE_COUNT * 3)
     const col = new Float32Array(NODE_COUNT * 3)
@@ -542,7 +576,7 @@ function AgentNodes() {
       pos[i * 3] = r * Math.cos(theta) * Math.sin(phi)
       pos[i * 3 + 1] = r * Math.sin(theta) * Math.sin(phi)
       pos[i * 3 + 2] = r * Math.cos(phi)
-      const isFree = i >= 60
+      const isFree = i >= 36
       if (isFree) {
         col[i * 3] = 0.133; col[i * 3 + 1] = 0.827; col[i * 3 + 2] = 0.933
       } else {
@@ -687,7 +721,7 @@ function OrbitalData({ liveData }) {
   )
 }
 
-// === DATA STREAM — particles flowing along orbital paths ===
+// === DATA STREAM — particles flowing along orbital paths (optimizado 80→50) ===
 function DataStream() {
   const groupRef = useRef()
   const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
@@ -699,7 +733,7 @@ function DataStream() {
   })
 
   const { positions, colors, sizes } = useMemo(() => {
-    const count = 80
+    const count = 50
     const pos = new Float32Array(count * 3)
     const col = new Float32Array(count * 3)
     const sz = new Float32Array(count)
@@ -904,9 +938,7 @@ function GlobeScene({ liveData, paused }) {
         <UnifiedHalo />
         <InnerCore />
         <AgentNodes />
-        <OrbitRings />
-        <SingleOrbitalRing liveData={liveData} />
-        <OrbitalData liveData={liveData} />
+        <DualOrbitalRings liveData={liveData} />
         <DataStream />
       </group>
       {!isMobile && (
