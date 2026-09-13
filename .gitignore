@@ -1,0 +1,50 @@
+# Node
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+.pnpm-store/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.venv/
+venv/
+env/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.tsbuildinfo
+*.pyc
+*.o
+*.so
+
+# Secrets
+.env
+.env.local
+*.pem
+*.key
+
+# opencode/automaton artifacts
+.automaton/
+.opencode/audit-state.json
+.opencode/skills/automaton/.automaton-*/
+.opencode/skills/automaton/astra-live/
+.opencode/skills/automaton/daemon/
+.opencode/skills/automaton/tests/
+.opencode/skills/automaton/fix/
+.opencode/skills/automaton/gates/
+.opencode/skills/automaton/gstack/
+.opencode/skills/automaton/obs/
+.opencode/skills/automaton/memory/
