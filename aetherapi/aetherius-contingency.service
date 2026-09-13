@@ -1,0 +1,57 @@
+[Unit]
+Description=AETHERIUS Contingency Daemon — Ensures system survival if the builder disappears
+Documentation=https://github.com/aetherius/aetheriusxapi
+After=network-online.target
+Wants=network-online.target
+Requires=aetherius-api.service
+After=aetherius-api.service
+
+[Service]
+Type=simple
+User=aetherius
+Group=aetherius
+WorkingDirectory=/opt/aetherius/aetherapi
+EnvironmentFile=-/etc/aetherius/contingency.env
+ExecStart=/opt/aetherius/venv/bin/python -m contingency_daemon
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aetherius-contingency
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/aetherius /var/lib/aetherius
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+RemoveIPC=true
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Capabilities (minimal)
+CapabilityBoundingSet=CAP_DAC_OVERRIDE CAP_CHOWN CAP_FOWNER
+
+[Install]
+WantedBy=multi-user.target
+Also=aetherius-api.service

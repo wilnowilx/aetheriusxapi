@@ -5,6 +5,7 @@ import json
 import time
 import re
 import subprocess
+import asyncio
 from datetime import datetime
 
 # x402 imports
@@ -13,6 +14,17 @@ from x402.http.middleware.fastapi import PaymentMiddlewareASGI
 from x402.http.types import RouteConfig
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
 from x402.server import x402ResourceServer
+
+# Contingency daemon
+from contingency_daemon import start_contingency_daemon, get_contingency_status
+
+# Gravity Well v0 — Batch Settlement
+try:
+    from gravity_well import init_gravity_well, get_gravity_well, record_gravity_settlement
+    GRAVITY_WELL_AVAILABLE = True
+except ImportError:
+    GRAVITY_WELL_AVAILABLE = False
+    init_gravity_well = get_gravity_well = record_gravity_settlement = None
 
 # === CONFIG ===
 PAY_TO = "0x677B483128D0399bCD0A5AB36eE990C0246d7f61"
@@ -72,6 +84,22 @@ routes = {
 app.add_middleware(PaymentMiddlewareASGI, routes=routes, server=server)
 
 
+# === CONTINGENCY DAEMON STARTUP ===
+
+@app.on_event("startup")
+async def startup_contingency():
+    """Start the contingency daemon as a background task."""
+    asyncio.create_task(start_contingency_daemon())
+
+# === GRAVITY WELL v0 STARTUP ===
+
+@app.on_event("startup")
+async def startup_gravity_well():
+    """Initialize Gravity Well batch settlement layer."""
+    if GRAVITY_WELL_AVAILABLE:
+        await init_gravity_well(app)
+
+
 # === API ENDPOINTS ===
 
 @app.get("/api/v1/health")
@@ -80,7 +108,7 @@ async def health():
         "status": "alive",
         "service": "AetherAPI",
         "version": "1.0.0",
-        "network": "Base Sepolia testnet (USDC)",
+        "network": "Base Mainnet (USDC) - eip155:8453",
         "wallet": PAY_TO,
         "timestamp": datetime.utcnow().isoformat(),
         "endpoints": {
@@ -89,8 +117,41 @@ async def health():
             "/api/v1/token/analyze": "$0.02/call - Crypto token analysis",
             "/api/v1/web/scrape": "$0.01/call - Generic web scraper",
             "/api/v1/email/validate": "$0.005/call - Email validation",
+            "/api/v1/token/price": "$0.005/call - Real-time token price (Canary #2 REAL)",
+            "/api/v1/contingency/status": "Free - Contingency daemon survival monitor",
+            "/api/v1/gravity/well/status": "Free - Gravity Well batch settlement layer",
         }
     }
+
+
+@app.get("/api/v1/contingency/status")
+async def contingency_status():
+    """Contingency daemon status — survival monitor for AETHERIUS."""
+    return await get_contingency_status()
+
+
+@app.get("/api/v1/gravity/well/status")
+async def gravity_well_status():
+    """Gravity Well v0 status — batch settlement layer for micro-payments."""
+    if not GRAVITY_WELL_AVAILABLE:
+        return JSONResponse(status_code=503, content={"error": "gravity_well_unavailable"})
+    return await get_gravity_well().get_status()
+
+
+@app.get("/api/v1/gravity/well/agent/{address}")
+async def gravity_well_agent(address: str):
+    """Per-agent accounting in Gravity Well."""
+    if not GRAVITY_WELL_AVAILABLE:
+        return JSONResponse(status_code=503, content={"error": "gravity_well_unavailable"})
+    return await get_gravity_well().get_agent_status(address)
+
+
+@app.post("/api/v1/gravity/well/flush")
+async def gravity_well_flush():
+    """Manual admin flush of pending batch."""
+    if not GRAVITY_WELL_AVAILABLE:
+        return JSONResponse(status_code=503, content={"error": "gravity_well_unavailable"})
+    return await get_gravity_well().manual_flush()
 
 
 @app.get("/api/v1/maps/search")
@@ -375,14 +436,17 @@ if __name__ == "__main__":
     import uvicorn
     print("=== AetherAPI Starting ===")
     print(f"Wallet: {PAY_TO}")
-    print(f"Network: Base mainnet (USDC)")
+    print(f"Network: Base Mainnet (USDC) - eip155:8453")
     print(f"Port: 4020")
     print("=== Endpoints ===")
-    print("GET /api/v1/health        - Free")
-    print("GET /api/v1/maps/search    - $0.01/call")
-    print("GET /api/v1/maps/reviews   - $0.02/call")
-    print("GET /api/v1/token/analyze  - $0.02/call")
-    print("GET /api/v1/web/scrape     - $0.01/call")
-    print("GET /api/v1/email/validate - $0.005/call")
+    print("GET /api/v1/health              - Free")
+    print("GET /api/v1/maps/search          - $0.01/call")
+    print("GET /api/v1/maps/reviews         - $0.02/call")
+    print("GET /api/v1/token/analyze        - $0.02/call")
+    print("GET /api/v1/web/scrape           - $0.01/call")
+    print("GET /api/v1/email/validate       - $0.005/call")
+    print("GET /api/v1/token/price          - $0.005/call (Canary #2 REAL)")
+    print("GET /api/v1/contingency/status   - Free (Survival Monitor)")
+    print("GET /api/v1/gravity/well/status  - Free (Batch Settlement)")
     print("========================")
     uvicorn.run(app, host="0.0.0.0", port=4020)
