@@ -1,0 +1,96 @@
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: 'Packages to publish (comma-separated)'
+        required: false
+        default: 'aether-oracle,aether-axioms-mcp,aether-oracle-mcp'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish-aether-oracle:
+    name: Publish aether-oracle
+    if: contains(github.event.inputs.packages, 'aether-oracle') || github.event_name == 'release'
+    runs-on: ubuntu-latest
+    environment: pypi
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install build dependencies
+        run: pip install build twine
+      - name: Build aether-oracle
+        working-directory: ./aether-oracle
+        run: python -m build
+      - name: Publish aether-oracle
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ./aether-oracle/dist/
+          verbose: true
+
+  publish-aether-axioms-mcp:
+    name: Publish aether-axioms-mcp
+    if: contains(github.event.inputs.packages, 'aether-axioms-mcp') || github.event_name == 'release'
+    runs-on: ubuntu-latest
+    environment: pypi
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install build dependencies
+        run: pip install build twine
+      - name: Build aether-axioms-mcp
+        working-directory: ./aether_axioms_mcp
+        run: python -m build
+      - name: Publish aether-axioms-mcp
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ./aether_axioms_mcp/dist/
+          verbose: true
+
+  publish-aether-oracle-mcp:
+    name: Publish aether-oracle-mcp
+    if: contains(github.event.inputs.packages, 'aether-oracle-mcp') || github.event_name == 'release'
+    runs-on: ubuntu-latest
+    environment: pypi
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install build dependencies
+        run: pip install build twine
+      - name: Build aether-oracle-mcp
+        working-directory: ./aether_oracle_mcp
+        run: python -m build
+      - name: Publish aether-oracle-mcp
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ./aether_oracle_mcp/dist/
+          verbose: true
+
+  notify:
+    name: Notify
+    needs: [publish-aether-oracle, publish-aether-axioms-mcp, publish-aether-oracle-mcp]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summary
+        run: |
+          echo "=== PyPI Publish Summary ==="
+          echo "aether-oracle: ${{ needs.publish-aether-oracle.result }}"
+          echo "aether-axioms-mcp: ${{ needs.publish-aether-axioms-mcp.result }}"
+          echo "aether-oracle-mcp: ${{ needs.publish-aether-oracle-mcp.result }}"
+          echo "Check: https://pypi.org/manage/projects/"
