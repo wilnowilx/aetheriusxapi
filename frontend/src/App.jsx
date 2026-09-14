@@ -681,14 +681,115 @@ function Features() {
   )
 }
 
-// === CODE SECTION ===
+// === CODE SECTION — Typing Terminal ===
 function CodeSection() {
   const [tab, setTab] = useState('py')
+  const [typedLines, setTypedLines] = useState([])
+  const [currentLine, setCurrentLine] = useState('')
+  const [lineIdx, setLineIdx] = useState(0)
+  const [charIdx, setCharIdx] = useState(0)
+  const [showCursor, setShowCursor] = useState(true)
+  const typingRef = useRef(null)
+  const containerRef = useRef(null)
 
   const codeBlocks = {
-    py: `<span style="color:var(--text-muted)"># Install the SDK</span>\n<span style="color:var(--green)">$</span> <span style="color:var(--text)">pip install aetheriusx</span>\n\n<span style="color:var(--text-muted)"># Initialize with your wallet</span>\n<span style="color:var(--green)">$</span> <span style="color:var(--text)">python</span>\n<span style="color:var(--purple-light)">&gt;&gt;&gt; from</span> aetheriusx <span style="color:var(--purple-light)">import</span> <span style="color:var(--pink)">Client</span>\n<span style="color:var(--purple-light)">&gt;&gt;&gt; client</span> = <span style="color:var(--pink)">Client</span>(<span style="color:var(--magenta-light)">"0xYourWallet"</span>)\n\n<span style="color:var(--text-muted)"># Call any API — payment is automatic</span>\n<span style="color:var(--purple-light)">&gt;&gt;&gt; resp</span> = client.<span style="color:var(--pink)">get</span>(<span style="color:var(--magenta-light)">"/v1/crypto/price"</span>,\n        params={<span style="color:var(--magenta-light)">"token"</span>: <span style="color:var(--magenta-light)">"ETH"</span>})\n\n<span style="color:var(--purple-light)">&gt;&gt;&gt; print</span>(resp.data)\n<span style="color:var(--text-sec)">{</span><span style="color:var(--magenta-light)">"price"</span>: <span style="color:var(--orange)">2384.50</span>, <span style="color:var(--magenta-light)">"change"</span>: <span style="color:var(--orange)">2.3</span><span style="color:var(--text-sec)">}</span>\n<span style="color:var(--green)">$</span> <span style="color:var(--text-muted)"># That's it. Payment handled.</span>`,
-    js: `<span style="color:var(--text-muted)">// Install the SDK</span>\n<span style="color:var(--green)">$</span> <span style="color:var(--text)">npm install aetheriusx</span>\n\n<span style="color:var(--text-muted)">// Initialize with your wallet</span>\n<span style="color:var(--purple-light)">import</span> { <span style="color:var(--pink)">Client</span> } <span style="color:var(--purple-light)">from</span> <span style="color:var(--magenta-light)">'aetheriusx'</span>;\n\n<span style="color:var(--purple-light)">const</span> client = <span style="color:var(--purple-light)">new</span> <span style="color:var(--pink)">Client</span>(<span style="color:var(--magenta-light)">'0xYourWallet'</span>);\n\n<span style="color:var(--text-muted)">// Call any API — payment is automatic</span>\n<span style="color:var(--purple-light)">const</span> resp = <span style="color:var(--purple-light)">await</span> client.<span style="color:var(--pink)">get</span>(\n  <span style="color:var(--magenta-light)">'/v1/crypto/price'</span>,\n  { params: { token: <span style="color:var(--magenta-light)">'ETH'</span> } }\n);\n\nconsole.<span style="color:var(--pink)">log</span>(resp.data);\n<span style="color:var(--text-sec)">// { price: 2384.50, change: 2.3 }</span>`,
-    curl: `<span style="color:var(--text-muted)"># Make a request with x402 payment</span>\n<span style="color:var(--green)">$</span> <span style="color:var(--text)">curl</span> <span style="color:var(--cyan)">-X GET</span> \\\n  <span style="color:var(--magenta-light)">"https://api.aetheriusx.io/v1/crypto/price?token=ETH"</span> \\\n  <span style="color:var(--cyan)">-H</span> <span style="color:var(--magenta-light)">"X-PAYMENT: 0x...proof"</span> \\\n  <span style="color:var(--cyan)">-H</span> <span style="color:var(--magenta-light)">"Content-Type: application/json"</span>\n\n<span style="color:var(--text-muted)"># Response</span>\n<span style="color:var(--text-sec)">{</span>\n  <span style="color:var(--magenta-light)">"data"</span>: <span style="color:var(--text-sec)">{</span>\n    <span style="color:var(--magenta-light)">"price"</span>: <span style="color:var(--orange)">2384.50</span>,\n    <span style="color:var(--magenta-light)">"change_24h"</span>: <span style="color:var(--orange)">2.3</span>\n  <span style="color:var(--text-sec)">}</span>\n<span style="color:var(--text-sec)">}</span>`,
+    py: [
+      '# Install the SDK',
+      '$ pip install aetheriusx',
+      '',
+      '# Initialize with your wallet',
+      '$ python',
+      '>>> from aetheriusx import Client',
+      '>>> client = Client("0xYourWallet")',
+      '',
+      '# Call any API — payment is automatic',
+      '>>> resp = client.get("/v1/crypto/price",',
+      '...         params={"token": "ETH"})',
+      '',
+      '>>> print(resp.data)',
+      '{"price": 2384.50, "change": 2.3}',
+      '$  # That\'s it. Payment handled.',
+    ],
+    js: [
+      '// Install the SDK',
+      '$ npm install aetheriusx',
+      '',
+      '// Initialize with your wallet',
+      "import { Client } from 'aetheriusx';",
+      '',
+      "const client = new Client('0xYourWallet');",
+      '',
+      '// Call any API — payment is automatic',
+      "const resp = await client.get(",
+      "  '/v1/crypto/price',",
+      "  { params: { token: 'ETH' } }",
+      ');',
+      '',
+      'console.log(resp.data);',
+      '// { price: 2384.50, change: 2.3 }',
+    ],
+    curl: [
+      '# Make a request with x402 payment',
+      '$ curl -X GET \\',
+      '  "https://api.aetheriusx.io/v1/crypto/price?token=ETH" \\',
+      '  -H "X-PAYMENT: 0x...proof" \\',
+      '  -H "Content-Type: application/json"',
+      '',
+      '# Response',
+      '{',
+      '  "data": {',
+      '    "price": 2384.50,',
+      '    "change_24h": 2.3',
+      '  }',
+      '}',
+    ],
+  }
+
+  // Typing effect
+  useEffect(() => {
+    setTypedLines([])
+    setCurrentLine('')
+    setLineIdx(0)
+    setCharIdx(0)
+  }, [tab])
+
+  useEffect(() => {
+    const lines = codeBlocks[tab]
+    if (lineIdx >= lines.length) return
+
+    const line = lines[lineIdx]
+    if (charIdx < line.length) {
+      const speed = line.startsWith('$') || line.startsWith('#') || line.startsWith('//') ? 25 : 35
+      typingRef.current = setTimeout(() => {
+        setCurrentLine(line.slice(0, charIdx + 1))
+        setCharIdx(charIdx + 1)
+      }, speed)
+    } else {
+      // Line complete → move to next
+      typingRef.current = setTimeout(() => {
+        setTypedLines(prev => [...prev, line])
+        setCurrentLine('')
+        setLineIdx(lineIdx + 1)
+        setCharIdx(0)
+      }, line === '' ? 80 : 150)
+    }
+    return () => clearTimeout(typingRef.current)
+  }, [lineIdx, charIdx, tab])
+
+  // Cursor blink
+  useEffect(() => {
+    const iv = setInterval(() => setShowCursor(v => !v), 530)
+    return () => clearInterval(iv)
+  }, [])
+
+  const renderLine = (text, isCurrent) => {
+    if (!text) return <br />
+    // Colorize based on content
+    let color = 'var(--text)'
+    if (text.startsWith('$') || text.startsWith('>>>') || text.startsWith('...')) color = 'var(--green)'
+    else if (text.startsWith('#') || text.startsWith('//')) color = 'var(--text-muted)'
+    else if (text.includes('"') || text.includes("'")) color = 'var(--magenta-light)'
+    return <span style={{ color }}>{text}</span>
   }
 
   return (
@@ -702,13 +803,15 @@ function CodeSection() {
         <p className="section-desc" style={{ margin: '0 auto' }}>One SDK. Every API. Zero configuration.</p>
         <div data-animate-card style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 48, marginTop: 72, alignItems: 'start' }}>
           <div>
-            <div style={{ background: '#0c0c14', border: '1px solid rgba(168,85,247,0.16)', borderRadius: 16, overflow: 'hidden', textAlign: 'left' }}>
+            <div style={{ background: '#0a0a14', border: '1px solid rgba(168,85,247,0.16)', borderRadius: 16, overflow: 'hidden', textAlign: 'left' }}>
+              {/* Window chrome */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 20px', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid var(--border)' }}>
                 <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ef4444' }} />
                 <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#f59e0b' }} />
                 <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#10b981' }} />
                 <span style={{ marginLeft: 12, fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', color: 'var(--text-muted)' }}>terminal</span>
               </div>
+              {/* Tabs */}
               <div style={{ display: 'flex', gap: 2, padding: '0 16px', background: 'rgba(255,255,255,0.02)' }}>
                 {[['py', 'Python'], ['js', 'JavaScript'], ['curl', 'cURL']].map(([key, label]) => (
                   <button key={key} onClick={() => setTab(key)} style={{
@@ -718,8 +821,35 @@ function CodeSection() {
                   }}>{label}</button>
                 ))}
               </div>
-              <div style={{ padding: 24, fontFamily: 'JetBrains Mono, monospace', fontSize: '0.82rem', lineHeight: 1.9, minHeight: 300 }}>
-                <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }} dangerouslySetInnerHTML={{ __html: codeBlocks[tab] }} />
+              {/* Terminal content */}
+              <div ref={containerRef} style={{ padding: 24, fontFamily: 'JetBrains Mono, monospace', fontSize: '0.82rem', lineHeight: 1.9, minHeight: 380, position: 'relative' }}>
+                {/* Completed lines */}
+                {typedLines.map((line, i) => (
+                  <div key={i}>{renderLine(line, false)}</div>
+                ))}
+                {/* Current typing line */}
+                {lineIdx < codeBlocks[tab].length && (
+                  <div>
+                    {renderLine(currentLine, true)}
+                    <span style={{
+                      display: 'inline-block', width: 8, height: 16,
+                      background: showCursor ? 'var(--purple)' : 'transparent',
+                      marginLeft: 1, verticalAlign: 'text-bottom',
+                      transition: 'background 0.1s',
+                    }} />
+                  </div>
+                )}
+                {/* Done indicator */}
+                {lineIdx >= codeBlocks[tab].length && (
+                  <div style={{ marginTop: 8 }}>
+                    <span style={{ color: 'var(--green)' }}>$</span>
+                    <span style={{
+                      display: 'inline-block', width: 8, height: 16,
+                      background: showCursor ? 'var(--green)' : 'transparent',
+                      marginLeft: 4, verticalAlign: 'text-bottom',
+                    }} />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1497,11 +1627,41 @@ function DotNav() {
   )
 }
 
+// === SECTION DIVIDER ===
+function SectionDivider() {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}>
+      <div style={{
+        width: '100%', maxWidth: 600, height: 1,
+        background: 'linear-gradient(90deg, transparent 0%, rgba(168,85,247,0.12) 30%, rgba(168,85,247,0.18) 50%, rgba(168,85,247,0.12) 70%, transparent 100%)',
+        position: 'relative',
+      }}>
+        <div style={{
+          position: 'absolute', left: '50%', top: '50%',
+          width: 3, height: 3, borderRadius: '50%',
+          background: 'rgba(168,85,247,0.3)',
+          transform: 'translate(-50%, -50%)',
+          boxShadow: '0 0 8px rgba(168,85,247,0.2)',
+        }} />
+      </div>
+    </div>
+  )
+}
+
 // === APP ===
 function App() {
   const appRef = useRef(null)
   useScrollAnimations()
   useSmoothScroll()
+
+  // Force scroll to top on every load/refresh
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    // Also handle bfcache (back/forward)
+    const handler = () => { if (!window.location.hash) window.scrollTo(0, 0) }
+    window.addEventListener('popstate', handler)
+    return () => window.removeEventListener('popstate', handler)
+  }, [])
 
   return (
     <div ref={appRef}>
@@ -1511,15 +1671,25 @@ function App() {
       <SectionBoundary fallback={<div style={{ minHeight: '60vh' }} />}>
         <Hero />
       </SectionBoundary>
+      <SectionDivider />
       <SectionBoundary><Playground /></SectionBoundary>
+      <SectionDivider />
       <SectionBoundary><Instruments /></SectionBoundary>
+      <SectionDivider />
       <SectionBoundary><FlowExplorer /></SectionBoundary>
+      <SectionDivider />
       <SectionBoundary><X402Intelligence /></SectionBoundary>
+      <SectionDivider />
       <SectionBoundary><HowItWorks /></SectionBoundary>
+      <SectionDivider />
       <SectionBoundary><Features /></SectionBoundary>
+      <SectionDivider />
       <SectionBoundary><CodeSection /></SectionBoundary>
+      <SectionDivider />
       <SectionBoundary><Heartbeat /></SectionBoundary>
+      <SectionDivider />
       <SectionBoundary><Founders /></SectionBoundary>
+      <SectionDivider />
       <SectionBoundary><CTA /></SectionBoundary>
       <Footer />
       <DotNav />
