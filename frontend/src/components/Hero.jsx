@@ -14,212 +14,206 @@ class GlobeBoundary extends React.Component {
   }
 }
 
-// === FLUID IGNITION — encendido fluido, una sola curva orgánica ===
-// Una sola curva ease: punto → línea respirando → florece en estrella ✦ → entrega.
-// TOTAL 1800ms. Sin fases duras, todo es una sola curva ease.
+// === FLUID LOADING — 6.5s card-flip clock + radial reveal ===
+// Black screen. Flip-clock digits count down. At 6.5s → reveal.
 function FluidLoader({ onComplete }) {
-  const canvasRef = useRef(null)
-  const animRef = useRef(null)
-  const overlayRef = useRef(null)
+  const [digits, setDigits] = useState([6, 5])
+  const [phase, setPhase] = useState('counting') // counting → reveal → done
+  const [revealProgress, setRevealProgress] = useState(0)
   const onCompleteRef = useRef(onComplete)
+  const containerRef = useRef(null)
   onCompleteRef.current = onComplete
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    const dpr = window.devicePixelRatio || 1
-    canvas.width = window.innerWidth * dpr
-    canvas.height = window.innerHeight * dpr
-    ctx.scale(dpr, dpr)
-    const w = window.innerWidth, h = window.innerHeight
-    const cx = w / 2, cy = h / 2
-
-    // --- audio orgánico minimalista (solo si contexto running) ---
-    let ac = null
+  // Audio: single warm tone at reveal
+  const playRevealSound = useCallback(() => {
     try {
       const AC = window.AudioContext || window.webkitAudioContext
-      if (AC) {
-        const test = new AC()
-        if (test.state === 'running') {
-          ac = test
-          const t0 = ac.currentTime
-          const master = ac.createGain()
-          master.gain.value = 0
-          master.connect(ac.destination)
-          // thump suave: 55→30Hz
-          const osc = ac.createOscillator()
-          osc.type = 'sine'
-          osc.frequency.setValueAtTime(55, t0)
-          osc.frequency.exponentialRampToValueAtTime(30, t0 + 0.35)
-          const og = ac.createGain()
-          og.gain.setValueAtTime(0.3, t0)
-          og.gain.exponentialRampToValueAtTime(0.001, t0 + 0.4)
-          osc.connect(og); og.connect(master); osc.start(t0); osc.stop(t0 + 0.4)
-          // hum cálido: 65→90Hz
-          const hum = ac.createOscillator()
-          hum.type = 'triangle'
-          hum.frequency.setValueAtTime(65, t0 + 0.15)
-          hum.frequency.exponentialRampToValueAtTime(90, t0 + 1.0)
-          const hf = ac.createBiquadFilter()
-          hf.type = 'lowpass'; hf.frequency.value = 200
-          const hg = ac.createGain()
-          hg.gain.setValueAtTime(0.0001, t0 + 0.15)
-          hg.gain.exponentialRampToValueAtTime(0.06, t0 + 0.8)
-          hg.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.5)
-          hum.connect(hf); hf.connect(hg); hg.connect(master)
-          hum.start(t0 + 0.15); hum.stop(t0 + 1.55)
-          // whoosh de aire al abrirse (t~1.1s)
-          const len = Math.floor(ac.sampleRate * 0.6)
-          const buf = ac.createBuffer(1, len, ac.sampleRate)
-          const ch = buf.getChannelData(0)
-          for (let i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * 0.3
-          const ns = ac.createBufferSource()
-          ns.buffer = buf
-          const bp = ac.createBiquadFilter()
-          bp.type = 'bandpass'; bp.Q.value = 0.8
-          bp.frequency.setValueAtTime(300, t0 + 1.1)
-          bp.frequency.exponentialRampToValueAtTime(1800, t0 + 1.5)
-          const ng = ac.createGain()
-          ng.gain.setValueAtTime(0.0001, t0 + 1.1)
-          ng.gain.exponentialRampToValueAtTime(0.12, t0 + 1.35)
-          ng.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.65)
-          ns.connect(bp); bp.connect(ng); ng.connect(master)
-          ns.start(t0 + 1.1); ns.stop(t0 + 1.7)
-          master.gain.setValueAtTime(0.12, t0 + 0.6)
-          master.gain.linearRampToValueAtTime(0.0001, t0 + 1.05)
-        } else { try { test.close() } catch {} }
-      }
-    } catch { ac = null }
-
-    let running = true
-    const startTime = performance.now()
-    const TOTAL_DURATION = 1100 // ms — rápido, cinematográfico
-    const S = Math.max(w, h) / 800
-
-    // Ease orgánica: smoothstep cúbico continuo, sin fases duras
-    const ease = (t) => t * t * t * (t * (t * 6 - 15) + 10) // quintic smoothstep
-
-
-    const draw = (now) => {
-      if (!running) return
-      const elapsed = now - startTime
-      const t = Math.min(elapsed / TOTAL_DURATION, 1)
-      const et = ease(t) // curva orgánica única
-      const flick = 0.95 + 0.05 * Math.sin(elapsed * 0.06) // respiración suave
-
-      ctx.fillStyle = '#010005'
-      ctx.fillRect(0, 0, w, h)
-
-      // 0→0.35: punto → línea horizontal con aura
-      if (et < 0.35) {
-        const p = et / 0.35
-        const q = p * p * (3 - 2 * p) // smoothstep
-        const halfW = 3 + q * w * 0.26
-        const dotR = (2 + q * 6) * S
-        // aura elíptica
-        const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, halfW * 1.5)
-        halo.addColorStop(0, `rgba(150,170,255,${0.2 * flick})`)
-        halo.addColorStop(0.5, `rgba(168,85,247,${0.1 * flick})`)
-        halo.addColorStop(1, 'rgba(0,82,255,0)')
-        ctx.fillStyle = halo
-        ctx.beginPath(); ctx.arc(cx, cy, halfW * 1.5, 0, Math.PI * 2); ctx.fill()
-        // punto
-        const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, dotR * 6)
-        glow.addColorStop(0, `rgba(255,255,255,${0.8 * flick})`)
-        glow.addColorStop(0.4, `rgba(34,211,238,${0.2 * flick})`)
-        glow.addColorStop(1, 'rgba(0,82,255,0)')
-        ctx.fillStyle = glow
-        ctx.beginPath(); ctx.arc(cx, cy, dotR * 6, 0, Math.PI * 2); ctx.fill()
-        // línea con gradiente
-        const lg = ctx.createLinearGradient(cx - halfW, 0, cx + halfW, 0)
-        lg.addColorStop(0, 'rgba(0,82,255,0)')
-        lg.addColorStop(0.25, `rgba(168,85,247,${0.6 * flick})`)
-        lg.addColorStop(0.5, `rgba(255,255,255,${0.9 * flick})`)
-        lg.addColorStop(0.75, `rgba(34,211,238,${0.6 * flick})`)
-        lg.addColorStop(1, 'rgba(0,82,255,0)')
-        ctx.fillStyle = lg
-        ctx.fillRect(cx - halfW, cy - 2, halfW * 2, 4)
-        ctx.fillStyle = `rgba(255,255,255,${0.85 * flick})`
-        ctx.fillRect(cx - halfW, cy - 0.5, halfW * 2, 1)
-      }
-
-      // 0.35→0.55: línea → elipse que respira
-      if (et >= 0.35 && et < 0.55) {
-        const q = (et - 0.35) / 0.2
-        const breathe = 0.88 + 0.12 * Math.sin(elapsed * 0.025)
-        const halfW = w * 0.26
-        const halfH = 2 + q * h * 0.18
-        // aura
-        const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, halfW * 1.5)
-        halo.addColorStop(0, `rgba(150,170,255,${0.18 * flick * breathe})`)
-        halo.addColorStop(0.5, `rgba(168,85,247,${0.08 * flick * breathe})`)
-        halo.addColorStop(1, 'rgba(0,82,255,0)')
-        ctx.fillStyle = halo
-        ctx.beginPath(); ctx.arc(cx, cy, halfW * 1.5, 0, Math.PI * 2); ctx.fill()
-        // elipse vertical
-        const vg = ctx.createLinearGradient(0, cy - halfH, 0, cy + halfH)
-        vg.addColorStop(0, 'rgba(0,82,255,0)')
-        vg.addColorStop(0.5, `rgba(220,230,255,${0.4 * flick * breathe})`)
-        vg.addColorStop(1, 'rgba(0,82,255,0)')
-        ctx.fillStyle = vg
-        ctx.fillRect(cx - halfW, cy - halfH, halfW * 2, halfH * 2)
-        // bordes
-        ctx.fillStyle = `rgba(255,255,255,${0.7 * flick * breathe})`
-        ctx.fillRect(cx - halfW, cy - halfH, halfW * 2, 1.5)
-        ctx.fillRect(cx - halfW, cy + halfH - 1.5, halfW * 2, 1.5)
-      }
-
-      // 0.55→1: línea se expande sutil → disuelve al hero (sin estrella)
-      if (et >= 0.55) {
-        const q = (et - 0.55) / 0.45
-        const fadeOut = 1 - q
-        // Línea final se ensancha y se desvanece como respiración
-        const alpha = fadeOut * 0.5 * flick
-        if (alpha > 0.01) {
-          const grad = ctx.createLinearGradient(cx - w * 0.3, 0, cx + w * 0.3, 0)
-          grad.addColorStop(0, 'rgba(0,82,255,0)')
-          grad.addColorStop(0.5, `rgba(255,255,255,${alpha})`)
-          grad.addColorStop(1, 'rgba(0,82,255,0)')
-          ctx.fillStyle = grad
-          const h2 = 1 + q * 3
-          ctx.fillRect(cx - w * 0.3, cy - h2 / 2, w * 0.6, h2)
-        }
-        if (overlayRef.current) {
-          // Fade del overlay en los últimos 300ms
-          const overlayFade = q > 0.55 ? 1 - (q - 0.55) / 0.45 : 1
-          overlayRef.current.style.opacity = String(Math.max(0, overlayFade))
-        }
-      }
-
-      // canal brutalista sutil
-      if (et < 0.55) {
-        ctx.font = '10px monospace'
-        ctx.fillStyle = `rgba(255,255,255,${0.25 * flick})`
-        ctx.fillText('CH—402 · BASE', 24, h - 24)
-      }
-
-      animRef.current = requestAnimationFrame(draw)
-    }
-
-    animRef.current = requestAnimationFrame(draw)
-
-    const timer = setTimeout(() => {
-      running = false
-      cancelAnimationFrame(animRef.current)
-      try { ac?.close() } catch {}
-      onCompleteRef.current?.()
-    }, TOTAL_DURATION + 100)
-
-    return () => { running = false; cancelAnimationFrame(animRef.current); clearTimeout(timer); try { ac?.close() } catch {} }
+      const ac = new AC()
+      if (ac.state !== 'running') { try { ac.close() } catch {} return }
+      const t0 = ac.currentTime
+      const master = ac.createGain()
+      master.gain.value = 0.08
+      master.connect(ac.destination)
+      // warm pad
+      const osc = ac.createOscillator()
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(110, t0)
+      osc.frequency.exponentialRampToValueAtTime(220, t0 + 1.2)
+      const g = ac.createGain()
+      g.gain.setValueAtTime(0, t0)
+      g.gain.linearRampToValueAtTime(1, t0 + 0.3)
+      g.gain.exponentialRampToValueAtTime(0.001, t0 + 1.5)
+      osc.connect(g); g.connect(master); osc.start(t0); osc.stop(t0 + 1.5)
+      // shimmer
+      const osc2 = ac.createOscillator()
+      osc2.type = 'triangle'
+      osc2.frequency.setValueAtTime(330, t0)
+      const g2 = ac.createGain()
+      g2.gain.setValueAtTime(0, t0)
+      g2.gain.linearRampToValueAtTime(0.3, t0 + 0.2)
+      g2.gain.exponentialRampToValueAtTime(0.001, t0 + 1.0)
+      osc2.connect(g2); g2.connect(master); osc2.start(t0); osc2.stop(t0 + 1.0)
+      setTimeout(() => { try { ac.close() } catch {} }, 2000)
+    } catch {}
   }, [])
 
+  // Countdown: flip digits every 1s from 6→1
+  useEffect(() => {
+    let count = 6
+    const iv = setInterval(() => {
+      count--
+      if (count >= 1) {
+        setDigits([count, count + 1]) // [current, previous]
+      }
+      if (count <= 0) {
+        clearInterval(iv)
+        setPhase('reveal')
+        playRevealSound()
+      }
+    }, 1000)
+    return () => clearInterval(iv)
+  }, [playRevealSound])
+
+  // Reveal animation: radial wipe from center over 1.5s
+  useEffect(() => {
+    if (phase !== 'reveal') return
+    let start = null
+    const DURATION = 1500
+    let raf
+    const animate = (ts) => {
+      if (!start) start = ts
+      const p = Math.min((ts - start) / DURATION, 1)
+      const ease = p * p * (3 - 2 * p) // smoothstep
+      setRevealProgress(ease)
+      if (p < 1) {
+        raf = requestAnimationFrame(animate)
+      } else {
+        setPhase('done')
+        onCompleteRef.current?.()
+      }
+    }
+    raf = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(raf)
+  }, [phase, onCompleteRef])
+
+  // Container opacity — fade out when done
+  const containerOpacity = phase === 'done' ? 0 : 1
+
   return (
-    <div ref={overlayRef} style={{
+    <div ref={containerRef} style={{
       position: 'fixed', inset: 0, zIndex: 9999,
       background: '#010005',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      opacity: containerOpacity,
+      transition: 'opacity 0.4s ease-out',
+      pointerEvents: phase === 'done' ? 'none' : 'auto',
     }}>
-      <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
+      {/* Radial reveal mask */}
+      {phase === 'reveal' && (
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: `radial-gradient(circle at 50% 50%, transparent ${revealProgress * 120}%, rgba(1,0,5,0.98) ${revealProgress * 120 + 5}%)`,
+          zIndex: 1,
+        }} />
+      )}
+
+      {/* Card-flip clock digits */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        position: 'relative', zIndex: 2,
+      }}>
+        {digits.map((digit, idx) => {
+          const isCurrent = idx === 0
+          return (
+            <div key={isCurrent ? 'cur' : 'prev'} style={{
+              width: 72, height: 96,
+              position: 'relative',
+              perspective: '400px',
+            }}>
+              {/* Card face */}
+              <div style={{
+                width: '100%', height: '100%',
+                background: isCurrent
+                  ? 'linear-gradient(180deg, rgba(168,85,247,0.08) 0%, rgba(168,85,247,0.03) 50%, rgba(168,85,247,0.06) 100%)'
+                  : 'rgba(255,255,255,0.02)',
+                border: `1px solid ${isCurrent ? 'rgba(168,85,247,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                borderRadius: 8,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                overflow: 'hidden',
+                position: 'relative',
+              }}>
+                {/* Horizontal split line */}
+                <div style={{
+                  position: 'absolute', left: 0, right: 0, top: '50%',
+                  height: 1, background: 'rgba(0,0,0,0.5)', zIndex: 1,
+                }} />
+                <span style={{
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '2.8rem', fontWeight: 800,
+                  color: isCurrent ? '#a855f7' : 'rgba(255,255,255,0.15)',
+                  textShadow: isCurrent ? '0 0 20px rgba(168,85,247,0.4)' : 'none',
+                  transition: 'all 0.3s ease-out',
+                }}>
+                  {isCurrent ? digit : digits[1]}
+                </span>
+              </div>
+            </div>
+          )
+        })}
+        {/* Separator dot */}
+        <div style={{
+          width: 6, height: 6, borderRadius: '50%',
+          background: '#a855f7',
+          boxShadow: '0 0 12px rgba(168,85,247,0.6)',
+          margin: '0 4px',
+          animation: 'loaderPulse 1s ease-in-out infinite',
+        }} />
+      </div>
+
+      {/* Brand + status text */}
+      <div style={{
+        position: 'relative', zIndex: 2,
+        marginTop: 32, textAlign: 'center',
+      }}>
+        <div style={{
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '0.65rem', letterSpacing: '0.3em',
+          color: 'rgba(168,85,247,0.5)',
+          textTransform: 'uppercase',
+        }}>
+          AETHERIUS
+        </div>
+        <div style={{
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '0.55rem', letterSpacing: '0.15em',
+          color: 'rgba(255,255,255,0.12)',
+          marginTop: 8,
+        }}>
+          INITIALIZING BASE MAINNET
+        </div>
+      </div>
+
+      {/* Bottom status bar */}
+      <div style={{
+        position: 'absolute', bottom: 32, left: 0, right: 0,
+        display: 'flex', justifyContent: 'center', zIndex: 2,
+      }}>
+        <div style={{
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '0.5rem', letterSpacing: '0.2em',
+          color: 'rgba(255,255,255,0.08)',
+        }}>
+          CH—402 · BASE · 2026
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes loaderPulse {
+          0%, 100% { opacity: 0.4; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.3); }
+        }
+      `}</style>
     </div>
   )
 }
@@ -658,10 +652,10 @@ function Hero() {
   // Stable loader callback (inline arrow would restart the canvas effect)
   const handleLoaded = useCallback(() => setLoaded(true), [])
 
-  // Safety: never trap the page behind the loader — force reveal after 4s
+  // Safety: never trap the page behind the loader — force reveal after 8s
   useEffect(() => {
     if (loaded) return
-    const t = setTimeout(() => setLoaded(true), 4000)
+    const t = setTimeout(() => setLoaded(true), 8000)
     return () => clearTimeout(t)
   }, [loaded])
 

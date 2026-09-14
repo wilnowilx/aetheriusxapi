@@ -14,41 +14,41 @@ const TextBandRings = ({ liveData }) => {
   const ringsConfig = useMemo(() => {
     const d = liveData || {}
     return [
-      // ANILLO 1 EXTERIOR: "THE MARKETPLACE THAT LIVES" — banda blanca, casi horizontal
+      // ANILLO 1 EXTERIOR: "THE MARKETPLACE THAT LIVES" — banda blanca
       {
         radius: 3.6,
-        tilt: 0.18, // ~10° — casi horizontal
+        tilt: 0.18,
         yOffset: 0.45,
         speed: 0.025,
         bandWidth: 0.42,
         color: '#ffffff',
         opacity: 0.9,
-        fontSize: 44,
-        text: 'THE MARKETPLACE   THAT LIVES   ',
+        fontSize: 42,
+        text: '   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   ',
       },
-      // ANILLO 2 INTERMEDIO: subtítulo — banda magenta, ángulo distinto
+      // ANILLO 2 INTERMEDIO: subtítulo — banda magenta
       {
         radius: 3.05,
-        tilt: 0.32, // ~18° — ligeramente más inclinado
+        tilt: 0.32,
         yOffset: -0.15,
-        speed: -0.035, // dirección opuesta para dinamismo
+        speed: -0.035,
         bandWidth: 0.36,
         color: '#d946ef',
-        opacity: 0.78,
+        opacity: 0.82,
         fontSize: 34,
-        text: 'API INFRASTRUCTURE   FOR AI AGENTS   THAT PAY   ',
+        text: '   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   ',
       },
-      // ANILLO 3 INTERIOR: métricas vivas — banda cian, otro ángulo
+      // ANILLO 3 INTERIOR: métricas vivas — banda cian
       {
         radius: 2.55,
-        tilt: 0.12, // ~7° — casi plano
+        tilt: 0.12,
         yOffset: -0.55,
         speed: 0.04,
         bandWidth: 0.32,
         color: '#22d3ee',
-        opacity: 0.68,
+        opacity: 0.75,
         fontSize: 28,
-        text: `${d.endpoints || '100+'} ENDPOINTS   ${d.freeEndpoints || '40'} FREE   ${d.latency || '—'}   `,
+        text: `   ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE  ${d.latency || ''}   ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE  ${d.latency || ''}   `,
       },
     ]
   }, [liveData])
@@ -176,13 +176,13 @@ const TextBandRings = ({ liveData }) => {
               toneMapped={false}
             />
           </mesh>
-          {/* Borde de brillo sutil en los bordes de la banda */}
+          {/* Borde de brillo sutil en los bordes de la banda — ultra tenue */}
           <mesh>
-            <torusGeometry args={[ring.radius, ring.bandWidth * 0.06, 6, 128]} />
+            <torusGeometry args={[ring.radius, ring.bandWidth * 0.03, 6, 128]} />
             <meshBasicMaterial
               color={ring.color}
               transparent
-              opacity={ring.opacity * 0.12}
+              opacity={ring.opacity * 0.04}
               depthWrite={false}
             />
           </mesh>
@@ -610,9 +610,9 @@ function BaseCore({ flowRef }) {
               float swirl = sin(vPos.x*5.0+time*0.4)*sin(vPos.y*4.0+time*0.3)*sin(vPos.z*3.5+time*0.35);
               float turbulence = 0.5 + 0.5 * swirl;
               float beat = 0.4 + 0.6 * pulse;
-              // Bright cyan-green-blue Argua tones
-              vec3 col = mix(vec3(0.0,0.35,0.8), vec3(0.1,0.7,1.0), dist*0.5);
-              col += vec3(0.05,0.4,0.5) * (1.0-dist) * 0.5;
+              // Efecto neón cian y azul base puro
+              vec3 col = mix(vec3(0.0,0.3,1.0), vec3(0.0,0.85,1.0), dist*0.5);
+              col += vec3(0.0,0.5,1.0) * (1.0-dist) * 0.4;
               float alpha = fog * turbulence * 0.18 * beat * (0.5 + 0.5*flow);
               gl_FragColor = vec4(col, alpha);
             }`}
@@ -634,9 +634,9 @@ function BaseCore({ flowRef }) {
               float tendrils = 0.4 + 0.6 * swirl;
               float noise = tendrils * 0.7 + 0.3;
               float beat = 0.3 + 0.7 * pulse;
-              // Bright cyan-green tones
-              vec3 col = mix(vec3(0.0,0.5,0.9), vec3(0.1,0.8,0.75), noise*0.5);
-              col += vec3(0.08,0.35,0.5) * (1.0-dist) * 0.5;
+              // Efecto neón cian y azul base
+              vec3 col = mix(vec3(0.0,0.4,1.0), vec3(0.0,0.9,1.0), noise*0.5);
+              col += vec3(0.0,0.5,1.0) * (1.0-dist) * 0.4;
               float alpha = radial * noise * 0.20 * beat * (0.4 + 0.6*flow);
               alpha *= smoothstep(1.0, 0.15, dist);
               gl_FragColor = vec4(col, alpha);
@@ -788,17 +788,13 @@ function PulsarEngine({ gasUniforms }) {
       pos[i * 3 + 1] = (Math.random() - 0.5) * 0.04
       pos[i * 3 + 2] = (Math.random() - 0.5) * 0.04
 
-      // Colors: sparks = cyan→white hot, trails = magenta→purple
+      // Colors: estrictamente cian y azul base (cero magenta/púrpura)
       if (!isTrail) {
         const t = Math.random()
-        col[i*3] = 0.1 + t * 0.9
-        col[i*3+1] = 0.6 + t * 0.4
-        col[i*3+2] = 0.8 + t * 0.2
+        col[i*3] = 0.0; col[i*3+1] = 0.75 + t * 0.25; col[i*3+2] = 1.0
       } else {
         const t = Math.random()
-        col[i*3] = 0.6 + t * 0.3
-        col[i*3+1] = 0.15 + t * 0.2
-        col[i*3+2] = 0.85 + t * 0.15
+        col[i*3] = 0.0; col[i*3+1] = 0.5 + t * 0.4; col[i*3+2] = 0.95 + t * 0.05
       }
     }
     return { positions: pos, velocities: vel, seeds: seed, colors: col }
@@ -908,11 +904,12 @@ function PulsarEngine({ gasUniforms }) {
       float death = 1.0 - smoothstep(0.6, 1.0, lifeRatio);
       float alive_f = step(0.5, alive);
 
-      // Size: sparks small, trails very thin
-      float baseSize = type < 0.5 ? 2.0 : 0.8;
+      // Size: sparks microscopic — tiny pinpricks
+      float baseSize = type < 0.5 ? 0.03 : 0.012;
       // Distance-based scaling
+      vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
       float dist = length(position);
-      float perspScale = 200.0 / (-mvPos.z);
+      float perspScale = 12.0 / (-mvPos.z);
 
       vAlpha = birth * death * alive_f * (0.7 + 0.3 * pulse);
       gl_PointSize = baseSize * perspScale * (1.0 - lifeRatio * 0.4);
@@ -1138,17 +1135,14 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
     out[2] = Math.cos(phi) * speed
   }
 
-  // Partículas visibles: más grandes, con estela. Verde USDC vs azul→púrpura mercado
+  // Partículas visibles: estrictamente cian y azul base, perfectamente perceptibles
   const paintKind = (col, sz, i) => {
-    if (Math.random() < 0.42) {
-      col[i * 3] = 0.08; col[i * 3 + 1] = 0.85; col[i * 3 + 2] = 0.55
-      sz[i] = 0.025 + Math.random() * 0.02
+    if (Math.random() < 0.5) {
+      col[i * 3] = 0.0; col[i * 3 + 1] = 0.85; col[i * 3 + 2] = 1.0 // cian vivo
+      sz[i] = 0.04 + Math.random() * 0.03
     } else {
-      const t = Math.random()
-      col[i * 3] = 0.15 * (1 - t) + 0.78 * t
-      col[i * 3 + 1] = 0.45 * (1 - t) + 0.35 * t
-      col[i * 3 + 2] = 0.95
-      sz[i] = 0.02 + Math.random() * 0.02
+      col[i * 3] = 0.0; col[i * 3 + 1] = 0.4; col[i * 3 + 2] = 1.0  // azul base
+      sz[i] = 0.035 + Math.random() * 0.03
     }
   }
 
@@ -1690,6 +1684,9 @@ function CosmicComets() {
   )
 }
 
+// === REPUTATION PARTICLES — Partículas de eventos Anchored/BatchAnchored ===
+import ReputationParticles from './ReputationParticles'
+
 // === COSMIC UNIVERSE — el universo 3D que rodea la esfera ===
 // Cuando giras la esfera, sientes que flota en una dimensión infinita.
 // Estrellas lejanas en múltiples capas de profundidad + nubes de nebulosa orgánicas.
@@ -1976,6 +1973,7 @@ function GlobeScene({ liveData, paused }) {
         <AgentNodes />
         <TextBandRings liveData={liveData} />
         <DataStream />
+        <ReputationParticles />
       </group>
       {!isMobile && (
         <>

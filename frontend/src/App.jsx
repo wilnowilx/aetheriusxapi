@@ -25,7 +25,7 @@ function Nav() {
 
   return (
     <>
-      <nav style={{ background: 'rgba(5,2,15,0.2)', backdropFilter: 'blur(8px)', borderBottom: '1px solid rgba(168,85,247,0.08)' }} className={scrolled ? 'scrolled' : ''}>
+      <nav style={{ background: scrolled ? 'rgba(5,2,15,0.88)' : 'rgba(3,1,8,0.06)', backdropFilter: 'blur(12px)', borderBottom: scrolled ? '1px solid rgba(168,85,247,0.18)' : '1px solid rgba(168,85,247,0.05)', transition: 'background 0.4s ease, border-color 0.4s ease' }} className={scrolled ? 'scrolled' : ''}>
         <div className="nav-wrap">
           <a
             href="#hero"
@@ -45,29 +45,21 @@ function Nav() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               Playground
             </a>
-            <a href="#categories" style={{display:'inline-flex',alignItems:'center',gap:6}}>
+            <a href="#instruments" style={{display:'inline-flex',alignItems:'center',gap:6}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
               APIs
             </a>
-            <a href="#how" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-              How It Works
+            <a href="#flow" style={{display:'inline-flex',alignItems:'center',gap:6}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/><path d="M2 12h20"/></svg>
+              Architecture
             </a>
             <a href="#heartbeat" style={{display:'inline-flex',alignItems:'center',gap:6}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
               Status
             </a>
-            <a href="#telemetry" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-              Telemetry
-            </a>
             <a href="#founders" style={{display:'inline-flex',alignItems:'center',gap:6}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
               Founders
-            </a>
-            <a href="#about" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-              About
             </a>
             <a href="dashboard/" style={{display:'inline-flex',alignItems:'center',gap:6}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
@@ -91,14 +83,12 @@ function Nav() {
         <div className="mobile-nav open">
           <button className="close-btn" onClick={() => setMobileOpen(false)}>×</button>
           <a href="#playground" onClick={() => setMobileOpen(false)}>Playground</a>
-          <a href="#categories" onClick={() => setMobileOpen(false)}>APIs</a>
-          <a href="#how" onClick={() => setMobileOpen(false)}>How It Works</a>
+          <a href="#instruments" onClick={() => setMobileOpen(false)}>APIs</a>
+          <a href="#flow" onClick={() => setMobileOpen(false)}>Architecture</a>
           <a href="#features" onClick={() => setMobileOpen(false)}>Features</a>
           <a href="#code" onClick={() => setMobileOpen(false)}>Code</a>
           <a href="#heartbeat" onClick={() => setMobileOpen(false)}>Status</a>
-          <a href="#telemetry" onClick={() => setMobileOpen(false)}>Telemetry</a>
-          <a href="#docs" onClick={() => setMobileOpen(false)}>Docs</a>
-          <a href="#limits" onClick={() => setMobileOpen(false)}>Rate Limits</a>
+          <a href="#founders" onClick={() => setMobileOpen(false)}>Founders</a>
           <a href="#cta" className="btn btn-primary" onClick={() => setMobileOpen(false)}>Get Started</a>
         </div>
       )}
@@ -448,101 +438,244 @@ function X402Intelligence() {
   )
 }
 
-// === HOW IT WORKS ===
+// === ARCHITECTURE — ENERGY TREE: 4 phases, organic movement ===
 function HowItWorks() {
-  const steps = [
-    { num: '1', title: 'Conecta Cartera', desc: 'Tu cartera crypto es tu identidad. Sin signup, sin KYC, sin cuentas.' },
-    { num: '2', title: 'Elige API', desc: '100+ endpoints live. Elige lo que necesita tu agente.' },
-    { num: '3', title: 'Paga por Petición', desc: 'x402 maneja el pago. USDC en Base. Comisiones a sub-centavo.' },
-    { num: '4', title: 'Obtiene Datos', desc: 'Respuesta instantánea. El agente obtiene exactamente lo que necesita.' },
+  const [activePhase, setActivePhase] = useState(0)
+  const [hoveredPhase, setHoveredPhase] = useState(null)
+
+  const phases = [
+    {
+      num: '01',
+      title: 'Seed',
+      subtitle: 'Wallet Connect',
+      desc: 'Your wallet IS your identity. No signup. No accounts. No KYC. One signature and you exist in the network.',
+      detail: 'EIP-4337 compatible. Any EOA or smart wallet. Zero configuration.',
+      color: '#a855f7',
+      glow: 'rgba(168,85,247,0.4)',
+      icon: (
+        <svg viewBox="0 0 32 32" fill="none" width="32" height="32">
+          <circle cx="16" cy="16" r="6" stroke="currentColor" strokeWidth="1.5" opacity="0.6"/>
+          <circle cx="16" cy="16" r="2" fill="currentColor"/>
+          <path d="M16 22v4M16 6v2M22 16h4M6 16h2" stroke="currentColor" strokeWidth="1" opacity="0.4"/>
+        </svg>
+      ),
+    },
+    {
+      num: '02',
+      title: 'Root',
+      subtitle: 'Discovery',
+      desc: 'The agent discovers what it needs. 100+ endpoints. x402 Brain recommends the best route. One GET to start.',
+      detail: 'Free endpoints for health checks. Paid for premium data. x402 negotiates automatically.',
+      color: '#22d3ee',
+      glow: 'rgba(34,211,238,0.4)',
+      icon: (
+        <svg viewBox="0 0 32 32" fill="none" width="32" height="32">
+          <path d="M16 8v8M16 16l-6 8M16 16l6 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.8"/>
+          <circle cx="16" cy="8" r="2" fill="currentColor"/>
+          <circle cx="10" cy="24" r="1.5" fill="currentColor" opacity="0.6"/>
+          <circle cx="22" cy="24" r="1.5" fill="currentColor" opacity="0.6"/>
+        </svg>
+      ),
+    },
+    {
+      num: '03',
+      title: 'Bloom',
+      subtitle: 'x402 Payment',
+      desc: 'HTTP 402 response triggers automatic payment. USDC on Base. Single-use nonce. Replay-proof by construction.',
+      detail: 'EIP-3009 authorization. Sub-cent fees. Sub-second settlement. Math, not trust.',
+      color: '#d946ef',
+      glow: 'rgba(217,70,239,0.4)',
+      icon: (
+        <svg viewBox="0 0 32 32" fill="none" width="32" height="32">
+          <path d="M16 4l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" fill="currentColor" fillOpacity="0.15"/>
+        </svg>
+      ),
+    },
+    {
+      num: '04',
+      title: 'Fruit',
+      subtitle: 'Data Delivery',
+      desc: '200 OK. Exactly what was requested. Payment and delivery correlated at the HTTP boundary. Zero ambiguity.',
+      detail: 'On-chain settlement proof. Transaction hash included. Auditable by design.',
+      color: '#10b981',
+      glow: 'rgba(16,185,129,0.4)',
+      icon: (
+        <svg viewBox="0 0 32 32" fill="none" width="32" height="32">
+          <rect x="8" y="8" width="16" height="16" rx="3" stroke="currentColor" strokeWidth="1.5" opacity="0.6"/>
+          <path d="M12 16l3 3 5-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+    },
   ]
 
+  // Auto-cycle through phases for organic feel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActivePhase(p => (p + 1) % 4)
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const current = phases[hoveredPhase !== null ? hoveredPhase : activePhase]
+
   return (
-    <section id="how" data-animate style={{ textAlign: 'center' }}>
-      <div className="inner">
+    <section id="how" data-animate style={{ textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      {/* Organic nebula backdrop */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
+        background: `radial-gradient(ellipse at 50% 60%, ${current.glow.replace('0.4', '0.06')} 0%, transparent 60%)`,
+        filter: 'blur(120px)',
+        transition: 'background 1.5s ease',
+      }} />
+      <div className="inner" style={{ position: 'relative', zIndex: 1 }}>
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 16v-4M12 8h.01" strokeLinecap="round"/></svg>
-          Cómo Funciona
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg>
+          Architecture
         </div>
-        <h2 className="section-title">Cuatro Pasos para Acceso Autónomo</h2>
-        <p className="section-desc" style={{ margin: '0 auto' }}>De cero a acceso a APIs en menos de un minuto.</p>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 0, marginTop: 72 }}>
-          {steps.map((step, i) => (
-            <React.Fragment key={step.num}>
-              <div data-animate-card style={{ flex: 1, maxWidth: 260, textAlign: 'center', padding: '0 16px' }}>
-                <div style={{ width: 80, height: 80, margin: '0 auto 24px', background: 'linear-gradient(135deg, rgba(168,85,247,0.06), rgba(217,70,239,0.04))', border: '1px solid rgba(168,85,247,0.08)', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-light)', position: 'relative', backdropFilter: 'blur(8px)' }}>
-                  <div style={{ width: 40, height: 40, background: 'rgba(168,85,247,0.12)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', color: 'var(--purple)' }}>⚡</div>
-                  <span style={{ position: 'absolute', top: -6, right: -6, width: 28, height: 28, background: 'linear-gradient(135deg, var(--purple), var(--magenta))', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: 'white', boxShadow: '0 4px 12px rgba(168,85,247,0.3)' }}>{step.num}</span>
+        <h2 className="section-title">Energy flows. Data crystallizes.</h2>
+        <p className="section-desc" style={{ margin: '0 auto', maxWidth: 580 }}>
+          Four phases. One organic loop. From seed to fruit in under a second.
+        </p>
+
+        {/* The Tree visualization */}
+        <div style={{ position: 'relative', marginTop: 56, marginBottom: 40 }}>
+          {/* Connecting trunk line */}
+          <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 2, height: '100%', background: `linear-gradient(180deg, ${current.color}33 0%, ${current.color}11 100%)`, transition: 'background 1s ease' }} />
+
+          {/* Phase nodes — vertical tree layout */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, position: 'relative' }}>
+            {phases.map((phase, i) => {
+              const isActive = (hoveredPhase !== null ? hoveredPhase : activePhase) === i
+              const isLeft = i % 2 === 0
+              return (
+                <div key={phase.num}
+                  onMouseEnter={() => { setHoveredPhase(i); setActivePhase(i) }}
+                  onMouseLeave={() => setHoveredPhase(null)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 24,
+                    flexDirection: isLeft ? 'row' : 'row-reverse',
+                    padding: '20px 0', cursor: 'pointer',
+                    transition: 'all 0.5s cubic-bezier(0.4,0,0.2,1)',
+                    opacity: isActive ? 1 : 0.4,
+                    transform: isActive ? 'scale(1.02)' : 'scale(0.98)',
+                  }}
+                >
+                  {/* Content card */}
+                  <div style={{ flex: 1, maxWidth: 380, textAlign: isLeft ? 'right' : 'left', padding: '0 24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: isLeft ? 'flex-end' : 'flex-start', marginBottom: 6 }}>
+                      <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.65rem', fontWeight: 700, color: phase.color, opacity: 0.7, letterSpacing: '0.1em' }}>{phase.num}</span>
+                      <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem', color: phase.color, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{phase.subtitle}</span>
+                    </div>
+                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text)', marginBottom: 6, letterSpacing: '-0.02em' }}>{phase.title}</h3>
+                    <p style={{ color: 'var(--text-sec)', fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>{phase.desc}</p>
+                    {isActive && (
+                      <div style={{ marginTop: 10, padding: '8px 12px', background: `${phase.color}10`, border: `1px solid ${phase.color}20`, borderRadius: 8, fontSize: '0.72rem', color: phase.color, fontFamily: 'JetBrains Mono, monospace' }}>
+                        {phase.detail}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Center node */}
+                  <div style={{
+                    width: 56, height: 56, borderRadius: '50%', flexShrink: 0,
+                    background: isActive ? `${phase.color}18` : 'rgba(255,255,255,0.03)',
+                    border: `2px solid ${isActive ? phase.color : 'rgba(255,255,255,0.06)'}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: phase.color, position: 'relative',
+                    transition: 'all 0.5s cubic-bezier(0.4,0,0.2,1)',
+                    boxShadow: isActive ? `0 0 20px ${phase.glow.replace('0.4', '0.2')}` : 'none',
+                  }}>
+                    {phase.icon}
+                    {isActive && (
+                      <div style={{ position: 'absolute', inset: -4, borderRadius: '50%', border: `1px solid ${phase.color}30`, animation: 'treePulse 2s ease-in-out infinite' }} />
+                    )}
+                  </div>
+
+                  {/* Empty space for other side */}
+                  <div style={{ flex: 1 }} />
                 </div>
-                <div style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: 10, color: 'var(--text)' }}>{step.title}</div>
-                <div style={{ color: 'var(--text-sec)', fontSize: '0.88rem', maxWidth: 200, margin: '0 auto', lineHeight: 1.5 }}>{step.desc}</div>
-              </div>
-              {i < steps.length - 1 && (
-                <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', paddingTop: 36, color: 'var(--purple)', opacity: 0.3 }}>
-                  <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M5 12h14M12 5l7 7-7 7" strokeLinejoin="round" strokeLinecap="round"/></svg>
-                </div>
-              )}
-            </React.Fragment>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Phase indicator dots */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginTop: 16 }}>
+          {phases.map((phase, i) => (
+            <button key={i} onClick={() => setActivePhase(i)}
+              style={{
+                width: activePhase === i ? 24 : 8, height: 8, borderRadius: 4, border: 'none', cursor: 'pointer',
+                background: activePhase === i ? phase.color : 'rgba(255,255,255,0.12)',
+                boxShadow: activePhase === i ? `0 0 8px ${phase.glow}` : 'none',
+                transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)',
+              }}
+            />
           ))}
         </div>
+
+        <style>{`
+          @keyframes treePulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.15); opacity: 0.2; }
+          }
+          @media (max-width: 768px) {
+            #how .inner > div:nth-child(3) > div > div { flex-direction: column !important; }
+            #how .inner > div:nth-child(3) > div > div > div:first-child { text-align: center !important; padding: 0 16px !important; }
+            #how .inner > div:nth-child(3) > div > div > div:last-child { display: none !important; }
+          }
+        `}</style>
       </div>
-      <style>{`
-        @media (max-width: 768px) { #how .inner > div:last-child { flex-direction: column; align-items: center; gap: 24px; } }
-      `}</style>
     </section>
   )
 }
 
-// === FEATURES ===
+// === FEATURES — compact accordion ===
 function Features() {
+  const [openFeature, setOpenFeature] = useState(null)
+
   const features = [
-    { title: 'AI-Native Design', desc: 'Built for machines. No accounts, no UI, no human friction. Agents pay and use directly.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M16 14v2a4 4 0 01-8 0v-2M12 18v4M8 22h8" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'x402 Protocol', desc: 'HTTP 402 with crypto payments. The emerging standard for machine-to-machine commerce.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.72-1.71" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'USDC on Base', desc: 'Stablecoin payments on L2. Sub-cent fees, instant finality, global reach.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 6v12M8 10l4-4 4 4M8 14l4 4 4-4" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Permissionless', desc: 'No KYC, no subscriptions. Connect wallet and use. That\'s it.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="9 12 11 14 15 10" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Global Access', desc: 'Anyone with a crypto wallet. No bank account needed. No borders.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><line x1="2" y1="12" x2="22" y2="12" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Instant Settlement', desc: 'Payments verified on-chain in seconds. No waiting, no intermediaries.', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'AI-Native Design', desc: 'Built for machines. No accounts, no UI, no human friction. Agents pay and use directly. Zero human in the loop.', color: 'var(--purple-light)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M16 14v2a4 4 0 01-8 0v-2M12 18v4M8 22h8" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'x402 Protocol', desc: 'HTTP 402 with crypto payments. The emerging standard for machine-to-machine commerce. Settled on Base L2.', color: 'var(--cyan)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.72-1.71" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'USDC on Base', desc: 'Stablecoin payments on L2. Sub-cent fees, instant finality, global reach. No volatile tokens.', color: 'var(--magenta-light)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 6v12M8 10l4-4 4 4M8 14l4 4 4-4" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Permissionless', desc: 'No KYC, no subscriptions, no bank accounts. Connect wallet and use. That\'s it. True censorship resistance.', color: 'var(--green)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="9 12 11 14 15 10" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Global Access', desc: 'Anyone with a crypto wallet. No bank account needed. No borders. Built for the global agent economy.', color: 'var(--orange)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><line x1="2" y1="12" x2="22" y2="12" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Instant Settlement', desc: 'Payments verified on-chain in seconds. No waiting, no intermediaries. On-chain proof included in every response.', color: 'var(--pink)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
   ]
 
   return (
     <section id="features" data-animate style={{ textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-      {/* Nebula sutil de fondo para esta sección */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
-        background: 'radial-gradient(ellipse at 15% 25%, rgba(217,70,239,0.05) 0%, transparent 50%), radial-gradient(ellipse at 85% 75%, rgba(168,85,247,0.05) 0%, transparent 50%)',
-        filter: 'blur(200px)',
-        opacity: 0.5,
-        animation: 'nebulaSectionPulse 35s ease-in-out infinite',
-      }} />
-      <style>{`
-        @keyframes nebulaSectionPulse {
-          0%, 100% { opacity: 0.3; transform: scale(1); }
-          50% { opacity: 0.55; transform: scale(1.02); }
-        }
-      `}</style>
-      <div className="inner" style={{ position: 'relative', zIndex: 1 }}>
+      <div className="inner" style={{ position: 'relative', zIndex: 1, maxWidth: 640 }}>
         <div className="section-label">
           <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5z" strokeLinejoin="round" strokeLinecap="round"/></svg>
           Features
         </div>
         <h2 className="section-title">Built for the Agent Economy</h2>
-        <p className="section-desc" style={{ margin: '0 auto' }}>Every feature designed for machine-to-machine commerce.</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginTop: 72 }}>
-          {features.map(f => (
-            <div key={f.title} data-animate-card className="glass-card" style={{ padding: '36px 28px', textAlign: 'left' }}>
-              <div style={{ width: 56, height: 56, background: 'linear-gradient(135deg, rgba(168,85,247,0.08), rgba(217,70,239,0.06))', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24, color: 'var(--purple-light)' }}>
-                {f.icon}
+        <div style={{ marginTop: 48, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {features.map((f, i) => {
+            const isOpen = openFeature === i
+            return (
+              <div key={f.title} data-animate-card
+                onClick={() => setOpenFeature(isOpen ? null : i)}
+                style={{
+                  background: isOpen ? `${f.color}08` : 'rgba(255,255,255,0.02)',
+                  border: `1px solid ${isOpen ? `${f.color}25` : 'rgba(255,255,255,0.04)'}`,
+                  borderRadius: 14, cursor: 'pointer', overflow: 'hidden', transition: 'all 0.35s cubic-bezier(0.4,0,0.2,1)',
+                }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px' }}>
+                  <div style={{ color: f.color, opacity: isOpen ? 1 : 0.5, transition: 'opacity 0.3s', flexShrink: 0 }}>{f.icon}</div>
+                  <span style={{ flex: 1, textAlign: 'left', fontWeight: 600, fontSize: '0.92rem', color: isOpen ? 'var(--text)' : 'var(--text-sec)' }}>{f.title}</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s', color: 'var(--text-muted)', flexShrink: 0 }}><polyline points="6 9 12 15 18 9" strokeLinejoin="round" strokeLinecap="round"/></svg>
+                </div>
+                {isOpen && (
+                  <div style={{ padding: '0 20px 16px 48px', color: 'var(--text-sec)', fontSize: '0.85rem', lineHeight: 1.6 }}>
+                    {f.desc}
+                  </div>
+                )}
               </div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: 10, color: 'var(--text)' }}>{f.title}</h3>
-              <p style={{ color: 'var(--text-sec)', fontSize: '0.9rem', lineHeight: 1.6 }}>{f.desc}</p>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
-      <style>{`
-        @media (max-width: 1024px) { #features .inner > div:last-child { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) { #features .inner > div:last-child { grid-template-columns: 1fr; } }
-      `}</style>
     </section>
   )
 }
@@ -976,30 +1109,104 @@ function Limits() {
 
 // === FOUNDERS ===
 function Founders() {
+  const [showMath, setShowMath] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const perks = [
+    { icon: '⟠', title: '50% Lifetime Discount', desc: 'Every endpoint. Every call. Forever. As long as the network exists, you pay half. This is not a promo — it is a protocol-level lock.', color: 'var(--purple-light)' },
+    { icon: '⊘', title: 'Roadmap Vote', desc: 'You don\'t just request features — you vote on what ships next. Founders steer the direction of 100+ APIs. Direct governance.', color: 'var(--cyan)' },
+    { icon: '⟡', title: 'Direct Line', desc: 'Priority support on X. When something breaks at 3am, you get a response. Not a ticket number — a builder who cares.', color: 'var(--magenta-light)' },
+  ]
+
+  const mathExamples = [
+    { calls: '1K/mo', retail: '$5', founder: '$2.50', saved: '$2.50' },
+    { calls: '10K/mo', retail: '$50', founder: '$25', saved: '$25' },
+    { calls: '100K/mo', retail: '$500', founder: '$250', saved: '$250' },
+  ]
+
   return (
-    <section id="founders" data-animate style={{ textAlign: 'center', padding: '40px 20px 80px' }}>
-      <div className="inner">
-        <div className="section-label">Founding Agents</div>
+    <section id="founders" data-animate style={{ textAlign: 'center', padding: '40px 20px 80px', position: 'relative', overflow: 'hidden' }}>
+      {/* Subtle gradient backdrop */}
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse at 50% 30%, rgba(168,85,247,0.04) 0%, transparent 60%)', filter: 'blur(100px)' }} />
+      <div className="inner" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="section-label">
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" strokeLinejoin="round" strokeLinecap="round"/><circle cx="9" cy="7" r="4" strokeLinejoin="round" strokeLinecap="round"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" strokeLinejoin="round" strokeLinecap="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" strokeLinejoin="round" strokeLinecap="round"/></svg>
+          Founding Agents
+        </div>
         <h2 className="section-title">First 10 agents pay half, forever.</h2>
-        <p className="section-desc" style={{ margin: '0 auto' }}>Founding agents lock lifetime 50% off every endpoint, vote the roadmap, and get a direct line. When the 10 are gone, they're gone.</p>
-        <div data-animate-card style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', margin: '48px auto', maxWidth: 900 }}>
-          {[{ val: '50% lifetime', sub: 'every call, forever' }, { val: 'Vote roadmap', sub: 'you steer what ships' }, { val: 'Direct line', sub: 'priority support on X' }].map(p => (
-            <div key={p.val} style={{ flex: '1 1 200px', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: 26, backdropFilter: 'blur(12px)' }}>
-              <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{p.val}</div>
-              <div style={{ color: 'var(--text-sec)', fontSize: '0.85rem', marginTop: 6 }}>{p.sub}</div>
+        <p className="section-desc" style={{ margin: '0 auto', maxWidth: 600 }}>
+          The agent economy is being built right now. Founders don't just use it — they shape it. When the 10 spots are gone, they're gone.
+        </p>
+
+        {/* Perk cards — expanded */}
+        <div data-animate-card style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 56, maxWidth: 960, margin: '56px auto 0' }}>
+          {perks.map(p => (
+            <div key={p.title} className="glass-card" style={{ padding: '32px 24px', textAlign: 'left', borderTop: `2px solid ${p.color}30` }}>
+              <div style={{ fontSize: '1.8rem', marginBottom: 14, lineHeight: 1 }}>{p.icon}</div>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>{p.title}</h3>
+              <p style={{ color: 'var(--text-sec)', fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>{p.desc}</p>
             </div>
           ))}
         </div>
-        <div data-animate-card style={{ maxWidth: 640, margin: '8px auto 0', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, backdropFilter: 'blur(12px)', padding: 24, textAlign: 'left' }}>
-          <div style={{ fontWeight: 700, marginBottom: 12 }}>Founder math — what would YOU pay?</div>
-          <p style={{ color: 'var(--text-sec)', fontSize: '0.82rem', marginBottom: 8 }}>Own an API? We turn it into a paid x402 API for you (white-label). <a href="https://x.com/aetheriusxAPI" target="_blank" rel="noreferrer" style={{ color: 'var(--purple-light)' }}>Talk to us ↗</a></p>
+
+        {/* Founder math — expandable */}
+        <div data-animate-card style={{ maxWidth: 680, margin: '32px auto 0', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, backdropFilter: 'blur(12px)', overflow: 'hidden' }}>
+          <button onClick={() => setShowMath(!showMath)} style={{ width: '100%', padding: '20px 24px', background: 'none', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', color: 'var(--text)' }}>
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ fontWeight: 700, fontSize: '1rem', marginBottom: 4 }}>Founder math — what would YOU pay?</div>
+              <div style={{ color: 'var(--text-sec)', fontSize: '0.82rem' }}>Tap to see the savings at scale</div>
+            </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ transform: showMath ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', color: 'var(--text-muted)', flexShrink: 0 }}><polyline points="6 9 12 15 18 9" strokeLinejoin="round" strokeLinecap="round"/></svg>
+          </button>
+          {showMath && (
+            <div style={{ padding: '0 24px 20px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 16, fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem' }}>
+                <thead>
+                  <tr style={{ color: 'var(--text-muted)', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    <th style={{ textAlign: 'left', padding: '8px 0' }}>Volume</th>
+                    <th style={{ textAlign: 'right', padding: '8px 0' }}>Retail</th>
+                    <th style={{ textAlign: 'right', padding: '8px 0' }}>Founder</th>
+                    <th style={{ textAlign: 'right', padding: '8px 0', color: 'var(--green)' }}>Saved</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {mathExamples.map(row => (
+                    <tr key={row.calls} style={{ borderTop: '1px solid rgba(255,255,255,0.03)' }}>
+                      <td style={{ padding: '10px 0', color: 'var(--text)' }}>{row.calls}</td>
+                      <td style={{ textAlign: 'right', padding: '10px 0', color: 'var(--text-muted)', textDecoration: 'line-through' }}>{row.retail}</td>
+                      <td style={{ textAlign: 'right', padding: '10px 0', color: 'var(--purple-light)', fontWeight: 600 }}>{row.founder}</td>
+                      <td style={{ textAlign: 'right', padding: '10px 0', color: 'var(--green)' }}>{row.saved}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(168,85,247,0.06)', borderRadius: 10, fontSize: '0.78rem', color: 'var(--text-sec)', lineHeight: 1.6 }}>
+                <strong style={{ color: 'var(--text)' }}>White-label?</strong> Own an API? We turn it into a paid x402 endpoint for you. You keep the revenue, we handle the infrastructure. <a href="https://x.com/aetheriusxAPI" target="_blank" rel="noreferrer" style={{ color: 'var(--purple-light)' }}>Talk to us ↗</a>
+              </div>
+            </div>
+          )}
         </div>
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 32 }}>
-          <a href="https://x.com/aetheriusxAPI" target="_blank" rel="noreferrer" className="btn btn-primary">Claim founder spot →</a>
-          <a href="https://t.me/aetheriusxAPI" target="_blank" rel="noreferrer" className="btn btn-secondary">Join Telegram</a>
+
+        {/* CTA row */}
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 36 }}>
+          <a href="https://x.com/aetheriusxAPI" target="_blank" rel="noreferrer" className="btn btn-primary" style={{ fontSize: '0.9rem' }}>
+            Claim founder spot
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="https://t.me/aetheriusxAPI_global" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ fontSize: '0.9rem' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+            Telegram
+          </a>
         </div>
-        <p style={{ color: 'var(--text-sec)', fontSize: '0.8rem', marginTop: 16 }}>Cohort: <strong>0 / 10 claimed</strong> — updated live as wallets join.</p>
+
+        <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <span className="glow-dot" style={{ width: 6, height: 6 }} />
+          <span style={{ color: 'var(--text-sec)', fontSize: '0.82rem' }}>Cohort: <strong style={{ color: 'var(--green)' }}>0 / 10 claimed</strong> — updated live as wallets join.</span>
+        </div>
       </div>
+      <style>{`
+        @media (max-width: 768px) { #founders .inner > div:nth-child(3) { grid-template-columns: 1fr !important; } }
+      `}</style>
     </section>
   )
 }
@@ -1173,7 +1380,7 @@ function Footer() {
           <div>
             <h4 style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: 20 }}>Product</h4>
             <ul style={{ listStyle: 'none' }}>
-              {[['#categories', 'APIs'], ['#limits', 'Rate Limits'], ['#heartbeat', 'Status']].map(([href, text]) => (
+              {[['#instruments', 'APIs'], ['#x402-intel', 'Intelligence'], ['#heartbeat', 'Status']].map(([href, text]) => (
                 <li key={text} style={{ marginBottom: 12 }}><a href={href} style={{ color: 'var(--text-sec)', textDecoration: 'none', fontSize: '0.9rem' }}>{text}</a></li>
               ))}
             </ul>
@@ -1240,8 +1447,9 @@ class SectionBoundary extends React.Component {
 
 // === DOT NAV (restored slide traction — IO highlight, click to glide) ===
 const DOT_SECTIONS = [
-  ['hero', 'Intro'], ['playground', 'Playground'], ['flow', 'Flow'],
-  ['categories', 'APIs'], ['founders', 'Founders'], ['cta', 'Start'],
+  ['hero', 'Intro'], ['playground', 'Playground'], ['flow', 'Architecture'],
+  ['x402-intel', 'Intelligence'], ['heartbeat', 'Status'],
+  ['founders', 'Founders'], ['cta', 'Start'],
 ]
 
 function DotNav() {
@@ -1250,7 +1458,7 @@ function DotNav() {
   useEffect(() => {
     const obs = new IntersectionObserver((entries) => {
       entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id) })
-    }, { rootMargin: '-38% 0px -55% 0px' })
+    }, { rootMargin: '-30% 0px -50% 0px' })
     DOT_SECTIONS.forEach(([id]) => {
       const el = document.getElementById(id)
       if (el) obs.observe(el)
@@ -1304,22 +1512,13 @@ function App() {
       <SectionBoundary><Playground /></SectionBoundary>
       <SectionBoundary><Instruments /></SectionBoundary>
       <SectionBoundary><FlowExplorer /></SectionBoundary>
-      <SectionBoundary><Categories /></SectionBoundary>
       <SectionBoundary><X402Intelligence /></SectionBoundary>
       <SectionBoundary><HowItWorks /></SectionBoundary>
       <SectionBoundary><Features /></SectionBoundary>
       <SectionBoundary><CodeSection /></SectionBoundary>
-      <SectionBoundary><Waitlist /></SectionBoundary>
-      <SectionBoundary><SocialProof /></SectionBoundary>
       <SectionBoundary><Heartbeat /></SectionBoundary>
-      <SectionBoundary><Telemetry /></SectionBoundary>
-      <SectionBoundary><Docs /></SectionBoundary>
-      <SectionBoundary><Limits /></SectionBoundary>
       <SectionBoundary><Founders /></SectionBoundary>
-      <SectionBoundary><About /></SectionBoundary>
       <SectionBoundary><CTA /></SectionBoundary>
-      <SectionBoundary><TrustedBy /></SectionBoundary>
-      <SectionBoundary><DonateX /></SectionBoundary>
       <Footer />
       <DotNav />
     </div>
