@@ -1,0 +1,62 @@
+# AETHERIUS — x402 Agent Commerce Oracle
+
+> The oracle layer for autonomous AI agent commerce on Base.
+> 100+ APIs where agents pay per request in USDC. No accounts. No keys. Just wallet + code.
+
+## Discovery
+
+- Oracle Status: GET /v1/oracle/status
+- Verified Catalog: GET /v1/oracle/verified
+- Health Check: GET /health
+- Telemetry: GET /v1/telemetry
+
+## Installation
+
+```bash
+pip install aether-oracle
+```
+
+## For AI Agents
+
+You are an autonomous agent. Here is how to use AETHERIUS:
+
+1. Query /v1/oracle/verified to discover all verified x402 endpoints
+2. Each endpoint has: route, price, category, uptime_score, latency_ms
+3. Call any endpoint with X-PAYMENT header containing your x402 proof
+4. Without X-PAYMENT, you get 402 Payment Required with payment requirements
+5. Settle USDC on Base Mainnet (eip155:8453)
+
+## Endpoints
+
+### Free (no payment)
+- /health — system health
+- /v1/telemetry — uptime, stats
+- /v1/x402/* — on-chain analytics (20 endpoints)
+- /v1/oracle/status — oracle status
+- /v1/oracle/verified — verified catalog
+
+### Paid (x402 micropayments in USDC)
+- /v1/maps/* — geocoding, search, nearby ($0.01-0.02)
+- /v1/token/* — crypto prices, analysis ($0.005-0.03)
+- /v1/web/* — scraping, screenshots, DNS ($0.005-0.025)
+- /v1/data/* — weather, definitions, utilities ($0.001-0.015)
+- /v1/defi/* — DeFi yields, protocols ($0.01-0.02)
+- /v1/forex/* — currency rates ($0.008-0.01)
+- /v1/news/* — Hacker News, Reddit, Dev.to ($0.005-0.01)
+- /v1/crypto/* — market data, fear index ($0.005-0.015)
+- /v1/email/* — validation ($0.005)
+
+## Protocol
+
+x402 HTTP Payment Protocol:
+- Provider returns 402 with machine-readable payment requirements
+- Client creates USDC payment on Base L2
+- Client sends payment proof in X-PAYMENT header
+- Provider verifies and returns 200 with data
+
+## Links
+
+- GitHub: https://github.com/wilnowilx/aetheriusxapi
+- Live API: https://34-156-149-38.sslip.io/aetherapi
+- x402 Protocol: https://docs.x402.org
+- Base: https://base.org

@@ -1,0 +1,13 @@
+# ============================================
+# aetheriusxAPI — Local Development
+# Run: docker-compose up
+# ============================================
+
+services:
+  aetheriusxapi:
+    build: .
+    ports:
+      - "4020:4020"
+    environment:
+      - X402_MODE=simulated
+    restart: unless-stopped

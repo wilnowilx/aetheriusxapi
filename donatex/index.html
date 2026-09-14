@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DonateX — Accept USDC Donations in 5 Minutes</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💜</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{--bg:#09090b;--purple:#a855f7;--magenta:#d946ef;--pink:#ec4899;--green:#10b981;--orange:#f59e0b;--text:#f0f0f5;--sec:#8a8a9a;--surface:#0e0e18;--border:rgba(168,85,247,.3)}
+::-webkit-scrollbar{display:none}*{margin:0;padding:0;box-sizing:border-box;scrollbar-width:none}
+html{overflow-x:hidden;scroll-snap-type:y mandatory;scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* === PLASMA BG === */
+#plasma-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
+.plasma-blob{position:absolute;border-radius:42% 58% 63% 37%/45% 42% 58% 55%;filter:blur(90px);mix-blend-mode:screen;animation:plasmaFloat 14s ease-in-out infinite alternate,auroraMorph 19s ease-in-out infinite alternate}
+.plasma-blob:nth-child(1){width:560px;height:560px;background:radial-gradient(circle,rgba(168,85,247,.5) 0%,transparent 70%);top:-12%;left:-8%;animation-duration:16s}
+.plasma-blob:nth-child(2){width:480px;height:480px;background:radial-gradient(circle,rgba(217,70,239,.45) 0%,transparent 70%);top:35%;right:-10%;animation-duration:13s;animation-delay:-5s}
+.plasma-blob:nth-child(3){width:420px;height:420px;background:radial-gradient(circle,rgba(236,72,153,.4) 0%,transparent 70%);bottom:-8%;left:25%;animation-duration:15s;animation-delay:-9s}
+@keyframes plasmaFloat{0%{transform:translate(0,0) scale(1)}25%{transform:translate(80px,-55px) scale(1.14)}50%{transform:translate(-45px,70px) scale(.94)}75%{transform:translate(60px,25px) scale(1.06)}100%{transform:translate(-30px,-45px) scale(1)}}
+@keyframes auroraMorph{0%,100%{border-radius:42% 58% 63% 37%/45% 42% 58% 55%}33%{border-radius:63% 37% 42% 58%/55% 58% 42% 45%}66%{border-radius:37% 63% 55% 45%/42% 55% 45% 58%}}
+
+/* === THREE.JS CANVAS === */
+#three-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* === FADE UP === */
+.fade-up{opacity:0;transform:translateY(40px);transition:all .8s cubic-bezier(.16,1,.3,1)}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+/* === NAV === */
+nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:18px 40px;background:rgba(9,9,11,.85);backdrop-filter:blur(16px);border-bottom:1px solid rgba(168,85,247,.08);z-index:1000;transition:all .3s}
+nav.scrolled{padding:12px 40px;background:rgba(9,9,11,.95)}
+.brand{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:24px;align-items:center}
+.nav-links a{color:var(--sec);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--purple)}
+.nav-cta{background:linear-gradient(135deg,var(--purple),var(--magenta))!important;color:#fff!important;padding:10px 22px!important;border-radius:10px;font-weight:600!important;transition:all .3s!important}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(168,85,247,.4)}
+
+/* === HERO === */
+.hero{position:relative;z-index:1;min-height:auto;display:flex;align-items:center;justify-content:center;text-align:center;padding:140px 20px 60px;scroll-snap-align:start}
+.hero-inner{max-width:900px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);border-radius:50px;padding:8px 22px;font-size:13px;color:var(--purple);font-weight:600;margin-bottom:28px;animation:badgePulse 3s ease-in-out infinite}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(168,85,247,0)}50%{box-shadow:0 0 0 8px rgba(168,85,247,.1)}}
+.hero h1{font-size:64px;font-weight:900;line-height:1.05;margin-bottom:24px;letter-spacing:-2px}
+.hero h1 span{background:linear-gradient(135deg,var(--purple),var(--magenta),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% 200%;animation:gradShift 4s ease-in-out infinite alternate}
+@keyframes gradShift{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+.hero p{font-size:19px;color:var(--sec);line-height:1.65;max-width:620px;margin:0 auto 40px}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.hero-visual{margin-top:32px;font-size:12px;color:var(--sec);letter-spacing:.5px;opacity:.7}
+.btn{padding:16px 36px;border-radius:14px;font-weight:700;font-size:16px;text-decoration:none;transition:all .3s;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn-fill{background:linear-gradient(135deg,var(--purple),var(--magenta));color:#fff}
+.btn-fill:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(168,85,247,.45)}
+.btn-ghost{background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);color:var(--purple)}
+.btn-ghost:hover{background:rgba(168,85,247,.15);transform:translateY(-1px)}
+
+/* === STATS === */
+.stats{position:relative;z-index:1;display:flex;justify-content:center;gap:32px;padding:32px 20px;border-top:1px solid rgba(168,85,247,.08);border-bottom:1px solid rgba(168,85,247,.08);max-width:650px;margin:0 auto}
+.stat{text-align:center}
+.stat-val{font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-lbl{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1.2px;margin-top:2px}
+
+/* === TERMINAL === */
+.term-section{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:80px 20px;scroll-snap-align:start}
+.term-section h2{text-align:center;font-size:38px;font-weight:800;margin-bottom:12px}
+.term-section .sub{text-align:center;color:var(--sec);margin-bottom:40px;font-size:17px}
+.term-wrap{background:#0c0c10;border:1px solid rgba(168,85,247,.4);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);height:480px;display:flex;flex-direction:column}
+.term-chrome{display:flex;align-items:center;gap:8px;padding:12px 18px;background:#111116;border-bottom:1px solid rgba(168,85,247,.1);font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec);flex-shrink:0}
+.term-chrome .title{flex:1;text-align:center;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.term-chrome .dots{display:flex;gap:6px}
+.term-chrome .dot{width:12px;height:12px;border-radius:50%}
+.dot.r{background:#ef4444}.dot.y{background:#eab308}.dot.g{background:#22c55e}
+.progress-bar{height:3px;background:rgba(255,255,255,.06);border-left:1px solid rgba(168,85,247,.4);border-right:1px solid rgba(168,85,247,.4);flex-shrink:0}
+.progress-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--magenta),var(--pink));transition:width .3s}
+.term{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;padding:20px 24px;flex:1;overflow-y:auto;white-space:pre-wrap;word-break:break-word;position:relative;scrollbar-width:none}
+.term::-webkit-scrollbar{display:none}
+.term .banner{color:var(--purple);font-weight:700}
+.term .ok{color:var(--green)}.term .warn{color:var(--orange)}.term .dim{color:var(--sec)}.term .key{color:var(--purple)}.term .val{color:var(--pink)}.term .num{color:var(--orange)}.term .str{color:var(--green)}
+.cursor{display:inline-block;width:9px;height:17px;background:var(--purple);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.term-controls{display:flex;gap:12px;justify-content:center;padding:14px;background:#111116;border-top:1px solid rgba(168,85,247,.1);flex-shrink:0}
+.term-controls button{background:linear-gradient(90deg,var(--purple),var(--magenta));color:#fff;border:none;border-radius:9px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.term-controls button:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(168,85,247,.4)}
+.term-controls button.ghost{background:transparent;border:1px solid rgba(255,255,255,.2)}
+
+/* === WIKI TOOLTIPS === */
+.wiki{position:fixed;z-index:9999;max-width:380px;min-width:260px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.55;color:var(--text);box-shadow:0 12px 48px rgba(0,0,0,.6),0 0 24px rgba(168,85,247,.15);pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .25s,transform .25s}
+.wiki.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.wiki .wk{color:var(--purple);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.wiki .wt{font-weight:600;margin-bottom:6px;font-size:14px}
+.wiki .wd{color:var(--sec);font-size:13px;line-height:1.6}
+.wiki .wd code{background:rgba(168,85,247,.12);color:var(--purple);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12px}
+.wiki .wd strong{color:var(--text);font-weight:600}
+
+/* === FEATURES === */
+.features{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:60px 20px;scroll-snap-align:start}
+.features h2{text-align:center;font-size:38px;font-weight:800;margin-bottom:56px}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat{background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.1);border-radius:18px;padding:32px 24px;transition:all .3s}
+.feat:hover{border-color:rgba(168,85,247,.3);transform:translateY(-4px)}
+.feat-icon{font-size:32px;margin-bottom:14px}
+.feat h3{font-size:16px;margin-bottom:8px;font-weight:700}
+.feat p{font-size:13px;color:var(--sec);line-height:1.6}
+
+/* === COMPARE TABLE === */
+.compare{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:60px 20px;scroll-snap-align:start}
+.compare h2{text-align:center;font-size:28px;font-weight:700;margin-bottom:8px}
+.compare .sub{text-align:center;color:var(--sec);margin-bottom:28px;font-size:14px}
+.compare table{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid rgba(168,85,247,.12);border-radius:14px;overflow:hidden;font-size:13px}
+.compare th{background:rgba(168,85,247,.08);padding:12px 16px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--purple)}
+.compare td{padding:10px 16px;font-size:13px;border-top:1px solid rgba(168,85,247,.06)}
+.compare tr:hover td{background:rgba(168,85,247,.03)}
+.compare .win{color:var(--green);font-weight:600}.compare .lose{color:#ef4444}
+
+/* === DOCS === */
+.docs{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:60px 20px;scroll-snap-align:start}
+.docs h2{text-align:center;font-size:38px;font-weight:800;margin-bottom:16px}
+.docs .sub{text-align:center;color:var(--sec);margin-bottom:40px;font-size:17px}
+.doc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.doc-card{background:var(--surface);border:1px solid rgba(168,85,247,.12);border-radius:16px;padding:28px;transition:all .3s}
+.doc-card:hover{border-color:rgba(168,85,247,.3);transform:translateY(-2px)}
+.doc-card h3{font-size:16px;margin-bottom:8px;font-weight:700;display:flex;align-items:center;gap:8px}
+.doc-card p{font-size:13px;color:var(--sec);line-height:1.6}
+.doc-card pre{background:#16161d;border:1px solid rgba(168,85,247,.1);border-radius:10px;padding:14px;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;color:var(--text);overflow-x:auto}
+.doc-card pre .c{color:#475569}.doc-card pre .k{color:var(--purple)}.doc-card pre .s{color:var(--green)}.doc-card pre .a{color:var(--pink)}
+
+/* === LIVE VERIFY === */
+.verify{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:60px 20px;text-align:center;scroll-snap-align:start}
+.verify h2{font-size:38px;font-weight:800;margin-bottom:12px}
+.verify .sub{color:var(--sec);margin-bottom:40px;font-size:17px}
+.verify-box{background:var(--surface);border:1px solid rgba(168,85,247,.15);border-radius:18px;padding:32px;text-align:left}
+.verify-row{display:flex;gap:12px;margin-bottom:16px}
+.verify-input{flex:1;background:#16161d;border:1px solid rgba(168,85,247,.2);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;transition:border-color .2s}
+.verify-input:focus{border-color:var(--purple)}
+.verify-input::placeholder{color:#475569}
+.verify-btn{background:linear-gradient(90deg,var(--purple),var(--magenta));color:#fff;border:none;border-radius:10px;padding:12px 24px;font-weight:700;cursor:pointer;transition:all .2s}
+.verify-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(168,85,247,.4)}
+.verify-result{background:#16161d;border:1px solid rgba(168,85,247,.1);border-radius:12px;padding:20px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;min-height:80px;color:var(--sec)}
+
+/* === CTA === */
+.cta{position:relative;z-index:1;text-align:center;padding:80px 20px;background:linear-gradient(180deg,transparent,rgba(168,85,247,.05),transparent);scroll-snap-align:start}
+.cta h2{font-size:42px;font-weight:800;margin-bottom:16px}
+.cta p{color:var(--sec);font-size:18px;margin-bottom:36px}
+
+/* === FOOTER === */
+footer{position:relative;z-index:1;text-align:center;padding:40px 20px;border-top:1px solid rgba(168,85,247,.08);color:#475569;font-size:13px}
+footer a{color:var(--purple);text-decoration:none}
+
+@media(max-width:768px){.hero h1{font-size:36px}.feat-grid{grid-template-columns:1fr}.doc-grid{grid-template-columns:1fr}.stats{gap:20px;flex-wrap:wrap}.stat-val{font-size:22px}nav{padding:14px 20px}.nav-links{gap:14px}html{scroll-snap-type:none}}
+</style>
+</head>
+<body>
+
+<canvas id="three-canvas"></canvas>
+<div id="plasma-bg"><div class="plasma-blob"></div><div class="plasma-blob"></div><div class="plasma-blob"></div></div>
+
+<nav id="nav">
+  <div class="brand">💜 DonateX</div>
+  <div class="nav-links">
+    <a href="#terminal">Live Demo</a>
+    <a href="#features">Features</a>
+    <a href="#docs">Docs</a>
+    <a href="https://github.com/wilnowilx/aetheriusxapi/tree/main/donatex" target="_blank" class="nav-cta">GitHub</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">⚡ Open Source · No KYC · Base Network · $0 Gas</div>
+    <h1>Accept <span>USDC Donations</span><br>With One Line of Code</h1>
+    <p>A donation button that works everywhere. No Stripe. No PayPal. No bank accounts. Just a wallet address and 3KB of JavaScript.</p>
+    <div class="hero-btns">
+      <a href="#terminal" class="btn btn-fill">Watch Live Demo</a>
+      <a href="#code" class="btn btn-ghost">Get the Code</a>
+    </div>
+    <p class="hero-visual">✦ Each particle is a USDC transfer flowing on Base Network — real-time agent economy visualization</p>
+  </div>
+</section>
+
+<!-- TERMINAL DEMO -->
+<section class="term-section fade-up" id="terminal">
+  <h2>See It In Action</h2>
+  <p class="sub">Interactive terminal replay. Click Play to watch the full flow — from adding the widget to receiving a donation.</p>
+  <div class="term-wrap">
+    <div class="term-chrome">
+      <div class="dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+      <span class="title">donatex — build + deploy.cast</span>
+    </div>
+    <div class="progress-bar"><i id="pbar"></i></div>
+    <div class="term" id="term"></div>
+    <div class="term-controls">
+      <button id="btnPlay">▶ Play</button>
+      <button id="btnReplay" class="ghost">↻ Replay</button>
+    </div>
+  </div>
+</section>
+
+<!-- WIKI TOOLTIP -->
+<div class="wiki" id="wiki"></div>
+
+<!-- STATS -->
+<div class="stats fade-up">
+  <div class="stat"><div class="stat-val">0%</div><div class="stat-lbl">Platform Fees</div></div>
+  <div class="stat"><div class="stat-val">0</div><div class="stat-lbl">Sign-ups</div></div>
+  <div class="stat"><div class="stat-val">3KB</div><div class="stat-lbl">Widget Size</div></div>
+  <div class="stat"><div class="stat-val">$0.001</div><div class="stat-lbl">Gas on Base</div></div>
+</div>
+
+<!-- FEATURES -->
+<section class="features fade-up" id="features">
+  <h2>Why DonateX?</h2>
+  <div class="feat-grid">
+    <div class="feat">
+      <div class="feat-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg></div>
+      <h3>No KYC Required</h3>
+      <p>Just a wallet address. No identity verification, no bank accounts. Works for anyone, anywhere.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--magenta)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <h3>$0.001 Gas</h3>
+      <p>Built on Base (Coinbase L2). Transactions cost less than a penny. Donors keep 99.9%.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+      <h3>Fully Transparent</h3>
+      <p>Every donation on-chain. Your community can verify exactly where funds go.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+      <h3>Works Everywhere</h3>
+      <p>Any website, any framework, any platform. If it has a script tag, it works.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <h3>Wallet Connect</h3>
+      <p>MetaMask, Rabby, or any Base wallet. One click, done.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+      <h3>Zero Dependencies</h3>
+      <p>Vanilla JavaScript. No React, no Vue, no build tools. Just 3KB.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="compare fade-up">
+  <h2>Honest Comparison</h2>
+  <p class="sub">The numbers speak for themselves.</p>
+  <table>
+    <thead><tr><th>Feature</th><th>DonateX</th><th>Stripe</th><th>PayPal</th></tr></thead>
+    <tbody>
+      <tr><td>Fees</td><td class="win">0%</td><td class="lose">2.9% + $0.30</td><td class="lose">3.49% + $0.49</td></tr>
+      <tr><td>KYC</td><td class="win">No</td><td class="lose">Yes</td><td class="lose">Yes</td></tr>
+      <tr><td>Bank Account</td><td class="win">No</td><td class="lose">Yes</td><td class="lose">Yes</td></tr>
+      <tr><td>Settlement</td><td class="win">Instant</td><td class="lose">2-7 days</td><td class="lose">1-3 days</td></tr>
+      <tr><td>Global</td><td class="win">Everyone</td><td class="lose">Limited</td><td class="lose">Limited</td></tr>
+      <tr><td>$1 Donation</td><td class="win">$0.999</td><td class="lose">$0.67</td><td class="lose">$0.47</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- DOCS -->
+<section class="docs fade-up" id="docs">
+  <h2>Quick Reference</h2>
+  <p class="sub">Everything you need to integrate DonateX.</p>
+  <div class="doc-grid">
+    <div class="doc-card">
+      <h3>📋 Script Tag</h3>
+      <p>Add to any HTML page. Only data-wallet is required.</p>
+      <pre><span class="c">&lt;!-- Minimal --&gt;</span>
+<span class="k">&lt;script</span>
+  <span class="a">src</span>=<span class="s">"widget.js"</span>
+  <span class="a">data-wallet</span>=<span class="s">"0xYOUR_ADDRESS"</span>
+<span class="k">&gt;&lt;/script&gt;</span>
+
+<span class="c">&lt;!-- Full options --&gt;</span>
+<span class="k">&lt;script</span>
+  <span class="a">src</span>=<span class="s">"widget.js"</span>
+  <span class="a">data-wallet</span>=<span class="s">"0xYOUR_ADDRESS"</span>
+  <span class="a">data-currency</span>=<span class="s">"USDC"</span>
+  <span class="a">data-amounts</span>=<span class="s">"1,5,10,25"</span>
+  <span class="a">data-position</span>=<span class="s">"bottom-right"</span>
+  <span class="a">data-label</span>=<span class="s">"Donate"</span>
+<span class="k">&gt;&lt;/script&gt;</span></pre>
+    </div>
+    <div class="doc-card">
+      <h3>🔍 Verification API</h3>
+      <p>Verify donations on-chain. Build dashboards and badges.</p>
+      <pre><span class="c"># Verify a transaction</span>
+<span class="k">GET</span> <span class="s">/donatex/api/verify</span>
+    ?tx=0x...
+    &wallet=0x...
+
+<span class="c"># Recent donations</span>
+<span class="k">GET</span> <span class="s">/donatex/api/recent</span>
+    ?wallet=0x...
+    &limit=10
+
+<span class="c"># Donation stats</span>
+<span class="k">GET</span> <span class="s">/donatex/api/stats</span>
+    ?wallet=0x...</pre>
+    </div>
+    <div class="doc-card">
+      <h3>⚙️ Configuration</h3>
+      <p>All data attributes. Only wallet is required.</p>
+      <pre><span class="a">data-wallet</span>     <span class="c">Your Base address</span>  <span class="s">required</span>
+<span class="a">data-currency</span>   <span class="c">Token to accept</span>    <span class="s">"USDC"</span>
+<span class="a">data-amounts</span>    <span class="c">Preset buttons</span>     <span class="s">"1,5,10,25"</span>
+<span class="a">data-position</span>   <span class="c">Button location</span>    <span class="s">"bottom-right"</span>
+<span class="a">data-label</span>      <span class="c">Button text</span>        <span class="s">"Donate"</span></pre>
+    </div>
+    <div class="doc-card">
+      <h3>📥 Install</h3>
+      <p>Clone, copy, or download. Zero build step.</p>
+      <pre><span class="c"># Clone the repo</span>
+<span class="k">git</span> clone https://github.com/wilnowilx/aetheriusxapi.git
+<span class="k">cp</span> aetheriusxapi/donatex/widget.js ./your-project/
+
+<span class="c"># Or download directly</span>
+<span class="k">curl</span> -O https://raw.githubusercontent.com/.../widget.js</pre>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE VERIFY -->
+<section class="verify fade-up" id="verify">
+  <h2>Verify a Donation</h2>
+  <p class="sub">Paste a transaction hash to verify it on-chain.</p>
+  <div class="verify-box">
+    <div class="verify-row">
+      <input class="verify-input" id="verifyTx" placeholder="0x... transaction hash">
+      <button class="verify-btn" id="verifyBtn">Verify</button>
+    </div>
+    <div class="verify-result" id="verifyResult">Paste a Base transaction hash above and click Verify.</div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta fade-up">
+  <h2>Start Receiving Donations Today</h2>
+  <p>One line of code. Zero fees. Global access.</p>
+  <a href="#code" class="btn btn-fill">Get the Widget →</a>
+</section>
+
+<footer>
+  <p>Built by <a href="https://github.com/wilnowilx/aetheriusxapi" target="_blank">AETHERIUS</a> · MIT License · <a href="https://github.com/wilnowilx/aetheriusxapi/tree/main/donatex" target="_blank">View Source</a></p>
+</footer>
+
+<!-- DONATEX WIDGET LIVE -->
+<script src="widget.js" data-wallet="0x677B483128D0399bCD0A5AB36eE990C246d7f61" data-currency="USDC" data-amounts="1,5,10,25" data-position="bottom-right" data-label="Donate USDC"></script>
+
+<script>
+// ═══════════════════════════════════════════════════
+// NAV SCROLL
+// ═══════════════════════════════════════════════════
+window.addEventListener('scroll', function(){
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ═══════════════════════════════════════════════════
+// FADE-UP ON SCROLL
+// ═══════════════════════════════════════════════════
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// ═══════════════════════════════════════════════════
+// TERMINAL REPLAYER + INTERACTIVE WIKI
+// ═══════════════════════════════════════════════════
+(function(){
+var term = document.getElementById('term');
+var pbar = document.getElementById('pbar');
+var btnPlay = document.getElementById('btnPlay');
+var btnReplay = document.getElementById('btnReplay');
+var wiki = document.getElementById('wiki');
+
+// Rich wiki content with HTML support
+var WIKI = {
+  setup: {
+    k:'SETUP', t:'One file · 3KB · Zero dependencies',
+    d:'Copy <code>widget.js</code> into your project. No npm, no build, no framework. It\'s a single vanilla JS file that works with any static site, React, Vue, Next.js, or plain HTML.',
+    code:'curl -O widget.js',
+    link:{text:'View on GitHub', url:'https://github.com/wilnowilx/aetheriusxapi/tree/main/donatex'},
+    tags:['vanilla-js','3kb','zero-deps']
+  },
+  config: {
+    k:'CONFIG', t:'Your wallet address',
+    d:'Set <code>data-wallet="0xYOUR_ADDRESS"</code> in the script tag. That\'s the only required attribute. Donations arrive directly to this address on Base Mainnet. No intermediaries.',
+    code:'data-wallet="0x677B...7f61"',
+    tags:['base-mainnet','no-kyc','direct']
+  },
+  amounts: {
+    k:'PRESETS', t:'Customizable donation tiers',
+    d:'The <code>data-amounts</code> attribute defines preset buttons. Default: 1,5,10,25 USDC. Donors can also type any custom amount. All values are in USDC (1:1 with USD).',
+    code:'data-amounts="1,5,10,25,50,100"',
+    tags:['usdc','custom-amount','flexible']
+  },
+  qr: {
+    k:'QR CODE', t:'Mobile-first donations',
+    d:'Generates a QR code using <strong>EIP-681 URI standard</strong>. Any mobile wallet that scans it (Coinbase Wallet, Rainbow, Trust Wallet) recognizes it as a USDC transfer on Base.',
+    tags:['eip-681','mobile','coinbase-wallet']
+  },
+  wallet: {
+    k:'WALLET', t:'One-click MetaMask connect',
+    d:'Supporters click → MetaMask pops up → confirm → done. The widget handles <strong>chain switching to Base</strong> automatically. If they\'re on Ethereum, it prompts to switch.',
+    tags:['metamask','chain-switch','one-click']
+  },
+  tx: {
+    k:'TRANSFER', t:'ERC-20 USDC transfer',
+    d:'Builds <code>transfer(address,uint256)</code> calldata directly. No web3.js, no ethers.js. Just raw <strong>JSON-RPC to window.ethereum</strong>. Gas on Base: ~$0.001.',
+    code:'eth_sendTransaction → USDC.transfer()',
+    tags:['erc-20','raw-rpc','gas-optimized']
+  },
+  confirm: {
+    k:'CONFIRM', t:'On-chain verification',
+    d:'Polls <code>eth_getTransactionReceipt</code> until <code>status=0x1</code>. Once confirmed, the donation is <strong>irreversible</strong> and permanently verifiable on BaseScan. No middleman can block it.',
+    tags:['irreversible','basescan','receipt']
+  },
+  verify: {
+    k:'VERIFY', t:'Public transparency',
+    d:'Every donation is verifiable via the <code>/donatex/api/verify</code> endpoint or directly on BaseScan. Build <strong>trust badges, leaderboards, or dashboards</strong> — all from public on-chain data.',
+    code:'GET /donatex/api/verify?tx=0x...',
+    tags:['transparency','api','public']
+  },
+  deploy: {
+    k:'DEPLOY', t:'Works anywhere',
+    d:'GitHub Pages, Vercel, Netlify, Cloudflare Pages, your own server — if it serves HTML, DonateX works. <strong>No server-side code needed.</strong> No accounts to manage.',
+    tags:['static','hosting','universal']
+  },
+  live: {
+    k:'LIVE API', t:'Real Base Mainnet verification',
+    d:'This calls the live verification API on Base Mainnet. The response is <strong>real data, no simulation</strong>. You can try it yourself right now with any Base transaction hash.',
+    tags:['mainnet','real','try-it']
+  },
+  chain: {
+    k:'BASE NETWORK', t:'Coinbase L2 · $0.001 gas',
+    d:'Base is an Ethereum L2 built by Coinbase. Transactions settle in <strong>~2 seconds</strong> with gas fees under a penny. It inherits Ethereum security while being 100x cheaper.',
+    tags:['l2','coinbase','ethereum']
+  },
+  erc20: {
+    k:'ERC-20', t:'USDC standard transfer',
+    d:'USDC follows the ERC-20 standard. The widget calls <code>transfer(recipient, amount)</code> directly. Each USDC = $1.00 USD, backed 1:1 by reserves.',
+    tags:['standard','stablecoin','1:1']
+  },
+  websocket: {
+    k:'REAL-TIME', t:'WebSocket confirmation',
+    d:'After sending the transaction, the widget subscribes to <strong>pending transactions</strong> via WebSocket. This gives instant confirmation instead of polling.',
+    tags:['websocket','instant','sub-second']
+  },
+  mobile: {
+    k:'MOBILE', t:'WalletConnect + deep links',
+    d:'On mobile, DonateX uses <strong>WalletConnect v2</strong> and EIP-681 deep links. Works with any mobile wallet — Coinbase Wallet, Rainbow, Trust Wallet, and more.',
+    tags:['walletconnect','deep-links','mobile-first']
+  },
+  fallback: {
+    k:'FALLBACK', t:'QR code for any wallet',
+    d:'If no wallet is detected, DonateX shows a <strong>QR code</strong> that any wallet can scan. This covers hardware wallets, mobile wallets, and desktop wallets that don\'t inject window.ethereum.',
+    tags:['qr','hardware-wallet','universal']
+  }
+};
+
+// Build rich wiki HTML
+function wikiHTML(k){
+  var w=WIKI[k]; if(!w) return null;
+  var h='<div class="wk">'+w.k+'</div><div class="wt">'+w.t+'</div><div class="wd">'+w.d+'</div>';
+  if(w.code) h+='<div style="background:#16161d;border:1px solid rgba(168,85,247,.15);border-radius:8px;padding:10px 14px;margin-top:10px;font-family:\'JetBrains Mono\',monospace;font-size:12px;color:var(--purple)">'+w.code+'</div>';
+  if(w.link) h+='<a href="'+w.link.url+'" target="_blank" style="display:inline-block;margin-top:10px;color:var(--magenta);font-size:12px;font-weight:600;text-decoration:none">'+w.link.text+' →</a>';
+  if(w.tags) h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">'+w.tags.map(function(t){return '<span style="background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.15);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--sec)">'+t+'</span>';}).join('')+'</div>';
+  return h;
+}
+
+var autoWiki = false;
+function showWiki(k){
+  var h=wikiHTML(k); if(!h) return;
+  wiki.innerHTML=h; wiki.classList.add('show');
+  var tr=term.getBoundingClientRect(), ww=Math.min(380,window.innerWidth-32), wx=tr.right+16;
+  if(wx+ww+16>window.innerWidth) wx=window.innerWidth-ww-16;
+  if(wx<16) wx=16;
+  var wy=tr.top+24; if(wy+260>window.innerHeight) wy=Math.max(8,window.innerHeight-270);
+  wiki.style.left=wx+'px'; wiki.style.top=wy+'px';
+}
+function hideWiki(){ wiki.classList.remove('show'); autoWiki=false; }
+
+var EQ='══════════════════════════════════════════════════════════';
+function B(t){return '<div class="banner">'+EQ+'</div><div class="banner">'+t+'</div><div class="banner">'+EQ+'</div>';}
+
+// Terminal steps — each line can trigger a wiki
+var S=[
+  {h:B('  STEP 1/6  COPY THE WIDGET'), g:600, wiki:'setup'},
+  {t:'$ mkdir my-project && cd my-project', g:300},
+  {t:'$ curl -O https://raw.githubusercontent.com/.../widget.js', g:400, wiki:'setup'},
+  {t:'✓ widget.js downloaded (3KB)', c:'ok', g:600},
+  {t:'  └─ No npm install. No package.json. Just one file.', c:'dim', g:400},
+
+  {h:B('  STEP 2/6  CONFIGURE YOUR WALLET'), g:600, wiki:'config'},
+  {t:'// Add to your HTML:', g:300},
+  {t:'<script src="widget.js" data-wallet="0xYOUR_ADDRESS"><\/script>', g:500, wiki:'config'},
+  {t:'  └─ That\'s the ENTIRE setup. One line.', c:'dim', g:400},
+  {t:'  └─ Optional: data-amounts="1,5,10,25"', c:'dim', g:400, wiki:'amounts'},
+  {t:'✓ Done. Your site now accepts crypto donations.', c:'ok', g:800},
+
+  {h:B('  STEP 3/6  OPEN IN BROWSER'), g:600, wiki:'deploy'},
+  {t:'$ open index.html', g:300},
+  {t:'→ Browser loads... widget injects itself', g:400, wiki:'deploy'},
+  {t:'→ DOM ready: button created at position fixed', g:400},
+  {t:'→ Style applied: background gradient purple→magenta', g:400},
+  {t:'  └─ CSS: bottom-right, z-index 9999, border-radius 50%', c:'dim', g:400},
+  {t:'→ Widget ready. Click to open donation modal.', g:400, wiki:'qr'},
+  {t:'  └─ Modal renders: QR code + "Connect Wallet" button', c:'dim', g:400},
+  {t:'→ Preset buttons: $1 · $5 · $10 · $25', g:400, wiki:'amounts'},
+  {t:'→ Or type any custom amount', g:600},
+
+  {h:B('  STEP 4/6  DONOR CONNECTS WALLET'), g:600, wiki:'wallet'},
+  {t:'→ Donor clicks "💜 Donate"', g:300},
+  {t:'→ Modal shows: QR code + "Connect Wallet" button', g:400},
+  {t:'→ Donor clicks Connect → MetaMask popup', g:400, wiki:'wallet'},
+  {t:'  └─ Auto-switches to Base Network if needed', c:'dim', g:400, wiki:'chain'},
+  {t:'→ Donor selects $10 USDC → Confirm', g:400},
+  {t:'→ Widget builds ERC-20 transfer calldata', g:400, wiki:'tx'},
+  {t:'  └─ transfer(0x677B...7f61, 10.00 * 10^6)', c:'dim', g:400, wiki:'erc20'},
+  {t:'→ Transaction sent: 0x7a3f...b2c1', g:600},
+
+  {h:B('  STEP 5/6  ON-CHAIN CONFIRMATION'), g:600, wiki:'confirm'},
+  {t:'→ Subscribing to pending transactions...', g:400, wiki:'websocket'},
+  {t:'→ eth_getTransactionReceipt polling...', g:400},
+  {t:'→ status: 0x1 ✓  blockNumber: 12345678', c:'ok', g:400},
+  {t:'✓ CONFIRMED! $10.00 USDC received.', c:'ok', g:400},
+  {t:'  └─ Irreversible. Permanent. Verifiable.', c:'dim', g:400},
+  {t:'→ BaseScan: basescan.org/tx/0x7a3f...b2c1', c:'dim', g:600, wiki:'verify'},
+
+  {h:B('  STEP 6/6  VERIFY VIA API — LIVE CALL'), g:600, wiki:'live'},
+  {t:'$ curl https://34-156-149-38.sslip.io/aetherapi/donatex/api/verify?tx=0x7a3f...', g:500, wiki:'verify'},
+  {t:'{', g:200},
+  {t:'  "verified": true,', c:'ok', g:200},
+  {t:'  "from": "0xDonor...",', g:200},
+  {t:'  "to": "0x677B...7f61",', g:200},
+  {t:'  "amount_usdc": "10.00",', g:200},
+  {t:'  "chain": "Base Mainnet"', g:200},
+  {t:'}', g:200},
+  {t:'✓ Done. Donation verified on-chain in ~2 seconds.', c:'ok', g:800},
+];
+
+var timers=[],playing=false,total=S.length,done=0;
+function scroll(){term.scrollTop=term.scrollHeight;}
+function prog(){pbar.style.width=Math.round(done/total*100)+'%';}
+var PCHAR=12;
+var cur=document.createElement('span'); cur.className='cursor';
+
+function runStep(idx){
+  if(!playing||idx>=S.length){playing=false;btnPlay.textContent='▶ Play';hideWiki();return;}
+  if(autoWiki) hideWiki();
+  autoWiki=false;
+  var s=S[idx];
+  function advance(){
+    done=idx+1;prog();term.appendChild(cur);
+    timers.push(setTimeout(function(){runStep(idx+1);},s.g||850));
+  }
+  if(s.h){
+    var html=s.h;
+    if(s.wiki) html='<span style="cursor:help;border-bottom:1px dashed rgba(168,85,247,.3)" data-wk="'+s.wiki+'">'+html+'</span>';
+    term.insertAdjacentHTML('beforeend',html);
+    if(s.wiki&&playing){autoWiki=true;showWiki(s.wiki);}
+    scroll();advance();
+  } else {
+    var d=document.createElement('div');
+    if(s.c)d.className=s.c;
+    if(s.wiki){d.style.cursor='help';d.style.borderBottom='1px dashed rgba(168,85,247,.3)';d.setAttribute('data-wk',s.wiki);}
+    d.appendChild(cur);term.appendChild(d);
+    if(s.wiki&&playing){autoWiki=true;showWiki(s.wiki);}
+    var full=s.t,i=0;
+    (function type(){
+      if(!playing)return;
+      cur.before(document.createTextNode(full[i]));scroll();i++;
+      if(i<full.length) timers.push(setTimeout(type,PCHAR));
+      else advance();
+    })();
+  }
+}
+
+function clear(){timers.forEach(clearTimeout);timers=[];}
+function play(){
+  clear();term.innerHTML='';done=0;prog();
+  playing=true;btnPlay.textContent='⏸ Pause';runStep(0);
+}
+function renderAll(){
+  clear();term.innerHTML='';done=total;prog();
+  S.forEach(function(s){
+    if(s.h){var html=s.h;if(s.wiki)html='<span style="cursor:help;border-bottom:1px dashed rgba(168,85,247,.3)" data-wk="'+s.wiki+'">'+html+'</span>';term.innerHTML+=html;}
+    else{var c=s.c||'';if(s.wiki)c+=' wiki';term.innerHTML+='<div class="'+c.trim()+'"'+(s.wiki?' data-wk="'+s.wiki+'"':'')+'>'+s.t.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</div>';}
+  });playing=false;btnPlay.textContent='▶ Play';
+}
+
+btnPlay.onclick=function(){if(playing){clear();playing=false;btnPlay.textContent='▶ Play';hideWiki();}else{play();}};
+btnReplay.onclick=function(){play();};
+
+// Hover wikis — works on ALL lines, during and after playback
+term.addEventListener('mouseover',function(e){
+  var z=e.target.closest('[data-wk]');
+  if(z){
+    var k=z.getAttribute('data-wk'),h=wikiHTML(k);
+    if(!h)return;
+    wiki.innerHTML=h;
+    var r=e.target.getBoundingClientRect(),wx=r.right+14;
+    if(wx+400>window.innerWidth)wx=r.left-400;
+    if(wx<8)wx=8;
+    var wy=r.top-20;if(wy+280>window.innerHeight)wy=window.innerHeight-290;
+    if(wy<8)wy=8;
+    wiki.style.left=wx+'px';wiki.style.top=wy+'px';
+    wiki.classList.add('show');
+  }
+});
+term.addEventListener('mouseout',function(e){
+  var z=e.target.closest('[data-wk]');
+  if(z&&!z.contains(e.relatedTarget))hideWiki();
+});
+
+// Auto-play on scroll into view
+var played=false;
+var termObs=new IntersectionObserver(function(entries){
+  if(entries[0].isIntersecting&&!played){played=true;play();}
+},{threshold:0.3});
+termObs.observe(document.querySelector('.term-section'));
+
+// Render all if reduced motion
+try{if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)renderAll();}catch(e){}
+})();
+
+// ═══════════════════════════════════════════════════
+// LIVE VERIFY
+// ═══════════════════════════════════════════════════
+document.getElementById('verifyBtn').onclick = async function(){
+  var tx = document.getElementById('verifyTx').value.trim();
+  var result = document.getElementById('verifyResult');
+  if(!tx){result.innerHTML='<span style="color:var(--orange)">Enter a transaction hash</span>';return;}
+  result.innerHTML='<span style="color:var(--purple)">⏳ Verifying on Base...</span>';
+  try{
+    var resp = await fetch('https://34-156-149-38.sslip.io/aetherapi/donatex/api/verify?tx='+tx);
+    var data = await resp.json();
+    if(data.verified){
+      result.innerHTML='<span style="color:var(--green)">✅ Verified!</span>\n\n'+
+        '<span class="key">From:</span>    <span class="val">'+data.from+'</span>\n'+
+        '<span class="key">To:</span>      <span class="val">'+data.to+'</span>\n'+
+        '<span class="key">Amount:</span>   <span class="num">$'+data.amount_usdc+' USDC</span>\n'+
+        '<span class="key">Block:</span>    <span class="num">'+data.block+'</span>\n'+
+        '<span class="key">Chain:</span>    <span class="str">'+data.chain+'</span>';
+    } else {
+      result.innerHTML='<span style="color:var(--orange)">⚠️ '+data.error+'</span>';
+    }
+  }catch(e){
+    result.innerHTML='<span style="color:#ef4444">Error: '+e.message+'</span>';
+  }
+};
+</script>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- THREE.JS: USDC FLOW VISUALIZATION                  -->
+<!-- ═══════════════════════════════════════════════════ -->
+<script>
+(function(){
+  var canvas=document.getElementById('three-canvas');
+  var scene=new THREE.Scene();
+  var camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
+  renderer.setSize(window.innerWidth,window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+
+  // Colors: purple, magenta, pink
+  var colors=[
+    new THREE.Color(0xa855f7),
+    new THREE.Color(0xd946ef),
+    new THREE.Color(0xec4899),
+    new THREE.Color(0x8b5cf6),
+    new THREE.Color(0xf472b6)
+  ];
+
+  // Particle system: USDC transfers flowing
+  var PARTICLE_COUNT=800;
+  var geometry=new THREE.BufferGeometry();
+  var positions=new Float32Array(PARTICLE_COUNT*3);
+  var velocities=new Float32Array(PARTICLE_COUNT*3);
+  var particleColors=new Float32Array(PARTICLE_COUNT*3);
+  var sizes=new Float32Array(PARTICLE_COUNT);
+  var lifetimes=new Float32Array(PARTICLE_COUNT);
+
+  for(var i=0;i<PARTICLE_COUNT;i++){
+    // Random spawn positions
+    positions[i*3]=(Math.random()-0.5)*20;     // x
+    positions[i*3+1]=(Math.random()-0.5)*12;   // y
+    positions[i*3+2]=(Math.random()-0.5)*10;   // z
+
+    // Velocities: flowing right with slight drift
+    velocities[i*3]=0.01+Math.random()*0.03;   // x speed
+    velocities[i*3+1]=(Math.random()-0.5)*0.005; // y drift
+    velocities[i*3+2]=(Math.random()-0.5)*0.005; // z drift
+
+    // Random color from palette
+    var c=colors[Math.floor(Math.random()*colors.length)];
+    particleColors[i*3]=c.r;
+    particleColors[i*3+1]=c.g;
+    particleColors[i*3+2]=c.b;
+
+    // Random sizes
+    sizes[i]=0.02+Math.random()*0.06;
+    lifetimes[i]=Math.random();
+  }
+
+  geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
+  geometry.setAttribute('color',new THREE.BufferAttribute(particleColors,3));
+  geometry.setAttribute('size',new THREE.BufferAttribute(sizes,1));
+
+  // Shader material for glowing particles
+  var material=new THREE.ShaderMaterial({
+    uniforms:{
+      time:{value:0},
+      mouse:{value:new THREE.Vector2(0,0)}
+    },
+    vertexShader:`
+      attribute float size;
+      attribute vec3 color;
+      varying vec3 vColor;
+      varying float vAlpha;
+      uniform float time;
+      uniform vec2 mouse;
+      void main(){
+        vColor=color;
+        vec3 pos=position;
+        // Subtle wave motion
+        pos.y+=sin(time*0.5+position.x*0.3)*0.1;
+        pos.z+=cos(time*0.3+position.y*0.2)*0.05;
+        // Mouse interaction
+        float dx=pos.x-mouse.x*10.0;
+        float dy=pos.y-mouse.y*5.0;
+        float dist=sqrt(dx*dx+dy*dy);
+        if(dist<2.0){
+          pos.x+=dx*0.1*(1.0-dist/2.0);
+          pos.y+=dy*0.1*(1.0-dist/2.0);
+        }
+        vec4 mvPosition=modelViewMatrix*vec4(pos,1.0);
+        gl_PointSize=size*(300.0/-mvPosition.z);
+        gl_Position=projectionMatrix*mvPosition;
+        vAlpha=0.4+0.6*sin(time+position.x*2.0);
+      }
+    `,
+    fragmentShader:`
+      varying vec3 vColor;
+      varying float vAlpha;
+      void main(){
+        float d=length(gl_PointCoord-vec2(0.5));
+        if(d>0.5)discard;
+        float glow=1.0-d*2.0;
+        glow=pow(glow,2.0);
+        gl_FragColor=vec4(vColor,vAlpha*glow*0.6);
+      }
+    `,
+    transparent:true,
+    blending:THREE.AdditiveBlending,
+    depthWrite:false
+  });
+
+  var particles=new THREE.Points(geometry,material);
+  scene.add(particles);
+
+  // Connection lines between nearby particles
+  var lineGeometry=new THREE.BufferGeometry();
+  var linePositions=new Float32Array(200*6); // 200 max lines
+  lineGeometry.setAttribute('position',new THREE.BufferAttribute(linePositions,3));
+  var lineMaterial=new THREE.LineBasicMaterial({
+    color:0xa855f7,
+    transparent:true,
+    opacity:0.08,
+    blending:THREE.AdditiveBlending
+  });
+  var lines=new THREE.LineSegments(lineGeometry,lineMaterial);
+  scene.add(lines);
+
+  camera.position.z=5;
+
+  // Mouse tracking
+  var mouse={x:0,y:0};
+  document.addEventListener('mousemove',function(e){
+    mouse.x=(e.clientX/window.innerWidth)*2-1;
+    mouse.y=-(e.clientY/window.innerHeight)*2+1;
+  });
+
+  // Scroll tracking
+  var scrollY=0;
+  window.addEventListener('scroll',function(){
+    scrollY=window.scrollY;
+  });
+
+  // Animation loop
+  var clock=new THREE.Clock();
+  function animate(){
+    requestAnimationFrame(animate);
+    var t=clock.getElapsedTime();
+    var pos=geometry.attributes.position.array;
+
+    // Move particles
+    for(var i=0;i<PARTICLE_COUNT;i++){
+      pos[i*3]+=velocities[i*3];
+      pos[i*3+1]+=velocities[i*3+1];
+      pos[i*3+2]+=velocities[i*3+2];
+
+      // Reset when out of bounds
+      if(pos[i*3]>10){
+        pos[i*3]=-10;
+        pos[i*3+1]=(Math.random()-0.5)*12;
+        pos[i*3+2]=(Math.random()-0.5)*10;
+      }
+    }
+    geometry.attributes.position.needsUpdate=true;
+
+    // Update connection lines
+    var lineIdx=0;
+    var maxLines=200;
+    for(var i=0;i<PARTICLE_COUNT&&lineIdx<maxLines;i++){
+      for(var j=i+1;j<PARTICLE_COUNT&&lineIdx<maxLines;j++){
+        var dx=pos[i*3]-pos[j*3];
+        var dy=pos[i*3+1]-pos[j*3+1];
+        var dz=pos[i*3+2]-pos[j*3+2];
+        var dist=Math.sqrt(dx*dx+dy*dy+dz*dz);
+        if(dist<1.5){
+          linePositions[lineIdx*6]=pos[i*3];
+          linePositions[lineIdx*6+1]=pos[i*3+1];
+          linePositions[lineIdx*6+2]=pos[i*3+2];
+          linePositions[lineIdx*6+3]=pos[j*3];
+          linePositions[lineIdx*6+4]=pos[j*3+1];
+          linePositions[lineIdx*6+5]=pos[j*3+2];
+          lineIdx++;
+        }
+      }
+    }
+    // Clear remaining lines
+    for(var i=lineIdx*6;i<200*6;i++)linePositions[i]=0;
+    lineGeometry.attributes.position.needsUpdate=true;
+
+    // Update uniforms
+    material.uniforms.time.value=t;
+    material.uniforms.mouse.value.set(mouse.x,mouse.y);
+
+    // Camera subtle movement
+    camera.position.x=mouse.x*0.3;
+    camera.position.y=mouse.y*0.2+scrollY*0.001;
+    camera.lookAt(0,0,0);
+
+    renderer.render(scene,camera);
+  }
+  animate();
+
+  // Resize handler
+  window.addEventListener('resize',function(){
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+  });
+})();
+</script>
+</body>
+</html>

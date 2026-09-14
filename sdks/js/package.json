@@ -1,0 +1,27 @@
+{
+  "name": "aetheriusx",
+  "version": "1.0.0",
+  "description": "JavaScript client for AetheriusX API — AI agents pay per request in USDC on Base",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "aetherius",
+    "aetheriusxapi",
+    "x402",
+    "usdc",
+    "base",
+    "ai-agents",
+    "api",
+    "micropayments",
+    "crypto"
+  ],
+  "author": "Wilmer Piña",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wilnowilx/aetheriusxapi"
+  }
+}

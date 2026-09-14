@@ -1,0 +1,101 @@
+{
+  "@context": {
+    "@vocab": "https://aetherius.dev/ontology#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@type": "AxiomCollection",
+  "id": "aetherius-axioms-v1",
+  "name": "AETHERIUS Fundamental Axioms",
+  "version": "1.0.0",
+  "created": "2026-09-12",
+  "author": "AETHERIUS Research",
+  "description": "Fundamental laws governing M2M commerce settlement windows",
+  "axioms": [
+    {
+      "id": "axiom-001",
+      "name": "Settlement Window Law",
+      "statement_es": "Todo sistema de pago que sirve recursos antes de confirmar settlement crea una ventana de explotación proporcional a la latencia de finalidad y inversamente proporcional al costo de gas.",
+      "statement_en": "Any payment system that serves resources before confirming settlement creates an exploitation window proportional to finality latency and inversely proportional to gas cost.",
+      "formula": {
+        "symbolic": "E_p = (V_r / C_g) × L_f",
+        "variables": {
+          "E_p": {"name": "exploitation_potential", "type": "float", "unit": "dimensionless"},
+          "V_r": {"name": "resource_value", "type": "float", "unit": "USD"},
+          "C_g": {"name": "gas_cost", "type": "float", "unit": "USD"},
+          "L_f": {"name": "finality_latency", "type": "float", "unit": "seconds"}
+        }
+      },
+      "domain": "M2M Commerce",
+      "applicable_to": ["x402", "payment_channels", "state_channels", "optimistic_payments"],
+      "proven": true,
+      "proof_reference": "research/001-settlement-window.md",
+      "evidence": [
+        "Base L2 finality: 1-2 seconds",
+        "x402 authorization flow serves before settlement",
+        "Gas cost on Base: ~$0.001 per transaction"
+      ],
+      "implications": [
+        "Providers using optimistic flows MUST implement velocity detection",
+        "The window size is determined by L2 finality time, not provider choice",
+        "Higher resource value increases exploitation potential"
+      ]
+    },
+    {
+      "id": "axiom-002",
+      "name": "Velocity Exploitation Law",
+      "statement_es": "Un agente malicioso maximiza extracción enviando N proofs por segundo, donde N = min(resource_value / gas_cost, detection_threshold).",
+      "statement_en": "A malicious agent maximizes extraction by sending N proofs per second, where N = min(resource_value / gas_cost, detection_threshold).",
+      "formula": {
+        "symbolic": "N_max = min(V_r / C_g, T_d)",
+        "variables": {
+          "N_max": {"name": "max_proofs_per_second", "type": "float", "unit": "proofs/s"},
+          "V_r": {"name": "resource_value", "type": "float", "unit": "USD"},
+          "C_g": {"name": "gas_cost", "type": "float", "unit": "USD"},
+          "T_d": {"name": "detection_threshold", "type": "float", "unit": "proofs/s"}
+        }
+      },
+      "domain": "M2M Security",
+      "applicable_to": ["x402", "micropayments", "API_abuse", "rate_limiting"],
+      "proven": true,
+      "proof_reference": "research/001-settlement-window.md",
+      "evidence": [
+        "Attack rate: 10 proofs/s on Base",
+        "Detection threshold: 2 proofs/s (AETHERIUS)",
+        "Profit at 10 req/s: $144/hour without defense"
+      ],
+      "implications": [
+        "Without velocity detection, attackers can extract unlimited value",
+        "The optimal attack rate is determined by the gas/value ratio",
+        "Detection systems must operate below the optimal attack rate"
+      ]
+    },
+    {
+      "id": "axiom-003",
+      "name": "Defense Temporal Law",
+      "statement_es": "Toda defensa contra explotación de ventana de settlement debe operar en un tiempo menor a la ventana misma, o falla inevitablemente.",
+      "statement_en": "Any defense against settlement window exploitation must operate faster than the window itself, or it will inevitably fail.",
+      "formula": {
+        "symbolic": "T_defense < T_window",
+        "variables": {
+          "T_defense": {"name": "defense_latency", "type": "float", "unit": "seconds"},
+          "T_window": {"name": "settlement_window", "type": "float", "unit": "seconds"}
+        }
+      },
+      "domain": "M2M Defense",
+      "applicable_to": ["all_settlement_systems", "real_time_defense", "fraud_detection"],
+      "proven": true,
+      "proof_reference": "research/001-settlement-window.md",
+      "evidence": [
+        "AETHERIUS middleware latency: 0.08ms",
+        "Settlement window on Base: 1-2 seconds",
+        "Detection time: <2 seconds"
+      ],
+      "implications": [
+        "Asynchronous defense (check after) is insufficient alone",
+        "Real-time scoring MUST happen in the request path",
+        "The defense must be faster than the attack can repeat"
+      ]
+    }
+  ]
+}

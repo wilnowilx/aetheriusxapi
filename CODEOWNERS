@@ -1,0 +1,10 @@
+# Ownership — every path has a reviewer. PRs touching these require maintainer review.
+* @wilnowilx
+*.py @wilnowilx
+/frontend/ @wilnowilx
+/assets/ @wilnowilx
+wiki/ @wilnowilx
+docs/ @wilnowilx
+.github/ @wilnowilx
+SECURITY.md @wilnowilx
+CHANGELOG.md @wilnowilx

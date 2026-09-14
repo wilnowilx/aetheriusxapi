@@ -1,0 +1,12 @@
+{
+  "name": "aetheriusx",
+  "version": "0.1.0",
+  "description": "JavaScript client for AetheriusX agent APIs",
+  "type": "module",
+  "exports": "./aetheriusx.mjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["aetheriusx", "x402", "base", "usdc", "ai-agents"],
+  "license": "MIT"
+}

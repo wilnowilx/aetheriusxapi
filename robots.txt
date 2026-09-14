@@ -1,0 +1,27 @@
+# AETHERIUS — x402 Agent Commerce Oracle
+# https://github.com/wilnowilx/aetheriusxapi
+
+User-agent: *
+Allow: /health
+Allow: /v1/oracle/status
+Allow: /v1/oracle/verified
+Allow: /v1/telemetry
+Allow: /v1/x402/*
+Allow: /v1/antireplay/stats
+
+# Paid endpoints require x402 payment proof
+Disallow: /v1/maps/*
+Disallow: /v1/token/*
+Disallow: /v1/web/*
+Disallow: /v1/data/*
+Disallow: /v1/defi/*
+Disallow: /v1/forex/*
+Disallow: /v1/news/*
+Disallow: /v1/crypto/*
+Disallow: /v1/email/*
+
+# Machine-readable discovery
+# GET /llms.txt — full project description for LLMs
+# GET /.well-known/ai-plugin.json — OpenAI plugin manifest
+# GET /v1/oracle/verified — verified endpoint catalog
+# GET /v1/oracle/status — system health
