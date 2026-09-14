@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract ReputationAnchor is AccessControl, ReentrancyGuard {
     bytes32 public constant ORACLE_ROLE = keccak256("ORACLE_ROLE");
