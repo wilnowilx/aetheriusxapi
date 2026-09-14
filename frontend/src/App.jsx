@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react'
 import Hero from './components/Hero'
 import Instruments from './components/Instruments'
 import FlowExplorer from './components/FlowExplorer'
+import NetworkStatus from './components/NetworkStatus'
 import { useScrollAnimations } from './hooks/useScrollAnimations'
 import { useSmoothScroll } from './hooks/useSmoothScroll'
 
@@ -1506,6 +1507,7 @@ function App() {
     <div ref={appRef}>
       <PlasmaBg />
       <Nav />
+      <NetworkStatus />
       <SectionBoundary fallback={<div style={{ minHeight: '60vh' }} />}>
         <Hero />
       </SectionBoundary>
