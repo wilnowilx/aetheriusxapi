@@ -4,13 +4,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// NOTE (2026-09-07): scroll-driven ENTRANCE animations removed on purpose.
-// gsap.from() hides elements until their trigger fires; with Lenis +
-// lazy-loaded 3D content shifting layout, trigger positions went stale and
-// whole card grids stayed invisible. Content renders visible by default now.
-// This hook only keeps ScrollTrigger position data fresh (harmless).
 export function useScrollAnimations() {
   useEffect(() => {
+    // Refresh ScrollTrigger positions
     const refresh = () => {
       try { ScrollTrigger.refresh() } catch { /* noop */ }
     }
@@ -20,10 +16,25 @@ export function useScrollAnimations() {
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(refresh).catch(() => {})
     }
+
+    // Entrance animations: add .visible class when elements scroll into view
+    const animatedEls = document.querySelectorAll('[data-animate], [data-animate-card]')
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible')
+          observer.unobserve(e.target)
+        }
+      })
+    }, { rootMargin: '0px 0px -40px 0px', threshold: 0.08 })
+
+    animatedEls.forEach(el => observer.observe(el))
+
     return () => {
       clearTimeout(t1)
       clearTimeout(t2)
       window.removeEventListener('load', refresh)
+      observer.disconnect()
     }
   }, [])
 }

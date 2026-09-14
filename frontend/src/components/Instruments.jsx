@@ -258,6 +258,35 @@ export default function Instruments() {
       <style>{`
         @media (max-width: 1024px) { #instruments .instruments-grid { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 768px) { #instruments .instruments-grid { grid-template-columns: 1fr; } }
+        #instruments .glass-card {
+          position: relative;
+          overflow: hidden;
+        }
+        #instruments .glass-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, var(--purple), var(--magenta), transparent);
+          opacity: 0;
+          transition: opacity 0.4s ease;
+        }
+        #instruments .glass-card:hover::before {
+          opacity: 1;
+        }
+        #instruments .glass-card::after {
+          content: '';
+          position: absolute;
+          top: -50%; left: -50%;
+          width: 200%; height: 200%;
+          background: radial-gradient(circle at 50% 0%, rgba(168,85,247,0.06) 0%, transparent 50%);
+          opacity: 0;
+          transition: opacity 0.5s ease;
+          pointer-events: none;
+        }
+        #instruments .glass-card:hover::after {
+          opacity: 1;
+        }
       `}</style>
     </section>
   )

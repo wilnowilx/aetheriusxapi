@@ -33,13 +33,22 @@
 
 html {
   scroll-behavior: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--purple-deep) var(--bg);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--purple-deep); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--cyan-deep); }
+::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* Global scrollbar hide — custom scrollbar used via .noscroll class */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
 
 body {
   font-family: 'Inter', -apple-system, sans-serif;
@@ -354,11 +363,41 @@ nav.scrolled {
   border-radius: 20px;
   backdrop-filter: blur(16px);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, box-shadow;
 }
 .glass-card:hover {
   border-color: var(--glass-border-hover);
   box-shadow: var(--glow-purple);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+}
+
+/* === SECTION ENTRANCE ANIMATIONS === */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+[data-animate].visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-animate-card] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.15s, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.15s;
+}
+[data-animate-card].visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === GLOBAL HOVER LIFT === */
+a, button {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+}
+a:active, button:active {
+  transform: scale(0.97);
 }
 
 /* === GLOW DOT === */

@@ -218,7 +218,8 @@ export function useReputationStream() {
 
   const setupWebSocketListener = useCallback(async () => {
     try {
-      const wsUrl = `wss://mainnet.base.org`
+      // Use public WS RPC — avoids MetaMask/cors issues
+      const wsUrl = `wss://base-mainnet.g.alchemy.com/v2/demo`
       wsProviderRef.current = new ethers.WebSocketProvider(wsUrl)
 
       wsProviderRef.current.on('open', () => {
@@ -266,7 +267,7 @@ export function useReputationStream() {
       listenersRef.current.anchored = anchoredHandler
       listenersRef.current.batch = batchHandler
 
-      await wsProviderRef.current._start()
+      // ethers v6 WebSocketProvider auto-connects on construction
     } catch (err) {
       console.error('[ReputationStream] WebSocket setup failed:', err)
       setError(err.message)
@@ -331,22 +332,24 @@ export function useReputationStream() {
   }, [setupWebSocketListener])
 
   const connect = useCallback(async () => {
-    if (!window.ethereum) {
-      console.warn('[ReputationStream] No injected provider, using public RPC')
+    // Always use public RPC for on-chain data — avoids MetaMask popup issues
+    try {
       providerRef.current = new ethers.JsonRpcProvider(BASE_RPC_URL)
-    } else {
-      providerRef.current = new ethers.BrowserProvider(window.ethereum)
+    } catch (err) {
+      console.error('[ReputationStream] RPC provider failed:', err)
+    }
 
+    // If MetaMask is present, get chain ID silently (no popup)
+    if (window.ethereum) {
       try {
-        const network = await providerRef.current.getNetwork()
-        const currentChainId = Number(network.chainId)
+        const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' })
+        const currentChainId = parseInt(chainIdHex, 16)
         setChainId(currentChainId)
-
         if (currentChainId !== BASE_CHAIN_ID) {
           setError(`Wrong network. Please switch to Base Mainnet (chainId: ${BASE_CHAIN_ID})`)
         }
-      } catch (err) {
-        console.error('[ReputationStream] Network check failed:', err)
+      } catch {
+        // Silently ignore — user may not have wallet connected
       }
     }
 

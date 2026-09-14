@@ -240,12 +240,12 @@ function Playground() {
         <div data-animate-card style={{
           display: 'grid', gridTemplateColumns: '280px 1fr', gap: 0, marginTop: 56,
           background: 'rgba(10,10,20,0.5)', border: '1px solid rgba(168,85,247,0.08)',
-          borderRadius: 20, overflow: 'hidden', minHeight: 500, position: 'relative',
+          borderRadius: 20, overflow: 'hidden', height: 500, position: 'relative',
           boxShadow: '0 0 60px rgba(168,85,247,0.06), 0 0 120px rgba(217,70,239,0.03)',
           backdropFilter: 'blur(20px)',
         }}>
-          {/* Sidebar */}
-          <div className="noscroll" style={{ background: 'rgba(255,255,255,0.015)', borderRight: '1px solid rgba(255,255,255,0.04)', padding: 16, overflowY: 'auto', maxHeight: 500 }}>
+          {/* Sidebar — independent scroll */}
+          <div className="noscroll" style={{ background: 'rgba(255,255,255,0.015)', borderRight: '1px solid rgba(255,255,255,0.04)', padding: 16, overflowY: 'auto', overscrollBehavior: 'contain', minHeight: 0 }}>
             {playgroundEndpoints.map(group => (
               <div key={group.cat} style={{ marginBottom: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: '0.72rem', fontWeight: 700, color: group.free ? 'var(--green)' : 'var(--purple-light)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
@@ -968,28 +968,15 @@ function SocialProof() {
   )
 }
 
-// === HEARTBEAT ===
+// === HEARTBEAT — Live pulsing bars + metrics ===
 function Heartbeat() {
-  const canvasRef = useRef(null)
+  const [latencies, setLatencies] = useState(() => Array(60).fill(0).map(() => Math.random() * 150 + 50))
+  const [tick, setTick] = useState(0)
   const animRef = useRef(null)
-  const dataRef = useRef(Array(60).fill(0))
 
+  // Fetch real latency + animate bars
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
     let running = true
-
-    const resize = () => {
-      const rect = canvas.parentElement.getBoundingClientRect()
-      canvas.width = rect.width * 2
-      canvas.height = rect.height * 2
-      ctx.scale(2, 2)
-    }
-    resize()
-    window.addEventListener('resize', resize)
-
-    // Seed + refresh from REAL server latency (no fake random data)
     const seed = async () => {
       try {
         const r = await fetch('https://34-156-149-38.sslip.io/aetherapi/v1/telemetry')
@@ -997,63 +984,24 @@ function Heartbeat() {
         const arr = t && Array.isArray(t.recent_latency_ms) ? t.recent_latency_ms : []
         if (arr.length && running) {
           const pad = Array(Math.max(0, 60 - arr.length)).fill(arr[0])
-          dataRef.current = pad.concat(arr).slice(-60)
+          setLatencies(pad.concat(arr).slice(-60))
         }
-      } catch (e) { /* keep last data when offline */ }
+      } catch { /* keep defaults */ }
     }
     seed()
     const seedTimer = setInterval(seed, 15000)
 
-    const draw = () => {
+    // Animate tick for bars
+    let frame
+    const animate = () => {
       if (!running) return
-      const w = canvas.width / 2
-      const h = canvas.height / 2
-      ctx.clearRect(0, 0, w, h)
-
-      // Draw grid lines
-      ctx.strokeStyle = 'rgba(255,255,255,0.04)'
-      ctx.lineWidth = 1
-      for (let y = 0; y < h; y += 30) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke()
-      }
-
-      // Draw line (dynamic scale from real ms values)
-      const data = dataRef.current
-      const max = Math.max(100, ...data)
-      const step = w / (data.length - 1)
-      ctx.beginPath()
-      ctx.strokeStyle = '#a855f7'
-      ctx.lineWidth = 2
-      data.forEach((v, i) => {
-        const x = i * step
-        const y = h - (v / max) * h * 0.9 - h * 0.05
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
-      })
-      ctx.stroke()
-
-      // Gradient fill
-      const grad = ctx.createLinearGradient(0, 0, 0, h)
-      grad.addColorStop(0, 'rgba(168,85,247,0.08)')
-      grad.addColorStop(1, 'rgba(168,85,247,0)')
-      ctx.lineTo(w, h)
-      ctx.lineTo(0, h)
-      ctx.fillStyle = grad
-      ctx.fill()
+      setTick(t => t + 1)
+      frame = requestAnimationFrame(animate)
     }
+    // Only tick every 200ms for smooth but not janky
+    const tickTimer = setInterval(() => { if (running) setTick(t => t + 1) }, 200)
 
-    const frame = (ts) => {
-      if (!running) return
-      draw(ts)
-      animRef.current = requestAnimationFrame(frame)
-    }
-    animRef.current = requestAnimationFrame(frame)
-
-    return () => {
-      running = false
-      clearInterval(seedTimer)
-      cancelAnimationFrame(animRef.current)
-      window.removeEventListener('resize', resize)
-    }
+    return () => { running = false; clearInterval(seedTimer); clearInterval(tickTimer); cancelAnimationFrame(frame) }
   }, [])
 
   const endpoints = [
@@ -1065,6 +1013,8 @@ function Heartbeat() {
     { name: '/v1/health', latency: '~5ms', status: 'up' },
   ]
 
+  const maxLat = Math.max(100, ...latencies)
+
   return (
     <section id="heartbeat" data-animate style={{ textAlign: 'center' }}>
       <div className="inner">
@@ -1075,7 +1025,7 @@ function Heartbeat() {
         <h2 className="section-title">Live Infrastructure</h2>
         <p className="section-desc" style={{ margin: '0 auto' }}>Real-time health of every API endpoint.</p>
         <div data-animate-card style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, marginTop: 72 }}>
-          {/* Request Volume */}
+          {/* Animated bar chart */}
           <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(16px)', borderRadius: 24, padding: 36, textAlign: 'left' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
               <div style={{ fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -1087,13 +1037,38 @@ function Heartbeat() {
                 Live
               </div>
             </div>
-            <div style={{ width: '100%', height: 120, marginBottom: 20 }}>
-              <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
+            {/* Bar chart */}
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 120, marginBottom: 20 }}>
+              {latencies.map((v, i) => {
+                const h = Math.max(4, (v / maxLat) * 100)
+                const isNew = i >= latencies.length - 1
+                return (
+                  <div key={i} style={{
+                    flex: 1, height: `${h}%`,
+                    background: isNew
+                      ? 'linear-gradient(180deg, #a855f7, #7c3aed)'
+                      : `linear-gradient(180deg, rgba(168,85,247,${0.3 + (v / maxLat) * 0.5}), rgba(168,85,247,${0.1 + (v / maxLat) * 0.2}))`,
+                    borderRadius: 2,
+                    transition: 'height 0.3s ease-out',
+                    boxShadow: isNew ? '0 0 8px rgba(168,85,247,0.4)' : 'none',
+                  }} />
+                )
+              })}
             </div>
+            {/* Pulsing numbers */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-              <div style={{ textAlign: 'center' }}><div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', color: 'var(--green)' }}>99.9%</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Uptime</div></div>
-              <div style={{ textAlign: 'center' }}><div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', color: 'var(--purple-light)' }}>~549ms</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Avg Latency</div></div>
-              <div style={{ textAlign: 'center' }}><div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', color: 'var(--green)' }}>94.0%</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Success Rate</div></div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', color: 'var(--green)' }}>99.9%</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Uptime</div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', color: 'var(--purple-light)' }}>~{Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length)}ms</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Avg Latency</div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', color: 'var(--green)' }}>94.0%</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Success Rate</div>
+              </div>
             </div>
           </div>
           {/* Endpoint Health */}
@@ -1498,59 +1473,143 @@ function DonateX() {
   )
 }
 
-// === FOOTER ===
+// === FOOTER — Professional ===
 function Footer() {
+  const [year] = useState(new Date().getFullYear())
   return (
-    <footer style={{ minHeight: 'auto', padding: '80px 0 40px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-      <div className="inner">
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
+    <footer style={{ position: 'relative', borderTop: '1px solid rgba(168,85,247,0.08)' }}>
+      {/* Top gradient line */}
+      <div style={{ position: 'absolute', top: 0, left: '10%', right: '10%', height: 1, background: 'linear-gradient(90deg, transparent, rgba(168,85,247,0.2), transparent)' }} />
+
+      <div className="inner" style={{ padding: '80px 0 40px' }}>
+        {/* Main grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr', gap: 48, marginBottom: 56 }}>
+          {/* Brand */}
           <div>
-            <a href="#hero" className="brand" style={{ marginRight: 0 }}>AETHERIUS</a>
-            <p style={{ color: 'var(--text-sec)', fontSize: '0.95rem', marginTop: 16, lineHeight: 1.7 }}>The operating system for AI agent commerce. Infrastructure for machines that pay for themselves.</p>
+            <a href="#hero" className="brand" style={{ marginRight: 0, fontSize: '1.1rem' }}>AETHERIUS</a>
+            <p style={{ color: 'var(--text-sec)', fontSize: '0.9rem', marginTop: 16, lineHeight: 1.7, maxWidth: 300 }}>
+              The operating system for AI agent commerce. Infrastructure for machines that pay for themselves.
+            </p>
+            {/* Stats row */}
+            <div style={{ display: 'flex', gap: 20, marginTop: 24 }}>
+              {[
+                { val: '100+', label: 'APIs' },
+                { val: '99.9%', label: 'Uptime' },
+                { val: 'x402', label: 'Protocol' },
+              ].map(s => (
+                <div key={s.label} style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', color: 'var(--purple-light)' }}>{s.val}</div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
+
+          {/* Product */}
           <div>
-            <h4 style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: 20 }}>Product</h4>
+            <h4 style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', marginBottom: 20 }}>Product</h4>
             <ul style={{ listStyle: 'none' }}>
-              {[['#instruments', 'APIs'], ['#x402-intel', 'Intelligence'], ['#heartbeat', 'Status']].map(([href, text]) => (
-                <li key={text} style={{ marginBottom: 12 }}><a href={href} style={{ color: 'var(--text-sec)', textDecoration: 'none', fontSize: '0.9rem' }}>{text}</a></li>
+              {[
+                ['#instruments', 'APIs'],
+                ['#x402-intel', 'Intelligence'],
+                ['#flow', 'Architecture'],
+                ['#heartbeat', 'Status'],
+                ['dashboard/', 'Dashboard'],
+              ].map(([href, text]) => (
+                <li key={text} style={{ marginBottom: 12 }}>
+                  <a href={href} style={{ color: 'var(--text-sec)', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.2s' }}>{text}</a>
+                </li>
               ))}
             </ul>
           </div>
+
+          {/* Developers */}
           <div>
-            <h4 style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: 20 }}>Developers</h4>
+            <h4 style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', marginBottom: 20 }}>Developers</h4>
             <ul style={{ listStyle: 'none' }}>
-              {[['https://docs.x402.org', 'x402 Docs'], ['https://github.com/wilnowilx/aetheriusxapi', 'GitHub'], ['https://github.com/wilnowilx/aetheriusxapi/tree/main/sdks', 'SDKs']].map(([href, text]) => (
-                <li key={text} style={{ marginBottom: 12 }}><a href={href} target="_blank" rel="noreferrer" style={{ color: 'var(--text-sec)', textDecoration: 'none', fontSize: '0.9rem' }}>{text}</a></li>
+              {[
+                ['https://github.com/wilnowilx/aetheriusxapi/blob/main/docs/API.md', 'Documentation'],
+                ['https://github.com/wilnowilx/aetheriusxapi', 'GitHub'],
+                ['https://github.com/wilnowilx/aetheriusxapi/tree/main/sdks', 'SDKs'],
+                ['https://docs.x402.org', 'x402 Protocol'],
+              ].map(([href, text]) => (
+                <li key={text} style={{ marginBottom: 12 }}>
+                  <a href={href} target="_blank" rel="noreferrer" style={{ color: 'var(--text-sec)', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.2s', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    {text}
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.4 }}><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                  </a>
+                </li>
               ))}
             </ul>
           </div>
+
+          {/* Network */}
           <div>
-            <h4 style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: 20 }}>Community</h4>
+            <h4 style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', marginBottom: 20 }}>Network</h4>
             <ul style={{ listStyle: 'none' }}>
-              {[['https://x.com/aetheriusxAPI', 'X / Twitter'], ['https://t.me/aetheriusxAPI_global', 'Telegram']].map(([href, text]) => (
-                <li key={text} style={{ marginBottom: 12 }}><a href={href} target="_blank" rel="noreferrer" style={{ color: 'var(--text-sec)', textDecoration: 'none', fontSize: '0.9rem' }}>{text}</a></li>
+              {[
+                ['#features', 'Features'],
+                ['#code', 'SDKs & Code'],
+                ['https://x.com/aetheriusxAPI', 'X / Twitter'],
+                ['https://t.me/aetheriusxAPI_global', 'Telegram'],
+              ].map(([href, text]) => (
+                <li key={text} style={{ marginBottom: 12 }}>
+                  <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noreferrer' : undefined} style={{ color: 'var(--text-sec)', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.2s' }}>{text}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h4 style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', marginBottom: 20 }}>Legal</h4>
+            <ul style={{ listStyle: 'none' }}>
+              {[
+                ['MIT License', 'Open Source'],
+                ['#heartbeat', 'System Status'],
+              ].map(([text, sub]) => (
+                <li key={text} style={{ marginBottom: 12 }}>
+                  <span style={{ color: 'var(--text-sec)', fontSize: '0.88rem' }}>{text}</span>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 2 }}>{sub}</div>
+                </li>
               ))}
             </ul>
           </div>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>&copy; 2026 AETHERIUS. All rights reserved.</span>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <a href="https://x.com/aetheriusxAPI" target="_blank" rel="noreferrer" style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 10, color: 'var(--text-sec)', transition: 'all 0.3s', textDecoration: 'none' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path strokeLinejoin="round" strokeLinecap="round" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </a>
-            <a href="https://github.com/wilnowilx/aetheriusxapi" target="_blank" rel="noreferrer" style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 10, color: 'var(--text-sec)', transition: 'all 0.3s', textDecoration: 'none' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path strokeLinejoin="round" strokeLinecap="round" d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-            </a>
-            <a href="https://t.me/aetheriusxAPI_global" target="_blank" rel="noreferrer" style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 10, color: 'var(--text-sec)', transition: 'all 0.3s', textDecoration: 'none' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path strokeLinejoin="round" strokeLinecap="round" d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-            </a>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)', marginBottom: 32 }} />
+
+        {/* Bottom row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>&copy; {year} AETHERIUS. All rights reserved.</span>
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.68rem', color: 'rgba(255,255,255,0.1)', padding: '4px 10px', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 6 }}>
+              Base Mainnet · USDC · 0x677B…7f61
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            {[
+              ['https://x.com/aetheriusxAPI', <svg key="x" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>],
+              ['https://github.com/wilnowilx/aetheriusxapi', <svg key="gh" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>],
+              ['https://t.me/aetheriusxAPI_global', <svg key="tg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>],
+            ].map(([href, icon]) => (
+              <a key={href} href={href} target="_blank" rel="noreferrer" style={{
+                width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(255,255,255,0.04)', borderRadius: 8, color: 'var(--text-sec)',
+                transition: 'all 0.25s', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.05)',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.1)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.2)' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)' }}
+              >{icon}</a>
+            ))}
           </div>
         </div>
       </div>
       <style>{`
-        @media (max-width: 1024px) { footer .inner > div:first-child { grid-template-columns: 1fr 1fr; } }
-        @media (max-width: 768px) { footer .inner > div:first-child { grid-template-columns: 1fr; } }
+        @media (max-width: 1100px) { footer .inner > div:first-child { grid-template-columns: 1.5fr 1fr 1fr !important; } }
+        @media (max-width: 768px) { footer .inner > div:first-child { grid-template-columns: 1fr 1fr !important; } }
+        @media (max-width: 480px) { footer .inner > div:first-child { grid-template-columns: 1fr !important; } }
       `}</style>
     </footer>
   )
@@ -1578,9 +1637,10 @@ class SectionBoundary extends React.Component {
 
 // === DOT NAV (restored slide traction — IO highlight, click to glide) ===
 const DOT_SECTIONS = [
-  ['hero', 'Intro'], ['playground', 'Playground'], ['flow', 'Architecture'],
-  ['x402-intel', 'Intelligence'], ['heartbeat', 'Status'],
-  ['founders', 'Founders'], ['cta', 'Start'],
+  ['hero', 'Intro'], ['playground', 'Playground'], ['instruments', 'Instruments'],
+  ['flow', 'Architecture'], ['x402-intel', 'Intelligence'], ['how', 'How It Works'],
+  ['features', 'Features'], ['code', 'Code'],
+  ['heartbeat', 'Status'], ['founders', 'Founders'], ['cta', 'Start'],
 ]
 
 function DotNav() {
@@ -1608,10 +1668,10 @@ function DotNav() {
       <style>{`
         .dot-nav {
           position: fixed; right: 22px; top: 50%; transform: translateY(-50%);
-          display: flex; flex-direction: column; gap: 12px; z-index: 900;
+          display: flex; flex-direction: column; gap: 8px; z-index: 900;
         }
         .dot-nav .dot {
-          width: 8px; height: 8px; border-radius: 50%;
+          width: 6px; height: 6px; border-radius: 50%;
           background: rgba(255,255,255,0.18); border: none; cursor: pointer;
           padding: 0; transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
         }

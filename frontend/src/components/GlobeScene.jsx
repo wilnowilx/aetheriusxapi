@@ -53,15 +53,15 @@ const TextBandRings = ({ liveData }) => {
     ]
   }, [liveData])
 
-  // Canvas 4096×160 — neon premium: bloom real + nítido frontal
+  // Canvas 4096×240 — neon premium: bloom real + nítido frontal, más altura para no overlap
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
       canvas.width = 4096
-      canvas.height = 160
+      canvas.height = 240
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      const font = `900 ${ring.fontSize * 1.35}px 'JetBrains Mono', 'Fira Code', monospace`
+      const font = `900 ${ring.fontSize * 1.1}px 'JetBrains Mono', 'Fira Code', monospace`
       ctx.font = font
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
@@ -69,19 +69,25 @@ const TextBandRings = ({ liveData }) => {
       const phraseW = ctx.measureText(phrase).width
       const repeats = Math.ceil((canvas.width + phraseW) / phraseW)
       const startOffset = (canvas.width - phraseW * repeats) / 2 + phraseW / 2
-      // Neon layers: bloom externo + bloom medio + núcleo sólido
+      // Pass 1: Wide bloom (glow halo)
       ctx.shadowColor = ring.color
-      ctx.shadowBlur = 48
+      ctx.shadowBlur = 64
       ctx.fillStyle = ring.color
+      ctx.globalAlpha = 0.5
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      ctx.shadowBlur = 22
+      // Pass 2: Mid bloom
+      ctx.shadowBlur = 32
+      ctx.globalAlpha = 0.8
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      ctx.shadowBlur = 0
+      // Pass 3: Core solid
+      ctx.shadowBlur = 8
+      ctx.globalAlpha = 1
       ctx.fillStyle = ring.color === '#ffffff' ? '#ffffff' : ring.color
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      // Highlight central ultra fino para legibilidad
+      // Pass 4: Bright center for legibility
+      ctx.shadowBlur = 0
       ctx.fillStyle = '#ffffff'
-      ctx.globalAlpha = 0.85
+      ctx.globalAlpha = 0.7
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       ctx.globalAlpha = 1
       const tex = new THREE.CanvasTexture(canvas)
@@ -97,10 +103,10 @@ const TextBandRings = ({ liveData }) => {
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
       canvas.width = 4096
-      canvas.height = 160
+      canvas.height = 240
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.font = `900 ${ring.fontSize * 1.35}px 'JetBrains Mono', 'Fira Code', monospace`
+      ctx.font = `900 ${ring.fontSize * 1.1}px 'JetBrains Mono', 'Fira Code', monospace`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       const phrase = ring.text

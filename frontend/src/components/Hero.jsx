@@ -14,206 +14,167 @@ class GlobeBoundary extends React.Component {
   }
 }
 
-// === FLUID LOADING — 6.5s card-flip clock + radial reveal ===
-// Black screen. Flip-clock digits count down. At 6.5s → reveal.
+// === FLUID LOADING — single card flip + big bang reveal ===
 function FluidLoader({ onComplete }) {
-  const [digits, setDigits] = useState([6, 5])
-  const [phase, setPhase] = useState('counting') // counting → reveal → done
-  const [revealProgress, setRevealProgress] = useState(0)
+  const [digit, setDigit] = useState(7)
+  const [phase, setPhase] = useState('counting') // counting → bigbang → done
+  const [bigbangProgress, setBigbangProgress] = useState(0)
   const onCompleteRef = useRef(onComplete)
-  const containerRef = useRef(null)
   onCompleteRef.current = onComplete
 
-  // Audio: single warm tone at reveal
-  const playRevealSound = useCallback(() => {
+  // Countdown: 7→0
+  useEffect(() => {
+    let count = 7
+    const iv = setInterval(() => {
+      count--
+      if (count >= 0) setDigit(count)
+      if (count <= 0) {
+        clearInterval(iv)
+        setPhase('bigbang')
+      }
+    }, 850)
+    return () => clearInterval(iv)
+  }, [])
+
+  // Big bang: radial burst expanding from center
+  useEffect(() => {
+    if (phase !== 'bigbang') return
+    let start = null
+    const DURATION = 1200
+    let raf
+    // Sound: warm thump + whoosh
     try {
       const AC = window.AudioContext || window.webkitAudioContext
       const ac = new AC()
-      if (ac.state !== 'running') { try { ac.close() } catch {} return }
-      const t0 = ac.currentTime
-      const master = ac.createGain()
-      master.gain.value = 0.08
-      master.connect(ac.destination)
-      // warm pad
-      const osc = ac.createOscillator()
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(110, t0)
-      osc.frequency.exponentialRampToValueAtTime(220, t0 + 1.2)
-      const g = ac.createGain()
-      g.gain.setValueAtTime(0, t0)
-      g.gain.linearRampToValueAtTime(1, t0 + 0.3)
-      g.gain.exponentialRampToValueAtTime(0.001, t0 + 1.5)
-      osc.connect(g); g.connect(master); osc.start(t0); osc.stop(t0 + 1.5)
-      // shimmer
-      const osc2 = ac.createOscillator()
-      osc2.type = 'triangle'
-      osc2.frequency.setValueAtTime(330, t0)
-      const g2 = ac.createGain()
-      g2.gain.setValueAtTime(0, t0)
-      g2.gain.linearRampToValueAtTime(0.3, t0 + 0.2)
-      g2.gain.exponentialRampToValueAtTime(0.001, t0 + 1.0)
-      osc2.connect(g2); g2.connect(master); osc2.start(t0); osc2.stop(t0 + 1.0)
-      setTimeout(() => { try { ac.close() } catch {} }, 2000)
+      if (ac.state === 'running') {
+        const t0 = ac.currentTime
+        const master = ac.createGain(); master.gain.value = 0.1; master.connect(ac.destination)
+        const osc = ac.createOscillator(); osc.type = 'sine'
+        osc.frequency.setValueAtTime(55, t0); osc.frequency.exponentialRampToValueAtTime(180, t0 + 0.4)
+        const g = ac.createGain(); g.gain.setValueAtTime(0.6, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.8)
+        osc.connect(g); g.connect(master); osc.start(t0); osc.stop(t0 + 0.8)
+        // shimmer
+        const s = ac.createOscillator(); s.type = 'triangle'
+        s.frequency.setValueAtTime(440, t0 + 0.1)
+        const sg = ac.createGain(); sg.gain.setValueAtTime(0, t0); sg.gain.linearRampToValueAtTime(0.2, t0 + 0.15); sg.gain.exponentialRampToValueAtTime(0.001, t0 + 0.6)
+        s.connect(sg); sg.connect(master); s.start(t0 + 0.1); s.stop(t0 + 0.6)
+        setTimeout(() => { try { ac.close() } catch {} }, 1500)
+      } else { try { ac.close() } catch {} }
     } catch {}
-  }, [])
-
-  // Countdown: flip digits every 1s from 6→1
-  useEffect(() => {
-    let count = 6
-    const iv = setInterval(() => {
-      count--
-      if (count >= 1) {
-        setDigits([count, count + 1]) // [current, previous]
-      }
-      if (count <= 0) {
-        clearInterval(iv)
-        setPhase('reveal')
-        playRevealSound()
-      }
-    }, 1000)
-    return () => clearInterval(iv)
-  }, [playRevealSound])
-
-  // Reveal animation: radial wipe from center over 1.5s
-  useEffect(() => {
-    if (phase !== 'reveal') return
-    let start = null
-    const DURATION = 1500
-    let raf
     const animate = (ts) => {
       if (!start) start = ts
       const p = Math.min((ts - start) / DURATION, 1)
-      const ease = p * p * (3 - 2 * p) // smoothstep
-      setRevealProgress(ease)
-      if (p < 1) {
-        raf = requestAnimationFrame(animate)
-      } else {
-        setPhase('done')
-        onCompleteRef.current?.()
-      }
+      const ease = p * p
+      setBigbangProgress(ease)
+      if (p < 1) raf = requestAnimationFrame(animate)
+      else { setPhase('done'); onCompleteRef.current?.() }
     }
     raf = requestAnimationFrame(animate)
     return () => cancelAnimationFrame(raf)
-  }, [phase, onCompleteRef])
-
-  // Container opacity — fade out when done
-  const containerOpacity = phase === 'done' ? 0 : 1
+  }, [phase])
 
   return (
-    <div ref={containerRef} style={{
+    <div style={{
       position: 'fixed', inset: 0, zIndex: 9999,
       background: '#010005',
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
-      opacity: containerOpacity,
-      transition: 'opacity 0.4s ease-out',
+      opacity: phase === 'done' ? 0 : 1,
+      transition: 'opacity 0.3s ease-out',
       pointerEvents: phase === 'done' ? 'none' : 'auto',
     }}>
-      {/* Radial reveal mask */}
-      {phase === 'reveal' && (
+      {/* Big bang: expanding radial ring */}
+      {phase === 'bigbang' && (
+        <div style={{
+          position: 'absolute',
+          left: '50%', top: '50%',
+          width: bigbangProgress * 200 + 'vmax',
+          height: bigbangProgress * 200 + 'vmax',
+          transform: 'translate(-50%, -50%)',
+          borderRadius: '50%',
+          border: `2px solid rgba(168,85,247,${(1 - bigbangProgress) * 0.8})`,
+          boxShadow: `0 0 ${bigbangProgress * 80}px rgba(168,85,247,${(1 - bigbangProgress) * 0.4}), inset 0 0 ${bigbangProgress * 40}px rgba(34,211,238,${(1 - bigbangProgress) * 0.2})`,
+        }} />
+      )}
+      {phase === 'bigbang' && (
         <div style={{
           position: 'absolute', inset: 0,
-          background: `radial-gradient(circle at 50% 50%, transparent ${revealProgress * 120}%, rgba(1,0,5,0.98) ${revealProgress * 120 + 5}%)`,
-          zIndex: 1,
+          background: `radial-gradient(circle at 50% 50%, rgba(168,85,247,${(1 - bigbangProgress) * 0.15}) 0%, transparent 50%)`,
         }} />
       )}
 
-      {/* Card-flip clock digits */}
+      {/* Single card */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 6,
-        position: 'relative', zIndex: 2,
+        width: 90, height: 110,
+        background: phase === 'bigbang'
+          ? `linear-gradient(180deg, rgba(168,85,247,${0.12 * (1 - bigbangProgress)}) 0%, rgba(168,85,247,${0.04 * (1 - bigbangProgress)}) 100%)`
+          : 'linear-gradient(180deg, rgba(168,85,247,0.08) 0%, rgba(168,85,247,0.03) 100%)',
+        border: `1px solid rgba(168,85,247,${phase === 'bigbang' ? 0.1 * (1 - bigbangProgress) : 0.2})`,
+        borderRadius: 10,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        position: 'relative', overflow: 'hidden',
+        transform: phase === 'bigbang' ? `scale(${1 + bigbangProgress * 2})` : 'scale(1)',
+        opacity: phase === 'bigbang' ? 1 - bigbangProgress : 1,
+        transition: 'none',
       }}>
-        {digits.map((digit, idx) => {
-          const isCurrent = idx === 0
+        {/* Horizontal split line */}
+        <div style={{ position: 'absolute', left: 0, right: 0, top: '50%', height: 1, background: 'rgba(0,0,0,0.5)' }} />
+        <span style={{
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '3rem', fontWeight: 800,
+          color: '#a855f7',
+          textShadow: '0 0 24px rgba(168,85,247,0.5)',
+        }}>
+          {digit}
+        </span>
+      </div>
+
+      {/* Brand text — brighter + glow */}
+      <div style={{
+        marginTop: 28, textAlign: 'center',
+        opacity: phase === 'bigbang' ? 1 - bigbangProgress : 0.9,
+      }}>
+        <div style={{
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '0.75rem', letterSpacing: '0.35em', fontWeight: 700,
+          color: '#c084fc',
+          textShadow: '0 0 20px rgba(168,85,247,0.7), 0 0 40px rgba(168,85,247,0.4), 0 0 80px rgba(168,85,247,0.2)',
+        }}>AETHERIUS</div>
+      </div>
+
+      {/* Particle stars around card */}
+      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        {[...Array(24)].map((_, i) => {
+          const size = 1 + Math.random() * 2
+          const angle = (i / 24) * Math.PI * 2
+          const dist = 80 + Math.random() * 120
+          const x = 50 + (Math.cos(angle) * dist / window.innerWidth * 100)
+          const y = 50 + (Math.sin(angle) * dist / window.innerHeight * 100)
           return (
-            <div key={isCurrent ? 'cur' : 'prev'} style={{
-              width: 72, height: 96,
-              position: 'relative',
-              perspective: '400px',
-            }}>
-              {/* Card face */}
-              <div style={{
-                width: '100%', height: '100%',
-                background: isCurrent
-                  ? 'linear-gradient(180deg, rgba(168,85,247,0.08) 0%, rgba(168,85,247,0.03) 50%, rgba(168,85,247,0.06) 100%)'
-                  : 'rgba(255,255,255,0.02)',
-                border: `1px solid ${isCurrent ? 'rgba(168,85,247,0.2)' : 'rgba(255,255,255,0.06)'}`,
-                borderRadius: 8,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                overflow: 'hidden',
-                position: 'relative',
-              }}>
-                {/* Horizontal split line */}
-                <div style={{
-                  position: 'absolute', left: 0, right: 0, top: '50%',
-                  height: 1, background: 'rgba(0,0,0,0.5)', zIndex: 1,
-                }} />
-                <span style={{
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: '2.8rem', fontWeight: 800,
-                  color: isCurrent ? '#a855f7' : 'rgba(255,255,255,0.15)',
-                  textShadow: isCurrent ? '0 0 20px rgba(168,85,247,0.4)' : 'none',
-                  transition: 'all 0.3s ease-out',
-                }}>
-                  {isCurrent ? digit : digits[1]}
-                </span>
-              </div>
-            </div>
+            <div key={i} style={{
+              position: 'absolute',
+              left: `${x}%`, top: `${y}%`,
+              width: size, height: size,
+              borderRadius: '50%',
+              background: i % 3 === 0 ? '#a855f7' : i % 3 === 1 ? '#22d3ee' : '#ffffff',
+              opacity: 0.3 + Math.random() * 0.5,
+              animation: `loaderStar ${1.5 + Math.random() * 2}s ease-in-out ${Math.random() * 1.5}s infinite alternate`,
+              boxShadow: `0 0 ${size * 3}px ${i % 3 === 0 ? 'rgba(168,85,247,0.6)' : i % 3 === 1 ? 'rgba(34,211,238,0.5)' : 'rgba(255,255,255,0.4)'}`,
+            }} />
           )
         })}
-        {/* Separator dot */}
-        <div style={{
-          width: 6, height: 6, borderRadius: '50%',
-          background: '#a855f7',
-          boxShadow: '0 0 12px rgba(168,85,247,0.6)',
-          margin: '0 4px',
-          animation: 'loaderPulse 1s ease-in-out infinite',
-        }} />
+        <style>{`
+          @keyframes loaderStar {
+            0% { opacity: 0.15; transform: scale(0.6); }
+            100% { opacity: 0.7; transform: scale(1.2); }
+          }
+        `}</style>
       </div>
 
-      {/* Brand + status text */}
-      <div style={{
-        position: 'relative', zIndex: 2,
-        marginTop: 32, textAlign: 'center',
-      }}>
-        <div style={{
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: '0.65rem', letterSpacing: '0.3em',
-          color: 'rgba(168,85,247,0.5)',
-          textTransform: 'uppercase',
-        }}>
-          AETHERIUS
-        </div>
-        <div style={{
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: '0.55rem', letterSpacing: '0.15em',
-          color: 'rgba(255,255,255,0.12)',
-          marginTop: 8,
-        }}>
-          INITIALIZING BASE MAINNET
-        </div>
+      {/* Bottom */}
+      <div style={{ position: 'absolute', bottom: 28, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.45rem', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.06)' }}>
+        CH—402 · BASE · 2026
       </div>
-
-      {/* Bottom status bar */}
-      <div style={{
-        position: 'absolute', bottom: 32, left: 0, right: 0,
-        display: 'flex', justifyContent: 'center', zIndex: 2,
-      }}>
-        <div style={{
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: '0.5rem', letterSpacing: '0.2em',
-          color: 'rgba(255,255,255,0.08)',
-        }}>
-          CH—402 · BASE · 2026
-        </div>
-      </div>
-
-      <style>{`
-        @keyframes loaderPulse {
-          0%, 100% { opacity: 0.4; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.3); }
-        }
-      `}</style>
     </div>
   )
 }
