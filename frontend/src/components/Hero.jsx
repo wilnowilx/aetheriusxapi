@@ -147,9 +147,9 @@ function FluidLoader({ onComplete }) {
         {[...Array(24)].map((_, i) => {
           const size = 1 + Math.random() * 2
           const angle = (i / 24) * Math.PI * 2
-          const dist = 80 + Math.random() * 120
-          const x = 50 + (Math.cos(angle) * dist / window.innerWidth * 100)
-          const y = 50 + (Math.sin(angle) * dist / window.innerHeight * 100)
+          const dist = 15 + Math.random() * 25
+          const x = 50 + Math.cos(angle) * dist
+          const y = 50 + Math.sin(angle) * dist
           return (
             <div key={i} style={{
               position: 'absolute',

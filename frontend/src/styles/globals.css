@@ -372,22 +372,31 @@ nav.scrolled {
 }
 
 /* === SECTION ENTRANCE ANIMATIONS === */
+/* Content visible by default — animation is progressive enhancement */
 [data-animate] {
+  opacity: 1;
+  transform: translateY(0);
+}
+[data-animate].animate-ready {
   opacity: 0;
   transform: translateY(24px);
   transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
-[data-animate].visible {
+[data-animate].animate-ready.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
 [data-animate-card] {
+  opacity: 1;
+  transform: translateY(0);
+}
+[data-animate-card].animate-ready {
   opacity: 0;
   transform: translateY(16px);
   transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.15s, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.15s;
 }
-[data-animate-card].visible {
+[data-animate-card].animate-ready.visible {
   opacity: 1;
   transform: translateY(0);
 }

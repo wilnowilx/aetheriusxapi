@@ -17,7 +17,7 @@ export function useScrollAnimations() {
       document.fonts.ready.then(refresh).catch(() => {})
     }
 
-    // Entrance animations: add .visible class when elements scroll into view
+    // Entrance animations: progressive enhancement — content visible by default
     const animatedEls = document.querySelectorAll('[data-animate], [data-animate-card]')
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(e => {
@@ -28,7 +28,15 @@ export function useScrollAnimations() {
       })
     }, { rootMargin: '0px 0px -40px 0px', threshold: 0.08 })
 
-    animatedEls.forEach(el => observer.observe(el))
+    // Stagger the ready class so initial paint is always visible
+    requestAnimationFrame(() => {
+      animatedEls.forEach((el, i) => {
+        setTimeout(() => {
+          el.classList.add('animate-ready')
+          observer.observe(el)
+        }, Math.min(i * 60, 400))
+      })
+    })
 
     return () => {
       clearTimeout(t1)
