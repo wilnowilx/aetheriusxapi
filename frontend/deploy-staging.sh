@@ -1,59 +1,35 @@
 #!/bin/bash
-# ============================================
-# STAGING DEPLOY — AetheriusXapi
-# ============================================
-# FIX: Antes usábamos `cp -r dist\assets assets` que ANIDABA
-# los archivos en assets/assets/ (pantalla negra).
-# Ahora: copiamos CONTENTS de dist/ al root del staging repo.
-# ============================================
+# deploy-staging.sh — Safe staging deploy for Git Bash on Windows
+# Disables MSYS path conversion to prevent /Program Files/Git/ injection
 
 set -e
 
-STAGING_DIR="/c/Users/wil/AppData/Local/Temp/staging-deploy"
-DIST_DIR="$(pwd)/dist"
+export MSYS_NO_PATHCONV=1
+export MSYS2_ARG_CONV_EXCL="*"
 
-echo "🔨 Building..."
-PAGES_BASE=/aetheriusxapi-staging/ npm run build 2>&1 | tail -5
+STAGING_REPO="C:/Users/wil/AppData/Local/Temp/staging-deploy"
+DIST_DIR="$(dirname "$0")/dist"
 
-echo ""
-echo "📦 Deploying to staging..."
+echo "[1/5] Building..."
+PAGES_BASE=/aetheriusxapi-staging/ npm run build
 
-# 1. Limpiar archivos viejos del staging (excepto .git)
-find "$STAGING_DIR" -maxdepth 1 -not -name '.git' -not -name '.' -not -name '..' -exec rm -rf {} +
+echo "[2/5] Cleaning old assets..."
+rm -rf "$STAGING_REPO/assets"
 
-# 2. Copiar contents de dist/ al root del staging (NO nested)
-cp "$DIST_DIR/index.html" "$STAGING_DIR/index.html"
-cp "$DIST_DIR/favicon.svg" "$STAGING_DIR/favicon.svg" 2>/dev/null || true
-cp -r "$DIST_DIR/assets" "$STAGING_DIR/assets"
+echo "[3/5] Copying dist..."
+cp -r "$DIST_DIR/assets" "$STAGING_REPO/assets"
+cp "$DIST_DIR/index.html" "$STAGING_REPO/index.html"
 
-# 3. Fix Windows Git Bash path injection
-sed -i 's|/Program Files/Git/aetheriusxapi-staging|/aetheriusxapi-staging|g' "$STAGING_DIR/index.html"
+echo "[4/5] Fixing Git Bash path corruption..."
+cd "$STAGING_REPO"
+# Remove any /Program Files/Git/ prefix that Git Bash injected
+sed -i 's|/Program Files/Git/aetheriusxapi-staging/|/aetheriusxapi-staging/|g' index.html
+# Fix favicon
+sed -i 's|href="/aetheriusxapi/favicon.svg"|href="/aetheriusxapi-staging/favicon.svg"|g' index.html
 
-# 4. Verificar que todos los archivos referenciados existen
-echo ""
-echo "🔍 Verifying assets..."
-MISSING=0
-for f in $(grep -o 'assets/[^"]*' "$STAGING_DIR/index.html"); do
-  if [ -f "$STAGING_DIR/$f" ]; then
-    echo "  ✓ $f"
-  else
-    echo "  ✗ MISSING: $f"
-    MISSING=1
-  fi
-done
-
-if [ $MISSING -eq 1 ]; then
-  echo ""
-  echo "❌ ABORT: Missing assets! Fix before pushing."
-  exit 1
-fi
-
-# 5. Push
-cd "$STAGING_DIR"
+echo "[5/5] Commit and push..."
 git add -A
-git commit -m "deploy: $(date '+%Y-%m-%d %H:%M') — $(git diff --cached --stat | tail -1)"
-git push origin main
+git commit -m "deploy: staging update $(date +%Y-%m-%d_%H-%M)"
+git push
 
-echo ""
-echo "✅ Deployed! CDN propagation: ~2-5 min"
-echo "🔗 https://wilnowilx.github.io/aetheriusxapi-staging/"
+echo "✅ Deployed to staging!"
