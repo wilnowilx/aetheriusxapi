@@ -365,17 +365,17 @@ function VisibleWireframe({ impactPoints }) {
           uniform vec3 impact0, impact1, impact2, impact3, impact4, impact5, impact6, impact7;
           uniform float i0t, i1t, i2t, i3t, i4t, i5t, i6t, i7t;
 
-          // Collision glow: localized bright point where spark hits wireframe
+          // Collision glow: whisper-thin — barely visible flash at impact
           float impactPulse(vec3 worldPos, vec3 impactPos, float intensity) {
             float dist = length(worldPos - impactPos);
             // Tight ring expanding from impact point
             float ring = abs(dist - time * 0.8 * intensity);
-            float ringGlow = exp(-ring * 1.5) * intensity * 0.3;
+            float ringGlow = exp(-ring * 2.0) * intensity * 0.06;
             // Proximity glow (bright at impact, fades radially)
-            float prox = exp(-dist * 2.5) * intensity * 0.3;
-            // Hot center flash — DIMINUTO
-            float hotCenter = exp(-dist * 6.0) * intensity * 0.4;
-            return (ringGlow * 0.7 + prox + hotCenter) * intensity;
+            float prox = exp(-dist * 3.0) * intensity * 0.05;
+            // Hot center flash — whisper
+            float hotCenter = exp(-dist * 8.0) * intensity * 0.08;
+            return (ringGlow * 0.5 + prox + hotCenter) * intensity;
           }
 
           float polarGlow(vec3 pos) {
@@ -425,15 +425,15 @@ function VisibleWireframe({ impactPoints }) {
             float polar = polarGlow(vPos);
             baseCol += polar * vec3(0.1, 0.05, 0.3);
 
-            // Impact: hot cyan-white flash at collision — DIMINUTO
-            vec3 impactCol = vec3(0.4, 1.0, 1.0); // bright cyan
-            vec3 col = mix(baseCol, impactCol, impacts * 0.3);
-            col += vec3(0.1, 0.2, 0.3) * impacts;
+            // Impact: whisper flash at collision — barely visible
+            vec3 impactCol = vec3(0.4, 1.0, 1.0);
+            vec3 col = mix(baseCol, impactCol, impacts * 0.08);
+            col += vec3(0.04, 0.08, 0.12) * impacts;
 
             // Sparkle
-            col += vec3(0.3, 0.6, 0.8) * sparkle * 0.3;
+            col += vec3(0.3, 0.6, 0.8) * sparkle * 0.15;
 
-            float alpha = (0.10 + polar * 0.05 + cyanPulse * 0.04) * pulse * fade + impacts * 0.3 + sparkle * 0.04;
+            float alpha = (0.10 + polar * 0.05 + cyanPulse * 0.04) * pulse * fade + impacts * 0.08 + sparkle * 0.02;
             gl_FragColor = vec4(col, alpha);
           }
         `}
@@ -859,10 +859,10 @@ function PulsarEngine({ gasUniforms }) {
         positions[i*3+1] *= s
         positions[i*3+2] *= s
 
-        // Register collision for wireframe glow
+        // Register collision for wireframe glow — whisper
         collisions.push({
           x: positions[i*3], y: positions[i*3+1], z: positions[i*3+2],
-          intensity: isTrail ? 0.6 : 1.0
+          intensity: isTrail ? 0.15 : 0.25
         })
 
         // Spark dies on impact (energy absorbed by wireframe mesh)
@@ -910,8 +910,8 @@ function PulsarEngine({ gasUniforms }) {
       float death = 1.0 - smoothstep(0.6, 1.0, lifeRatio);
       float alive_f = step(0.5, alive);
 
-      // Size: sparks microscopic — tiny pinpricks
-      float baseSize = type < 0.5 ? 0.005 : 0.003;
+      // Size: sparks microscopic — whisper pinpricks
+      float baseSize = type < 0.5 ? 0.003 : 0.002;
       // Distance-based scaling
       vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
       float dist = length(position);
