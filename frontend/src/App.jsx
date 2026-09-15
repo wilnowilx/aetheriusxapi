@@ -79,12 +79,12 @@ function Nav() {
 function PlasmaBg() {
   return (
     <div className="plasma-bg">
-      <div className="plasma-blob" style={{ width: 760, height: 760, background: 'radial-gradient(circle, rgba(168,85,247,0.68) 0%, transparent 70%)', top: '-12%', left: '-6%', animationDuration: '16s' }} />
-      <div className="plasma-blob" style={{ width: 640, height: 640, background: 'radial-gradient(circle, rgba(217,70,239,0.6) 0%, transparent 70%)', top: '28%', right: '-12%', animationDuration: '13s', animationDelay: '-5s' }} />
-      <div className="plasma-blob" style={{ width: 580, height: 580, background: 'radial-gradient(circle, rgba(236,72,153,0.54) 0%, transparent 70%)', bottom: '-6%', left: '18%', animationDuration: '15s', animationDelay: '-10s' }} />
-      <div className="plasma-blob" style={{ width: 520, height: 520, background: 'radial-gradient(circle, rgba(6,182,212,0.44) 0%, transparent 70%)', top: '58%', left: '52%', animationDuration: '12s', animationDelay: '-3s' }} />
-      <div className="plasma-blob" style={{ width: 460, height: 460, background: 'radial-gradient(circle, rgba(168,85,247,0.44) 0%, transparent 70%)', top: '8%', left: '42%', animationDuration: '17s', animationDelay: '-8s' }} />
-      <div className="plasma-blob" style={{ width: 500, height: 500, background: 'radial-gradient(circle, rgba(232,121,249,0.4) 0%, transparent 70%)', top: '45%', right: '5%', animationDuration: '14s', animationDelay: '-6s' }} />
+      <div className="plasma-blob" style={{ width: 760, height: 760, background: 'radial-gradient(circle, rgba(168,85,247,0.35) 0%, transparent 70%)', top: '-12%', left: '-6%', animationDuration: '16s' }} />
+      <div className="plasma-blob" style={{ width: 640, height: 640, background: 'radial-gradient(circle, rgba(217,70,239,0.30) 0%, transparent 70%)', top: '28%', right: '-12%', animationDuration: '13s', animationDelay: '-5s' }} />
+      <div className="plasma-blob" style={{ width: 580, height: 580, background: 'radial-gradient(circle, rgba(236,72,153,0.28) 0%, transparent 70%)', bottom: '-6%', left: '18%', animationDuration: '15s', animationDelay: '-10s' }} />
+      <div className="plasma-blob" style={{ width: 520, height: 520, background: 'radial-gradient(circle, rgba(6,182,212,0.22) 0%, transparent 70%)', top: '58%', left: '52%', animationDuration: '12s', animationDelay: '-3s' }} />
+      <div className="plasma-blob" style={{ width: 460, height: 460, background: 'radial-gradient(circle, rgba(168,85,247,0.22) 0%, transparent 70%)', top: '8%', left: '42%', animationDuration: '17s', animationDelay: '-8s' }} />
+      <div className="plasma-blob" style={{ width: 500, height: 500, background: 'radial-gradient(circle, rgba(232,121,249,0.20) 0%, transparent 70%)', top: '45%', right: '5%', animationDuration: '14s', animationDelay: '-6s' }} />
       <div className="grain-overlay" />
       <style>{`
         @keyframes plasmaFloat {
@@ -1401,20 +1401,23 @@ function App() {
 
   return (
     <div ref={appRef}>
-      <div className="cosmic-bg" aria-hidden="true" />
       <PlasmaBg />
       <Nav />
       <NetworkStatus />
 
       {/* Screen 1: The Vision — Hero + Globe */}
-      <SectionBoundary fallback={<div style={{ minHeight: '60vh' }} />}>
+      <SectionBoundary fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#06060e', color: '#a855f7', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem' }}>Loading vision…</div>}>
         <VisionScreen>
           <Hero />
         </VisionScreen>
       </SectionBoundary>
 
       {/* Screen 2: The OS — Live Desktop Environment */}
-        <SectionBoundary fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>Loading OS…</div>}>
+      <SectionBoundary fallback={<div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#06060e', color: '#d946ef', fontFamily: 'JetBrains Mono, monospace', gap: 16 }}>
+        <span style={{ fontSize: 32, opacity: 0.5 }}>◈</span>
+        <span style={{ fontSize: '0.8rem' }}>AETHERIUS OS</span>
+        <span style={{ fontSize: '0.65rem', color: '#8a8a9a' }}>Initializing desktop environment…</span>
+      </div>}>
         <AetheriusOS />
       </SectionBoundary>
 

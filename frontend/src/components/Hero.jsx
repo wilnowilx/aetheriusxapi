@@ -83,7 +83,7 @@ function FluidLoader({ onComplete }) {
       transition: 'opacity 0.3s ease-out',
       pointerEvents: phase === 'done' ? 'none' : 'auto',
     }}>
-      {/* Big bang: expanding radial ring */}
+      {/* Big bang: expanding radial ring — toned down */}
       {phase === 'bigbang' && (
         <div style={{
           position: 'absolute',
@@ -92,14 +92,14 @@ function FluidLoader({ onComplete }) {
           height: bigbangProgress * 200 + 'vmax',
           transform: 'translate(-50%, -50%)',
           borderRadius: '50%',
-          border: `2px solid rgba(168,85,247,${(1 - bigbangProgress) * 0.8})`,
-          boxShadow: `0 0 ${bigbangProgress * 80}px rgba(168,85,247,${(1 - bigbangProgress) * 0.4}), inset 0 0 ${bigbangProgress * 40}px rgba(34,211,238,${(1 - bigbangProgress) * 0.2})`,
+          border: `1px solid rgba(168,85,247,${(1 - bigbangProgress) * 0.3})`,
+          boxShadow: `0 0 ${bigbangProgress * 30}px rgba(168,85,247,${(1 - bigbangProgress) * 0.15}), inset 0 0 ${bigbangProgress * 15}px rgba(34,211,238,${(1 - bigbangProgress) * 0.08})`,
         }} />
       )}
       {phase === 'bigbang' && (
         <div style={{
           position: 'absolute', inset: 0,
-          background: `radial-gradient(circle at 50% 50%, rgba(168,85,247,${(1 - bigbangProgress) * 0.15}) 0%, transparent 50%)`,
+          background: `radial-gradient(circle at 50% 50%, rgba(168,85,247,${(1 - bigbangProgress) * 0.06}) 0%, transparent 50%)`,
         }} />
       )}
 
@@ -165,8 +165,8 @@ function FluidLoader({ onComplete }) {
         })}
         <style>{`
           @keyframes loaderStar {
-            0% { opacity: 0.15; transform: scale(0.6); }
-            100% { opacity: 0.7; transform: scale(1.2); }
+            0% { opacity: 0.08; transform: scale(0.6); }
+            100% { opacity: 0.35; transform: scale(1.1); }
           }
         `}</style>
       </div>
@@ -264,28 +264,28 @@ function CosmicVoid() {
         .void-aurora--1 {
           top: 8%;
           background: linear-gradient(135deg, transparent 0%,
-            rgba(168,85,247,0.12) 20%, rgba(217,70,239,0.15) 45%,
-            rgba(34,211,238,0.08) 65%, transparent 100%);
+            rgba(168,85,247,0.06) 20%, rgba(217,70,239,0.08) 45%,
+            rgba(34,211,238,0.04) 65%, transparent 100%);
           animation-delay: 0s; animation-duration: 24s;
         }
         .void-aurora--2 {
           top: 18%;
           background: linear-gradient(225deg, transparent 0%,
-            rgba(34,211,238,0.08) 25%, rgba(168,85,247,0.12) 50%,
-            rgba(236,72,153,0.06) 75%, transparent 100%);
+            rgba(34,211,238,0.04) 25%, rgba(168,85,247,0.06) 50%,
+            rgba(236,72,153,0.03) 75%, transparent 100%);
           animation-delay: -8s; animation-duration: 28s;
         }
         .void-aurora--3 {
           top: 2%; height: 30%;
           background: linear-gradient(180deg,
-            rgba(217,70,239,0.06) 0%, rgba(168,85,247,0.04) 35%, transparent 65%);
+            rgba(217,70,239,0.03) 0%, rgba(168,85,247,0.02) 35%, transparent 65%);
           animation-delay: -16s; animation-duration: 34s;
         }
         @keyframes auroraBreath {
-          0%, 100% { opacity: 0.3; transform: translateX(-4%) scaleY(1); }
-          25% { opacity: 0.65; transform: translateX(3%) scaleY(1.12); }
-          50% { opacity: 0.45; transform: translateX(-2%) scaleY(0.88); }
-          75% { opacity: 0.75; transform: translateX(5%) scaleY(1.08); }
+          0%, 100% { opacity: 0.12; transform: translateX(-4%) scaleY(1); }
+          25% { opacity: 0.25; transform: translateX(3%) scaleY(1.12); }
+          50% { opacity: 0.18; transform: translateX(-2%) scaleY(0.88); }
+          75% { opacity: 0.30; transform: translateX(5%) scaleY(1.08); }
         }
 
         .void-rays {
@@ -301,46 +301,46 @@ function CosmicVoid() {
           animation: rayPulse 14s ease-in-out infinite;
         }
         .void-ray--1 {
-          background: linear-gradient(180deg, rgba(168,85,247,0.2) 0%, transparent 100%);
+          background: linear-gradient(180deg, rgba(168,85,247,0.1) 0%, transparent 100%);
           transform: translate(-50%, 0) rotate(-22deg); animation-delay: 0s;
         }
         .void-ray--2 {
-          background: linear-gradient(180deg, rgba(34,211,238,0.15) 0%, transparent 100%);
+          background: linear-gradient(180deg, rgba(34,211,238,0.08) 0%, transparent 100%);
           transform: translate(-50%, 0) rotate(12deg); animation-delay: -3s;
         }
         .void-ray--3 {
-          background: linear-gradient(180deg, rgba(217,70,239,0.14) 0%, transparent 100%);
+          background: linear-gradient(180deg, rgba(217,70,239,0.07) 0%, transparent 100%);
           transform: translate(-50%, 0) rotate(-6deg); animation-delay: -7s;
         }
         .void-ray--4 {
-          background: linear-gradient(180deg, rgba(236,72,153,0.12) 0%, transparent 100%);
+          background: linear-gradient(180deg, rgba(236,72,153,0.06) 0%, transparent 100%);
           transform: translate(-50%, 0) rotate(28deg); animation-delay: -10s;
         }
         @keyframes rayPulse {
           0%, 100% { opacity: 0; }
-          25% { opacity: 0.5; }
-          50% { opacity: 0.2; }
-          75% { opacity: 0.6; }
+          25% { opacity: 0.18; }
+          50% { opacity: 0.08; }
+          75% { opacity: 0.22; }
         }
 
         .void-nebula {
           position: absolute; border-radius: 50%;
           filter: blur(180px); mix-blend-mode: screen;
-          opacity: 0.25; animation: nebulaPulse 25s ease-in-out infinite;
+          opacity: 0.12; animation: nebulaPulse 25s ease-in-out infinite;
         }
         .void-nebula--1 {
           width: 1500px; height: 900px; top: -22%; left: -15%;
-          background: radial-gradient(ellipse, rgba(168,85,247,0.28) 0%, rgba(217,70,239,0.20) 45%, transparent 70%);
+          background: radial-gradient(ellipse, rgba(168,85,247,0.18) 0%, rgba(217,70,239,0.12) 45%, transparent 70%);
           animation-delay: 0s; animation-duration: 35s;
         }
         .void-nebula--2 {
           width: 1300px; height: 750px; top: 25%; right: -15%;
-          background: radial-gradient(ellipse, rgba(34,211,238,0.22) 0%, rgba(168,85,247,0.16) 50%, transparent 70%);
+          background: radial-gradient(ellipse, rgba(34,211,238,0.14) 0%, rgba(168,85,247,0.10) 50%, transparent 70%);
           animation-delay: -12s; animation-duration: 30s;
         }
         .void-nebula--3 {
           width: 1100px; height: 650px; bottom: 12%; left: 5%;
-          background: radial-gradient(ellipse, rgba(236,72,153,0.20) 0%, rgba(217,70,239,0.12) 55%, transparent 70%);
+          background: radial-gradient(ellipse, rgba(236,72,153,0.12) 0%, rgba(217,70,239,0.08) 55%, transparent 70%);
           animation-delay: -20s; animation-duration: 42s;
         }
         .void-nebula--4 {
@@ -354,9 +354,9 @@ function CosmicVoid() {
           animation-delay: -15s; animation-duration: 38s;
         }
         @keyframes nebulaPulse {
-          0%, 100% { opacity: 0.3; transform: scale(1) translate(0, 0); }
-          33% { opacity: 0.65; transform: scale(1.08) translate(15px, -8px); }
-          66% { opacity: 0.4; transform: scale(0.95) translate(-8px, 6px); }
+          0%, 100% { opacity: 0.12; transform: scale(1) translate(0, 0); }
+          33% { opacity: 0.25; transform: scale(1.04) translate(8px, -4px); }
+          66% { opacity: 0.16; transform: scale(0.97) translate(-4px, 3px); }
         }
 
         .void-vignette {
@@ -741,8 +741,8 @@ return (
 
         <style>{`
           @keyframes holoPulse {
-            0% { opacity: 0.4; transform: scale(0.97); }
-            100% { opacity: 1; transform: scale(1.03); }
+            0% { opacity: 0.15; transform: scale(0.98); }
+            100% { opacity: 0.4; transform: scale(1.02); }
           }
           @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
           .hero-cue .cue-chev { animation: cueDrop 2s ease-in-out infinite; }
