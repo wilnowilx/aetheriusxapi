@@ -123,7 +123,15 @@ timeline
     Sep 10 : Canary flip : /v1/data/uuid LIVE on Base Mainnet : real $0.001 USDC settled via CDP
     Sep 10 : Bazaar discovery : /mcp/discovery manifest : 10 MCP tools over HTTPS SSE
     Sep 10 : Fail-open fix : canary complement stays simulated : 0 unguarded routes
-    Sep 11 : Oracle layer : verified catalog : circuit breaker : anti-replay : MCP discovery : pip package
+        Sep 11 : Oracle layer : verified catalog : circuit breaker : anti-replay : MCP discovery : pip package
+    Sep 11 : Middleware hardening : scope hardening : budget hardening : evidence hardening (telemetry tx_hash) : verified catalog
+    Sep 12 : Canary #3 LIVE - /v1/token/analyze settling real $0.005 USDC via CDP facilitator
+    Sep 12 : MEV-Share integration : order flow listener active on Base Mainnet
+    Sep 12 : Flashbots Protect RPC + Bundle Submission : atomic execution via Flashbots Relay
+    Sep 12 : Gravity Well v1 : batch settlement layer (threshold: $0.50 / 100 tx / 5min)
+    Sep 12 : Oracle Auto-Sync : hourly MCP Discovery - health check + canary settlement test
+    Sep 12 : Alpha Hunter MVP : Unified agent (SentinelBrain + AETHERIUS Oracle + Flashloan) - $10-100/day target
+
 ```
 
 | Phase | Work | Time | Verify |
@@ -417,12 +425,13 @@ The Research Layer is exposed via MCP (Model Context Protocol):
 |---|---|---|---|
 | `/v1/data/uuid` | **REAL** | CDP Facilitator | Active |
 | `/v1/token/price` | **REAL (Canary #2)** | CDP Facilitator | Active |
+| `/v1/token/analyze` | **REAL (Canary #3)** | CDP Facilitator | Active |
 | `/v1/*` (Resto) | Simulated / Guarded | Nonce Graph | Pending |
 
 | Signal | Value |
 |--------|-------|
 | **Network** | **Base Mainnet `eip155:8453`** 🔴 LIVE |
-| **Mode** | **`real` — Two canaries live: `/v1/data/uuid` and `/v1/token/price`, both CDP facilitator settling USDC on-chain** |
+| **Mode** | **`real` — Three canaries live: `/v1/data/uuid`, `/v1/token/price`, `/v1/token/analyze`, all CDP facilitator settling USDC on-chain** |
 | Health | `GET /health` (free) |
 | Telemetry | `GET /v1/telemetry` (free): uptime, per-endpoint stats, settled USDC volume |
 | Playground | [`/`](https://wilnowilx.github.io/aetheriusxapi/) — interactive endpoint testing |
@@ -433,7 +442,7 @@ The Research Layer is exposed via MCP (Model Context Protocol):
 | Oracle Risk | `GET /v1/oracle/risk/{address}` — agent risk score (Credit Velocity) |
 | **Axioms** | `GET /v1/axioms` — 3 fundamental axioms (JSON-LD, M2M-native) |
 | **Ontology** | `GET /v1/ontology` — RDF ontology (9 classes, 11 properties) |
-| Version | v2.0.0 · 100 live endpoints · Oracle Layer · Research Layer · 39 tests · Python SDK v2.0 |
+| Version | v2.1.0 · 100+ live endpoints · Oracle Layer · Research Layer · 39 tests · Python SDK v2.0 |
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 mainnet USDC |
 | MCP SSE | `https://34-156-149-38.sslip.io/aetherapi/mcp/sse` — Agent-native MCP bridge |
 
