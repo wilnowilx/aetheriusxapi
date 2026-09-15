@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import Hero from './components/Hero'
+import AetheriusOS from './components/os/AetheriusOS'
 import NetworkStatus from './components/NetworkStatus'
 import { useScrollAnimations } from './hooks/useScrollAnimations'
 import { useSmoothScroll } from './hooks/useSmoothScroll'
@@ -40,29 +41,21 @@ function Nav() {
             AETHERIUS
           </a>
           <div className="nav-links">
-            <a href="#product" style={{display:'inline-flex',alignItems:'center',gap:6}}>
+            <a href="#hero" style={{display:'inline-flex',alignItems:'center',gap:6}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Product
+              Home
             </a>
-            <a href="#system" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-              System
-            </a>
-            <a href="#join" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" strokeLinejoin="round" strokeLinecap="round"/><circle cx="9" cy="7" r="4" strokeLinejoin="round" strokeLinecap="round"/></svg>
-              Founders
-            </a>
-            <a href="dashboard/" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-              Dashboard
+            <a href="#ae-os" style={{display:'inline-flex',alignItems:'center',gap:6}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              OS
             </a>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.72rem', fontWeight: 600, color: 'var(--green)', padding: '6px 14px', border: '1px solid rgba(16,185,129,0.25)', borderRadius: 9999, background: 'rgba(16,185,129,0.06)', fontFamily: 'JetBrains Mono, monospace', backdropFilter: 'blur(8px)' }}>
               <span className="glow-dot" style={{ width: 6, height: 6 }} />
               Mainnet
             </span>
-            <a href="#join" className="btn-nav" style={{display:'inline-flex',alignItems:'center',gap:6}}>
+            <a href="#ae-os" className="btn-nav" style={{display:'inline-flex',alignItems:'center',gap:6}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              Get Started
+              Launch OS
             </a>
           </div>
           <button className="mobile-toggle" onClick={() => setMobileOpen(true)}>
@@ -73,11 +66,9 @@ function Nav() {
       {mobileOpen && (
         <div className="mobile-nav open">
           <button className="close-btn" onClick={() => setMobileOpen(false)}>×</button>
-          <a href="#product" onClick={() => setMobileOpen(false)}>Product</a>
-          <a href="#system" onClick={() => setMobileOpen(false)}>System</a>
-          <a href="#join" onClick={() => setMobileOpen(false)}>Founders</a>
-          <a href="dashboard/" onClick={() => setMobileOpen(false)}>Dashboard</a>
-          <a href="#join" className="btn btn-primary" onClick={() => setMobileOpen(false)}>Get Started</a>
+          <a href="#hero" onClick={() => setMobileOpen(false)}>Home</a>
+          <a href="#ae-os" onClick={() => setMobileOpen(false)}>OS</a>
+          <a href="#ae-os" className="btn btn-primary" onClick={() => setMobileOpen(false)}>Launch OS</a>
         </div>
       )}
     </>
@@ -1422,34 +1413,12 @@ function App() {
         </VisionScreen>
       </SectionBoundary>
 
-      {/* Screen 2: The Product — APIs + Playground + Architecture */}
-      <SectionBoundary>
-        <ProductScreen>
-          <X402Intelligence />
-          <Playground />
-          <HowItWorks />
-        </ProductScreen>
-      </SectionBoundary>
-
-      {/* Screen 3: The System — Code + Status + Features */}
-      <SectionBoundary>
-        <SystemScreen>
-          <CodeSection />
-          <Heartbeat />
-          <Features />
-        </SystemScreen>
-      </SectionBoundary>
-
-      {/* Screen 4: Join — Founders + CTA */}
-      <SectionBoundary>
-        <JoinScreen>
-          <Founders />
-          <CTA />
-        </JoinScreen>
+      {/* Screen 2: The OS — Live Desktop Environment */}
+        <SectionBoundary fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>Loading OS…</div>}>
+        <AetheriusOS />
       </SectionBoundary>
 
       <Footer />
-      <DotNav />
     </div>
   )
 }
