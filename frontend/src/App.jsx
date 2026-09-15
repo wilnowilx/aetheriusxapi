@@ -50,17 +50,17 @@ function Nav() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
               APIs
             </a>
-            <a href="#flow" style={{display:'inline-flex',alignItems:'center',gap:6}}>
+            <a href="#x402-intel" style={{display:'inline-flex',alignItems:'center',gap:6}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path strokeLinejoin="round" strokeLinecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              Intelligence
+            </a>
+            <a href="#how" style={{display:'inline-flex',alignItems:'center',gap:6}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/><path d="M2 12h20"/></svg>
               Architecture
             </a>
             <a href="#heartbeat" style={{display:'inline-flex',alignItems:'center',gap:6}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
               Status
-            </a>
-            <a href="#founders" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-              Founders
             </a>
             <a href="dashboard/" style={{display:'inline-flex',alignItems:'center',gap:6}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
@@ -85,7 +85,8 @@ function Nav() {
           <button className="close-btn" onClick={() => setMobileOpen(false)}>×</button>
           <a href="#playground" onClick={() => setMobileOpen(false)}>Playground</a>
           <a href="#instruments" onClick={() => setMobileOpen(false)}>APIs</a>
-          <a href="#flow" onClick={() => setMobileOpen(false)}>Architecture</a>
+          <a href="#x402-intel" onClick={() => setMobileOpen(false)}>Intelligence</a>
+          <a href="#how" onClick={() => setMobileOpen(false)}>Architecture</a>
           <a href="#features" onClick={() => setMobileOpen(false)}>Features</a>
           <a href="#code" onClick={() => setMobileOpen(false)}>Code</a>
           <a href="#heartbeat" onClick={() => setMobileOpen(false)}>Status</a>
@@ -128,7 +129,7 @@ function PlasmaBg() {
 
 // === PLAYGROUND ===
 const playgroundEndpoints = [
-  { cat: 'x402 Intelligence', free: true, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+  { cat: 'x402 Intelligence', free: true, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>, items: [
     { method: 'GET', path: '/v1/x402/base-stats', price: 'FREE', params: '{}' },
     { method: 'GET', path: '/v1/x402/gas', price: 'FREE', params: '{}' },
     { method: 'GET', path: '/v1/x402/market-pulse', price: 'FREE', params: '{}' },
@@ -136,26 +137,26 @@ const playgroundEndpoints = [
     { method: 'GET', path: '/v1/x402/stablecoins', price: 'FREE', params: '{}' },
     { method: 'GET', path: '/v1/x402/whales', price: 'FREE', params: '{}' },
   ]},
-  { cat: 'Crypto Market', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M22 12h-4l-3 9L9 3l-3 9H2" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+  { cat: 'Crypto Market', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>, items: [
     { method: 'GET', path: '/v1/crypto/market', price: '$0.005', params: '{"token":"ETH"}' },
     { method: 'GET', path: '/v1/crypto/fear-greed', price: '$0.005', params: '{}' },
     { method: 'GET', path: '/v1/crypto/trending', price: '$0.01', params: '{}' },
     { method: 'GET', path: '/v1/crypto/ohlcv', price: '$0.01', params: '{"token":"ETH","interval":"1d"}' },
     { method: 'GET', path: '/v1/crypto/dominance', price: '$0.005', params: '{}' },
   ]},
-  { cat: 'Token', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 6v12M8 10l4-4 4 4" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+  { cat: 'Token', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 6v12M8 10l4-4 4 4"/></svg>, items: [
     { method: 'GET', path: '/v1/token/price', price: '$0.005', params: '{"token":"ETH"}' },
     { method: 'GET', path: '/v1/token/analyze', price: '$0.01', params: '{"address":"0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984"}' },
   ]},
-  { cat: 'DeFi', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+  { cat: 'DeFi', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>, items: [
     { method: 'GET', path: '/v1/defi/impermanent-loss', price: '$0.01', params: '{}' },
     { method: 'GET', path: '/v1/defi/staking-apy', price: '$0.005', params: '{"protocol":"lido","token":"ETH"}' },
   ]},
-  { cat: 'News', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M18 14h-8M15 18h-5M10 6h8v4h-8z" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+  { cat: 'News', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/><path strokeLinejoin="round" strokeLinecap="round" d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg>, items: [
     { method: 'GET', path: '/v1/news/hackernews', price: '$0.01', params: '{}' },
     { method: 'GET', path: '/v1/news/reddit', price: '$0.01', params: '{"subreddit":"cryptocurrency"}' },
   ]},
-  { cat: 'Data', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="22.08" x2="12" y2="12" strokeLinecap="round"/></svg>, items: [
+  { cat: 'Data', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><path strokeLinejoin="round" strokeLinecap="round" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="22.08" x2="12" y2="12" strokeLinecap="round"/></svg>, items: [
     { method: 'GET', path: '/v1/data/weather', price: '$0.005', params: '{"lat":"19.4326","lon":"-99.1332"}' },
     { method: 'GET', path: '/v1/data/ip', price: '$0.005', params: '{"ip":"8.8.8.8"}' },
     { method: 'GET', path: '/v1/data/uuid', price: '$0.001', params: '{}' },
@@ -163,7 +164,7 @@ const playgroundEndpoints = [
     { method: 'GET', path: '/v1/data/qrcode', price: '$0.003', params: '{"text":"https://aetheriusx.io"}' },
     { method: 'POST', path: '/v1/data/translate', price: '$0.01', params: '{"text":"hello","target":"es"}' },
   ]},
-  { cat: 'Web Tools', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg>, items: [
+  { cat: 'Web Tools', free: false, icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>, items: [
     { method: 'GET', path: '/v1/web/ssl', price: '$0.005', params: '{"domain":"example.com"}' },
     { method: 'GET', path: '/v1/web/whois', price: '$0.01', params: '{"domain":"example.com"}' },
     { method: 'GET', path: '/v1/web/headers', price: '$0.005', params: '{"url":"https://example.com"}' },
@@ -330,18 +331,18 @@ function Playground() {
 // === CATEGORIES ===
 function Categories() {
   const cats = [
-    { title: 'Maps & Location', count: '5 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" strokeLinejoin="round" strokeLinecap="round"/><circle cx="12" cy="10" r="3" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Crypto & DeFi', count: '19 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Web & Scraping', count: '4 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'AI & ML', count: 'soon', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M16 14v2a4 4 0 01-8 0v-2M12 18v4M8 22h8" strokeLinejoin="round" strokeLinecap="round"/></svg>, soon: true },
-    { title: 'Finance', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Weather', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'News & Media', count: '6 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Data & Analytics', count: '8 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="22.08" x2="12" y2="12" strokeLinecap="round"/></svg> },
+    { title: 'Maps & Location', count: '5 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Crypto & DeFi', count: '19 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> },
+    { title: 'Web & Scraping', count: '4 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> },
+    { title: 'AI & ML', count: 'soon', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z"/><path strokeLinejoin="round" strokeLinecap="round" d="M16 14v2a4 4 0 01-8 0v-2M12 18v4M8 22h8"/></svg>, soon: true },
+    { title: 'Finance', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
+    { title: 'Weather', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg> },
+    { title: 'News & Media', count: '6 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/></svg> },
+    { title: 'Data & Analytics', count: '8 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="22.08" x2="12" y2="12" strokeLinecap="round"/></svg> },
     { title: 'Crypto Market Data', count: '5 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Web Tools', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="14 2 14 8 20 8" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Data Tools', count: '7 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><ellipse cx="12" cy="5" rx="9" ry="3" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Security', count: 'soon', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinejoin="round" strokeLinecap="round"/></svg>, soon: true },
+    { title: 'Web Tools', count: '3 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Data Tools', count: '7 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><ellipse cx="12" cy="5" rx="9" ry="3" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path strokeLinejoin="round" strokeLinecap="round" d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg> },
+    { title: 'Security', count: 'soon', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, soon: true },
   ]
 
   return (
@@ -379,10 +380,10 @@ function Categories() {
 // === X402 INTELLIGENCE ===
 function X402Intelligence() {
   const cards = [
-    { title: 'Brain Recommender', desc: 'Tell it what you need — "defi", "wallet", "gas" — and it recommends the best endpoints. AI-powered routing.', code: 'GET /v1/x402/brain?intent=defi', color: 'var(--purple-light)', bg: 'rgba(168,85,247,0.06)', iconBg: 'linear-gradient(135deg, rgba(168,85,247,0.06), rgba(217,70,239,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" strokeLinejoin="round" strokeLinecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" strokeLinecap="round"/></svg> },
+    { title: 'Brain Recommender', desc: 'Tell it what you need — "defi", "wallet", "gas" — and it recommends the best endpoints. AI-powered routing.', code: 'GET /v1/x402/brain?intent=defi', color: 'var(--purple-light)', bg: 'rgba(168,85,247,0.06)', iconBg: 'linear-gradient(135deg, rgba(168,85,247,0.06), rgba(217,70,239,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" strokeLinecap="round"/></svg> },
     { title: 'Market Pulse', desc: 'Real-time Base conditions: gas, chain health, USDC activity, ETH price, bullish/bearish signal. One call.', code: 'GET /v1/x402/market-pulse', color: 'var(--green)', bg: 'rgba(16,185,129,0.06)', iconBg: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Wallet Intel', desc: 'Full wallet profile: USDC flow, risk score, counterparty analysis, ETH balance. Any address on Base.', code: 'GET /v1/x402/wallet-intel/{address}', color: 'var(--pink)', bg: 'rgba(236,72,153,0.06)', iconBg: 'linear-gradient(135deg, rgba(236,72,153,0.1), rgba(168,85,247,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" strokeLinejoin="round" strokeLinecap="round"/><circle cx="12" cy="7" r="4" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Sentiment + Risk', desc: 'Fear & Greed Index + on-chain sentiment. Multi-factor risk scoring with detailed breakdown. Compliance indicators.', code: 'GET /v1/x402/sentiment · /risk-intel', color: 'var(--cyan)', bg: 'rgba(6,182,212,0.06)', iconBg: 'linear-gradient(135deg, rgba(6,182,212,0.1), rgba(16,185,129,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Wallet Intel', desc: 'Full wallet profile: USDC flow, risk score, counterparty analysis, ETH balance. Any address on Base.', code: 'GET /v1/x402/wallet-intel/{address}', color: 'var(--pink)', bg: 'rgba(236,72,153,0.06)', iconBg: 'linear-gradient(135deg, rgba(236,72,153,0.1), rgba(168,85,247,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'Sentiment + Risk', desc: 'Fear & Greed Index + on-chain sentiment. Multi-factor risk scoring with detailed breakdown. Compliance indicators.', code: 'GET /v1/x402/sentiment · /risk-intel', color: 'var(--cyan)', bg: 'rgba(6,182,212,0.06)', iconBg: 'linear-gradient(135deg, rgba(6,182,212,0.1), rgba(16,185,129,0.08))', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="28" height="28"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> },
   ]
 
   return (
@@ -403,7 +404,7 @@ function X402Intelligence() {
       `}</style>
       <div className="inner" style={{ position: 'relative', zIndex: 1 }}>
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path strokeLinejoin="round" strokeLinecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path strokeLinejoin="round" strokeLinecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
           QuantumXBrain — FREE Intelligence Layer
         </div>
         <h2 className="section-title">20 Free Endpoints. Real On-Chain Intelligence.</h2>
@@ -635,19 +636,19 @@ function Features() {
   const [openFeature, setOpenFeature] = useState(null)
 
   const features = [
-    { title: 'AI-Native Design', desc: 'Built for machines. No accounts, no UI, no human friction. Agents pay and use directly. Zero human in the loop.', color: 'var(--purple-light)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M16 14v2a4 4 0 01-8 0v-2M12 18v4M8 22h8" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'x402 Protocol', desc: 'HTTP 402 with crypto payments. The emerging standard for machine-to-machine commerce. Settled on Base L2.', color: 'var(--cyan)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.72-1.71" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'USDC on Base', desc: 'Stablecoin payments on L2. Sub-cent fees, instant finality, global reach. No volatile tokens.', color: 'var(--magenta-light)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 6v12M8 10l4-4 4 4M8 14l4 4 4-4" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Permissionless', desc: 'No KYC, no subscriptions, no bank accounts. Connect wallet and use. That\'s it. True censorship resistance.', color: 'var(--green)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinejoin="round" strokeLinecap="round"/><polyline points="9 12 11 14 15 10" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Global Access', desc: 'Anyone with a crypto wallet. No bank account needed. No borders. Built for the global agent economy.', color: 'var(--orange)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><circle cx="12" cy="12" r="10" strokeLinejoin="round" strokeLinecap="round"/><line x1="2" y1="12" x2="22" y2="12" strokeLinecap="round"/><path strokeLinejoin="round" strokeLinecap="round" d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
-    { title: 'Instant Settlement', desc: 'Payments verified on-chain in seconds. No waiting, no intermediaries. On-chain proof included in every response.', color: 'var(--pink)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinejoin="round" strokeLinecap="round"/></svg> },
+    { title: 'AI-Native Design', desc: 'Built for machines. No accounts, no UI, no human friction. Agents pay and use directly. Zero human in the loop.', color: 'var(--purple-light)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z"/><path d="M16 14v2a4 4 0 01-8 0v-2M12 18v4M8 22h8"/></svg> },
+    { title: 'x402 Protocol', desc: 'HTTP 402 with crypto payments. The emerging standard for machine-to-machine commerce. Settled on Base L2.', color: 'var(--cyan)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.72-1.71"/></svg> },
+    { title: 'USDC on Base', desc: 'Stablecoin payments on L2. Sub-cent fees, instant finality, global reach. No volatile tokens.', color: 'var(--magenta-light)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10l4-4 4 4M8 14l4 4 4-4"/></svg> },
+    { title: 'Permissionless', desc: 'No KYC, no subscriptions, no bank accounts. Connect wallet and use. That\'s it. True censorship resistance.', color: 'var(--green)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> },
+    { title: 'Global Access', desc: 'Anyone with a crypto wallet. No bank account needed. No borders. Built for the global agent economy.', color: 'var(--orange)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> },
+    { title: 'Instant Settlement', desc: 'Payments verified on-chain in seconds. No waiting, no intermediaries. On-chain proof included in every response.', color: 'var(--pink)', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> },
   ]
 
   return (
     <section id="features" data-animate style={{ textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
       <div className="inner" style={{ position: 'relative', zIndex: 1, maxWidth: 640 }}>
         <div className="section-label">
-          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5z" strokeLinejoin="round" strokeLinecap="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
           Features
         </div>
         <h2 className="section-title">Built for the Agent Economy</h2>
@@ -1512,7 +1513,7 @@ function Footer() {
               {[
                 ['#instruments', 'APIs'],
                 ['#x402-intel', 'Intelligence'],
-                ['#flow', 'Architecture'],
+                ['#how', 'Architecture'],
                 ['#heartbeat', 'Status'],
                 ['dashboard/', 'Dashboard'],
               ].map(([href, text]) => (
@@ -1638,7 +1639,7 @@ class SectionBoundary extends React.Component {
 // === DOT NAV (restored slide traction — IO highlight, click to glide) ===
 const DOT_SECTIONS = [
   ['hero', 'Intro'], ['playground', 'Playground'], ['instruments', 'Instruments'],
-  ['flow', 'Architecture'], ['x402-intel', 'Intelligence'], ['how', 'How It Works'],
+  ['x402-intel', 'Intelligence'], ['how', 'Architecture'],
   ['features', 'Features'], ['code', 'Code'],
   ['heartbeat', 'Status'], ['founders', 'Founders'], ['cta', 'Start'],
 ]
@@ -1725,31 +1726,22 @@ function App() {
 
   return (
     <div ref={appRef}>
+      <div className="cosmic-bg" aria-hidden="true" />
       <PlasmaBg />
       <Nav />
       <NetworkStatus />
       <SectionBoundary fallback={<div style={{ minHeight: '60vh' }} />}>
         <Hero />
       </SectionBoundary>
-      <SectionDivider />
       <SectionBoundary><Playground /></SectionBoundary>
-      <SectionDivider />
       <SectionBoundary><Instruments /></SectionBoundary>
-      <SectionDivider />
       <SectionBoundary><FlowExplorer /></SectionBoundary>
-      <SectionDivider />
       <SectionBoundary><X402Intelligence /></SectionBoundary>
-      <SectionDivider />
       <SectionBoundary><HowItWorks /></SectionBoundary>
-      <SectionDivider />
       <SectionBoundary><Features /></SectionBoundary>
-      <SectionDivider />
       <SectionBoundary><CodeSection /></SectionBoundary>
-      <SectionDivider />
       <SectionBoundary><Heartbeat /></SectionBoundary>
-      <SectionDivider />
       <SectionBoundary><Founders /></SectionBoundary>
-      <SectionDivider />
       <SectionBoundary><CTA /></SectionBoundary>
       <Footer />
       <DotNav />

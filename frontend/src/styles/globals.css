@@ -35,6 +35,7 @@ html {
   scroll-behavior: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  scroll-snap-type: y proximity;
 }
 ::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
@@ -137,12 +138,20 @@ body {
 }
 
 section {
-  padding: 100px 0;
+  min-height: 100vh;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: start;
+  padding: 80px 0;
 }
 
+/* Hero keeps its natural height — no min-height override */
 #hero {
   overflow: visible;
+  min-height: auto;
+  height: 100vh;
 }
 
 /* Section inner — glass morphism, no hard borders */
@@ -154,6 +163,8 @@ section .inner {
   backdrop-filter: blur(20px);
   box-shadow: var(--glow-purple);
   transition: border-color 0.5s ease, box-shadow 0.5s ease;
+  width: 100%;
+  max-width: 1200px;
 }
 
 section .inner:hover {
@@ -423,14 +434,44 @@ a:active, button:active {
 @media (max-width: 768px) {
   .nav-links { display: none; }
   .mobile-toggle { display: block; }
-  section { padding: 60px 0; }
+  section { min-height: 100vh; padding: 60px 0; }
   .inner { padding: 0 20px; }
+  .cosmic-bg { opacity: 0.35; }
 }
 
 /* R3F Canvas transparency */
 canvas {
   background: transparent !important;
   display: block;
+}
+
+/* === COSMIC BACKGROUND — subtle fixed stars behind all sections === */
+.cosmic-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 30% 60%, rgba(168,85,247,0.3), transparent),
+    radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 70% 80%, rgba(34,211,238,0.25), transparent),
+    radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1px 1px at 15% 85%, rgba(217,70,239,0.2), transparent),
+    radial-gradient(1px 1px at 45% 45%, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1px 1px at 75% 15%, rgba(168,85,247,0.2), transparent),
+    radial-gradient(1px 1px at 85% 65%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 25% 35%, rgba(34,211,238,0.15), transparent);
+  opacity: 0.6;
+}
+
+/* === SECTION DIVIDER LINE === */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168,85,247,0.15), transparent);
+  margin: 0;
 }
 
 /* Invisible-but-functional scrollbars for inner panels.

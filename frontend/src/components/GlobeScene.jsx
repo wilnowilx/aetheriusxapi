@@ -14,51 +14,51 @@ const TextBandRings = ({ liveData }) => {
   const ringsConfig = useMemo(() => {
     const d = liveData || {}
     return [
-      // ANILLO 1 EXTERIOR: "THE MARKETPLACE THAT LIVES" — banda blanca
+      // ANILLO 1 EXTERIOR: "THE MARKETPLACE THAT LIVES" — banda blanca GRANDE
       {
-        radius: 3.6,
+        radius: 3.8,
         tilt: 0.18,
-        yOffset: 0.45,
+        yOffset: 0.55,
         speed: 0.025,
-        bandWidth: 0.42,
+        bandWidth: 0.75,
         color: '#ffffff',
         opacity: 0.9,
-        fontSize: 42,
+        fontSize: 72,
         text: '   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   ',
       },
-      // ANILLO 2 INTERMEDIO: subtítulo — banda magenta
+      // ANILLO 2 INTERMEDIO: subtítulo — banda magenta GRANDE
       {
-        radius: 3.05,
+        radius: 3.15,
         tilt: 0.32,
         yOffset: -0.15,
         speed: -0.035,
-        bandWidth: 0.36,
+        bandWidth: 0.62,
         color: '#d946ef',
         opacity: 0.82,
-        fontSize: 34,
+        fontSize: 56,
         text: '   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   ',
       },
-      // ANILLO 3 INTERIOR: métricas vivas — banda cian
+      // ANILLO 3 INTERIOR: métricas vivas — banda cian GRANDE
       {
         radius: 2.55,
         tilt: 0.12,
-        yOffset: -0.55,
+        yOffset: -0.75,
         speed: 0.04,
-        bandWidth: 0.32,
+        bandWidth: 0.52,
         color: '#22d3ee',
         opacity: 0.75,
-        fontSize: 28,
+        fontSize: 44,
         text: `   ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE  ${d.latency || ''}   ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE  ${d.latency || ''}   `,
       },
     ]
   }, [liveData])
 
-  // Canvas 4096×240 — neon premium: bloom real + nítido frontal, más altura para no overlap
+  // Canvas 4096×400 — neon premium: bloom real + nítido frontal, bandas GRANDES
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
       canvas.width = 4096
-      canvas.height = 240
+      canvas.height = 400
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       const font = `900 ${ring.fontSize * 1.1}px 'JetBrains Mono', 'Fira Code', monospace`
@@ -103,7 +103,7 @@ const TextBandRings = ({ liveData }) => {
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
       canvas.width = 4096
-      canvas.height = 240
+      canvas.height = 400
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       ctx.font = `900 ${ring.fontSize * 1.1}px 'JetBrains Mono', 'Fira Code', monospace`
