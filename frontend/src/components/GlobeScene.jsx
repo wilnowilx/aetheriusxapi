@@ -156,7 +156,7 @@ const TextBandRings = ({ liveData }) => {
           <mesh
             onPointerOver={(e) => { e.stopPropagation(); setHoveredRing(ringIdx); document.body.style.cursor = 'pointer' }}
             onPointerOut={() => { setHoveredRing(null); document.body.style.cursor = 'auto' }}
-            onClick={() => { if (window.__aetherius_addImpact) window.__aetherius_addImpact({ position: new THREE.Vector3(ring.radius, ring.yOffset, 0), intensity: 0.8 }) }}
+            onClick={() => {}}
           >
             <cylinderGeometry args={[ring.radius, ring.radius, ring.bandWidth, 128, 1, true]} />
             <meshBasicMaterial
@@ -188,7 +188,7 @@ const TextBandRings = ({ liveData }) => {
             <meshBasicMaterial
               color={ring.color}
               transparent
-              opacity={ring.opacity * 0.04}
+              opacity={hoveredRing === ringIdx ? ring.opacity * 0.18 : ring.opacity * 0.04}
               depthWrite={false}
             />
           </mesh>
@@ -315,32 +315,15 @@ function InnerCore() {
   )
 }
 
-// === WIREFRAME — visible structure with pulse-on-impact ===
-function VisibleWireframe({ impactPoints }) {
+// === WIREFRAME — clean ambient pulse ===
+function VisibleWireframe() {
   const ref = useRef()
   const uniforms = useMemo(() => ({
     time: { value: 0 },
-    // 8 impact slots: position (xyz) + intensity + decay
-    impact0: { value: new THREE.Vector3(0, 0, 0) }, i0t: { value: 0 },
-    impact1: { value: new THREE.Vector3(0, 0, 0) }, i1t: { value: 0 },
-    impact2: { value: new THREE.Vector3(0, 0, 0) }, i2t: { value: 0 },
-    impact3: { value: new THREE.Vector3(0, 0, 0) }, i3t: { value: 0 },
-    impact4: { value: new THREE.Vector3(0, 0, 0) }, i4t: { value: 0 },
-    impact5: { value: new THREE.Vector3(0, 0, 0) }, i5t: { value: 0 },
-    impact6: { value: new THREE.Vector3(0, 0, 0) }, i6t: { value: 0 },
-    impact7: { value: new THREE.Vector3(0, 0, 0) }, i7t: { value: 0 },
   }), [])
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     uniforms.time.value += delta * 0.5
-    // Feed impact points into shader
-    if (impactPoints) {
-      for (let i = 0; i < 8 && i < impactPoints.length; i++) {
-        const pt = impactPoints[i]
-        uniforms[`impact${i}`].value.copy(pt.position)
-        uniforms[`i${i}t`].value = pt.intensity
-      }
-    }
   })
 
   return (
@@ -349,91 +332,48 @@ function VisibleWireframe({ impactPoints }) {
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={`
-          varying vec3 vPos; varying vec3 vWorldPos;
+          varying vec3 vPos;
           uniform float time;
-          uniform vec3 impact0, impact1, impact2, impact3, impact4, impact5, impact6, impact7;
-          uniform float i0t, i1t, i2t, i3t, i4t, i5t, i6t, i7t;
           void main() {
             vPos = position;
-            vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           }
         `}
         fragmentShader={`
-          varying vec3 vPos; varying vec3 vWorldPos;
+          varying vec3 vPos;
           uniform float time;
-          uniform vec3 impact0, impact1, impact2, impact3, impact4, impact5, impact6, impact7;
-          uniform float i0t, i1t, i2t, i3t, i4t, i5t, i6t, i7t;
-
-          // Collision glow: whisper-thin — barely visible flash at impact
-          float impactPulse(vec3 worldPos, vec3 impactPos, float intensity) {
-            float dist = length(worldPos - impactPos);
-            // Tight ring expanding from impact point
-            float ring = abs(dist - time * 0.8 * intensity);
-            float ringGlow = exp(-ring * 2.0) * intensity * 0.06;
-            // Proximity glow (bright at impact, fades radially)
-            float prox = exp(-dist * 3.0) * intensity * 0.05;
-            // Hot center flash — whisper
-            float hotCenter = exp(-dist * 8.0) * intensity * 0.08;
-            return (ringGlow * 0.5 + prox + hotCenter) * intensity;
-          }
 
           float polarGlow(vec3 pos) {
             return pow(abs(pos.y / 2.2), 2.5) * 0.6;
           }
 
-          // Ambient sparkle: makes wireframe feel alive even without impacts — DIMINUTO
           float ambientSparkle(vec3 pos, float t) {
             float s = 0.0;
-            // Traveling sparkles along wireframe edges
             float angle = atan(pos.z, pos.x);
             float lat = asin(pos.y / 2.2);
             s += pow(sin(angle * 12.0 + t * 1.5) * 0.5 + 0.5, 8.0) * 0.03;
             s += pow(sin(lat * 8.0 - t * 0.8) * 0.5 + 0.5, 10.0) * 0.02;
-            // Random micro-sparkles
             float hash = fract(sin(dot(floor(pos * 20.0), vec3(12.9898,78.233,45.164))) * 43758.5453);
             s += step(0.97, hash) * 0.06 * (0.5 + 0.5 * sin(t * 5.0 + hash * 20.0));
             return s;
           }
 
           void main() {
-            float pulse = 0.5 + 0.5 * sin(time * 0.8 + vWorldPos.y * 3.0);
+            float pulse = 0.5 + 0.5 * sin(time * 0.8 + vPos.y * 3.0);
             float fade = smoothstep(0.0, 0.3, abs(vPos.y));
-
-            // Accumulate impact pulses — enhanced collision glow
-            float impacts = 0.0;
-            impacts += impactPulse(vWorldPos, impact0, i0t);
-            impacts += impactPulse(vWorldPos, impact1, i1t);
-            impacts += impactPulse(vWorldPos, impact2, i2t);
-            impacts += impactPulse(vWorldPos, impact3, i3t);
-            impacts += impactPulse(vWorldPos, impact4, i4t);
-            impacts += impactPulse(vWorldPos, impact5, i5t);
-            impacts += impactPulse(vWorldPos, impact6, i6t);
-            impacts += impactPulse(vWorldPos, impact7, i7t);
-            impacts = clamp(impacts, 0.0, 2.0);
-
-            // Ambient sparkle on wireframe
             float sparkle = ambientSparkle(vPos, time * 2.0);
 
-            // Wireframe base: CYAN pulse (the dominant read)
             vec3 cyanBase = vec3(0.0, 0.75, 1.0);
             vec3 purpleAccent = vec3(0.55, 0.25, 0.9);
             float cyanPulse = 0.6 + 0.4 * sin(time * 0.6 + vPos.x * 2.0);
-            vec3 baseCol = mix(cyanBase, purpleAccent, 0.25 + 0.15 * sin(time * 0.25));
-            baseCol *= (0.7 + 0.3 * cyanPulse);
+            vec3 col = mix(cyanBase, purpleAccent, 0.25 + 0.15 * sin(time * 0.25));
+            col *= (0.7 + 0.3 * cyanPulse);
 
             float polar = polarGlow(vPos);
-            baseCol += polar * vec3(0.1, 0.05, 0.3);
-
-            // Impact: whisper flash at collision — barely visible
-            vec3 impactCol = vec3(0.4, 1.0, 1.0);
-            vec3 col = mix(baseCol, impactCol, impacts * 0.08);
-            col += vec3(0.04, 0.08, 0.12) * impacts;
-
-            // Sparkle
+            col += polar * vec3(0.1, 0.05, 0.3);
             col += vec3(0.3, 0.6, 0.8) * sparkle * 0.15;
 
-            float alpha = (0.10 + polar * 0.05 + cyanPulse * 0.04) * pulse * fade + impacts * 0.08 + sparkle * 0.02;
+            float alpha = (0.10 + polar * 0.05 + cyanPulse * 0.04) * pulse * fade + sparkle * 0.02;
             gl_FragColor = vec4(col, alpha);
           }
         `}
@@ -747,228 +687,11 @@ function BaseCore({ flowRef }) {
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
-      {/* === PULSAR ENGINE: chispas angulares que impactan el wireframe === */}
-      <PulsarEngine gasUniforms={gasUniforms} />
     </group>
   )
 }
 
-// === PULSAR ENGINE — chispas angulares + trazas de impacto ===
-// Nace desde el centro BASE → se disparan como una explosión de pulsar →
-// impactan el wireframe Dyson y lo iluminan en el punto de contacto.
-// Forma: NO redonda → diamante/estrella agresiva (gl_PointCoord distorsionado).
-function PulsarEngine({ gasUniforms }) {
-  const SPARK_COUNT = 5
-  const TRAIL_COUNT = 2
-  const TOTAL = SPARK_COUNT + TRAIL_COUNT
-  const WIRE_R = 2.2
-  const WIRE_R2 = WIRE_R * WIRE_R
-
-  const pointsRef = useRef()
-  const collisionRef = useRef([]) // puntos de colisión para wireframe
-
-  const state = useMemo(() => {
-    const pos = new Float32Array(TOTAL * 3)
-    const vel = new Float32Array(TOTAL * 3)
-    const seed = new Float32Array(TOTAL * 5) // speed, maxLife, age, type(0=spark,1=trail), alive
-    const col = new Float32Array(TOTAL * 3)
-
-    for (let i = 0; i < TOTAL; i++) {
-      const isTrail = i >= SPARK_COUNT
-      seed[i * 5] = 1.5 + Math.random() * 2.0         // speed
-      seed[i * 5 + 1] = 1.0 + Math.random() * 2.5    // maxLife
-      seed[i * 5 + 2] = Math.random() * 3.0           // age (stagger spawn)
-      seed[i * 5 + 3] = isTrail ? 1.0 : 0.0           // type
-      seed[i * 5 + 4] = 1.0                            // alive
-
-      // Spawn from center with random direction
-      const theta = Math.random() * Math.PI * 2
-      const phi = Math.acos(2 * Math.random() - 1)
-      const speed = seed[i * 5]
-      vel[i * 3] = Math.sin(phi) * Math.cos(theta) * speed
-      vel[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * speed
-      vel[i * 3 + 2] = Math.cos(phi) * speed
-
-      // Tiny offset from center
-      pos[i * 3] = (Math.random() - 0.5) * 0.04
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 0.04
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 0.04
-
-      // Colors: estrictamente cian y azul base (cero magenta/púrpura)
-      if (!isTrail) {
-        const t = Math.random()
-        col[i*3] = 0.0; col[i*3+1] = 0.75 + t * 0.25; col[i*3+2] = 1.0
-      } else {
-        const t = Math.random()
-        col[i*3] = 0.0; col[i*3+1] = 0.5 + t * 0.4; col[i*3+2] = 0.95 + t * 0.05
-      }
-    }
-    return { positions: pos, velocities: vel, seeds: seed, colors: col }
-  }, [])
-
-  useFrame((_, delta) => {
-    if (!pointsRef.current) return
-    const { positions, velocities, seeds, colors } = state
-    const time = gasUniforms.time.value
-    const pulse = gasUniforms.pulse.value
-    const collisions = []
-
-    for (let i = 0; i < TOTAL; i++) {
-      const isTrail = seeds[i * 5 + 3] > 0.5
-      seeds[i * 5 + 2] += delta // age
-      const age = seeds[i * 5 + 2]
-      const maxLife = seeds[i * 5 + 1]
-
-      // Respawn cuando muere
-      if (age >= maxLife) {
-        const theta = Math.random() * Math.PI * 2
-        const phi = Math.acos(2 * Math.random() - 1)
-        const speed = 1.5 + Math.random() * 2.0
-        velocities[i*3] = Math.sin(phi)*Math.cos(theta) * speed
-        velocities[i*3+1] = Math.sin(phi)*Math.sin(theta) * speed
-        velocities[i*3+2] = Math.cos(phi) * speed
-        positions[i*3] = (Math.random()-0.5)*0.04
-        positions[i*3+1] = (Math.random()-0.5)*0.04
-        positions[i*3+2] = (Math.random()-0.5)*0.04
-        seeds[i*5] = speed
-        seeds[i*5+2] = 0
-        seeds[i*5+4] = 1.0
-        continue
-      }
-
-      if (seeds[i*5+4] < 0.5) continue // dead
-
-      // Move
-      positions[i*3] += velocities[i*3] * delta
-      positions[i*3+1] += velocities[i*3+1] * delta
-      positions[i*3+2] += velocities[i*3+2] * delta
-
-      // Drag: sparks slow down faster (aggressive deceleration)
-      const drag = isTrail ? 0.97 : 0.992
-      velocities[i*3] *= drag
-      velocities[i*3+1] *= drag
-      velocities[i*3+2] *= drag
-
-      // Collision with Dyson sphere inner surface (r=2.2)
-      const d2 = positions[i*3]**2 + positions[i*3+1]**2 + positions[i*3+2]**2
-      if (d2 >= WIRE_R2 && seeds[i*5+4] > 0.5) {
-        // Clamp to surface
-        const d = Math.sqrt(d2)
-        const s = WIRE_R / d
-        positions[i*3] *= s
-        positions[i*3+1] *= s
-        positions[i*3+2] *= s
-
-        // Register collision for wireframe glow — whisper
-        collisions.push({
-          x: positions[i*3], y: positions[i*3+1], z: positions[i*3+2],
-          intensity: isTrail ? 0.15 : 0.25
-        })
-
-        // Spark dies on impact (energy absorbed by wireframe mesh)
-        if (!isTrail) {
-          seeds[i*5+4] = 0.0 // kill spark
-          seeds[i*5+2] = seeds[i*5+1] - 0.1 // nearly dead → fade
-        } else {
-          // Trail: slide along surface briefly then die
-          velocities[i*3] *= -0.3
-          velocities[i*3+1] *= -0.3
-          velocities[i*3+2] *= -0.3
-          seeds[i*5+2] = seeds[i*5+1] - 0.2
-        }
-      }
-    }
-
-    collisionRef.current = collisions
-    pointsRef.current.geometry.attributes.position.needsUpdate = true
-  })
-
-  const vertexShader = `
-    attribute vec5 seeds;
-    attribute vec3 aColor;
-    uniform float time;
-    uniform float pulse;
-    varying vec3 vColor;
-    varying float vAlpha;
-    varying float vType;
-    varying float vAge;
-
-    void main() {
-      vColor = aColor;
-      float speed = seeds.x;
-      float maxLife = seeds.y;
-      float age = seeds.z;
-      float type = seeds.w;
-      float alive = seeds.a;
-
-      vType = type;
-      float lifeRatio = clamp(age / maxLife, 0.0, 1.0);
-      vAge = lifeRatio;
-
-      // Fade: sharp birth, aggressive death
-      float birth = smoothstep(0.0, 0.08, lifeRatio);
-      float death = 1.0 - smoothstep(0.6, 1.0, lifeRatio);
-      float alive_f = step(0.5, alive);
-
-      // Size: sparks microscopic — whisper pinpricks
-      float baseSize = type < 0.5 ? 0.003 : 0.002;
-      // Distance-based scaling
-      vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
-      float dist = length(position);
-      float perspScale = 12.0 / (-mvPos.z);
-
-      vAlpha = birth * death * alive_f * (0.7 + 0.3 * pulse);
-      gl_PointSize = baseSize * perspScale * (1.0 - lifeRatio * 0.4);
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `
-
-  const fragmentShader = `
-    varying vec3 vColor;
-    varying float vAlpha;
-    varying float vType;
-    varying float vAge;
-
-    void main() {
-      vec2 uv = gl_PointCoord * 2.0 - 1.0;
-      float r = length(uv);
-      if (r > 1.0) discard; // MÁSCARA CIRCULAR ESTRICTA — IMPOSIBLE QUE SEAN CUADRADOS
-
-      float ax = abs(uv.x);
-      float ay = abs(uv.y);
-
-      // Estrella de 4 puntas orgánica dentro de límite circular
-      float spikeX = smoothstep(0.20, 0.0, ay) * pow(1.0 - ax, 2.0);
-      float spikeY = smoothstep(0.20, 0.0, ax) * pow(1.0 - ay, 2.0);
-      float starCross = max(spikeX, spikeY);
-
-      float centerGlow = pow(1.0 - r, 2.5);
-      float hotCore = pow(1.0 - r, 10.0);
-
-      vec3 hotColor = mix(vColor, vec3(1.0), hotCore * 0.85);
-      float alpha = (starCross * 0.6 + centerGlow * 0.4) * vAlpha;
-
-      gl_FragColor = vec4(hotColor, alpha);
-    }
-  `
-
-  return (
-    <points ref={pointsRef} renderOrder={10}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[state.positions, 3]} />
-        <bufferAttribute attach="attributes-seeds" args={[state.seeds, 5]} />
-        <bufferAttribute attach="attributes-aColor" args={[state.colors, 3]} />
-      </bufferGeometry>
-      <shaderMaterial
-        uniforms={gasUniforms}
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-        transparent depthWrite={false} blending={THREE.AdditiveBlending}
-      />
-    </points>
-  )
-}
-
+// === PULSAR ENGINE — REMOVED (no sparks) ===
 // === COSMIC DUST FIELD + NEBULA CLOUDS — profundidad 3D real ===
 // Polvo fino disperso + nubes de nebulosa flotantes en 3D alrededor de la esfera Dyson.
 function CosmicDustField() {
@@ -1551,90 +1274,7 @@ function DataStream() {
   )
 }
 
-// === IMPACT MANAGER — manages 8 impact slots ===
-function ImpactManager({ onImpactsReady }) {
-  const impactQueue = useRef([])
-  const impactSlots = useRef(
-    Array.from({ length: 8 }, () => ({
-      position: new THREE.Vector3(),
-      intensity: 0,
-      active: false,
-      age: 0,
-    }))
-  )
-
-  useFrame((state, delta) => {
-    // Process queue
-    while (impactQueue.current.length > 0 && impactSlots.current.some(s => !s.active)) {
-      const pt = impactQueue.current.shift()
-      const slot = impactSlots.current.find(s => !s.active)
-      if (slot) {
-        slot.position.copy(pt.position)
-        slot.intensity = pt.intensity
-        slot.active = true
-        slot.age = 0
-      }
-    }
-    // Decay active impacts — FAST fade for diminuto feel
-    const decaySpeed = 2.5
-    impactSlots.current.forEach(slot => {
-      if (slot.active) {
-        slot.age += delta
-        slot.intensity = Math.max(0, 1.0 - slot.age * decaySpeed)
-        if (slot.intensity <= 0) {
-          slot.active = false
-        }
-      }
-    })
-    // Pass to parent
-    onImpactsReady(impactSlots.current.filter(s => s.active).map(s => ({
-      position: s.position,
-      intensity: s.intensity,
-    })))
-  })
-
-  // Expose addImpact
-  useEffect(() => {
-    window.__aetherius_addImpact = (pt) => {
-      impactQueue.current.push(pt)
-    }
-    return () => { delete window.__aetherius_addImpact }
-  }, [])
-
-  return null
-}
-
-// === IMPACTS BRIDGE — holds impact state INSIDE Canvas ===
-// setImpactPoints used to live in the <Canvas> wrapper: every frame produced a
-// new array → wrapper re-rendered 60x/s recreating the inline camera prop →
-// R3F re-applied the camera each frame and fought OrbitControls autoRotate to
-// a standstill ("moves a little, then freezes"). Keeping the state here means
-// per-frame updates only reconcile Canvas children — the camera is untouched.
-function GlobeImpacts() {
-  const [impactPoints, setImpactPoints] = useState([])
-  const lastSig = useRef('')
-
-  // Only notify when the active set actually changes (idle frames send nothing)
-  const handleImpactsReady = useCallback((pts) => {
-    let sig = pts.length + ':'
-    for (let i = 0; i < pts.length; i++) {
-      const p = pts[i]
-      sig += p.position.x.toFixed(1) + ',' + p.position.y.toFixed(1) + ',' + p.position.z.toFixed(1) + ',' + p.intensity.toFixed(2) + ';'
-    }
-    if (sig !== lastSig.current) {
-      lastSig.current = sig
-      setImpactPoints(pts)
-    }
-  }, [])
-
-  return (
-    <>
-      <VisibleWireframe impactPoints={impactPoints} />
-      <ImpactManager onImpactsReady={handleImpactsReady} />
-    </>
-  )
-}
-
+// === IMPACT MANAGER — REMOVED (no sparks) ===
 // === COSMIC COMETS — estelas fugaces brutalismo cósmico ===
 function CosmicComets() {
   const ref = useRef()
@@ -1971,7 +1611,7 @@ function GlobeScene({ liveData, paused }) {
         {/* CAPA 1-4: Gas + nebula + BASE (renderOrder 0-2, sin depthWrite) */}
         <BaseCore flowRef={flowRef} />
         {/* CAPA 5: Wireframe DYSON (renderOrder 3, depthWrite=true → OCLUYE gas detrás) */}
-        <GlobeImpacts />
+        <VisibleWireframe />
         {/* CAPA 6-7: Partículas (renderOrder 4-10, encima del wireframe) */}
         <EnergyParticles liveData={liveData} onImpact={handleImpact} flowRef={flowRef} />
         <UnifiedHalo />
