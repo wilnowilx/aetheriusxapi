@@ -40,25 +40,17 @@ function Nav() {
             AETHERIUS
           </a>
           <div className="nav-links">
-            <a href="#playground" style={{display:'inline-flex',alignItems:'center',gap:6}}>
+            <a href="#product" style={{display:'inline-flex',alignItems:'center',gap:6}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Playground
+              Product
             </a>
-            <a href="#instruments" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-              APIs
+            <a href="#system" style={{display:'inline-flex',alignItems:'center',gap:6}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              System
             </a>
-            <a href="#x402-intel" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path strokeLinejoin="round" strokeLinecap="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              Intelligence
-            </a>
-            <a href="#how" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/><path d="M2 12h20"/></svg>
-              Architecture
-            </a>
-            <a href="#heartbeat" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-              Status
+            <a href="#join" style={{display:'inline-flex',alignItems:'center',gap:6}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" strokeLinejoin="round" strokeLinecap="round"/><circle cx="9" cy="7" r="4" strokeLinejoin="round" strokeLinecap="round"/></svg>
+              Founders
             </a>
             <a href="dashboard/" style={{display:'inline-flex',alignItems:'center',gap:6}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
@@ -68,7 +60,7 @@ function Nav() {
               <span className="glow-dot" style={{ width: 6, height: 6 }} />
               Mainnet
             </span>
-            <a href="#cta" className="btn-nav" style={{display:'inline-flex',alignItems:'center',gap:6}}>
+            <a href="#join" className="btn-nav" style={{display:'inline-flex',alignItems:'center',gap:6}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               Get Started
             </a>
@@ -81,15 +73,11 @@ function Nav() {
       {mobileOpen && (
         <div className="mobile-nav open">
           <button className="close-btn" onClick={() => setMobileOpen(false)}>×</button>
-          <a href="#playground" onClick={() => setMobileOpen(false)}>Playground</a>
-          <a href="#instruments" onClick={() => setMobileOpen(false)}>APIs</a>
-          <a href="#x402-intel" onClick={() => setMobileOpen(false)}>Intelligence</a>
-          <a href="#how" onClick={() => setMobileOpen(false)}>Architecture</a>
-          <a href="#features" onClick={() => setMobileOpen(false)}>Features</a>
-          <a href="#code" onClick={() => setMobileOpen(false)}>Code</a>
-          <a href="#heartbeat" onClick={() => setMobileOpen(false)}>Status</a>
-          <a href="#founders" onClick={() => setMobileOpen(false)}>Founders</a>
-          <a href="#cta" className="btn btn-primary" onClick={() => setMobileOpen(false)}>Get Started</a>
+          <a href="#product" onClick={() => setMobileOpen(false)}>Product</a>
+          <a href="#system" onClick={() => setMobileOpen(false)}>System</a>
+          <a href="#join" onClick={() => setMobileOpen(false)}>Founders</a>
+          <a href="dashboard/" onClick={() => setMobileOpen(false)}>Dashboard</a>
+          <a href="#join" className="btn btn-primary" onClick={() => setMobileOpen(false)}>Get Started</a>
         </div>
       )}
     </>
@@ -1050,13 +1038,6 @@ function Founders() {
           </a>
         </div>
 
-        <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 200, height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
-            <div style={{ width: '50%', height: '100%', background: 'linear-gradient(90deg, var(--purple), var(--magenta))', borderRadius: 3 }} />
-          </div>
-          <span style={{ color: 'var(--text-sec)', fontSize: '0.82rem' }}>5/10 spots taken</span>
-          <span style={{ color: 'var(--purple-light)', fontSize: '0.75rem', fontWeight: 600 }}>Only 5 spots remaining</span>
-        </div>
       </div>
       <style>{`
         @media (max-width: 768px) { #founders .inner > div:nth-child(3) { grid-template-columns: 1fr !important; } }
@@ -1136,10 +1117,9 @@ function Footer() {
             <h4 style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', marginBottom: 20 }}>Product</h4>
             <ul style={{ listStyle: 'none' }}>
               {[
-                ['#instruments', 'APIs'],
-                ['#x402-intel', 'Intelligence'],
-                ['#how', 'Architecture'],
-                ['#heartbeat', 'Status'],
+                ['#product', 'Product'],
+                ['#system', 'System'],
+                ['#join', 'Founders'],
                 ['dashboard/', 'Dashboard'],
               ].map(([href, text]) => (
                 <li key={text} style={{ marginBottom: 12 }}>
@@ -1174,8 +1154,8 @@ function Footer() {
             <h4 style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', marginBottom: 20 }}>Network</h4>
             <ul style={{ listStyle: 'none' }}>
               {[
-                ['#features', 'Features'],
-                ['#code', 'SDKs & Code'],
+                ['#system', 'System'],
+                ['#join', 'Community'],
                 ['https://x.com/aetheriusxAPI', 'X / Twitter'],
                 ['https://t.me/aetheriusxAPI_global', 'Telegram'],
               ].map(([href, text]) => (
@@ -1263,9 +1243,7 @@ class SectionBoundary extends React.Component {
 
 // === DOT NAV (restored slide traction — IO highlight, click to glide) ===
 const DOT_SECTIONS = [
-  ['hero', 'Intro'], ['x402-intel', 'Intelligence'], ['playground', 'Playground'],
-  ['how', 'Architecture'], ['code', 'Code'], ['heartbeat', 'Status'],
-  ['features', 'Features'], ['founders', 'Founders'], ['cta', 'Start'],
+  ['hero', 'Vision'], ['product', 'Product'], ['system', 'System'], ['join', 'Join'],
 ]
 
 function DotNav() {
@@ -1315,43 +1293,104 @@ function DotNav() {
 // === SCREEN 1: THE VISION ===
 function VisionScreen({ children }) {
   // Hero already renders its own <section id="hero"> — no wrapping <section> needed.
-  // Wrapping would double-nest sections and apply unwanted padding from CSS section rules.
   return <>{children}</>
 }
 
-// === SCREEN 2: THE PRODUCT ===
+// === SCREEN 2: THE PRODUCT — X402 Dashboard ===
 function ProductScreen({ children }) {
+  // children = [X402Intelligence, Playground, HowItWorks]
+  // Layout: full-width dashboard, 3-column on desktop
   return (
-    <section id="product" style={{ scrollSnapAlign: 'start' }}>
-      <div className="inner">
-        <div className="section-label">Product</div>
-        <h2 className="section-title">Explore the Platform</h2>
-        <p className="section-desc" style={{ margin: '0 auto' }}>100+ APIs. Live playground. Real responses.</p>
+    <section id="product" style={{ scrollSnapAlign: 'start', minHeight: 'auto', padding: '80px 0', position: 'relative', overflow: 'hidden' }}>
+      {/* Ambient nebula */}
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, background: 'radial-gradient(ellipse at 20% 30%, rgba(168,85,247,0.05) 0%, transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(34,211,238,0.04) 0%, transparent 50%)', filter: 'blur(200px)' }} />
+      <div className="inner" style={{ position: 'relative', zIndex: 1 }}>
+        {/* Dashboard header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 48, flexWrap: 'wrap', gap: 16 }}>
+          <div>
+            <div className="section-label">
+              <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              X402 Intelligence Dashboard
+            </div>
+            <h2 className="section-title" style={{ margin: '8px 0 0' }}>Explore the Platform</h2>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: 9999 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--green)', boxShadow: '0 0 8px var(--green)' }} />
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', fontWeight: 600, color: 'var(--green)' }}>100+ APIs Live</span>
+          </div>
+        </div>
+        {/* 3-column dashboard grid */}
+        <div className="product-dashboard" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 24 }}>
+          {children}
+        </div>
       </div>
-      {children}
+      <style>{`
+        @media (min-width: 1024px) { .product-dashboard { grid-template-columns: 1fr !important; } }
+      `}</style>
     </section>
   )
 }
 
-// === SCREEN 3: THE SYSTEM ===
+// === SCREEN 3: THE SYSTEM — Developer Console ===
 function SystemScreen({ children }) {
+  // children = [CodeSection, Heartbeat, Features]
   return (
-    <section id="system" style={{ scrollSnapAlign: 'start' }}>
-      <div className="inner">
-        <div className="section-label">System</div>
-        <h2 className="section-title">Built for Developers</h2>
-        <p className="section-desc" style={{ margin: '0 auto' }}>Integrate in minutes. Monitor in real-time.</p>
+    <section id="system" style={{ scrollSnapAlign: 'start', minHeight: 'auto', padding: '80px 0', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, background: 'linear-gradient(180deg, rgba(168,85,247,0.03) 0%, transparent 100%)' }} />
+      <div className="inner" style={{ position: 'relative', zIndex: 1 }}>
+        {/* Console header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 48, flexWrap: 'wrap', gap: 16 }}>
+          <div>
+            <div className="section-label">
+              <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              Developer Console
+            </div>
+            <h2 className="section-title" style={{ margin: '8px 0 0' }}>Built for Developers</h2>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {['Python', 'JavaScript', 'cURL'].map(lang => (
+              <span key={lang} style={{ padding: '6px 14px', borderRadius: 9999, fontSize: '0.75rem', fontWeight: 600, fontFamily: 'JetBrains Mono, monospace', background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.12)', color: 'var(--purple-light)' }}>{lang}</span>
+            ))}
+          </div>
+        </div>
+        <div className="system-console" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 24 }}>
+          {children}
+        </div>
       </div>
-      {children}
     </section>
   )
 }
 
-// === SCREEN 4: JOIN ===
+// === SCREEN 4: JOIN — Founding ===
 function JoinScreen({ children }) {
+  // children = [Founders, CTA]
   return (
-    <section id="join" style={{ scrollSnapAlign: 'start' }}>
-      {children}
+    <section id="join" style={{ scrollSnapAlign: 'start', minHeight: 'auto', padding: '80px 0', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, background: 'radial-gradient(ellipse at 50% 30%, rgba(168,85,247,0.04) 0%, transparent 60%)', filter: 'blur(100px)' }} />
+      <div className="inner" style={{ position: 'relative', zIndex: 1 }}>
+        {/* Urgency header */}
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <div className="section-label" style={{ justifyContent: 'center' }}>
+            <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" strokeLinejoin="round" strokeLinecap="round"/><circle cx="9" cy="7" r="4" strokeLinejoin="round" strokeLinecap="round"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" strokeLinejoin="round" strokeLinecap="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" strokeLinejoin="round" strokeLinecap="round"/></svg>
+            Founding Agents
+          </div>
+          <h2 className="section-title" style={{ margin: '12px 0 8px' }}>First 10 agents pay half, forever.</h2>
+          <p style={{ color: 'var(--text-sec)', fontSize: '1rem', maxWidth: 520, margin: '0 auto', lineHeight: 1.7 }}>
+            The agent economy is being built right now. Founders don't just use it — they shape it. When the 10 spots are gone, they're gone.
+          </p>
+          {/* Urgency progress bar */}
+          <div style={{ maxWidth: 280, margin: '24px auto 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: '100%', height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 4, overflow: 'hidden' }}>
+              <div style={{ width: '50%', height: '100%', background: 'linear-gradient(90deg, var(--purple), var(--magenta))', borderRadius: 4, transition: 'width 1s ease' }} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+              <span style={{ color: 'var(--text-sec)', fontSize: '0.82rem' }}>5/10 spots taken</span>
+              <span style={{ color: 'var(--purple-light)', fontSize: '0.75rem', fontWeight: 600 }}>Only 5 remaining</span>
+            </div>
+          </div>
+        </div>
+        {children}
+      </div>
     </section>
   )
 }
