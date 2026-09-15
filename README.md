@@ -56,6 +56,7 @@
 - [📡 Live Status](#-live-status)
 - [🎬 Live Demo](#-live-demo)
 - [🛡️ Settlement Window Attack](#%EF%B8%8F-settlement-window-attack--how-aetherius-stops-bot-swarms)
+- [🤝 Shared Responsibility Model](#-shared-responsibility-model)
 - [🐍 SDKs](#-sdks)
 - [🚀 Quick Start](#-quick-start)
 - [🎛️ Dashboard](#%EF%B8%8F-dashboard)
@@ -79,7 +80,7 @@
 
 <div align="center">
 
-![Days](https://img.shields.io/badge/🕐_days_since_repo_born-7-blueviolet?style=for-the-badge&labelColor=09090b&cacheSeconds=3600)
+![Days](https://img.shields.io/badge/🕐_days_since_repo_born-13-blueviolet?style=for-the-badge&labelColor=09090b&cacheSeconds=3600)
 
 > **Repo born:** Sep 2, 2026 — `3a6aeb6` "Initial commit"
 > **Mainnet deploy:** Sep 5, 2026 — Real x402 payments on Base Mainnet 🚀
@@ -96,7 +97,7 @@
 
 ```mermaid
 timeline
-    title AETHERIUS journey (Sep 2-8, 2026 — 6 days)
+    title AETHERIUS journey (Sep 2-15, 2026 — 13 days)
     Research : x402 study : market mapping : VM stabilization
     Sep 2 : Repo born : landing + docs : Python SDK : persistent telemetry
     Sep 2+47min : Backend v2.0 : 40 endpoints : real USDC on Base
@@ -123,7 +124,7 @@ timeline
     Sep 10 : Canary flip : /v1/data/uuid LIVE on Base Mainnet : real $0.001 USDC settled via CDP
     Sep 10 : Bazaar discovery : /mcp/discovery manifest : 10 MCP tools over HTTPS SSE
     Sep 10 : Fail-open fix : canary complement stays simulated : 0 unguarded routes
-        Sep 11 : Oracle layer : verified catalog : circuit breaker : anti-replay : MCP discovery : pip package
+    Sep 11 : Oracle layer : verified catalog : circuit breaker : anti-replay : MCP discovery : pip package
     Sep 11 : Middleware hardening : scope hardening : budget hardening : evidence hardening (telemetry tx_hash) : verified catalog
     Sep 12 : Canary #3 LIVE - /v1/token/analyze settling real $0.005 USDC via CDP facilitator
     Sep 12 : MEV-Share integration : order flow listener active on Base Mainnet
@@ -157,10 +158,15 @@ timeline
 | **Sep 8** — 18th deploy | VM security hardening — hardened perimeter (IDS, TLS lockdown, firewall, rate limiting) | **t+145h** | `curl https://34-156-149-38.sslip.io/aetherapi/health` |
 | **Sep 9** — 19th deploy | Flow Explorer 3D + Instruments + Wiki institutional + MCP bridge + governance (SECURITY, CODEOWNERS, TERMS, CITATION, CHANGELOG) | **t+168h** | `git log --oneline` |
 | **Sep 10** — 20th deploy | **CANARY LIVE** — `/v1/data/uuid` settling real $0.001 USDC via CDP on Base Mainnet + Bazaar discovery + fail-open fix | **t+192h** | `curl https://34-156-149-38.sslip.io/aetherapi/mcp/discovery` |
+| **Sep 11** — 21st deploy | **Oracle Layer** — verified catalog, circuit breaker, anti-replay, background health checks, `aether-oracle` pip package, MCP oracle server | **t+216h** | `curl https://34-156-149-38.sslip.io/aetherapi/v1/oracle/verified` |
+| **Sep 12** — 22nd deploy | **Canary #2 LIVE** — `/v1/token/price` settling real $0.005 USDC via CDP + middleware hardening (scope, budget, evidence `tx_hash`) | **t+240h** | `curl https://34-156-149-38.sslip.io/aetherapi/v1/token/price` |
+| **Sep 13** — 23rd deploy | **Canary #3 LIVE** — `/v1/token/analyze` settling real $0.02 USDC via CDP + ReputationAnchor deployed & verified on Base Mainnet | **t+264h** | `curl https://34-156-149-38.sslip.io/aetherapi/v1/token/analyze` |
+| **Sep 14** — 24th deploy | **Gravity Wells + Oracle Auto-Sync** — batch settlement thresholds, hourly MCP discovery health checks, contingency daemon + RUNBOOK | **t+288h** | `curl https://34-156-149-38.sslip.io/aetherapi/v1/gravity/well/status` |
+| **Sep 15** — 25th deploy | **MEV/Flashbots + Alpha Hunter track** — MEV-Share order flow, Flashbots Protect RPC + bundle submission, M2M swarm test, dashboard 3D reputation stream, Batch 004 manifesto | **t+312h** | `git log --oneline` |
 
-**Total commits:** 215+ and counting (`git log --oneline | wc -l` — velocity is public).
+**Total commits:** 300+ and counting (`git log --oneline | wc -l` — velocity is public).
 
-**Build velocity:** 100 live endpoints (60 paid + 40 free) + canary LIVE on Base Mainnet + MCP discovery + 39 tests + 2 SDKs + dashboard + R3F landing + playground + demo + Telegram bot + GitHub Actions in **8 days** (215+ commits).
+**Build velocity:** 100+ live endpoints (60 paid + 40 free) + 3 canaries REAL on Base Mainnet + Oracle Layer + Gravity Wells + ReputationAnchor + MEV/Flashbots track + M2M swarm + dashboard 3D + 39 tests + 2 SDKs + R3F landing + playground + demo + Telegram bot + GitHub Actions in **13 days** (300+ commits).
 Velocity is public — `git log --oneline | wc -l`.
 
 ---
@@ -258,13 +264,33 @@ flowchart TB
 
     subgraph "API Layer"
         FAST[FastAPI Server<br/>x402 Middleware]
-        ROUTER[Router<br/>100 Endpoints]
+        ROUTER[Router<br/>100+ Endpoints]
+        HARDEN[Hardening Middleware<br/>Scope + Budget + Evidence]
     end
 
     subgraph "Oracle Layer"
         CATALOG[Verified Catalog<br/>/v1/oracle/verified]
         CB[Circuit Breaker<br/>/v1/oracle/status]
         RISK[Risk Validator<br/>/v1/oracle/risk]
+        AUTOSYNC[Oracle Auto-Sync<br/>Hourly MCP Discovery]
+    end
+
+    subgraph "Survival Layer"
+        CONT[Contingency Daemon<br/>/v1/contingency/status]
+        GW0[Gravity Well v0<br/>/v1/gravity/well/status]
+        GW1[Gravity Well v1<br/>Singularities]
+    end
+
+    subgraph "Reputation Layer"
+        REPUT[ReputationAnchor<br/>Base Mainnet]
+        RISK2[Credit Velocity<br/>Risk Scoring]
+    end
+
+    subgraph "Execution Layer"
+        MEV[MEV-Share<br/>Order Flow]
+        FLASH[Flashbots Protect<br/>Bundles]
+        ALPHA[Alpha Hunter<br/>Unified Agent]
+        SWARM[M2M Swarm<br/>Load Test]
     end
 
     subgraph "Research Layer"
@@ -281,6 +307,7 @@ flowchart TB
     subgraph "External"
         CDP[Coinbase CDP<br/>USDC Settlement]
         UPSTREAM[Upstreams<br/>CoinGecko, OSM, etc.]
+        AAVE[Aave V3<br/>Flashloans]
     end
 
     PY --> NGINX
@@ -288,14 +315,30 @@ flowchart TB
     AGENT --> NGINX
     NGINX --> FAST
     FAST --> ROUTER
+    ROUTER --> HARDEN
     ROUTER --> CATALOG
     ROUTER --> CB
     ROUTER --> RISK
     ROUTER --> AXIOMS
     ROUTER --> ONTO
+    CATALOG --> AUTOSYNC
+    AUTOSYNC --> CATALOG
     CATALOG --> CDP
     CB --> CDP
     RISK --> CDP
+    RISK --> RISK2
+    RISK2 --> REPUT
+    REPUT --> CDP
+    ROUTER --> CONT
+    ROUTER --> GW0
+    GW0 --> GW1
+    GW1 --> CDP
+    MEV --> ALPHA
+    ALPHA --> FLASH
+    FLASH --> AAVE
+    FLASH --> CDP
+    SWARM --> ROUTER
+    SWARM --> REPUT
     AXIOMS --> UPSTREAM
     ONTO --> UPSTREAM
     MCP_AXIOM --> UPSTREAM
@@ -304,9 +347,20 @@ flowchart TB
     ROUTER --> UPSTREAM
 
     style FAST fill:#8B5CF6,color:#fff
+    style HARDEN fill:#7C3AED,color:#fff
     style CATALOG fill:#10B981,color:#fff
     style CB fill:#F59E0B,color:#fff
     style RISK fill:#EF4444,color:#fff
+    style AUTOSYNC fill:#059669,color:#fff
+    style CONT fill:#0EA5E9,color:#fff
+    style GW0 fill:#6366F1,color:#fff
+    style GW1 fill:#4F46E5,color:#fff
+    style REPUT fill:#F43F5E,color:#fff
+    style RISK2 fill:#E11D48,color:#fff
+    style MEV fill:#F59E0B,color:#fff
+    style FLASH fill:#EA580C,color:#fff
+    style ALPHA fill:#16A34A,color:#fff
+    style SWARM fill:#0891B2,color:#fff
     style AXIOMS fill:#8B5CF6,color:#fff
     style ONTO fill:#EC4899,color:#fff
     style MCP_ORACLE fill:#06B6D4,color:#fff
@@ -442,6 +496,10 @@ The Research Layer is exposed via MCP (Model Context Protocol):
 | Oracle Risk | `GET /v1/oracle/risk/{address}` — agent risk score (Credit Velocity) |
 | **Axioms** | `GET /v1/axioms` — 3 fundamental axioms (JSON-LD, M2M-native) |
 | **Ontology** | `GET /v1/ontology` — RDF ontology (9 classes, 11 properties) |
+| **ReputationAnchor** | `0x7d31b0683a46Ad793248A8590f77dF7d1c2b782A` — verified on Base Mainnet, `ORACLE_ROLE` granted |
+| **Gravity Wells** | `GET /v1/gravity/well/status` + `GET /v1/gravity/singularity/status` — batch settlement + singularities |
+| **Execution Track** | MEV-Share listener + Flashbots bundles + M2M swarm (`scripts/m2m_swarm_test.py`) + 3D reputation stream |
+| **Manifesto** | `MANIFESTO_TECNICO_BATCH004.md` — Batch 004 evidence pack |
 | Version | v2.1.0 · 100+ live endpoints · Oracle Layer · Research Layer · 39 tests · Python SDK v2.0 |
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 mainnet USDC |
 | MCP SSE | `https://34-156-149-38.sslip.io/aetherapi/mcp/sse` — Agent-native MCP bridge |
@@ -497,6 +555,24 @@ sequenceDiagram
 **[▶ Watch the defense demo](https://wilnowilx.github.io/aetheriusxapi/docs/demo/oracle-player.html)** · [raw .cast](https://wilnowilx.github.io/aetheriusxapi/docs/demo/oracle-attack.cast)
 
 The replay shows: a 10-req/s bot flood → oracle detects → risk score climbs → 429 blocks → attack stopped in <100ms. Real code. Real defense. Live on Base.
+
+---
+
+## 🤝 Shared Responsibility Model
+
+AETHERIUS and x402 are **deterministic facilitators** for M2M commerce on Base — not babysitters for agent logic.
+
+**AETHERIUS infrastructure guarantees:**
+- Valid x402 USDC payment → requested endpoint unlocks (pure state resolution)
+- Protocol integrity: payment validation speed, security and uptime on Base
+- Deterministic responses: clear `402` when funds are insufficient, `409` on replay, `429` on risk block
+
+**Agent creator responsibilities:**
+- Fund operational wallets with **micro-balances** (short bursts, not honeypots)
+- Own execution logic: if an agent loops and drains its micro-budget, x402 correctly rejecting it is **protocol success**, not protocol failure
+- Set thresholds and underwrite them: ownership is tied to staked exposure — the market prices the risk, not the infrastructure
+
+> **The fuse is mechanical, not moral.** Micro-funding + `402` walls = bounded blast radius. A drained agent wallet proves the protocol held.
 
 ---
 
@@ -835,7 +911,10 @@ Every response carries the `X-AETHERIUS-Fingerprint: quantumxbrain-v1` header.
 | **Dashboard** | Vanilla JS | Zero-build interactive control room |
 | **Landing** | React 19 + R3F 9 + Vite 6 + GSAP + Lenis | 3D globe, 20 sections, playground (`frontend/`) |
 | **SDKs** | Python + JavaScript | Agent integration libraries |
-| **Oracle Layer** | `aether-oracle` (pip) + `aether_oracle_mcp` | Verified catalog, circuit breaker, risk validator |
+| **Oracle Layer** | `aether-oracle` (pip) + `aether_oracle_mcp` | Verified catalog, circuit breaker, risk validator, auto-sync |
+| **Survival Layer** | Contingency daemon + Gravity Well v0/v1 | 5-min Base anchors, batch settlement, executable RUNBOOK |
+| **Reputation Layer** | `ReputationAnchor` on Base + Credit Velocity | On-chain agent reputation, risk scoring, behavior anchoring |
+| **Execution Layer** | MEV-Share + Flashbots + Alpha Hunter + M2M swarm | Order flow, atomic bundles, unified yield/arb agent, load test |
 | **Research Layer** | `research/` + `aether_axioms_mcp` | Axioms, ontology, MCP server (stdio + SSE) |
 | **MCP Bridge** | `aether_oracle_mcp` + `aether_axioms_mcp` | Agent-native discovery (stdio + SSE/HTTP) |
 
@@ -909,6 +988,16 @@ Every response carries the `X-AETHERIUS-Fingerprint: quantumxbrain-v1` header.
 - [x] **Canary LIVE** (Sep 10) — `/v1/data/uuid` settling real $0.001 USDC on Base Mainnet via CDP
 - [x] Fail-open fix (Sep 10) — canary complement stays simulated, 0 unguarded routes
 - [x] **Oracle Layer** (Sep 11) — verified catalog, circuit breaker, anti-replay, background health checks, `aether-oracle` pip package, MCP oracle server
+- [x] **Middleware hardening** (Sep 11) — scope hardening, budget hardening (`X-Budget-Remaining`), evidence hardening (`tx_hash` in telemetry)
+- [x] **Canary #2 LIVE** (Sep 12) — `/v1/token/price` settling real $0.005 USDC via CDP facilitator
+- [x] **Canary #3 LIVE** (Sep 12) — `/v1/token/analyze` settling real $0.02 USDC via CDP facilitator
+- [x] **ReputationAnchor** (Sep 13) — deployed & verified on Base Mainnet (`0x7d31b0683a46Ad793248A8590f77dF7d1c2b782A`), `ORACLE_ROLE` granted, Basescan + Sourcify verified
+- [x] **Gravity Wells + Contingency** (Sep 14) — batch settlement thresholds, contingency daemon with 5-min Base anchors, executable `RUNBOOK.md`
+- [x] **Oracle Auto-Sync** (Sep 14) — hourly MCP discovery health checks + canary settlement tests, verified catalog auto-population
+- [x] **MEV/Flashbots track** (Sep 15) — MEV-Share order-flow listener, Flashbots Protect RPC, bundle submission with mandatory pre-flight simulation + dynamic gas ceilings
+- [x] **M2M swarm test** (Sep 15) — 50 concurrent workers against 3 REAL canaries, settlement + reputation anchoring metrics
+- [x] **Dashboard 3D reputation stream** (Sep 15) — `useReputationStream` hook, R3F reputation particles, Base network status
+- [x] **Batch 004 manifesto** (Sep 15) — `MANIFESTO_TECNICO_BATCH004.md` technical evidence pack for evaluators
 - [ ] Base Ecosystem Fund application
 
 ### Phase 2: Scale (Post-Grant)
