@@ -16,11 +16,11 @@ const TextBandRings = ({ liveData }) => {
     return [
       // ANILLO 1 EXTERIOR: "THE MARKETPLACE THAT LIVES" — banda blanca GRANDE
       {
-        radius: 3.8,
+        radius: 4.75,
         tilt: 0.18,
         yOffset: 0.55,
         speed: 0.025,
-        bandWidth: 0.75,
+        bandWidth: 0.95,
         color: '#ffffff',
         opacity: 0.9,
         fontSize: 72,
@@ -28,11 +28,11 @@ const TextBandRings = ({ liveData }) => {
       },
       // ANILLO 2 INTERMEDIO: subtítulo — banda magenta GRANDE
       {
-        radius: 3.15,
+        radius: 3.95,
         tilt: 0.32,
         yOffset: -0.15,
         speed: -0.035,
-        bandWidth: 0.62,
+        bandWidth: 0.78,
         color: '#d946ef',
         opacity: 0.82,
         fontSize: 56,
@@ -40,11 +40,11 @@ const TextBandRings = ({ liveData }) => {
       },
       // ANILLO 3 INTERIOR: métricas vivas — banda cian GRANDE
       {
-        radius: 2.55,
+        radius: 3.2,
         tilt: 0.12,
         yOffset: -0.75,
         speed: 0.04,
-        bandWidth: 0.52,
+        bandWidth: 0.65,
         color: '#22d3ee',
         opacity: 0.75,
         fontSize: 44,
@@ -351,10 +351,12 @@ function VisibleWireframe() {
             float s = 0.0;
             float angle = atan(pos.z, pos.x);
             float lat = asin(pos.y / 2.2);
-            s += pow(sin(angle * 12.0 + t * 1.5) * 0.5 + 0.5, 8.0) * 0.03;
-            s += pow(sin(lat * 8.0 - t * 0.8) * 0.5 + 0.5, 10.0) * 0.02;
+            // Subtle grid-node pulse — like distant reactor nodes on a Dyson megastructure
+            s += pow(sin(angle * 12.0 + t * 1.5) * 0.5 + 0.5, 8.0) * 0.005;
+            s += pow(sin(lat * 8.0 - t * 0.8) * 0.5 + 0.5, 10.0) * 0.003;
+            // Sparse hash spark — very faint, rare
             float hash = fract(sin(dot(floor(pos * 20.0), vec3(12.9898,78.233,45.164))) * 43758.5453);
-            s += step(0.97, hash) * 0.06 * (0.5 + 0.5 * sin(t * 5.0 + hash * 20.0));
+            s += step(0.985, hash) * 0.012 * (0.5 + 0.5 * sin(t * 3.0 + hash * 20.0));
             return s;
           }
 
@@ -371,9 +373,9 @@ function VisibleWireframe() {
 
             float polar = polarGlow(vPos);
             col += polar * vec3(0.1, 0.05, 0.3);
-            col += vec3(0.3, 0.6, 0.8) * sparkle * 0.15;
+            col += vec3(0.3, 0.6, 0.8) * sparkle * 0.04;
 
-            float alpha = (0.10 + polar * 0.05 + cyanPulse * 0.04) * pulse * fade + sparkle * 0.02;
+            float alpha = (0.10 + polar * 0.05 + cyanPulse * 0.04) * pulse * fade + sparkle * 0.003;
             gl_FragColor = vec4(col, alpha);
           }
         `}
@@ -695,8 +697,8 @@ function BaseCore({ flowRef }) {
 // === COSMIC DUST FIELD + NEBULA CLOUDS — profundidad 3D real ===
 // Polvo fino disperso + nubes de nebulosa flotantes en 3D alrededor de la esfera Dyson.
 function CosmicDustField() {
-  const COUNT = 650 // Densidad aumentada de polvo cósmico flotante
-  const NEBULA_COUNT = 16
+  const COUNT = 350 // Reduced — subtle space ambiance, not fireworks
+  const NEBULA_COUNT = 10
   const ref = useRef()
   const nebulaRef = useRef([])
   const elapsed = useRef(0)
@@ -717,7 +719,7 @@ function CosmicDustField() {
       if (t < 0.5) { col[i*3]=0.0; col[i*3+1]=0.85; col[i*3+2]=1.0 }      // cian vivo
       else if (t < 0.8) { col[i*3]=0.0; col[i*3+1]=0.4; col[i*3+2]=1.0 }   // azul base
       else { col[i*3]=0.1; col[i*3+1]=0.9; col[i*3+2]=0.7 }                // verde-teal
-      sz[i] = 0.02 + Math.random() * 0.035
+      sz[i] = 0.012 + Math.random() * 0.02
     }
     return { positions: pos, colors: col, sizes: sz }
   }, [])
@@ -789,7 +791,7 @@ function CosmicDustField() {
               float d = length(gl_PointCoord - vec2(0.5));
               if (d > 0.5) discard;
               float g = pow(1.0 - d * 2.0, 1.8);
-              gl_FragColor = vec4(vColor, g * 0.55);
+              gl_FragColor = vec4(vColor, g * 0.2);
             }
           `}
           transparent depthWrite={false} blending={THREE.AdditiveBlending}
@@ -828,7 +830,7 @@ function CosmicDustField() {
                 float edgeMask = smoothstep(0.45, 0.12, dist);
                 float radial = pow(max(0.0, 1.0 - dist * 2.1), 2.2);
                 float turb = sin(vUv.x * 12.0) * sin(vUv.y * 10.0) * 0.25 + 0.75;
-                float alpha = radial * turb * 0.22 * edgeMask;
+                float alpha = radial * turb * 0.10 * edgeMask;
                 if (alpha < 0.002) discard;
                 gl_FragColor = vec4(color, alpha);
               }
