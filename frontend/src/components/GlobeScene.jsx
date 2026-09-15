@@ -370,11 +370,11 @@ function VisibleWireframe({ impactPoints }) {
             float dist = length(worldPos - impactPos);
             // Tight ring expanding from impact point
             float ring = abs(dist - time * 0.8 * intensity);
-            float ringGlow = exp(-ring * 1.5) * intensity * 1.5;
+            float ringGlow = exp(-ring * 1.5) * intensity * 0.3;
             // Proximity glow (bright at impact, fades radially)
-            float prox = exp(-dist * 2.5) * intensity * 1.5;
-            // Hot center flash — BRIGHT
-            float hotCenter = exp(-dist * 6.0) * intensity * 2.0;
+            float prox = exp(-dist * 2.5) * intensity * 0.3;
+            // Hot center flash — DIMINUTO
+            float hotCenter = exp(-dist * 6.0) * intensity * 0.4;
             return (ringGlow * 0.7 + prox + hotCenter) * intensity;
           }
 
@@ -382,17 +382,17 @@ function VisibleWireframe({ impactPoints }) {
             return pow(abs(pos.y / 2.2), 2.5) * 0.6;
           }
 
-          // Ambient sparkle: makes wireframe feel alive even without impacts
+          // Ambient sparkle: makes wireframe feel alive even without impacts — DIMINUTO
           float ambientSparkle(vec3 pos, float t) {
             float s = 0.0;
             // Traveling sparkles along wireframe edges
             float angle = atan(pos.z, pos.x);
             float lat = asin(pos.y / 2.2);
-            s += pow(sin(angle * 12.0 + t * 1.5) * 0.5 + 0.5, 8.0) * 0.15;
-            s += pow(sin(lat * 8.0 - t * 0.8) * 0.5 + 0.5, 10.0) * 0.1;
+            s += pow(sin(angle * 12.0 + t * 1.5) * 0.5 + 0.5, 8.0) * 0.03;
+            s += pow(sin(lat * 8.0 - t * 0.8) * 0.5 + 0.5, 10.0) * 0.02;
             // Random micro-sparkles
             float hash = fract(sin(dot(floor(pos * 20.0), vec3(12.9898,78.233,45.164))) * 43758.5453);
-            s += step(0.97, hash) * 0.3 * (0.5 + 0.5 * sin(t * 5.0 + hash * 20.0));
+            s += step(0.97, hash) * 0.06 * (0.5 + 0.5 * sin(t * 5.0 + hash * 20.0));
             return s;
           }
 
@@ -425,15 +425,15 @@ function VisibleWireframe({ impactPoints }) {
             float polar = polarGlow(vPos);
             baseCol += polar * vec3(0.1, 0.05, 0.3);
 
-            // Impact: hot cyan-white flash at collision — VIVID
+            // Impact: hot cyan-white flash at collision — DIMINUTO
             vec3 impactCol = vec3(0.4, 1.0, 1.0); // bright cyan
-            vec3 col = mix(baseCol, impactCol, impacts * 0.9);
-            col += vec3(0.3, 0.6, 0.8) * impacts;
+            vec3 col = mix(baseCol, impactCol, impacts * 0.3);
+            col += vec3(0.1, 0.2, 0.3) * impacts;
 
             // Sparkle
-            col += vec3(0.3, 0.6, 0.8) * sparkle;
+            col += vec3(0.3, 0.6, 0.8) * sparkle * 0.3;
 
-            float alpha = (0.10 + polar * 0.05 + cyanPulse * 0.04) * pulse * fade + impacts * 0.85 + sparkle * 0.18;
+            float alpha = (0.10 + polar * 0.05 + cyanPulse * 0.04) * pulse * fade + impacts * 0.3 + sparkle * 0.04;
             gl_FragColor = vec4(col, alpha);
           }
         `}
@@ -758,8 +758,8 @@ function BaseCore({ flowRef }) {
 // impactan el wireframe Dyson y lo iluminan en el punto de contacto.
 // Forma: NO redonda → diamante/estrella agresiva (gl_PointCoord distorsionado).
 function PulsarEngine({ gasUniforms }) {
-  const SPARK_COUNT = 48
-  const TRAIL_COUNT = 24
+  const SPARK_COUNT = 5
+  const TRAIL_COUNT = 2
   const TOTAL = SPARK_COUNT + TRAIL_COUNT
   const WIRE_R = 2.2
   const WIRE_R2 = WIRE_R * WIRE_R
@@ -911,7 +911,7 @@ function PulsarEngine({ gasUniforms }) {
       float alive_f = step(0.5, alive);
 
       // Size: sparks microscopic — tiny pinpricks
-      float baseSize = type < 0.5 ? 0.03 : 0.012;
+      float baseSize = type < 0.5 ? 0.005 : 0.003;
       // Distance-based scaling
       vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
       float dist = length(position);
@@ -1575,8 +1575,8 @@ function ImpactManager({ onImpactsReady }) {
         slot.age = 0
       }
     }
-    // Decay active impacts — SLOWER for visibility
-    const decaySpeed = 0.8
+    // Decay active impacts — FAST fade for diminuto feel
+    const decaySpeed = 2.5
     impactSlots.current.forEach(slot => {
       if (slot.active) {
         slot.age += delta
@@ -1640,7 +1640,7 @@ function CosmicComets() {
   const ref = useRef()
   const elapsed = useRef(0)
   const { positions, colors, sizes } = useMemo(() => {
-    const count = 8
+    const count = 2
     const pos = new Float32Array(count * 3)
     const col = new Float32Array(count * 3)
     const sz = new Float32Array(count)
@@ -1655,7 +1655,7 @@ function CosmicComets() {
       if (t < 0.4) { col[i * 3] = 0.13; col[i * 3 + 1] = 0.82; col[i * 3 + 2] = 0.93 }
       else if (t < 0.7) { col[i * 3] = 0.84; col[i * 3 + 1] = 0.27; col[i * 3 + 2] = 0.93 }
       else { col[i * 3] = 0.83; col[i * 3 + 1] = 0.66; col[i * 3 + 2] = 0.32 }
-      sz[i] = 0.08 + Math.random() * 0.06
+      sz[i] = 0.03 + Math.random() * 0.02
     }
     return { positions: pos, colors: col, sizes: sz }
   }, [])
@@ -1667,8 +1667,8 @@ function CosmicComets() {
     // Comet flicker
     const sz = ref.current?.geometry?.attributes?.aSize
     if (sz) {
-      for (let i = 0; i < 8; i++) {
-        sz.array[i] = 0.06 + 0.05 * Math.sin(elapsed.current * 2 + i * 1.5)
+      for (let i = 0; i < 2; i++) {
+        sz.array[i] = 0.02 + 0.02 * Math.sin(elapsed.current * 2 + i * 1.5)
       }
       sz.needsUpdate = true
     }
@@ -1699,7 +1699,7 @@ import ReputationParticles from './ReputationParticles'
 function CosmicUniverse() {
   // TWO LAYERED SYSTEMS: distant stars + organic nebula clouds
   // Camera: z=10.5, FOV=40°. Stars must be CLOSER and BIGGER to be visible.
-  const STAR_COUNT = 1200
+  const STAR_COUNT = 400
   const NEBULA_COUNT = 24
   const groupRef = useRef()
   const nebulaRef = useRef([])
@@ -1720,9 +1720,9 @@ function CosmicUniverse() {
       // near (6-12): clearly visible, medium (12-20): visible, far (20-28): faint
       const layer = rnd()
       let r, baseSize
-      if (layer < 0.45) { r = 6 + rnd() * 6; baseSize = 0.07 }       // near — bright
-      else if (layer < 0.80) { r = 12 + rnd() * 8; baseSize = 0.05 } // medium
-      else { r = 20 + rnd() * 8; baseSize = 0.035 }                   // far — dimmer
+      if (layer < 0.45) { r = 6 + rnd() * 6; baseSize = 0.03 }       // near — subtle
+      else if (layer < 0.80) { r = 12 + rnd() * 8; baseSize = 0.02 } // medium
+      else { r = 20 + rnd() * 8; baseSize = 0.015 }                  // far — dimmest
       pos[i*3]   = r * Math.sin(phi) * Math.cos(theta)
       pos[i*3+1] = r * Math.sin(phi) * Math.sin(theta)
       pos[i*3+2] = r * Math.cos(phi)
@@ -1734,14 +1734,14 @@ function CosmicUniverse() {
       else if (t < 0.78) { col[i*3]=0.6; col[i*3+1]=0.8; col[i*3+2]=1.0 }   // soft blue
       else if (t < 0.88) { col[i*3]=0.95; col[i*3+1]=0.35; col[i*3+2]=0.9 } // magenta
       else { col[i*3]=1.0; col[i*3+1]=0.82; col[i*3+2]=0.55 }               // warm gold
-      sz[i] = baseSize + rnd() * 0.035
+      sz[i] = baseSize + rnd() * 0.015
     }
     return { positions: pos, colors: col, sizes: sz }
   }, [])
 
   // ─── LAYER 2: Nebula clouds as circular point sprites (ZERO square artifacts) ───
   const nebulaPointsState = useMemo(() => {
-    const count = 32
+    const count = 12
     const pos = new Float32Array(count * 3)
     const col = new Float32Array(count * 3)
     const sz = new Float32Array(count)
@@ -1764,7 +1764,7 @@ function CosmicUniverse() {
       else c = [0.35, 0.15, 0.8]
       col[i*3] = c[0]; col[i*3+1] = c[1]; col[i*3+2] = c[2]
 
-      sz[i] = 220.0 + rnd() * 260.0
+      sz[i] = 120.0 + rnd() * 140.0
       noiseParams[i*2] = 2.0 + rnd() * 3.0
       noiseParams[i*2+1] = rnd() * 100.0
     }
@@ -1825,7 +1825,7 @@ function CosmicUniverse() {
               vColor = aColor;
               vec4 mv = modelViewMatrix * vec4(position, 1.0);
               vDist = -mv.z;
-              gl_PointSize = aSize * (380.0 / vDist);
+              gl_PointSize = aSize * (500.0 / vDist);
               gl_Position = projectionMatrix * mv;
             }
           `}
@@ -1867,7 +1867,7 @@ function CosmicUniverse() {
               vNoiseParams = aNoise;
               vec4 mv = modelViewMatrix * vec4(position, 1.0);
               vDist = -mv.z;
-              gl_PointSize = aSize * (320.0 / vDist);
+              gl_PointSize = aSize * (400.0 / vDist);
               gl_Position = projectionMatrix * mv;
             }
           `}
@@ -1894,7 +1894,7 @@ function CosmicUniverse() {
               filaments = smoothstep(0.2, 0.8, filaments);
 
               float edgeMask = smoothstep(1.0, 0.15, uvDist);
-              float alpha = radial * (0.35 + filaments * 0.65) * 0.26 * edgeMask;
+              float alpha = radial * (0.35 + filaments * 0.65) * 0.12 * edgeMask;
               if (alpha < 0.001) discard;
 
               float distFade = clamp(1.0 - (vDist - 6.0) / 28.0, 0.3, 1.0);
