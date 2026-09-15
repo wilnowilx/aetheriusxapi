@@ -1314,11 +1314,9 @@ function DotNav() {
 
 // === SCREEN 1: THE VISION ===
 function VisionScreen({ children }) {
-  return (
-    <section id="vision" style={{ scrollSnapAlign: 'start' }}>
-      {children}
-    </section>
-  )
+  // Hero already renders its own <section id="hero"> — no wrapping <section> needed.
+  // Wrapping would double-nest sections and apply unwanted padding from CSS section rules.
+  return <>{children}</>
 }
 
 // === SCREEN 2: THE PRODUCT ===
