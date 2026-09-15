@@ -330,6 +330,7 @@ function Playground() {
 
 // === CATEGORIES ===
 function Categories() {
+  const [activeCategory, setActiveCategory] = useState(null)
   const cats = [
     { title: 'Maps & Location', count: '5 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" strokeLinejoin="round" strokeLinecap="round"/></svg> },
     { title: 'Crypto & DeFi', count: '19 live', icon: <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="20" height="20"><path strokeLinejoin="round" strokeLinecap="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> },
@@ -355,18 +356,25 @@ function Categories() {
         <h2 className="section-title">100+ Live Endpoints, More Weekly</h2>
         <p className="section-desc" style={{ margin: '0 auto' }}>Production APIs across maps, DeFi, web, data, forex and news — new verticals shipping weekly.</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginTop: 48 }}>
-          {cats.map(cat => (
-            <div key={cat.title} data-animate-card className="glass-card" style={{
-              padding: '20px 14px', textAlign: 'center', cursor: 'pointer',
-              opacity: cat.soon ? 0.45 : 1,
-            }}>
+          {cats.map(cat => {
+            const isActive = activeCategory === cat.title
+            return (
+              <div key={cat.title} data-animate-card className="glass-card" onClick={() => setActiveCategory(isActive ? null : cat.title)} style={{
+                padding: '20px 14px', textAlign: 'center', cursor: 'pointer',
+                opacity: cat.soon ? 0.45 : 1,
+                transform: isActive ? 'scale(1.04)' : 'scale(1)',
+                border: isActive ? '1px solid rgba(168,85,247,0.45)' : '1px solid rgba(168,85,247,0.08)',
+                boxShadow: isActive ? '0 0 20px rgba(168,85,247,0.15), 0 0 40px rgba(217,70,239,0.08)' : 'none',
+                transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+              }}>
               <div style={{ width: 44, height: 44, margin: '0 auto 10px', background: 'linear-gradient(135deg, rgba(168,85,247,0.08), rgba(217,70,239,0.06))', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-light)' }}>
                 {cat.icon}
               </div>
               <div style={{ fontSize: '0.82rem', fontWeight: 700, marginBottom: 4, color: 'var(--text)' }}>{cat.title}</div>
               <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.68rem', color: cat.soon ? 'var(--text-muted)' : 'var(--green)' }}>{cat.count}</div>
             </div>
-          ))}
+            )
+          })}
         </div>
       </div>
       <style>{`
@@ -374,6 +382,29 @@ function Categories() {
         @media (max-width: 768px) { #categories .inner > div:last-child { grid-template-columns: 1fr 1fr; } }
       `}</style>
     </section>
+  )
+}
+
+function MoreEndpoints() {
+  const [showMore, setShowMore] = useState(false)
+  const moreEndpoints = ['Gas Intelligence', 'Token Discovery', 'Whale Clustering', 'DeFi Yield', 'Tx Patterns', 'Wallet Compare', 'Leaderboard', 'Contract Intel', 'Velocity', 'History', 'Search', 'Network Health', 'Stablecoin Flow', 'Chain Health', 'Wallet Activity']
+  return (
+    <div style={{ marginTop: 20 }}>
+      <button onClick={() => setShowMore(!showMore)} style={{ width: '100%', padding: '16px 32px', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: 16, textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text)' }}>
+        <div>
+          <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>+ 16 More Free Endpoints</span>
+          <span style={{ color: 'var(--text-sec)', fontSize: '0.82rem', marginLeft: 12 }}>{showMore ? 'Collapse' : 'Tap to reveal'}</span>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" style={{ transform: showMore ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s' }}><polyline points="6 9 12 15 18 9" strokeLinejoin="round" strokeLinecap="round"/></svg>
+      </button>
+      {showMore && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '16px 8px 0' }}>
+          {moreEndpoints.map(ep => (
+            <span key={ep} style={{ padding: '6px 14px', background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.1)', borderRadius: 8, fontSize: '0.78rem', color: 'var(--text-sec)' }}>{ep}</span>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -421,10 +452,7 @@ function X402Intelligence() {
             </div>
           ))}
         </div>
-        <div className="glass-card" style={{ marginTop: 20, padding: '20px 32px', textAlign: 'left', borderColor: 'rgba(245,158,11,0.15)' }}>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: 8, color: 'var(--text)' }}>+ 16 More Free Endpoints</h3>
-          <p style={{ color: 'var(--text-sec)', fontSize: '0.82rem', lineHeight: 1.6 }}>Gas Intelligence · Token Discovery · Whale Clustering · DeFi Yield · Tx Patterns · Wallet Compare · Leaderboard · Contract Intel · Velocity · History · Search · Network Health · Stablecoin Flow</p>
-        </div>
+        <MoreEndpoints />
         <div style={{ textAlign: 'center', marginTop: 32 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '14px 22px', background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.08)', borderRadius: 12, backdropFilter: 'blur(8px)' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="var(--purple-light)" strokeWidth="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" strokeLinejoin="round" strokeLinecap="round"/></svg>
@@ -440,192 +468,134 @@ function X402Intelligence() {
   )
 }
 
-// === ARCHITECTURE — ENERGY TREE: 4 phases, organic movement ===
+// === ARCHITECTURE — CLICK-TO-EXPLORE: 4 phases, horizontal steps ===
 function HowItWorks() {
   const [activePhase, setActivePhase] = useState(0)
-  const [hoveredPhase, setHoveredPhase] = useState(null)
 
   const phases = [
-    {
-      num: '01',
-      title: 'Seed',
-      subtitle: 'Wallet Connect',
-      desc: 'Your wallet IS your identity. No signup. No accounts. No KYC. One signature and you exist in the network.',
-      detail: 'EIP-4337 compatible. Any EOA or smart wallet. Zero configuration.',
-      color: '#a855f7',
-      glow: 'rgba(168,85,247,0.4)',
-      icon: (
-        <svg viewBox="0 0 32 32" fill="none" width="32" height="32">
-          <circle cx="16" cy="16" r="6" stroke="currentColor" strokeWidth="1.5" opacity="0.6"/>
-          <circle cx="16" cy="16" r="2" fill="currentColor"/>
-          <path d="M16 22v4M16 6v2M22 16h4M6 16h2" stroke="currentColor" strokeWidth="1" opacity="0.4"/>
-        </svg>
-      ),
-    },
-    {
-      num: '02',
-      title: 'Root',
-      subtitle: 'Discovery',
-      desc: 'The agent discovers what it needs. 100+ endpoints. x402 Brain recommends the best route. One GET to start.',
-      detail: 'Free endpoints for health checks. Paid for premium data. x402 negotiates automatically.',
-      color: '#22d3ee',
-      glow: 'rgba(34,211,238,0.4)',
-      icon: (
-        <svg viewBox="0 0 32 32" fill="none" width="32" height="32">
-          <path d="M16 8v8M16 16l-6 8M16 16l6 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.8"/>
-          <circle cx="16" cy="8" r="2" fill="currentColor"/>
-          <circle cx="10" cy="24" r="1.5" fill="currentColor" opacity="0.6"/>
-          <circle cx="22" cy="24" r="1.5" fill="currentColor" opacity="0.6"/>
-        </svg>
-      ),
-    },
-    {
-      num: '03',
-      title: 'Bloom',
-      subtitle: 'x402 Payment',
-      desc: 'HTTP 402 response triggers automatic payment. USDC on Base. Single-use nonce. Replay-proof by construction.',
-      detail: 'EIP-3009 authorization. Sub-cent fees. Sub-second settlement. Math, not trust.',
-      color: '#d946ef',
-      glow: 'rgba(217,70,239,0.4)',
-      icon: (
-        <svg viewBox="0 0 32 32" fill="none" width="32" height="32">
-          <path d="M16 4l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" fill="currentColor" fillOpacity="0.15"/>
-        </svg>
-      ),
-    },
-    {
-      num: '04',
-      title: 'Fruit',
-      subtitle: 'Data Delivery',
-      desc: '200 OK. Exactly what was requested. Payment and delivery correlated at the HTTP boundary. Zero ambiguity.',
-      detail: 'On-chain settlement proof. Transaction hash included. Auditable by design.',
-      color: '#10b981',
-      glow: 'rgba(16,185,129,0.4)',
-      icon: (
-        <svg viewBox="0 0 32 32" fill="none" width="32" height="32">
-          <rect x="8" y="8" width="16" height="16" rx="3" stroke="currentColor" strokeWidth="1.5" opacity="0.6"/>
-          <path d="M12 16l3 3 5-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      ),
-    },
+    { icon: '\u26A1', title: 'Capture', desc: 'Every call, header, response, and latency signal is captured in real-time.' },
+    { icon: '\uD83D\uDD0D', title: 'Normalize', desc: 'Raw signals are normalized into a universal schema across all providers.' },
+    { icon: '\uD83E\uDDE0', title: 'Analyze', desc: 'Pattern matching and anomaly detection run continuously on normalized data.' },
+    { icon: '\uD83D\uDE80', title: 'Route', desc: 'Optimal provider routing based on live performance, cost, and availability.' }
   ]
-
-  // Auto-cycle through phases for organic feel
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActivePhase(p => (p + 1) % 4)
-    }, 4000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const current = phases[hoveredPhase !== null ? hoveredPhase : activePhase]
 
   return (
     <section id="how" data-animate style={{ textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-      {/* Organic nebula backdrop */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
-        background: `radial-gradient(ellipse at 50% 60%, ${current.glow.replace('0.4', '0.06')} 0%, transparent 60%)`,
-        filter: 'blur(120px)',
-        transition: 'background 1.5s ease',
-      }} />
       <div className="inner" style={{ position: 'relative', zIndex: 1 }}>
         <div className="section-label">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinejoin="round" strokeLinecap="round"/></svg>
           Architecture
         </div>
-        <h2 className="section-title">Energy flows. Data crystallizes.</h2>
+        <h2 className="section-title">How AETHERIUS Works</h2>
         <p className="section-desc" style={{ margin: '0 auto', maxWidth: 580 }}>
-          Four phases. One organic loop. From seed to fruit in under a second.
+          Click each phase to explore the pipeline. From capture to delivery in real-time.
         </p>
 
-        {/* The Tree visualization */}
-        <div style={{ position: 'relative', marginTop: 56, marginBottom: 40 }}>
-          {/* Connecting trunk line */}
-          <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 2, height: '100%', background: `linear-gradient(180deg, ${current.color}33 0%, ${current.color}11 100%)`, transition: 'background 1s ease' }} />
-
-          {/* Phase nodes — vertical tree layout */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, position: 'relative' }}>
-            {phases.map((phase, i) => {
-              const isActive = (hoveredPhase !== null ? hoveredPhase : activePhase) === i
-              const isLeft = i % 2 === 0
-              return (
-                <div key={phase.num}
-                  onMouseEnter={() => { setHoveredPhase(i); setActivePhase(i) }}
-                  onMouseLeave={() => setHoveredPhase(null)}
+        {/* Horizontal steps with connectors */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 0, marginTop: 56, marginBottom: 40 }}>
+          {phases.map((phase, i) => {
+            const isActive = activePhase === i
+            return (
+              <div key={phase.title} style={{ display: 'flex', alignItems: 'center' }}>
+                {/* Step card */}
+                <div
+                  onClick={() => setActivePhase(i)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActivePhase(i) } }}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: 24,
-                    flexDirection: isLeft ? 'row' : 'row-reverse',
-                    padding: '20px 0', cursor: 'pointer',
-                    transition: 'all 0.5s cubic-bezier(0.4,0,0.2,1)',
-                    opacity: isActive ? 1 : 0.4,
-                    transform: isActive ? 'scale(1.02)' : 'scale(0.98)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
+                    padding: '24px 20px', borderRadius: 16, cursor: 'pointer',
+                    minWidth: 140, maxWidth: 180, position: 'relative',
+                    border: isActive ? '2px solid rgba(0,240,255,0.4)' : '1px solid rgba(255,255,255,0.06)',
+                    background: isActive ? 'rgba(0,240,255,0.06)' : 'transparent',
+                    boxShadow: isActive ? '0 0 20px rgba(0,240,255,0.15)' : 'none',
+                    transform: isActive ? 'scale(1.02)' : 'scale(1)',
+                    opacity: isActive ? 1 : 0.6,
+                    transition: 'all 0.35s cubic-bezier(0.4,0,0.2,1)',
                   }}
                 >
-                  {/* Content card */}
-                  <div style={{ flex: 1, maxWidth: 380, textAlign: isLeft ? 'right' : 'left', padding: '0 24px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: isLeft ? 'flex-end' : 'flex-start', marginBottom: 6 }}>
-                      <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.65rem', fontWeight: 700, color: phase.color, opacity: 0.7, letterSpacing: '0.1em' }}>{phase.num}</span>
-                      <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem', color: phase.color, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{phase.subtitle}</span>
-                    </div>
-                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text)', marginBottom: 6, letterSpacing: '-0.02em' }}>{phase.title}</h3>
-                    <p style={{ color: 'var(--text-sec)', fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>{phase.desc}</p>
-                    {isActive && (
-                      <div style={{ marginTop: 10, padding: '8px 12px', background: `${phase.color}10`, border: `1px solid ${phase.color}20`, borderRadius: 8, fontSize: '0.72rem', color: phase.color, fontFamily: 'JetBrains Mono, monospace' }}>
-                        {phase.detail}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Center node */}
+                  {/* Icon */}
                   <div style={{
-                    width: 56, height: 56, borderRadius: '50%', flexShrink: 0,
-                    background: isActive ? `${phase.color}18` : 'rgba(255,255,255,0.03)',
-                    border: `2px solid ${isActive ? phase.color : 'rgba(255,255,255,0.06)'}`,
+                    width: 48, height: 48, borderRadius: 12,
+                    background: isActive ? 'rgba(0,240,255,0.1)' : 'rgba(255,255,255,0.04)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: phase.color, position: 'relative',
-                    transition: 'all 0.5s cubic-bezier(0.4,0,0.2,1)',
-                    boxShadow: isActive ? `0 0 20px ${phase.glow.replace('0.4', '0.2')}` : 'none',
+                    fontSize: '1.4rem',
+                    transition: 'all 0.35s ease',
                   }}>
                     {phase.icon}
-                    {isActive && (
-                      <div style={{ position: 'absolute', inset: -4, borderRadius: '50%', border: `1px solid ${phase.color}30`, animation: 'treePulse 2s ease-in-out infinite' }} />
-                    )}
                   </div>
-
-                  {/* Empty space for other side */}
-                  <div style={{ flex: 1 }} />
+                  {/* Title */}
+                  <div style={{
+                    fontWeight: 700, fontSize: '0.95rem',
+                    color: isActive ? 'var(--text)' : 'var(--text-sec)',
+                    transition: 'color 0.35s ease',
+                  }}>
+                    {phase.title}
+                  </div>
                 </div>
-              )
-            })}
+
+                {/* Connector arrow between steps */}
+                {i < phases.length - 1 && (
+                  <div style={{
+                    width: 48, height: 2, position: 'relative',
+                    margin: '0 -2px', alignSelf: 'center', marginTop: -40,
+                  }}>
+                    {/* Background line */}
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      background: 'rgba(255,255,255,0.06)',
+                      borderRadius: 1,
+                    }} />
+                    {/* Filled portion */}
+                    <div style={{
+                      position: 'absolute', top: 0, left: 0, bottom: 0,
+                      width: activePhase > i ? '100%' : '0%',
+                      background: 'linear-gradient(90deg, rgba(0,240,255,0.4), rgba(0,240,255,0.2))',
+                      borderRadius: 1,
+                      transition: 'width 0.4s cubic-bezier(0.4,0,0.2,1)',
+                    }} />
+                    {/* Arrow head */}
+                    <svg width="10" height="10" viewBox="0 0 10 10" style={{
+                      position: 'absolute', right: -4, top: -4,
+                      color: activePhase > i ? 'rgba(0,240,255,0.5)' : 'rgba(255,255,255,0.1)',
+                      transition: 'color 0.4s ease',
+                    }}>
+                      <path d="M2 1l6 4-6 4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Expanded description panel */}
+        <div style={{
+          background: 'rgba(0,240,255,0.04)',
+          border: '1px solid rgba(0,240,255,0.12)',
+          borderRadius: 16, padding: '28px 32px', maxWidth: 520, margin: '0 auto',
+          transition: 'all 0.35s cubic-bezier(0.4,0,0.2,1)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+            <span style={{ fontSize: '1.6rem' }}>{phases[activePhase].icon}</span>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text)', margin: 0 }}>
+              {phases[activePhase].title}
+            </h3>
+            <span style={{
+              fontFamily: 'JetBrains Mono, monospace', fontSize: '0.65rem', fontWeight: 600,
+              padding: '3px 8px', borderRadius: 6, background: 'rgba(0,240,255,0.1)',
+              color: 'rgba(0,240,255,0.8)', marginLeft: 'auto',
+            }}>
+              Phase {activePhase + 1}/4
+            </span>
           </div>
+          <p style={{
+            color: 'var(--text-sec)', fontSize: '0.92rem', lineHeight: 1.7, margin: 0,
+          }}>
+            {phases[activePhase].desc}
+          </p>
         </div>
-
-        {/* Phase indicator dots */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginTop: 16 }}>
-          {phases.map((phase, i) => (
-            <button key={i} onClick={() => setActivePhase(i)}
-              style={{
-                width: activePhase === i ? 24 : 8, height: 8, borderRadius: 4, border: 'none', cursor: 'pointer',
-                background: activePhase === i ? phase.color : 'rgba(255,255,255,0.12)',
-                boxShadow: activePhase === i ? `0 0 8px ${phase.glow}` : 'none',
-                transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)',
-              }}
-            />
-          ))}
-        </div>
-
-        <style>{`
-          @keyframes treePulse {
-            0%, 100% { transform: scale(1); opacity: 0.6; }
-            50% { transform: scale(1.15); opacity: 0.2; }
-          }
-          @media (max-width: 768px) {
-            #how .inner > div:nth-child(3) > div > div { flex-direction: column !important; }
-            #how .inner > div:nth-child(3) > div > div > div:first-child { text-align: center !important; padding: 0 16px !important; }
-            #how .inner > div:nth-child(3) > div > div > div:last-child { display: none !important; }
-          }
-        `}</style>
       </div>
     </section>
   )
@@ -690,6 +660,7 @@ function CodeSection() {
   const [lineIdx, setLineIdx] = useState(0)
   const [charIdx, setCharIdx] = useState(0)
   const [showCursor, setShowCursor] = useState(true)
+  const [copied, setCopied] = useState(false)
   const typingRef = useRef(null)
   const containerRef = useRef(null)
 
@@ -783,6 +754,14 @@ function CodeSection() {
     return () => clearInterval(iv)
   }, [])
 
+  const handleCopy = () => {
+    const code = codeBlocks[tab].join('\n')
+    navigator.clipboard.writeText(code).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
   const renderLine = (text, isCurrent) => {
     if (!text) return <br />
     // Colorize based on content
@@ -824,6 +803,19 @@ function CodeSection() {
               </div>
               {/* Terminal content */}
               <div ref={containerRef} style={{ padding: 24, fontFamily: 'JetBrains Mono, monospace', fontSize: '0.82rem', lineHeight: 1.9, minHeight: 380, position: 'relative' }}>
+                {/* Copy button */}
+                <button onClick={handleCopy} style={{
+                  position: 'absolute', top: 12, right: 12, padding: '6px 12px',
+                  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(168,85,247,0.2)',
+                  borderRadius: 8, color: 'var(--cyan)', fontSize: '0.72rem', fontWeight: 600,
+                  cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
+                  transition: 'all 0.3s', zIndex: 10,
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.1)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.35)' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.2)' }}
+                >
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
                 {/* Completed lines */}
                 {typedLines.map((line, i) => (
                   <div key={i}>{renderLine(line, false)}</div>
@@ -879,6 +871,17 @@ function CodeSection() {
 function Waitlist() {
   const [email, setEmail] = useState('')
   const [wallet, setWallet] = useState('')
+  const [agentCount, setAgentCount] = useState(230)
+
+  useEffect(() => {
+    let count = 230
+    const iv = setInterval(() => {
+      count++
+      if (count >= 247) { count = 247; clearInterval(iv) }
+      setAgentCount(count)
+    }, 3000)
+    return () => clearInterval(iv)
+  }, [])
 
   const timeline = [
     { date: 'Aug 2026', title: 'Project Started', desc: 'x402 research, architecture design', status: 'done' },
@@ -896,7 +899,19 @@ function Waitlist() {
         </div>
         <h2 className="section-title">Join the Agent Economy</h2>
         <p className="section-desc" style={{ margin: '0 auto' }}>We're live on Base Mainnet. Start building with 100+ APIs today. Get early access to new endpoints and exclusive analytics.</p>
-        <div data-animate-card style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, marginTop: 72, textAlign: 'left' }}>
+        <div style={{ textAlign: 'center', marginTop: 40 }}>
+          <span style={{
+            fontFamily: 'JetBrains Mono, monospace', fontSize: '0.88rem', color: 'var(--text-sec)',
+          }}>
+            <span style={{
+              fontWeight: 800, fontSize: '1.1rem',
+              background: 'linear-gradient(135deg, var(--purple), var(--magenta))',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            }}>{agentCount}</span>
+            {' '}agents registered
+          </span>
+        </div>
+        <div data-animate-card style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, marginTop: 32, textAlign: 'left' }}>
           <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(16px)', borderRadius: 24, padding: 40, backdropFilter: 'blur(20px)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32 }}>
               {[{ val: '100+', label: 'Live APIs' }, { val: '40', label: 'FREE Endpoints' }, { val: 'x402', label: 'Protocol' }].map(s => (
@@ -947,26 +962,7 @@ function Waitlist() {
 
 // === SOCIAL PROOF ===
 function SocialProof() {
-  return (
-    <section id="social" data-animate style={{ minHeight: 'auto', padding: '80px 0' }}>
-      <div className="inner" style={{ padding: '0 40px' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 48, flexWrap: 'wrap' }}>
-          {[
-            { stat: 'Open Source', label: 'MIT License' },
-            { stat: '100+', label: 'Live Endpoints' },
-            { stat: '129', label: 'Tests Passing' },
-            { stat: 'x402', label: 'Native Protocol' },
-            { stat: 'Mainnet', label: 'Base L2 Live' },
-          ].map((item, i) => (
-            <div key={i} data-animate-card style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, color: 'var(--text-muted)' }}>
-              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)' }}>{item.stat}</div>
-              <div style={{ fontSize: '0.75rem' }}>{item.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
+  return null
 }
 
 // === HEARTBEAT — Live pulsing bars + metrics ===
@@ -1103,8 +1099,36 @@ function Heartbeat() {
 
 // === TELEMETRY ===
 function Telemetry() {
+  const [animated, setAnimated] = useState({ v100: 0, v129: 0, v40: 0 })
+  const sectionRef = useRef(null)
+  const hasAnimated = useRef(false)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !hasAnimated.current) {
+        hasAnimated.current = true
+        const targets = { v100: 100, v129: 129, v40: 40 }
+        const duration = 1800
+        const start = performance.now()
+        const tick = (now) => {
+          const t = Math.min((now - start) / duration, 1)
+          const ease = 1 - Math.pow(1 - t, 3)
+          setAnimated({
+            v100: Math.round(ease * targets.v100),
+            v129: Math.round(ease * targets.v129),
+            v40: Math.round(ease * targets.v40),
+          })
+          if (t < 1) requestAnimationFrame(tick)
+        }
+        requestAnimationFrame(tick)
+      }
+    }, { threshold: 0.3 })
+    if (sectionRef.current) observer.observe(sectionRef.current)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section id="telemetry" data-animate style={{ background: 'linear-gradient(180deg, rgba(168,85,247,0.04), transparent 55%)' }}>
+    <section id="telemetry" data-animate ref={sectionRef} style={{ background: 'linear-gradient(180deg, rgba(168,85,247,0.04), transparent 55%)' }}>
       <div className="inner">
         <div className="section-label">
           <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5" width="14" height="14"><path strokeLinejoin="round" strokeLinecap="round" d="M3 12h4l2-8 4 16 2-8h6"/></svg>
@@ -1131,6 +1155,15 @@ function Telemetry() {
         <div data-animate-card style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, color: 'var(--text-sec)', fontSize: '0.8rem' }}>
           <span>NATS stays private. Observability becomes a product.</span>
           <a href="dashboard/" style={{ color: 'var(--purple-light)', marginLeft: 12, textDecoration: 'none' }}>Inspect control room ↗</a>
+        </div>
+        {/* Live Stats */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 48, flexWrap: 'wrap', marginTop: 48 }}>
+          {[{ val: animated.v100, suffix: '+', label: 'Live Endpoints' }, { val: animated.v129, suffix: '', label: 'Tests Passing' }, { val: animated.v40, suffix: '', label: 'FREE Endpoints' }].map((item, i) => (
+            <div key={i} style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', background: 'linear-gradient(135deg, var(--purple), var(--magenta))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{item.val}{item.suffix}</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 4 }}>{item.label}</div>
+            </div>
+          ))}
         </div>
       </div>
       <style>{`
@@ -1216,19 +1249,14 @@ function Limits() {
 
 // === FOUNDERS ===
 function Founders() {
-  const [showMath, setShowMath] = useState(false)
-  const [copied, setCopied] = useState(false)
+  const [calcCalls, setCalcCalls] = useState(10000)
+  const [calcTokens, setCalcTokens] = useState(500)
+  const [calcResult, setCalcResult] = useState(null)
 
   const perks = [
     { icon: '⟠', title: '50% Lifetime Discount', desc: 'Every endpoint. Every call. Forever. As long as the network exists, you pay half. This is not a promo — it is a protocol-level lock.', color: 'var(--purple-light)' },
     { icon: '⊘', title: 'Roadmap Vote', desc: 'You don\'t just request features — you vote on what ships next. Founders steer the direction of 100+ APIs. Direct governance.', color: 'var(--cyan)' },
     { icon: '⟡', title: 'Direct Line', desc: 'Priority support on X. When something breaks at 3am, you get a response. Not a ticket number — a builder who cares.', color: 'var(--magenta-light)' },
-  ]
-
-  const mathExamples = [
-    { calls: '1K/mo', retail: '$5', founder: '$2.50', saved: '$2.50' },
-    { calls: '10K/mo', retail: '$50', founder: '$25', saved: '$25' },
-    { calls: '100K/mo', retail: '$500', founder: '$250', saved: '$250' },
   ]
 
   return (
@@ -1248,47 +1276,94 @@ function Founders() {
         {/* Perk cards — expanded */}
         <div data-animate-card style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 56, maxWidth: 960, margin: '56px auto 0' }}>
           {perks.map(p => (
-            <div key={p.title} className="glass-card" style={{ padding: '32px 24px', textAlign: 'left', borderTop: `2px solid ${p.color}30` }}>
+            <div key={p.title} className="glass-card" style={{ padding: '32px 24px', textAlign: 'left', borderTop: `2px solid ${p.color}30`, transition: 'all 0.3s ease' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = '1px solid rgba(168,85,247,0.3)'; e.currentTarget.style.borderTop = `2px solid ${p.color}30`; e.currentTarget.querySelector('.perk-desc').style.opacity = '1' }}
+              onMouseLeave={e => { e.currentTarget.style.background = ''; e.currentTarget.style.borderColor = ''; e.currentTarget.style.borderTop = ''; e.currentTarget.querySelector('.perk-desc').style.opacity = '0.5' }}
+            >
               <div style={{ fontSize: '1.8rem', marginBottom: 14, lineHeight: 1 }}>{p.icon}</div>
               <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>{p.title}</h3>
-              <p style={{ color: 'var(--text-sec)', fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>{p.desc}</p>
+              <p className="perk-desc" style={{ color: 'var(--text-sec)', fontSize: '0.85rem', lineHeight: 1.6, margin: 0, opacity: 0.5, transition: 'opacity 0.3s ease' }}>{p.desc}</p>
             </div>
           ))}
         </div>
 
-        {/* Founder math — expandable */}
-        <div data-animate-card style={{ maxWidth: 680, margin: '32px auto 0', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, backdropFilter: 'blur(12px)', overflow: 'hidden' }}>
-          <button onClick={() => setShowMath(!showMath)} style={{ width: '100%', padding: '20px 24px', background: 'none', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', color: 'var(--text)' }}>
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ fontWeight: 700, fontSize: '1rem', marginBottom: 4 }}>Founder math — what would YOU pay?</div>
-              <div style={{ color: 'var(--text-sec)', fontSize: '0.82rem' }}>Tap to see the savings at scale</div>
+        {/* Founder calculator */}
+        <div data-animate-card style={{ maxWidth: 680, margin: '32px auto 0', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, backdropFilter: 'blur(12px)', padding: '28px 28px 24px', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text)' }}>Founder savings calculator</div>
+              <div style={{ color: 'var(--text-sec)', fontSize: '0.82rem' }}>Estimate your monthly savings with 50% lifetime discount</div>
             </div>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ transform: showMath ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', color: 'var(--text-muted)', flexShrink: 0 }}><polyline points="6 9 12 15 18 9" strokeLinejoin="round" strokeLinecap="round"/></svg>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Monthly API calls</label>
+              <input
+                type="number"
+                value={calcCalls}
+                onChange={e => setCalcCalls(Number(e.target.value) || 0)}
+                style={{
+                  width: '100%', padding: '12px 14px', background: 'rgba(0,0,0,0.25)',
+                  border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10,
+                  color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
+                  outline: 'none', boxSizing: 'border-box',
+                }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Average tokens per call</label>
+              <input
+                type="number"
+                value={calcTokens}
+                onChange={e => setCalcTokens(Number(e.target.value) || 0)}
+                style={{
+                  width: '100%', padding: '12px 14px', background: 'rgba(0,0,0,0.25)',
+                  border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10,
+                  color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
+                  outline: 'none', boxSizing: 'border-box',
+                }}
+              />
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              const retail = calcCalls * 0.002
+              const founder = calcCalls * 0.0008
+              setCalcResult({ retail, founder, savings: retail - founder })
+            }}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 22px',
+              background: 'linear-gradient(135deg, var(--purple-deep), var(--magenta))',
+              color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: '0.85rem',
+              cursor: 'pointer', boxShadow: '0 4px 16px rgba(168,85,247,0.25)', transition: 'all 0.3s',
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
+            Calculate
           </button>
-          {showMath && (
-            <div style={{ padding: '0 24px 20px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 16, fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem' }}>
-                <thead>
-                  <tr style={{ color: 'var(--text-muted)', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                    <th style={{ textAlign: 'left', padding: '8px 0' }}>Volume</th>
-                    <th style={{ textAlign: 'right', padding: '8px 0' }}>Retail</th>
-                    <th style={{ textAlign: 'right', padding: '8px 0' }}>Founder</th>
-                    <th style={{ textAlign: 'right', padding: '8px 0', color: 'var(--green)' }}>Saved</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mathExamples.map(row => (
-                    <tr key={row.calls} style={{ borderTop: '1px solid rgba(255,255,255,0.03)' }}>
-                      <td style={{ padding: '10px 0', color: 'var(--text)' }}>{row.calls}</td>
-                      <td style={{ textAlign: 'right', padding: '10px 0', color: 'var(--text-muted)', textDecoration: 'line-through' }}>{row.retail}</td>
-                      <td style={{ textAlign: 'right', padding: '10px 0', color: 'var(--purple-light)', fontWeight: 600 }}>{row.founder}</td>
-                      <td style={{ textAlign: 'right', padding: '10px 0', color: 'var(--green)' }}>{row.saved}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(168,85,247,0.06)', borderRadius: 10, fontSize: '0.78rem', color: 'var(--text-sec)', lineHeight: 1.6 }}>
-                <strong style={{ color: 'var(--text)' }}>White-label?</strong> Own an API? We turn it into a paid x402 endpoint for you. You keep the revenue, we handle the infrastructure. <a href="https://x.com/aetheriusxAPI" target="_blank" rel="noreferrer" style={{ color: 'var(--purple-light)' }}>Talk to us ↗</a>
+          {calcResult && (
+            <div style={{
+              marginTop: 20, padding: '16px 20px',
+              background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.1)',
+              borderRadius: 12, fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
+              lineHeight: 1.8,
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
+                <span>Retail cost:</span>
+                <span style={{ textDecoration: 'line-through', color: 'var(--text-sec)' }}>${calcResult.retail.toFixed(2)}/mo</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--purple-light)', fontWeight: 600 }}>
+                <span>Founder cost:</span>
+                <span>${calcResult.founder.toFixed(2)}/mo</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, paddingTop: 10, borderTop: '1px solid rgba(168,85,247,0.12)' }}>
+                <span style={{ fontWeight: 700, color: 'var(--text)' }}>You save:</span>
+                <span style={{
+                  fontWeight: 800, fontSize: '1rem',
+                  background: 'linear-gradient(135deg, var(--purple), var(--magenta))',
+                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                }}>${calcResult.savings.toFixed(2)}/month</span>
               </div>
             </div>
           )}
@@ -1306,9 +1381,12 @@ function Founders() {
           </a>
         </div>
 
-        <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <span className="glow-dot" style={{ width: 6, height: 6 }} />
-          <span style={{ color: 'var(--text-sec)', fontSize: '0.82rem' }}>Cohort: <strong style={{ color: 'var(--green)' }}>0 / 10 claimed</strong> — updated live as wallets join.</span>
+        <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 200, height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{ width: '50%', height: '100%', background: 'linear-gradient(90deg, var(--purple), var(--magenta))', borderRadius: 3 }} />
+          </div>
+          <span style={{ color: 'var(--text-sec)', fontSize: '0.82rem' }}>5/10 spots taken</span>
+          <span style={{ color: 'var(--purple-light)', fontSize: '0.75rem', fontWeight: 600 }}>Only 5 spots remaining</span>
         </div>
       </div>
       <style>{`
@@ -1363,7 +1441,7 @@ function About() {
         </div>
         <h2 className="section-title">Built for the Agent Economy</h2>
         <p className="section-desc" style={{ margin: '0 auto 48px' }}>
-          AETHERIUS is the operating system for AI agent commerce. We build the infrastructure that lets machines pay for themselves — one request at a time.
+          AETHERIUS is the infrastructure layer for AI agents that transact on-chain. We build the tools that let agents discover APIs, pay for them, and route through the fastest provider — all in real-time.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginTop: 24 }}>
           {[

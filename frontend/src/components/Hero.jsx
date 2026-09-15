@@ -16,7 +16,7 @@ class GlobeBoundary extends React.Component {
 
 // === FLUID LOADING — single card flip + big bang reveal ===
 function FluidLoader({ onComplete }) {
-  const [digit, setDigit] = useState(7)
+  const [digit, setDigit] = useState(3)
   const [phase, setPhase] = useState('counting') // counting → bigbang → done
   const [bigbangProgress, setBigbangProgress] = useState(0)
   const onCompleteRef = useRef(onComplete)
@@ -24,7 +24,7 @@ function FluidLoader({ onComplete }) {
 
   // Countdown: 7→0
   useEffect(() => {
-    let count = 7
+    let count = 3
     const iv = setInterval(() => {
       count--
       if (count >= 0) setDigit(count)
@@ -32,7 +32,7 @@ function FluidLoader({ onComplete }) {
         clearInterval(iv)
         setPhase('bigbang')
       }
-    }, 850)
+    }, 600)
     return () => clearInterval(iv)
   }, [])
 
@@ -675,6 +675,15 @@ return (
         ) : (
             <GlobeCSSFallback />
           )}
+        </div>
+
+        {/* Scroll indicator */}
+        <div style={{
+          position: 'absolute', bottom: 60, left: '50%', transform: 'translateX(-50%)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+          opacity: 0.4, animation: 'scrollBounce 2s ease-in-out infinite',
+        }}>
+          <div style={{ width: 2, height: 24, background: 'linear-gradient(180deg, rgba(168,85,247,0.6), transparent)', borderRadius: 1 }} />
         </div>
 
         {/* x402 badge — arriba, fuera del centro del globo */}
