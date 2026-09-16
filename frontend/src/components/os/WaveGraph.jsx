@@ -92,6 +92,29 @@ export default function WaveGraph({ data, color = '#a855f7', secondaryColor = '#
       ctx.globalAlpha = 1;
       ctx.stroke();
 
+      // === GLOW TRAIL — leading edge highlight ===
+      const trailIdx = Math.floor((t * 12) % wavePoints.length);
+      if (trailIdx < wavePoints.length) {
+        const tp = wavePoints[trailIdx];
+        const tx = tp.x * w;
+        const tRipple = Math.sin(tp.x * 8 + t * 2) * 2 + Math.sin(tp.x * 12 - t * 1.5) * 1;
+        const ty = tp.y * h + tRipple;
+        // Outer glow
+        const tGlow = ctx.createRadialGradient(tx, ty, 0, tx, ty, 18);
+        tGlow.addColorStop(0, `rgba(${c1.r},${c1.g},${c1.b},0.6)`);
+        tGlow.addColorStop(0.4, `rgba(${c2.r},${c2.g},${c2.b},0.2)`);
+        tGlow.addColorStop(1, `rgba(${c1.r},${c1.g},${c1.b},0)`);
+        ctx.fillStyle = tGlow;
+        ctx.beginPath();
+        ctx.arc(tx, ty, 18, 0, Math.PI * 2);
+        ctx.fill();
+        // Core dot
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(255,255,255,0.9)`;
+        ctx.arc(tx, ty, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
       // === FILL under wave ===
       const lastPt = wavePoints[wavePoints.length - 1];
       ctx.lineTo(lastPt.x * w, h);

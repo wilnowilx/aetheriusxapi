@@ -152,6 +152,19 @@ const TextBandRings = ({ liveData }) => {
     <group ref={groupRef}>
       {ringsConfig.map((ring, ringIdx) => (
         <group key={ringIdx} position={[0, ring.yOffset, 0]} rotation={[ring.tilt, 0, 0]}>
+          {/* Bloom glow — wider, softer, additive behind the ring */}
+          <mesh>
+            <cylinderGeometry args={[ring.radius, ring.radius, ring.bandWidth * 1.6, 64, 1, true]} />
+            <meshBasicMaterial
+              color={ring.color}
+              transparent
+              opacity={ring.opacity * 0.12}
+              side={THREE.DoubleSide}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+              toneMapped={false}
+            />
+          </mesh>
           {/* Cara frontal nítida + reflejo trasero blur elegante */}
           <mesh
             onPointerOver={(e) => { e.stopPropagation(); setHoveredRing(ringIdx); document.body.style.cursor = 'pointer' }}

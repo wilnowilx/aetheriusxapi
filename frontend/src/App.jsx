@@ -1378,6 +1378,20 @@ function App() {
         </VisionScreen>
       </SectionBoundary>
 
+      {/* Gradient bridge — smooth visual transition hero→OS */}
+      <div style={{
+        height: 120,
+        background: 'linear-gradient(180deg, #030308 0%, rgba(3,3,8,0.8) 30%, rgba(3,3,8,0.3) 70%, transparent 100%)',
+        position: 'relative', zIndex: 1, marginTop: -1, pointerEvents: 'none',
+      }}>
+        {/* Subtle horizontal accent line */}
+        <div style={{
+          position: 'absolute', bottom: 40, left: '15%', right: '15%',
+          height: 1,
+          background: 'linear-gradient(90deg, transparent, rgba(168,85,247,0.15), rgba(217,70,239,0.12), rgba(34,211,238,0.08), transparent)',
+        }} />
+      </div>
+
       {/* Screen 2: The OS — Live Desktop Environment */}
       <SectionBoundary fallback={<div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#06060e', color: '#d946ef', fontFamily: 'JetBrains Mono, monospace', gap: 16 }}>
         <span style={{ fontSize: 32, opacity: 0.5 }}>◈</span>
