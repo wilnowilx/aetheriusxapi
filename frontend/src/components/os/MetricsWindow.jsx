@@ -1,5 +1,52 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { apiFetch, fmtUptime } from './api';
+
+/* === PULSE WAVE GRAPH — SVG line with glow === */
+function PulseGraph({ data, color = '#a855f7', height = 60 }) {
+  const points = useMemo(() => {
+    if (!data || data.length === 0) return '';
+    const mx = Math.max(...data, 1);
+    const w = 100; // viewBox width
+    const h = 100; // viewBox height
+    const step = w / Math.max(data.length - 1, 1);
+    return data.map((v, i) => {
+      const x = i * step;
+      const y = h - (v / mx) * (h * 0.85) - 5;
+      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+  }, [data]);
+
+  const fillPath = useMemo(() => {
+    if (!points) return '';
+    return points + ` L100,100 L0,100 Z`;
+  }, [points]);
+
+  if (!data || data.length === 0) return null;
+
+  return (
+    <div className="ae-pulse-graph" style={{ height }}>
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id={`pulse-grad-${color.replace('#','')}`} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={color} stopOpacity="0.2" />
+            <stop offset="50%" stopColor={color} stopOpacity="1" />
+            <stop offset="100%" stopColor={color} stopOpacity="0.4" />
+          </linearGradient>
+          <linearGradient id={`pulse-fill-${color.replace('#','')}`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor={color} stopOpacity="0.15" />
+            <stop offset="100%" stopColor={color} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {/* Glow layer */}
+        <path d={points} className="ae-pulse-glow" style={{ stroke: color, opacity: 0.15 }} />
+        {/* Fill */}
+        <path d={fillPath} fill={`url(#pulse-fill-${color.replace('#','')})`} />
+        {/* Main line */}
+        <path d={points} stroke={`url(#pulse-grad-${color.replace('#','')})`} fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </div>
+  );
+}
 
 /* === SHARED HOOK: fetch telemetry === */
 function useTelemetry() {
@@ -52,7 +99,6 @@ function LiveMetrics({ data }) {
   const avg = T.avg_latency_ms ?? 0;
   const lat = data.recent_latency_ms || [];
   const evts = data.recent_events || [];
-  const mx = Math.max(...lat, 1);
 
   return (
     <div className="ae-metrics">
@@ -69,12 +115,8 @@ function LiveMetrics({ data }) {
       </div>
       {lat.length > 0 && (
         <div className="ae-latency-section">
-          <span className="ae-section-title">Latency Distribution</span>
-          <div className="ae-latency-bars">
-            {lat.map((v, i) => (
-              <div key={i} className="ae-latency-bar" style={{ height: `${Math.max(8, Math.round((v / mx) * 100))}%` }} title={`${v} ms`} />
-            ))}
-          </div>
+          <span className="ae-section-title">Latency Pulse</span>
+          <PulseGraph data={lat} color="#a855f7" height={60} />
         </div>
       )}
       <div className="ae-activity-section">
@@ -105,7 +147,6 @@ function NetworkHealth({ data }) {
   const err = T.errors ?? 0;
   const ok = T.ok_200 ?? 0;
   const lat = data.recent_latency_ms || [];
-  const mx = Math.max(...lat, 1);
   const errRate = calls > 0 ? ((err / calls) * 100).toFixed(2) : '0.00';
   const okRate = calls > 0 ? ((ok / calls) * 100).toFixed(1) : '100.0';
   // Connection quality
@@ -131,13 +172,7 @@ function NetworkHealth({ data }) {
       {lat.length > 0 && (
         <div className="ae-latency-section">
           <span className="ae-section-title">Latency Waveform</span>
-          <div className="ae-latency-bars">
-            {lat.map((v, i) => (
-              <div key={i} className="ae-latency-bar"
-                style={{ height: `${Math.max(8, Math.round((v / mx) * 100))}%`, background: v > 500 ? '#ef4444' : v > 200 ? '#f59e0b' : '#22d3ee' }}
-                title={`${v} ms`} />
-            ))}
-          </div>
+          <PulseGraph data={lat} color="#22d3ee" height={60} />
         </div>
       )}
     </div>

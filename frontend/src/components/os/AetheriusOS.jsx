@@ -3,70 +3,71 @@ import Window from './Window';
 import MetricsWindow from './MetricsWindow';
 import ExplorerWindow from './ExplorerWindow';
 import CatalogWindow from './CatalogWindow';
+import Starfield from './Starfield';
 import { CATEGORIES, getCat } from './api';
 import './os.css';
 
 /* Window definitions — each app available in the sidebar */
 const APPS = [
-  { id: 'catalog',   label: 'API Catalog',    icon: '⬡', color: '#a855f7', component: 'catalog' },
-  { id: 'explorer',  label: 'Explorer',        icon: '⊕', color: '#ec4899', component: 'explorer' },
-  { id: 'metrics',   label: 'Live Metrics',    icon: '◎', color: '#00f0ff', component: 'metrics' },
-  { id: 'network',   label: 'Network Health',  icon: '⏣', color: '#0052FF', component: 'metrics', sub: 'network' },
-  { id: 'defi',      label: 'DeFi Intel',      icon: '◆', color: '#f59e0b', component: 'metrics', sub: 'defi' },
-  { id: 'wallet',    label: 'Wallet Intel',    icon: '◇', color: '#d946ef', component: 'metrics', sub: 'wallet' },
-  { id: 'brain',     label: 'QuantumXBrain',   icon: '∿', color: '#d946ef', component: 'metrics', sub: 'brain' },
+  { id: 'catalog',   label: 'API Catalog',    icon: '⬡', color: '#a855f7', component: 'catalog', desc: '70+ endpoints' },
+  { id: 'explorer',  label: 'Explorer',        icon: '⊕', color: '#ec4899', component: 'explorer', desc: 'Test any API' },
+  { id: 'metrics',   label: 'Live Metrics',    icon: '◎', color: '#00f0ff', component: 'metrics', desc: 'Full telemetry' },
+  { id: 'network',   label: 'Network Health',  icon: '⏣', color: '#0052FF', component: 'metrics', sub: 'network', desc: 'Latency & uptime' },
+  { id: 'defi',      label: 'DeFi Intel',      icon: '◆', color: '#f59e0b', component: 'metrics', sub: 'defi', desc: 'Volume & flow' },
+  { id: 'wallet',    label: 'Wallet Intel',    icon: '◇', color: '#d946ef', component: 'metrics', sub: 'wallet', desc: 'Wallet tracking' },
+  { id: 'brain',     label: 'QuantumXBrain',   icon: '∿', color: '#d946ef', component: 'metrics', sub: 'brain', desc: 'Pattern analysis' },
 ];
 
-/* Default positions for each window when first opened */
-const DEFAULT_POS = {
-  catalog:  { x: 230, y: 50,  w: 820, h: 520 },
-  explorer: { x: 250, y: 60,  w: 880, h: 540 },
-  metrics:  { x: 240, y: 55,  w: 700, h: 480 },
-  network:  { x: 235, y: 70,  w: 640, h: 440 },
-  defi:     { x: 245, y: 65,  w: 700, h: 480 },
-  wallet:   { x: 260, y: 55,  w: 640, h: 440 },
-  brain:    { x: 230, y: 50,  w: 640, h: 440 },
-};
+/* Default positions — metrics centered, others cascaded from center */
+function getDefaultPos(appId) {
+  const cx = typeof window !== 'undefined' ? Math.max(260, (window.innerWidth - 700) / 2) : 300;
+  const cy = typeof window !== 'undefined' ? Math.max(50, (window.innerHeight - 480) / 2) : 80;
+  const offsets = {
+    catalog:  { dx: -80, dy: -40, w: 820, h: 520 },
+    explorer: { dx: 0, dy: 0, w: 880, h: 540 },
+    metrics:  { dx: 0, dy: 0, w: 700, h: 480 },
+    network:  { dx: 60, dy: 30, w: 640, h: 440 },
+    defi:     { dx: -30, dy: 50, w: 700, h: 480 },
+    wallet:   { dx: 40, dy: -20, w: 640, h: 440 },
+    brain:    { dx: -60, dy: 20, w: 640, h: 440 },
+  };
+  const o = offsets[appId] || { dx: 0, dy: 0, w: 700, h: 480 };
+  return { x: cx + o.dx, y: cy + o.dy, w: o.w, h: o.h };
+}
 
 export default function AetheriusOS() {
   const sectionRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
   const [windows, setWindows] = useState(() => {
-    // Auto-open Live Metrics on first mount so the OS isn't empty
+    // Auto-open Live Metrics centered
+    const def = getDefaultPos('metrics');
     return [{
       id: 1, appId: 'metrics', isMin: false, isMax: false,
-      pos: { x: 200, y: 80 },
+      pos: { x: def.x, y: def.y },
     }];
   });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeWindow, setActiveWindow] = useState('metrics');
   const sidebarTimer = useRef(null);
 
-  /* IntersectionObserver: only show fixed elements when Hero is NOT the primary view */
+  /* Scroll-based visibility: show fixed elements only when Hero is NOT the primary view */
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
     const check = () => {
       const rect = el.getBoundingClientRect();
-      // OS visible when its top is above 55% of viewport (hero scrolled past)
-      // AND it fills at least 35% of viewport height
       const topInView = rect.top < window.innerHeight * 0.55;
       const fillsEnough = rect.height > 0 && (rect.bottom - Math.max(0, rect.top)) / window.innerHeight > 0.35;
       setIsVisible(topInView && fillsEnough);
     };
-    // Use scroll listener for instant response (IntersectionObserver lags on fast scroll)
     window.addEventListener('scroll', check, { passive: true });
     check();
     return () => window.removeEventListener('scroll', check);
   }, []);
 
-  /* Show sidebar when OS first becomes visible, keep it until user closes */
+  /* Show sidebar when OS first becomes visible */
   useEffect(() => {
-    if (isVisible) {
-      setSidebarOpen(true);
-    } else {
-      setSidebarOpen(false);
-    }
+    setSidebarOpen(isVisible);
   }, [isVisible]);
 
   /* Open a window — or bring to front if already open */
@@ -74,18 +75,15 @@ export default function AetheriusOS() {
     setWindows(prev => {
       const existing = prev.find(w => w.appId === appId);
       if (existing) {
-        return prev.map(w => w.appId === appId
-          ? { ...w, isMin: false }
-          : w
-        );
+        return prev.map(w => w.appId === appId ? { ...w, isMin: false } : w);
       }
-      const def = DEFAULT_POS[appId] || { x: 200, y: 100, w: 700, h: 480 };
+      const def = getDefaultPos(appId);
       return [...prev, {
         id: Date.now(),
         appId,
         isMin: false,
         isMax: false,
-        pos: { x: def.x + Math.random() * 40, y: def.y + Math.random() * 30 },
+        pos: { x: def.x + (Math.random() - 0.5) * 30, y: def.y + (Math.random() - 0.5) * 20 },
       }];
     });
     setActiveWindow(appId);
@@ -105,7 +103,7 @@ export default function AetheriusOS() {
     setWindows(prev => prev.map(w => w.appId === appId ? { ...w, isMax: !w.isMax } : w));
   }, []);
 
-  /* Sidebar: auto-show on mouse near left edge, auto-hide after delay */
+  /* Sidebar: auto-show on mouse near left edge */
   const onEdgeMove = useCallback((e) => {
     if (e.clientX <= 3) {
       setSidebarOpen(true);
@@ -119,18 +117,17 @@ export default function AetheriusOS() {
   }, [onEdgeMove]);
 
   const hideSidebar = useCallback(() => {
-    sidebarTimer.current = setTimeout(() => setSidebarOpen(false), 1800);
+    sidebarTimer.current = setTimeout(() => setSidebarOpen(false), 2500);
   }, []);
 
   const toggleSidebar = useCallback(() => {
     setSidebarOpen(prev => !prev);
   }, []);
 
-  /* Render window content based on appId */
   function renderContent(app) {
     switch (app.component) {
       case 'catalog':
-        return <CatalogWindow onSelectEndpoint={(route) => { openWindow('explorer'); }} />;
+        return <CatalogWindow onSelectEndpoint={() => openWindow('explorer')} />;
       case 'explorer':
         return <ExplorerWindow />;
       case 'metrics':
@@ -153,17 +150,20 @@ export default function AetheriusOS() {
 
   return (
     <section className="ae-os" id="ae-os" ref={sectionRef}>
-      {/* Plasma background blobs */}
-      <div className="ae-os-plasma">
-        <div className="ae-plasma-blob b1" />
-        <div className="ae-plasma-blob b2" />
-        <div className="ae-plasma-blob b3" />
+      {/* Starfield background */}
+      <Starfield className="ae-starfield" />
+
+      {/* Subtle nebula overlays */}
+      <div className="ae-nebula-layer">
+        <div className="ae-nebula n1" />
+        <div className="ae-nebula n2" />
+        <div className="ae-nebula n3" />
       </div>
 
       {/* Desktop surface */}
       <div className="ae-desktop">
         {isVisible && (<>
-          {/* Top bar */}
+          {/* Top bar — minimal, non-intrusive */}
           <div className="ae-topbar">
             <button className="ae-topbar-menu" onClick={toggleSidebar} title="Toggle menu">
               <svg width="18" height="14" viewBox="0 0 18 14">
@@ -183,7 +183,9 @@ export default function AetheriusOS() {
               <span className="ae-dot-on" /> OS Active
             </div>
             <div className="ae-topbar-right">
-              <span className="ae-topbar-label">AETHERIUS OS v1.0</span>
+              <a href="#hero" className="ae-topbar-home" title="Back to Home">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </a>
             </div>
           </div>
 
@@ -196,26 +198,29 @@ export default function AetheriusOS() {
             {APPS.map(app => (
               <button
                 key={app.id}
-                className="ae-sidebar-item"
+                className={`ae-sidebar-item ${activeWindow === app.id ? 'active' : ''}`}
                 style={{ '--app-color': app.color }}
-                onClick={() => { openWindow(app.id); }}
+                onClick={() => openWindow(app.id)}
               >
                 <span className="ae-sidebar-icon">{app.icon}</span>
-                <span className="ae-sidebar-label">{app.label}</span>
+                <div className="ae-sidebar-text">
+                  <span className="ae-sidebar-label">{app.label}</span>
+                  <span className="ae-sidebar-desc">{app.desc}</span>
+                </div>
               </button>
             ))}
           </div>
 
           {/* Windows */}
           {openWindows.map(win => {
-            const app = APPS.find(a => a.id === win.appId);
-            const def = DEFAULT_POS[win.appId] || { x: 200, y: 100, w: 700, h: 480 };
+            const def = getDefaultPos(win.appId);
             return (
               <Window
                 key={win.id}
                 id={win.appId}
                 title={getLabel(win.appId)}
                 icon={getIcon(win.appId)}
+                color={APPS.find(a => a.id === win.appId)?.color}
                 x={win.pos.x}
                 y={win.pos.y}
                 width={def.w}
@@ -226,12 +231,12 @@ export default function AetheriusOS() {
                 onMinimize={() => minimizeWindow(win.appId)}
                 onMaximize={() => maximizeWindow(win.appId)}
               >
-                {renderContent(app)}
+                {renderContent(APPS.find(a => a.id === win.appId))}
               </Window>
             );
           })}
 
-          {/* Dock */}
+          {/* Dock — floating pill at bottom */}
           {(openWindows.length > 0 || minimizedWindows.length > 0) && (
             <div className="ae-dock">
               {APPS.map(app => {

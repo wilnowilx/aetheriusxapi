@@ -1,9 +1,9 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 
-let zCounter = 100;
+let zCounter = 90000;
 
 export default function Window({
-  id, title, icon, children, x = 120, y = 80,
+  id, title, icon, color, children, x = 120, y = 80,
   width = 640, height = 440, minWidth = 320, minHeight = 220,
   onClose, onMinimize, onMaximize, isMinimized = false, isMaximized = false,
 }) {
@@ -89,7 +89,7 @@ export default function Window({
     <div
       ref={ref}
       className="ae-window"
-      style={style}
+      style={{ ...style, '--win-color': color || '#a855f7' }}
       onPointerDown={focus}
     >
       {/* Title bar */}
@@ -108,7 +108,7 @@ export default function Window({
             {isMaximized ? (
               <svg width="10" height="10" viewBox="0 0 10 10">
                 <rect x="0.5" y="2.5" width="6" height="6" rx="0.8" fill="none" stroke="currentColor" strokeWidth="1.2"/>
-                <rect x="3" y="0.5" width="6" height="6" rx="0.8" fill="none" stroke="currentColor" strokeWidth="1.2" fill="rgba(12,12,24,0.94)"/>
+                <rect x="3" y="0.5" width="6" height="6" rx="0.8" fill="rgba(12,12,24,0.94)" stroke="currentColor" strokeWidth="1.2"/>
               </svg>
             ) : (
               <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1" fill="none" stroke="currentColor" strokeWidth="1.3"/></svg>

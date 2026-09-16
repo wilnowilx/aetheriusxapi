@@ -23,23 +23,14 @@ function Nav() {
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
+  // When in OS, hide nav completely — OS has its own topbar
+  if (pastHero) return null
+
   return (
     <>
       <nav style={{ background: scrolled ? 'rgba(5,2,15,0.88)' : 'rgba(3,1,8,0.06)', backdropFilter: 'blur(12px)', borderBottom: scrolled ? '1px solid rgba(168,85,247,0.18)' : '1px solid rgba(168,85,247,0.05)', transition: 'background 0.4s ease, border-color 0.4s ease' }} className={scrolled ? 'scrolled' : ''}>
         <div className="nav-wrap">
-          <a
-            href="#hero"
-            className="brand"
-            aria-hidden={!pastHero}
-            style={{
-              opacity: pastHero ? 1 : 0,
-              transform: pastHero ? 'none' : 'translateY(-8px)',
-              transition: 'opacity 0.4s ease, transform 0.4s ease',
-              pointerEvents: pastHero ? 'auto' : 'none',
-            }}
-          >
-            AETHERIUS
-          </a>
+          <a href="#hero" className="brand">AETHERIUS</a>
           <div className="nav-links">
             <a href="#hero" style={{display:'inline-flex',alignItems:'center',gap:6}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
