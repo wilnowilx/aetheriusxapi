@@ -3,57 +3,58 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Stars, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
-// === TEXT BAND RINGS — Saturno: el texto orbita el wireframe, no flota en el vacío ===
-// Anillos delgados que abrazan la esfera (radio 2.2), como los anillos de Saturno.
-// Cada anillo es un cilindro DELGADO con canvas texture envuelto alrededor del wireframe.
+// === TEXT BAND RINGS — Dyson Sphere: energía DENTRO de la estructura ===
+// Los anillos viven DENTRO del wireframe (radio 2.2), como capas de energía
+// que fluyen desde el núcleo hacia afuera. Visibles a través de los huecos de la malla.
+// Arquitectura: Core(0.38) → Gas(1.2-1.5) → Bandas → Wireframe(2.2) → Halo(2.65)
 const TextBandRings = ({ liveData }) => {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Wireframe tiene radio 2.2. Los anillos deben orbitar JUSTO afuera.
-  // Anillo 1 (exterior): radio 2.5 — apenas fuera del wireframe
-  // Anillo 2 (medio): radio 2.35 — muy cerca del wireframe
-  // Anillo 3 (interior): radio 2.24 — casi pegado al wireframe
+  // Wireframe = 2.2. Las bandas van ADENTRO, de afuera hacia adentro:
+  // Anillo 1 (cercano al wireframe): radio 2.0 — visible a través de la malla
+  // Anillo 2 (medio): radio 1.7 — entre wireframe y gas
+  // Anillo 3 (cerca del core): radio 1.4 — capa más interna
   const ringsConfig = useMemo(() => {
     const d = liveData || {}
     return [
       {
-        radius: 2.5,
-        tilt: 0.12,
-        yOffset: 0.35,
-        speed: 0.018,
-        bandWidth: 0.14,
+        radius: 2.0,
+        tilt: 0.15,
+        yOffset: 0.4,
+        speed: 0.015,
+        bandWidth: 0.18,
         color: '#ffffff',
-        opacity: 0.92,
-        fontSize: 34,
+        opacity: 0.85,
+        fontSize: 30,
         text: '   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   ',
       },
       {
-        radius: 2.35,
-        tilt: -0.08,
+        radius: 1.7,
+        tilt: -0.1,
         yOffset: 0.0,
-        speed: -0.028,
-        bandWidth: 0.11,
+        speed: -0.025,
+        bandWidth: 0.14,
         color: '#d946ef',
-        opacity: 0.88,
-        fontSize: 26,
+        opacity: 0.8,
+        fontSize: 24,
         text: '   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   ',
       },
       {
-        radius: 2.24,
-        tilt: 0.04,
-        yOffset: -0.35,
-        speed: 0.038,
-        bandWidth: 0.08,
+        radius: 1.4,
+        tilt: 0.06,
+        yOffset: -0.4,
+        speed: 0.035,
+        bandWidth: 0.1,
         color: '#22d3ee',
-        opacity: 0.82,
+        opacity: 0.75,
         fontSize: 20,
         text: `   ${d.endpoints || '100+'} ENDPOINTS  ·  ${d.freeEndpoints || '40'} FREE  ·  ${d.latency || ''}   ${d.endpoints || '100+'} ENDPOINTS  ·  ${d.freeEndpoints || '40'} FREE  ·  ${d.latency || ''}   `,
       },
     ]
   }, [liveData])
 
-  // Canvas 2048×64 — textura delgada proporcional a los anillos delgados
+  // Canvas 2048×64 — texturas de las bandas internas
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
@@ -73,21 +74,21 @@ const TextBandRings = ({ liveData }) => {
       ctx.shadowColor = ring.color
       ctx.shadowBlur = 32
       ctx.fillStyle = ring.color
-      ctx.globalAlpha = 0.45
+      ctx.globalAlpha = 0.4
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       // Pass 2: Mid bloom
-      ctx.shadowBlur = 16
-      ctx.globalAlpha = 0.75
+      ctx.shadowBlur = 14
+      ctx.globalAlpha = 0.7
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       // Pass 3: Core solid
-      ctx.shadowBlur = 4
+      ctx.shadowBlur = 3
       ctx.globalAlpha = 1
       ctx.fillStyle = ring.color
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      // Pass 4: White center highlight
+      // Pass 4: White center for legibility through wireframe
       ctx.shadowBlur = 0
       ctx.fillStyle = '#ffffff'
-      ctx.globalAlpha = 0.6
+      ctx.globalAlpha = 0.55
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       ctx.globalAlpha = 1
       const tex = new THREE.CanvasTexture(canvas)
@@ -112,7 +113,7 @@ const TextBandRings = ({ liveData }) => {
           if (!paused) ringGroup.rotation.y += delta * ring.speed
           const frontMesh = ringGroup.children[0]
           if (frontMesh?.material) {
-            const breath = 0.9 + 0.1 * Math.sin(neonPulse.current * 0.7 + i * 1.2)
+            const breath = 0.88 + 0.12 * Math.sin(neonPulse.current * 0.6 + i * 1.5)
             frontMesh.material.opacity = (hoveredRing === i ? 1 : ring.opacity) * breath
           }
         }
@@ -124,7 +125,7 @@ const TextBandRings = ({ liveData }) => {
     <group ref={groupRef}>
       {ringsConfig.map((ring, ringIdx) => (
         <group key={ringIdx} position={[0, ring.yOffset, 0]} rotation={[ring.tilt, 0, 0]}>
-          {/* Cara frontal nítida */}
+          {/* Banda interna — visible desde fuera a través del wireframe */}
           <mesh
             onPointerOver={(e) => { e.stopPropagation(); setHoveredRing(ringIdx); document.body.style.cursor = 'pointer' }}
             onPointerOut={() => { setHoveredRing(null); document.body.style.cursor = 'auto' }}
@@ -139,16 +140,6 @@ const TextBandRings = ({ liveData }) => {
               depthWrite={false}
               blending={THREE.AdditiveBlending}
               toneMapped={false}
-            />
-          </mesh>
-          {/* Borde de brillo sutil */}
-          <mesh>
-            <torusGeometry args={[ring.radius, 0.003, 6, 128]} />
-            <meshBasicMaterial
-              color={ring.color}
-              transparent
-              opacity={hoveredRing === ringIdx ? ring.opacity * 0.3 : ring.opacity * 0.06}
-              depthWrite={false}
             />
           </mesh>
         </group>
