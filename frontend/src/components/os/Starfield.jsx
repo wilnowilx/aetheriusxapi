@@ -1,7 +1,8 @@
 import { useRef, useEffect, useCallback } from 'react';
 
 /* Cosmic starfield: 3D stars + dust + slow auto-drift + mouse parallax.
-   Listens on window for mouse (not just canvas) so it always works. */
+   Pauses rAF when not visible (IntersectionObserver).
+   Optimized: 180 stars, 30 dust particles. */
 export default function Starfield({ className }) {
   const canvasRef = useRef(null);
   const mouseRef = useRef({ x: 0, y: 0 });
@@ -9,10 +10,11 @@ export default function Starfield({ className }) {
   const starsRef = useRef([]);
   const dustRef = useRef([]);
   const frameRef = useRef(null);
+  const visibleRef = useRef(false);
 
   const init = useCallback((w, h) => {
     const stars = [];
-    for (let i = 0; i < 280; i++) {
+    for (let i = 0; i < 180; i++) {
         stars.push({
           x: (Math.random() - 0.5) * 2.4,
           y: (Math.random() - 0.5) * 2.4,
@@ -22,7 +24,6 @@ export default function Starfield({ className }) {
           twinkleSpeed: Math.random() * 0.04 + 0.012,
           twinkleOffset: Math.random() * Math.PI * 2,
           hue: Math.random() > 0.82 ? (Math.random() > 0.5 ? 280 : 190) : 0,
-          // Faster auto-drift for depth movement
           vx: (Math.random() - 0.5) * 0.00025,
           vy: (Math.random() - 0.5) * 0.00018,
         });
@@ -30,7 +31,7 @@ export default function Starfield({ className }) {
     starsRef.current = stars;
 
     const dust = [];
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 30; i++) {
       dust.push({
         x: (Math.random() - 0.5) * 2.4,
         y: (Math.random() - 0.5) * 2.4,
@@ -63,7 +64,6 @@ export default function Starfield({ className }) {
       init(w, h);
     };
 
-    // Listen on WINDOW for mouse — always works even if canvas is behind other elements
     const onMouse = (e) => {
       mouseRef.current.x = (e.clientX / window.innerWidth - 0.5) * 2;
       mouseRef.current.y = (e.clientY / window.innerHeight - 0.5) * 2;
@@ -71,10 +71,13 @@ export default function Starfield({ className }) {
 
     let time = 0;
     const draw = () => {
+      if (!visibleRef.current) {
+        frameRef.current = requestAnimationFrame(draw);
+        return; // skip rendering when offscreen
+      }
       time += 1;
       ctx.clearRect(0, 0, w, h);
 
-      // Smooth mouse interpolation (lerp) — faster for snappier response
       smoothMouse.current.x += (mouseRef.current.x - smoothMouse.current.x) * 0.06;
       smoothMouse.current.y += (mouseRef.current.y - smoothMouse.current.y) * 0.06;
 
@@ -85,10 +88,8 @@ export default function Starfield({ className }) {
 
       // === DUST ===
       for (const d of dustRef.current) {
-        // Auto-drift
         d.x += d.vx;
         d.y += d.vy;
-        // Wrap
         if (d.x > 1.4) d.x = -1.4;
         if (d.x < -1.4) d.x = 1.4;
         if (d.y > 1.4) d.y = -1.4;
@@ -110,10 +111,8 @@ export default function Starfield({ className }) {
 
       // === STARS ===
       for (const s of starsRef.current) {
-        // Auto-drift
         s.x += s.vx;
         s.y += s.vy;
-        // Wrap
         if (s.x > 1.4) s.x = -1.4;
         if (s.x < -1.4) s.x = 1.4;
         if (s.y > 1.4) s.y = -1.4;
@@ -138,7 +137,6 @@ export default function Starfield({ className }) {
         ctx.arc(sx, sy, size, 0, Math.PI * 2);
         ctx.fill();
 
-        // Glow for bright/close stars
         if (alpha > 0.45 && size > 0.8) {
           const glowR = size * (2.5 + depth);
           const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, glowR);
@@ -157,12 +155,20 @@ export default function Starfield({ className }) {
       frameRef.current = requestAnimationFrame(draw);
     };
 
+    // IntersectionObserver — pause rendering when offscreen
+    const observer = new IntersectionObserver(
+      ([entry]) => { visibleRef.current = entry.isIntersecting; },
+      { threshold: 0 }
+    );
+    observer.observe(canvas);
+
     resize();
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', onMouse);
     frameRef.current = requestAnimationFrame(draw);
 
     return () => {
+      observer.disconnect();
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouse);
       if (frameRef.current) cancelAnimationFrame(frameRef.current);

@@ -695,8 +695,8 @@ function BaseCore({ flowRef }) {
 // === COSMIC DUST FIELD + NEBULA CLOUDS — profundidad 3D real ===
 // Polvo fino disperso + nubes de nebulosa flotantes en 3D alrededor de la esfera Dyson.
 function CosmicDustField() {
-  const COUNT = 350 // Reduced — subtle space ambiance, not fireworks
-  const NEBULA_COUNT = 10
+  const COUNT = 200 // Optimized from 350 — still ambient, less GPU
+  const NEBULA_COUNT = 6
   const ref = useRef()
   const nebulaRef = useRef([])
   const elapsed = useRef(0)
@@ -847,7 +847,7 @@ function CosmicDustField() {
 // flowRef (ticker ≤500ms derivado de USDC/mercado): intensidad, velocidad,
 // tamaño y color (verde USDC vs azul→púrpura mercado). 36 pts para 60fps.
 function EnergyParticles({ liveData, onImpact, flowRef }) {
-  const PARTICLE_COUNT = 52
+  const PARTICLE_COUNT = 35 // Optimized from 52
   const elapsed = useRef(0)
   const pointsRef = useRef()
   const WIRE_RADIUS = 2.2
@@ -1047,7 +1047,7 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
 
 // === AGENT NODES — 60 endpoints (optimizado 100→60 para 60fps) ===
 function AgentNodes() {
-  const NODE_COUNT = 60
+  const NODE_COUNT = 45 // Optimized from 60
   const { positions, colors, sizes } = useMemo(() => {
     const pos = new Float32Array(NODE_COUNT * 3)
     const col = new Float32Array(NODE_COUNT * 3)
@@ -1216,7 +1216,7 @@ function DataStream() {
   })
 
   const { positions, colors, sizes } = useMemo(() => {
-    const count = 50
+    const count = 30 // Optimized from 50
     const pos = new Float32Array(count * 3)
     const col = new Float32Array(count * 3)
     const sz = new Float32Array(count)

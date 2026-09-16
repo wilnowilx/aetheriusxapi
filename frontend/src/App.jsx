@@ -51,8 +51,6 @@ function PlasmaBg() {
       <div className="plasma-blob" style={{ width: 640, height: 640, background: 'radial-gradient(circle, rgba(217,70,239,0.30) 0%, transparent 70%)', top: '28%', right: '-12%', animationDuration: '13s', animationDelay: '-5s' }} />
       <div className="plasma-blob" style={{ width: 580, height: 580, background: 'radial-gradient(circle, rgba(236,72,153,0.28) 0%, transparent 70%)', bottom: '-6%', left: '18%', animationDuration: '15s', animationDelay: '-10s' }} />
       <div className="plasma-blob" style={{ width: 520, height: 520, background: 'radial-gradient(circle, rgba(6,182,212,0.22) 0%, transparent 70%)', top: '58%', left: '52%', animationDuration: '12s', animationDelay: '-3s' }} />
-      <div className="plasma-blob" style={{ width: 460, height: 460, background: 'radial-gradient(circle, rgba(168,85,247,0.22) 0%, transparent 70%)', top: '8%', left: '42%', animationDuration: '17s', animationDelay: '-8s' }} />
-      <div className="plasma-blob" style={{ width: 500, height: 500, background: 'radial-gradient(circle, rgba(232,121,249,0.20) 0%, transparent 70%)', top: '45%', right: '5%', animationDuration: '14s', animationDelay: '-6s' }} />
       <div className="grain-overlay" />
       <style>{`
         @keyframes plasmaFloat {
@@ -761,8 +759,8 @@ function Heartbeat() {
       setTick(t => t + 1)
       frame = requestAnimationFrame(animate)
     }
-    // Only tick every 200ms for smooth but not janky
-    const tickTimer = setInterval(() => { if (running) setTick(t => t + 1) }, 200)
+    // Throttled to 600ms — reduces re-render load while keeping visual rhythm
+    const tickTimer = setInterval(() => { if (running) setTick(t => t + 1) }, 600)
 
     return () => { running = false; clearInterval(seedTimer); clearInterval(tickTimer); cancelAnimationFrame(frame) }
   }, [])
