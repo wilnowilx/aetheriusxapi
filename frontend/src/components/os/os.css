@@ -72,7 +72,7 @@
 .ae-topbar {
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: 38px;
+  height: 42px;
   background: rgba(3, 3, 8, 0.85);
   backdrop-filter: blur(24px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
@@ -81,7 +81,7 @@
   padding: 0 14px;
   gap: 14px;
   z-index: 9999;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text);
 }
 
@@ -96,7 +96,7 @@
 .ae-topbar-brand {
   display: flex; align-items: center; gap: 6px;
   font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-  font-size: 11px;
+  font-size: 12px;
   background: linear-gradient(135deg, #a855f7, #d946ef);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -105,7 +105,7 @@
 
 .ae-topbar-status {
   display: flex; align-items: center; gap: 6px;
-  font-size: 10px; color: #8a8a9a;
+  font-size: 11px; color: #8a8a9a;
 }
 
 .ae-topbar-right {
@@ -135,7 +135,7 @@
   position: fixed;
   top: 50%;
   left: 0;
-  width: 210px;
+  width: 220px;
   max-height: 70vh;
   transform: translateY(-50%) translateX(-100%);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -151,13 +151,34 @@
   box-shadow: 4px 0 40px rgba(0, 0, 0, 0.4);
 }
 
+/* Glow hint when sidebar is hidden — pulsing purple edge indicator */
+.ae-sidebar:not(.open)::before {
+  content: '';
+  position: fixed;
+  top: 50%;
+  left: 0;
+  width: 3px;
+  height: 60px;
+  transform: translateY(-50%);
+  background: linear-gradient(180deg, transparent, rgba(168,85,247,0.6), rgba(217,70,239,0.4), transparent);
+  border-radius: 0 2px 2px 0;
+  z-index: 9998;
+  pointer-events: none;
+  animation: sidebarGlow 3s ease-in-out infinite;
+}
+
+@keyframes sidebarGlow {
+  0%, 100% { opacity: 0.3; height: 50px; box-shadow: 0 0 8px rgba(168,85,247,0.2); }
+  50% { opacity: 0.8; height: 70px; box-shadow: 0 0 16px rgba(168,85,247,0.5), 0 0 30px rgba(217,70,239,0.3); }
+}
+
 .ae-sidebar.open {
   transform: translateY(-50%) translateX(0);
 }
 
 .ae-sidebar-title {
   padding: 0 14px 10px;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
@@ -168,12 +189,12 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 14px;
+  padding: 10px 14px;
   background: none;
   border: none;
   color: var(--text);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   text-align: left;
   width: 100%;
   transition: all 0.15s;
@@ -210,7 +231,7 @@
 }
 
 .ae-sidebar-desc {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--muted);
   letter-spacing: 0.02em;
 }
@@ -225,9 +246,10 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   box-shadow:
-    0 0 0 1px rgba(168, 85, 247, 0.06),
+    0 0 0 1px rgba(168, 85, 247, 0.08),
     0 8px 32px rgba(0, 0, 0, 0.5),
-    0 0 80px rgba(168, 85, 247, 0.03),
+    0 0 120px rgba(168, 85, 247, 0.06),
+    0 20px 60px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
   overflow: hidden;
   min-width: 300px;
@@ -238,9 +260,11 @@
 
 .ae-window:hover {
   box-shadow:
-    0 0 0 1px rgba(168, 85, 247, 0.1),
+    0 0 0 1px rgba(168, 85, 247, 0.15),
     0 12px 40px rgba(0, 0, 0, 0.6),
-    0 0 100px rgba(168, 85, 247, 0.05),
+    0 0 160px rgba(168, 85, 247, 0.1),
+    0 25px 80px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(217, 70, 239, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
@@ -248,8 +272,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 34px;
-  padding: 0 8px;
+  height: 38px;
+  padding: 0 10px;
   background: rgba(255, 255, 255, 0.02);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   cursor: grab;
@@ -268,7 +292,7 @@
 
 .ae-win-label {
   flex: 1;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text);
   white-space: nowrap;
@@ -303,7 +327,7 @@
   overflow-y: auto;
   padding: 0;
   color: var(--text);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .ae-win-body::-webkit-scrollbar { width: 4px; }
@@ -324,33 +348,36 @@
 /* === DOCK — floating pill === */
 .ae-dock {
   position: fixed;
-  bottom: 12px;
+  bottom: 14px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 2px;
-  padding: 5px 10px;
+  gap: 3px;
+  padding: 6px 14px;
   background: rgba(6, 6, 14, 0.88);
   backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 14px;
+  border-radius: 16px;
   z-index: 9997;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 60px rgba(168, 85, 247, 0.03);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.5), 
+    0 0 80px rgba(168, 85, 247, 0.06),
+    0 -2px 20px rgba(168, 85, 247, 0.04);
 }
 
 .ae-dock-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 5px 10px;
+  gap: 3px;
+  padding: 6px 12px;
   background: none;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--sec);
   cursor: pointer;
   transition: all 0.15s;
-  min-width: 50px;
+  min-width: 56px;
 }
 
 .ae-dock-item:hover {
@@ -376,8 +403,8 @@
 }
 .ae-dock-item.open::after { opacity: 1; }
 
-.ae-dock-icon { font-size: 18px; }
-.ae-dock-label { font-size: 8px; white-space: nowrap; letter-spacing: 0.04em; }
+.ae-dock-icon { font-size: 20px; }
+.ae-dock-label { font-size: 9px; white-space: nowrap; letter-spacing: 0.04em; }
 
 /* === METRICS WINDOW === */
 .ae-metrics {
@@ -423,7 +450,7 @@
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 8px;
-  padding: 10px 10px;
+  padding: 12px 12px;
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -436,7 +463,7 @@
 }
 
 .ae-metric-label {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -444,7 +471,7 @@
 }
 
 .ae-metric-value {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 600;
   font-family: 'JetBrains Mono', monospace;
   color: var(--text);
@@ -460,7 +487,7 @@
 
 .ae-section-title {
   display: block;
-  font-size: 9px;
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--muted);
@@ -532,8 +559,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 8px;
-  font-size: 11px;
+  padding: 6px 10px;
+  font-size: 12px;
   font-family: 'JetBrains Mono', monospace;
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.012);
@@ -545,9 +572,9 @@
 }
 
 .ae-activity-status {
-  padding: 1px 6px;
+  padding: 2px 8px;
   border-radius: 3px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
 }
 .ae-activity-status.ok { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
@@ -644,9 +671,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
+  padding: 6px 10px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
   transition: background 0.1s;
 }
 
@@ -661,7 +688,7 @@
 }
 
 .ae-exp-ep code {
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: var(--sec);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -698,7 +725,7 @@
 }
 
 .ae-exp-route {
-  font-size: 12px;
+  font-size: 13px;
   color: #d946ef;
 }
 
@@ -725,19 +752,19 @@
 }
 
 .ae-exp-param-name {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
 }
 
 .ae-required { color: #ef4444; }
 
 .ae-exp-param input {
-  padding: 5px 8px;
+  padding: 6px 10px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 5px;
   color: var(--text);
-  font-size: 12px;
+  font-size: 13px;
   font-family: 'JetBrains Mono', monospace;
   outline: none;
   min-width: 140px;
@@ -830,7 +857,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
 }
@@ -937,7 +964,7 @@
 
 .ae-catalog-card-route {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text);
   margin-bottom: 4px;
   word-break: break-all;

@@ -92,6 +92,33 @@ export default function Window({
       style={{ ...style, '--win-color': color || '#a855f7' }}
       onPointerDown={focus}
     >
+      {/* Floating glow — colored ambient light on bottom edges */}
+      <div style={{
+        position: 'absolute',
+        bottom: -8, left: '10%', right: '10%',
+        height: 30,
+        background: `radial-gradient(ellipse at 50% 100%, ${color || '#a855f7'}18 0%, transparent 70%)`,
+        filter: 'blur(12px)',
+        pointerEvents: 'none',
+        zIndex: -1,
+      }} />
+      {/* Side glow accents */}
+      <div style={{
+        position: 'absolute',
+        top: '20%', bottom: '20%', left: -4,
+        width: 3,
+        background: `linear-gradient(180deg, transparent, ${color || '#a855f7'}15, transparent)`,
+        pointerEvents: 'none',
+        zIndex: -1,
+      }} />
+      <div style={{
+        position: 'absolute',
+        top: '20%', bottom: '20%', right: -4,
+        width: 3,
+        background: `linear-gradient(180deg, transparent, ${color || '#a855f7'}15, transparent)`,
+        pointerEvents: 'none',
+        zIndex: -1,
+      }} />
       {/* Title bar */}
       <div
         className={`ae-wintitle ${dragging ? 'dragging' : ''}`}

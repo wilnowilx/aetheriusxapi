@@ -14,51 +14,51 @@ const TextBandRings = ({ liveData }) => {
   const ringsConfig = useMemo(() => {
     const d = liveData || {}
     return [
-      // ANILLO 1 EXTERIOR: "THE MARKETPLACE THAT LIVES" — banda blanca
+      // ANILLO 1 EXTERIOR: "THE MARKETPLACE THAT LIVES" — banda blanca GRANDE
       {
         radius: 3.3,
         tilt: 0.18,
         yOffset: 0.55,
         speed: 0.025,
-        bandWidth: 0.65,
+        bandWidth: 0.75,
         color: '#ffffff',
-        opacity: 0.9,
-        fontSize: 80,
+        opacity: 0.95,
+        fontSize: 120,
         text: '   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   ',
       },
-      // ANILLO 2 INTERMEDIO: subtítulo — banda magenta
+      // ANILLO 2 INTERMEDIO: subtítulo — banda magenta GRANDE
       {
         radius: 2.85,
         tilt: 0.32,
         yOffset: -0.15,
         speed: -0.035,
-        bandWidth: 0.56,
+        bandWidth: 0.65,
         color: '#d946ef',
-        opacity: 0.82,
-        fontSize: 48,
+        opacity: 0.9,
+        fontSize: 72,
         text: '   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   ',
       },
-      // ANILLO 3 INTERIOR: métricas vivas — banda cian
+      // ANILLO 3 INTERIOR: métricas vivas — banda cian GRANDE
       {
         radius: 2.45,
         tilt: 0.12,
         yOffset: -0.75,
         speed: 0.04,
-        bandWidth: 0.49,
+        bandWidth: 0.58,
         color: '#22d3ee',
-        opacity: 0.75,
-        fontSize: 32,
+        opacity: 0.85,
+        fontSize: 48,
         text: `   ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE  ${d.latency || ''}   ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE  ${d.latency || ''}   `,
       },
     ]
   }, [liveData])
 
-  // Canvas 4096×400 — neon premium: bloom real + nítido frontal, bandas GRANDES
+  // Canvas 4096×512 — neon premium: bloom real + nítido frontal, bandas GRANDES + opaque background
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
       canvas.width = 4096
-      canvas.height = 400
+      canvas.height = 512
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       const font = `900 ${ring.fontSize * 1.1}px 'JetBrains Mono', 'Fira Code', monospace`
@@ -103,7 +103,7 @@ const TextBandRings = ({ liveData }) => {
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
       canvas.width = 4096
-      canvas.height = 400
+      canvas.height = 512
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       ctx.font = `900 ${ring.fontSize * 1.1}px 'JetBrains Mono', 'Fira Code', monospace`
@@ -167,6 +167,17 @@ const TextBandRings = ({ liveData }) => {
               depthWrite={false}
               blending={THREE.AdditiveBlending}
               toneMapped={false}
+            />
+          </mesh>
+          {/* Dark backing band — opaque surface that blocks the sphere behind text */}
+          <mesh>
+            <cylinderGeometry args={[ring.radius - 0.01, ring.radius - 0.01, ring.bandWidth * 0.92, 128, 1, true]} />
+            <meshBasicMaterial
+              color="#030308"
+              transparent
+              opacity={0.85}
+              side={THREE.FrontSide}
+              depthWrite={true}
             />
           </mesh>
           {/* Reflejo trasero: espejo desenfocado tenue */}

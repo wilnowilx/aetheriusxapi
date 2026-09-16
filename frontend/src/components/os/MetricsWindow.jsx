@@ -41,8 +41,8 @@ function Loading() {
 function MiniStat({ label, value, color }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-      <span style={{ fontSize: 11, color: '#8a8a9a' }}>{label}</span>
-      <span style={{ fontSize: 12, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", color: color || 'var(--text)' }}>{value}</span>
+      <span style={{ fontSize: 12, color: '#8a8a9a' }}>{label}</span>
+      <span style={{ fontSize: 14, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", color: color || 'var(--text)' }}>{value}</span>
     </div>
   );
 }
@@ -92,21 +92,21 @@ function LiveMetrics({ data }) {
       {lat.length > 0 && (
         <div className="ae-latency-section">
           <span className="ae-section-title">Latency Pulse</span>
-          <WaveGraph data={lat} color="#a855f7" secondaryColor="#d946ef" height={70} />
+          <WaveGraph data={lat} color="#a855f7" secondaryColor="#d946ef" height={80} />
         </div>
       )}
       {/* Health breakdown */}
       <div className="ae-activity-section" style={{ marginTop: 14 }}>
         <span className="ae-section-title">Health</span>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 6, padding: '8px 10px' }}>
-            <div style={{ fontSize: 9, color: '#8a8a9a', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Success Rate</div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: '#22c55e', fontFamily: "'JetBrains Mono', monospace" }}>{okRate}%</div>
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 6, padding: '10px 12px' }}>
+            <div style={{ fontSize: 10, color: '#8a8a9a', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Success Rate</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: '#22c55e', fontFamily: "'JetBrains Mono', monospace" }}>{okRate}%</div>
             <ProgressBar value={ok} max={calls} color="#22c55e" />
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 6, padding: '8px 10px' }}>
-            <div style={{ fontSize: 9, color: '#8a8a9a', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Error Rate</div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: '#ef4444', fontFamily: "'JetBrains Mono', monospace" }}>{errRate}%</div>
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 6, padding: '10px 12px' }}>
+            <div style={{ fontSize: 10, color: '#8a8a9a', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Error Rate</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: '#ef4444', fontFamily: "'JetBrains Mono', monospace" }}>{errRate}%</div>
             <ProgressBar value={err} max={calls} color="#ef4444" />
           </div>
         </div>
@@ -154,14 +154,14 @@ function NetworkHealth({ data }) {
       <div className="ae-metrics-status"><span className="ae-dot-on" /> LIVE · Network Health</div>
       {/* Quality hero */}
       <div style={{ textAlign: 'center', padding: '12px 0 6px' }}>
-        <div style={{ fontSize: '2.2rem', fontWeight: 800, color: qColor, letterSpacing: '0.12em', fontFamily: "'JetBrains Mono', monospace", textShadow: `0 0 20px ${qColor}40` }}>{quality}</div>
-        <div style={{ fontSize: 9, color: '#8a8a9a', letterSpacing: '0.1em' }}>CONNECTION QUALITY</div>
+        <div style={{ fontSize: '2.6rem', fontWeight: 800, color: qColor, letterSpacing: '0.12em', fontFamily: "'JetBrains Mono', monospace", textShadow: `0 0 20px ${qColor}40` }}>{quality}</div>
+        <div style={{ fontSize: 10, color: '#8a8a9a', letterSpacing: '0.1em' }}>CONNECTION QUALITY</div>
       </div>
       {/* Waveform */}
       {lat.length > 0 && (
         <div className="ae-latency-section">
           <span className="ae-section-title">Live Waveform</span>
-          <WaveGraph data={lat} color="#22d3ee" secondaryColor="#0052FF" height={65} />
+          <WaveGraph data={lat} color="#22d3ee" secondaryColor="#0052FF" height={75} />
         </div>
       )}
       <div className="ae-metrics-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginTop: 10 }}>
@@ -207,14 +207,14 @@ function DefiIntel({ data }) {
       <div className="ae-metrics-status"><span className="ae-dot-on" /> LIVE · DeFi Intel</div>
       {/* Volume hero */}
       <div style={{ textAlign: 'center', padding: '12px 0 6px' }}>
-        <div style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b', fontFamily: "'JetBrains Mono', monospace", textShadow: '0 0 20px rgba(245,158,11,0.25)' }}>${vol.toFixed(4)}</div>
-        <div style={{ fontSize: 9, color: '#8a8a9a', letterSpacing: '0.1em' }}>TOTAL USDC VOLUME</div>
+        <div style={{ fontSize: '2.4rem', fontWeight: 800, color: '#f59e0b', fontFamily: "'JetBrains Mono', monospace", textShadow: '0 0 20px rgba(245,158,11,0.25)' }}>${vol.toFixed(4)}</div>
+        <div style={{ fontSize: 10, color: '#8a8a9a', letterSpacing: '0.1em' }}>TOTAL USDC VOLUME</div>
       </div>
       {/* Payment flow waveform */}
       {lat.length > 0 && (
         <div className="ae-latency-section">
           <span className="ae-section-title">Request Flow</span>
-          <WaveGraph data={lat} color="#f59e0b" secondaryColor="#d946ef" height={55} />
+          <WaveGraph data={lat} color="#f59e0b" secondaryColor="#d946ef" height={65} />
         </div>
       )}
       <div className="ae-metrics-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginTop: 10 }}>
@@ -279,14 +279,14 @@ function WalletIntel({ data }) {
       <div className="ae-metrics-status"><span className="ae-dot-on" /> LIVE · Wallet Intel</div>
       {/* Wallet count hero */}
       <div style={{ textAlign: 'center', padding: '12px 0 6px' }}>
-        <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#d946ef', fontFamily: "'JetBrains Mono', monospace", textShadow: '0 0 20px rgba(217,70,239,0.25)' }}>{wallets}</div>
-        <div style={{ fontSize: 9, color: '#8a8a9a', letterSpacing: '0.1em' }}>UNIQUE WALLETS</div>
+        <div style={{ fontSize: '3rem', fontWeight: 800, color: '#d946ef', fontFamily: "'JetBrains Mono', monospace", textShadow: '0 0 20px rgba(217,70,239,0.25)' }}>{wallets}</div>
+        <div style={{ fontSize: 10, color: '#8a8a9a', letterSpacing: '0.1em' }}>UNIQUE WALLETS</div>
       </div>
       {/* Traffic waveform */}
       {lat.length > 0 && (
         <div className="ae-latency-section">
           <span className="ae-section-title">Traffic Flow</span>
-          <WaveGraph data={lat} color="#d946ef" secondaryColor="#a855f7" height={55} />
+          <WaveGraph data={lat} color="#d946ef" secondaryColor="#a855f7" height={65} />
         </div>
       )}
       <div className="ae-metrics-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginTop: 10 }}>
@@ -302,10 +302,10 @@ function WalletIntel({ data }) {
           {topRoutes.map(([route, info], i) => (
             <div key={i} style={{ position: 'relative', overflow: 'hidden', borderRadius: 4, background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)' }}>
               <div style={{ position: 'absolute', inset: 0, width: `${(info.count / maxCount) * 100}%`, background: 'rgba(217,70,239,0.06)', transition: 'width 0.6s ease' }} />
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 8, padding: '5px 8px', fontSize: 11 }}>
-                <span style={{ color: '#d946ef', fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, minWidth: 24 }}>{info.count}×</span>
-                <span style={{ flex: 1, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#c8c8d8' }}>{route}</span>
-                <span style={{ fontSize: 9, color: '#8a8a9a' }}>{(info.totalMs / info.count).toFixed(0)} ms</span>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', fontSize: 12 }}>
+                <span style={{ color: '#d946ef', fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", fontSize: 11, minWidth: 24 }}>{info.count}×</span>
+                <span style={{ flex: 1, fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: '#c8c8d8' }}>{route}</span>
+                <span style={{ fontSize: 10, color: '#8a8a9a' }}>{(info.totalMs / info.count).toFixed(0)} ms</span>
               </div>
             </div>
           ))}
@@ -336,14 +336,14 @@ function QuantumBrain({ data }) {
       <div className="ae-metrics-status"><span className="ae-dot-on" /> LIVE · QuantumXBrain</div>
       {/* Overview */}
       <div style={{ textAlign: 'center', padding: '10px 0 4px' }}>
-        <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#d946ef', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.06em' }}>NEURAL PATTERN</div>
-        <div style={{ fontSize: 9, color: '#8a8a9a', letterSpacing: '0.08em' }}>{routes.length} ROUTES · {calls.toLocaleString()} REQUESTS</div>
+        <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#d946ef', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.06em' }}>NEURAL PATTERN</div>
+        <div style={{ fontSize: 10, color: '#8a8a9a', letterSpacing: '0.08em' }}>{routes.length} ROUTES · {calls.toLocaleString()} REQUESTS</div>
       </div>
       {/* Latency waveform */}
       {lat.length > 0 && (
         <div className="ae-latency-section">
           <span className="ae-section-title">Neural Signal</span>
-          <WaveGraph data={lat} color="#d946ef" secondaryColor="#ec4899" height={60} />
+          <WaveGraph data={lat} color="#d946ef" secondaryColor="#ec4899" height={70} />
         </div>
       )}
       {/* Status distribution with bars */}
@@ -353,9 +353,9 @@ function QuantumBrain({ data }) {
           {[{ label: '2xx', count: ok, color: '#22c55e' }, { label: '4xx', count: ch, color: '#f59e0b' }, { label: '5xx', count: err, color: '#ef4444' }].map(s => {
             const pct = calls > 0 ? (s.count / calls) * 100 : 0;
             return (
-              <div key={s.label} style={{ flex: 1, textAlign: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 6, padding: '8px 6px' }}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono', monospace" }}>{s.count.toLocaleString()}</div>
-                <div style={{ fontSize: 9, color: '#8a8a9a', marginBottom: 4 }}>{s.label}</div>
+              <div key={s.label} style={{ flex: 1, textAlign: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 6, padding: '10px 8px' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono', monospace" }}>{s.count.toLocaleString()}</div>
+                <div style={{ fontSize: 10, color: '#8a8a9a', marginBottom: 4 }}>{s.label}</div>
                 <ProgressBar value={s.count} max={calls} color={s.color} />
                 <div style={{ fontSize: 8, color: '#55556a', marginTop: 2 }}>{pct.toFixed(1)}%</div>
               </div>
@@ -368,9 +368,9 @@ function QuantumBrain({ data }) {
         <span className="ae-section-title">Latency Buckets</span>
         <div style={{ display: 'flex', gap: 6, padding: '6px 0' }}>
           {[{ label: '<200ms', count: fast, color: '#22d3ee' }, { label: '200-500ms', count: medium, color: '#f59e0b' }, { label: '500ms+', count: slow, color: '#ef4444' }].map(b => (
-            <div key={b.label} style={{ flex: 1, textAlign: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 6, padding: '8px 6px' }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: b.color, fontFamily: "'JetBrains Mono', monospace" }}>{b.count}</div>
-              <div style={{ fontSize: 9, color: '#8a8a9a', marginBottom: 4 }}>{b.label}</div>
+            <div key={b.label} style={{ flex: 1, textAlign: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 6, padding: '10px 8px' }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: b.color, fontFamily: "'JetBrains Mono', monospace" }}>{b.count}</div>
+              <div style={{ fontSize: 10, color: '#8a8a9a', marginBottom: 4 }}>{b.label}</div>
               <ProgressBar value={b.count} max={total} color={b.color} />
             </div>
           ))}

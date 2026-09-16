@@ -13,19 +13,19 @@ export default function Starfield({ className }) {
   const init = useCallback((w, h) => {
     const stars = [];
     for (let i = 0; i < 280; i++) {
-      stars.push({
-        x: (Math.random() - 0.5) * 2.4,
-        y: (Math.random() - 0.5) * 2.4,
-        z: Math.random(),
-        size: Math.random() * 2 + 0.3,
-        brightness: Math.random() * 0.6 + 0.4,
-        twinkleSpeed: Math.random() * 0.03 + 0.008,
-        twinkleOffset: Math.random() * Math.PI * 2,
-        hue: Math.random() > 0.82 ? (Math.random() > 0.5 ? 280 : 190) : 0,
-        // Auto-drift velocity
-        vx: (Math.random() - 0.5) * 0.00008,
-        vy: (Math.random() - 0.5) * 0.00006,
-      });
+        stars.push({
+          x: (Math.random() - 0.5) * 2.4,
+          y: (Math.random() - 0.5) * 2.4,
+          z: Math.random(),
+          size: Math.random() * 2.2 + 0.4,
+          brightness: Math.random() * 0.7 + 0.3,
+          twinkleSpeed: Math.random() * 0.04 + 0.012,
+          twinkleOffset: Math.random() * Math.PI * 2,
+          hue: Math.random() > 0.82 ? (Math.random() > 0.5 ? 280 : 190) : 0,
+          // Faster auto-drift for depth movement
+          vx: (Math.random() - 0.5) * 0.00025,
+          vy: (Math.random() - 0.5) * 0.00018,
+        });
     }
     starsRef.current = stars;
 
@@ -35,11 +35,11 @@ export default function Starfield({ className }) {
         x: (Math.random() - 0.5) * 2.4,
         y: (Math.random() - 0.5) * 2.4,
         z: Math.random() * 0.5 + 0.3,
-        size: Math.random() * 4 + 1.5,
-        opacity: Math.random() * 0.12 + 0.02,
+        size: Math.random() * 5 + 2,
+        opacity: Math.random() * 0.16 + 0.03,
         hue: Math.random() > 0.5 ? 280 : 190,
-        vx: (Math.random() - 0.5) * 0.00015,
-        vy: (Math.random() - 0.5) * 0.0001,
+        vx: (Math.random() - 0.5) * 0.0003,
+        vy: (Math.random() - 0.5) * 0.0002,
       });
     }
     dustRef.current = dust;
@@ -74,9 +74,9 @@ export default function Starfield({ className }) {
       time += 1;
       ctx.clearRect(0, 0, w, h);
 
-      // Smooth mouse interpolation (lerp)
-      smoothMouse.current.x += (mouseRef.current.x - smoothMouse.current.x) * 0.04;
-      smoothMouse.current.y += (mouseRef.current.y - smoothMouse.current.y) * 0.04;
+      // Smooth mouse interpolation (lerp) — faster for snappier response
+      smoothMouse.current.x += (mouseRef.current.x - smoothMouse.current.x) * 0.06;
+      smoothMouse.current.y += (mouseRef.current.y - smoothMouse.current.y) * 0.06;
 
       const mx = smoothMouse.current.x;
       const my = smoothMouse.current.y;
@@ -95,8 +95,8 @@ export default function Starfield({ className }) {
         if (d.y < -1.4) d.y = 1.4;
 
         const parallax = 1 - d.z * 0.4;
-        const dx = cx + (d.x + mx * parallax * 0.12) * cx;
-        const dy = cy + (d.y + my * parallax * 0.12) * cy;
+        const dx = cx + (d.x + mx * parallax * 0.18) * cx;
+        const dy = cy + (d.y + my * parallax * 0.18) * cy;
         const r = d.size * (1 + d.z * 0.5);
 
         const grad = ctx.createRadialGradient(dx, dy, 0, dx, dy, r);
@@ -121,8 +121,8 @@ export default function Starfield({ className }) {
 
         const depth = 0.25 + s.z * 0.75;
         const parallax = depth;
-        const sx = cx + (s.x + mx * parallax * 0.25) * cx * depth;
-        const sy = cy + (s.y + my * parallax * 0.25) * cy * depth;
+        const sx = cx + (s.x + mx * parallax * 0.35) * cx * depth;
+        const sy = cy + (s.y + my * parallax * 0.35) * cy * depth;
 
         const twinkle = 0.5 + 0.5 * Math.sin(time * s.twinkleSpeed + s.twinkleOffset);
         const alpha = s.brightness * (0.4 + twinkle * 0.6) * depth;
