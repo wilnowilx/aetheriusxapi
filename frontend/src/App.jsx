@@ -1416,7 +1416,7 @@ function App() {
       <SectionBoundary fallback={<div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#06060e', color: '#d946ef', fontFamily: 'JetBrains Mono, monospace', gap: 16 }}>
         <span style={{ fontSize: 32, opacity: 0.5 }}>◈</span>
         <span style={{ fontSize: '0.8rem' }}>AETHERIUS OS</span>
-        <span style={{ fontSize: '0.65rem', color: '#8a8a9a' }}>Initializing desktop environment…</span>
+        <span style={{ fontSize: '0.65rem', color: '#8a8a9a' }}>Initializing…</span>
       </div>}>
         <AetheriusOS />
       </SectionBoundary>
