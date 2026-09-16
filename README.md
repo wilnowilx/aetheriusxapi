@@ -497,6 +497,7 @@ The Research Layer is exposed via MCP (Model Context Protocol):
 | **Axioms** | `GET /v1/axioms` — 3 fundamental axioms (JSON-LD, M2M-native) |
 | **Ontology** | `GET /v1/ontology` — RDF ontology (9 classes, 11 properties) |
 | **ReputationAnchor** | `0x7d31b0683a46Ad793248A8590f77dF7d1c2b782A` — verified on Base Mainnet, `ORACLE_ROLE` granted |
+| **ArbitrageReceiver** | `0x120E93C8C88Ea46236Ab8f95DA838A737a05Cf0b` — verified on Base Mainnet, owner `0xB7B4...A37c`, AAVE V3 Pool `0xA238...d1c5` |
 | **Gravity Wells** | `GET /v1/gravity/well/status` + `GET /v1/gravity/singularity/status` — batch settlement + singularities |
 | **Execution Track** | MEV-Share listener + Flashbots bundles + M2M swarm (`scripts/m2m_swarm_test.py`) + 3D reputation stream |
 | **Manifesto** | `MANIFESTO_TECNICO_BATCH004.md` — Batch 004 evidence pack |
