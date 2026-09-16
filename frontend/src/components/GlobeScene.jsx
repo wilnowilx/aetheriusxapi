@@ -3,65 +3,65 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Stars, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
-// === TEXT BAND RINGS — Saturno: el texto ES el anillo, banda ancha ===
-// CylinderGeometry con canvas texture envuelto. El texto fluye SOBRE la banda,
-// no flota disperso. Cada anillo es una banda visible con el texto pintado.
+// === TEXT BAND RINGS — Saturno: el texto orbita el wireframe, no flota en el vacío ===
+// Anillos delgados que abrazan la esfera (radio 2.2), como los anillos de Saturno.
+// Cada anillo es un cilindro DELGADO con canvas texture envuelto alrededor del wireframe.
 const TextBandRings = ({ liveData }) => {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Horizontales subyacentes, ángulos distintos que NO convergen — como Saturno visto de frente
+  // Wireframe tiene radio 2.2. Los anillos deben orbitar JUSTO afuera.
+  // Anillo 1 (exterior): radio 2.5 — apenas fuera del wireframe
+  // Anillo 2 (medio): radio 2.35 — muy cerca del wireframe
+  // Anillo 3 (interior): radio 2.24 — casi pegado al wireframe
   const ringsConfig = useMemo(() => {
     const d = liveData || {}
     return [
-      // ANILLO 1 EXTERIOR: "THE MARKETPLACE THAT LIVES" — banda blanca GRANDE
       {
-        radius: 3.3,
-        tilt: 0.18,
-        yOffset: 0.55,
-        speed: 0.025,
-        bandWidth: 0.75,
+        radius: 2.5,
+        tilt: 0.12,
+        yOffset: 0.35,
+        speed: 0.018,
+        bandWidth: 0.14,
         color: '#ffffff',
-        opacity: 0.95,
-        fontSize: 120,
+        opacity: 0.92,
+        fontSize: 34,
         text: '   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   ',
       },
-      // ANILLO 2 INTERMEDIO: subtítulo — banda magenta GRANDE
       {
-        radius: 2.85,
-        tilt: 0.32,
-        yOffset: -0.15,
-        speed: -0.035,
-        bandWidth: 0.65,
+        radius: 2.35,
+        tilt: -0.08,
+        yOffset: 0.0,
+        speed: -0.028,
+        bandWidth: 0.11,
         color: '#d946ef',
-        opacity: 0.9,
-        fontSize: 72,
-        text: '   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   ',
+        opacity: 0.88,
+        fontSize: 26,
+        text: '   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   ',
       },
-      // ANILLO 3 INTERIOR: métricas vivas — banda cian GRANDE
       {
-        radius: 2.45,
-        tilt: 0.12,
-        yOffset: -0.75,
-        speed: 0.04,
-        bandWidth: 0.58,
+        radius: 2.24,
+        tilt: 0.04,
+        yOffset: -0.35,
+        speed: 0.038,
+        bandWidth: 0.08,
         color: '#22d3ee',
-        opacity: 0.85,
-        fontSize: 48,
-        text: `   ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE  ${d.latency || ''}   ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE  ${d.latency || ''}   `,
+        opacity: 0.82,
+        fontSize: 20,
+        text: `   ${d.endpoints || '100+'} ENDPOINTS  ·  ${d.freeEndpoints || '40'} FREE  ·  ${d.latency || ''}   ${d.endpoints || '100+'} ENDPOINTS  ·  ${d.freeEndpoints || '40'} FREE  ·  ${d.latency || ''}   `,
       },
     ]
   }, [liveData])
 
-  // Canvas 4096×512 — neon premium: bloom real + nítido frontal, bandas GRANDES + opaque background
+  // Canvas 2048×64 — textura delgada proporcional a los anillos delgados
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
-      canvas.width = 4096
-      canvas.height = 512
+      canvas.width = 2048
+      canvas.height = 64
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      const font = `900 ${ring.fontSize * 1.1}px 'JetBrains Mono', 'Fira Code', monospace`
+      const font = `900 ${ring.fontSize}px 'JetBrains Mono', 'Fira Code', monospace`
       ctx.font = font
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
@@ -69,58 +69,31 @@ const TextBandRings = ({ liveData }) => {
       const phraseW = ctx.measureText(phrase).width
       const repeats = Math.ceil((canvas.width + phraseW) / phraseW)
       const startOffset = (canvas.width - phraseW * repeats) / 2 + phraseW / 2
-      // Pass 1: Wide bloom (glow halo)
+      // Pass 1: Wide bloom
       ctx.shadowColor = ring.color
-      ctx.shadowBlur = 64
+      ctx.shadowBlur = 32
       ctx.fillStyle = ring.color
-      ctx.globalAlpha = 0.5
+      ctx.globalAlpha = 0.45
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       // Pass 2: Mid bloom
-      ctx.shadowBlur = 32
-      ctx.globalAlpha = 0.8
+      ctx.shadowBlur = 16
+      ctx.globalAlpha = 0.75
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       // Pass 3: Core solid
-      ctx.shadowBlur = 8
+      ctx.shadowBlur = 4
       ctx.globalAlpha = 1
-      ctx.fillStyle = ring.color === '#ffffff' ? '#ffffff' : ring.color
+      ctx.fillStyle = ring.color
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      // Pass 4: Bright center for legibility
+      // Pass 4: White center highlight
       ctx.shadowBlur = 0
       ctx.fillStyle = '#ffffff'
-      ctx.globalAlpha = 0.7
-      for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      ctx.globalAlpha = 1
-      const tex = new THREE.CanvasTexture(canvas)
-      tex.anisotropy = 8
-      tex.minFilter = THREE.LinearFilter
-      tex.magFilter = THREE.LinearFilter
-      return tex
-    })
-  , [ringsConfig])
-
-  // Textura espejo: mismo texto pero desenfocado y tenue — reflejo elegante
-  const mirrorTextures = useMemo(() =>
-    ringsConfig.map(ring => {
-      const canvas = document.createElement('canvas')
-      canvas.width = 4096
-      canvas.height = 512
-      const ctx = canvas.getContext('2d')
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.font = `900 ${ring.fontSize * 1.1}px 'JetBrains Mono', 'Fira Code', monospace`
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      const phrase = ring.text
-      const phraseW = ctx.measureText(phrase).width
-      const repeats = Math.ceil((canvas.width + phraseW) / phraseW)
-      const startOffset = (canvas.width - phraseW * repeats) / 2 + phraseW / 2
-      ctx.shadowColor = ring.color
-      ctx.shadowBlur = 28
-      ctx.fillStyle = ring.color
-      ctx.globalAlpha = 0.35
+      ctx.globalAlpha = 0.6
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       ctx.globalAlpha = 1
       const tex = new THREE.CanvasTexture(canvas)
       tex.anisotropy = 4
+      tex.minFilter = THREE.LinearFilter
+      tex.magFilter = THREE.LinearFilter
       return tex
     })
   , [ringsConfig])
@@ -137,10 +110,9 @@ const TextBandRings = ({ liveData }) => {
         if (ringGroup) {
           const paused = hoveredRing === i
           if (!paused) ringGroup.rotation.y += delta * ring.speed
-          // Neon respira: opacidad del material pulsa sutil
           const frontMesh = ringGroup.children[0]
           if (frontMesh?.material) {
-            const breath = 0.88 + 0.12 * Math.sin(neonPulse.current * 0.7 + i * 1.2)
+            const breath = 0.9 + 0.1 * Math.sin(neonPulse.current * 0.7 + i * 1.2)
             frontMesh.material.opacity = (hoveredRing === i ? 1 : ring.opacity) * breath
           }
         }
@@ -152,7 +124,7 @@ const TextBandRings = ({ liveData }) => {
     <group ref={groupRef}>
       {ringsConfig.map((ring, ringIdx) => (
         <group key={ringIdx} position={[0, ring.yOffset, 0]} rotation={[ring.tilt, 0, 0]}>
-          {/* Cara frontal nítida + reflejo trasero blur elegante */}
+          {/* Cara frontal nítida */}
           <mesh
             onPointerOver={(e) => { e.stopPropagation(); setHoveredRing(ringIdx); document.body.style.cursor = 'pointer' }}
             onPointerOut={() => { setHoveredRing(null); document.body.style.cursor = 'auto' }}
@@ -163,32 +135,19 @@ const TextBandRings = ({ liveData }) => {
               map={ringTextures[ringIdx]}
               transparent
               opacity={ring.opacity}
-              side={THREE.FrontSide}
+              side={THREE.DoubleSide}
               depthWrite={false}
               blending={THREE.AdditiveBlending}
               toneMapped={false}
             />
           </mesh>
-          {/* Reflejo trasero: espejo desenfocado tenue */}
+          {/* Borde de brillo sutil */}
           <mesh>
-            <cylinderGeometry args={[ring.radius, ring.radius, ring.bandWidth, 128, 1, true]} />
-            <meshBasicMaterial
-              map={mirrorTextures[ringIdx]}
-              transparent
-              opacity={0.22}
-              side={THREE.BackSide}
-              depthWrite={false}
-              blending={THREE.AdditiveBlending}
-              toneMapped={false}
-            />
-          </mesh>
-          {/* Borde de brillo sutil en los bordes de la banda — ultra tenue */}
-          <mesh>
-            <torusGeometry args={[ring.radius, ring.bandWidth * 0.03, 6, 128]} />
+            <torusGeometry args={[ring.radius, 0.003, 6, 128]} />
             <meshBasicMaterial
               color={ring.color}
               transparent
-              opacity={hoveredRing === ringIdx ? ring.opacity * 0.18 : ring.opacity * 0.04}
+              opacity={hoveredRing === ringIdx ? ring.opacity * 0.3 : ring.opacity * 0.06}
               depthWrite={false}
             />
           </mesh>
