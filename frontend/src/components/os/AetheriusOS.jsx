@@ -29,10 +29,23 @@ const DEFAULT_POS = {
 };
 
 export default function AetheriusOS() {
-  const [windows, setWindows] = useState([]); // [{id, appId, isMin, isMax, pos}]
+  const [windows, setWindows] = useState(() => {
+    // Auto-open Live Metrics on first mount so the OS isn't empty
+    return [{
+      id: 1, appId: 'metrics', isMin: false, isMax: false,
+      pos: { x: 200, y: 80 },
+    }];
+  });
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeWindow, setActiveWindow] = useState(null);
+  const [activeWindow, setActiveWindow] = useState('metrics');
   const sidebarTimer = useRef(null);
+
+  /* Flash sidebar open briefly on mount so user sees where apps are */
+  useEffect(() => {
+    setSidebarOpen(true);
+    const t = setTimeout(() => setSidebarOpen(false), 2500);
+    return () => clearTimeout(t);
+  }, []);
 
   /* Open a window — or bring to front if already open */
   const openWindow = useCallback((appId) => {

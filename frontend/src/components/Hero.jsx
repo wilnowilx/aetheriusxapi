@@ -713,31 +713,13 @@ return (
           }}>PROTOCOL</span>
         </div>
 
-        {/* Content */}
+        {/* Content — text lives in orbital bands */}
         <div className="hero-fade" style={{
           position: 'relative', zIndex: 10,
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', textAlign: 'center',
-          padding: '0 24px', gap: 12,
+          padding: '0 24px', gap: 0,
         }}>
-          <h1 style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-            fontWeight: 800,
-            color: '#f0f0f5',
-            letterSpacing: '0.08em',
-            textShadow: '0 0 40px rgba(168,85,247,0.3), 0 0 80px rgba(168,85,247,0.15)',
-            margin: 0,
-          }}>AETHERIUS</h1>
-          <p style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: 'clamp(0.65rem, 1.2vw, 0.82rem)',
-            color: '#8a8a9a',
-            letterSpacing: '0.15em',
-            maxWidth: 480,
-            lineHeight: 1.7,
-            margin: 0,
-          }}>100+ live APIs · AI agents pay per request in USDC on Base · No accounts. No subscriptions. Just code.</p>
         </div>
 
         {/* Scroll cue */}

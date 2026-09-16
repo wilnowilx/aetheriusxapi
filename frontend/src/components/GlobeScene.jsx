@@ -14,37 +14,37 @@ const TextBandRings = ({ liveData }) => {
   const ringsConfig = useMemo(() => {
     const d = liveData || {}
     return [
-      // ANILLO 1 EXTERIOR: "THE MARKETPLACE THAT LIVES" — banda blanca GRANDE
+      // ANILLO 1 EXTERIOR: "THE MARKETPLACE THAT LIVES" — banda blanca
       {
-        radius: 4.75,
+        radius: 3.3,
         tilt: 0.18,
         yOffset: 0.55,
         speed: 0.025,
-        bandWidth: 0.95,
+        bandWidth: 0.65,
         color: '#ffffff',
         opacity: 0.9,
         fontSize: 72,
         text: '   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   ',
       },
-      // ANILLO 2 INTERMEDIO: subtítulo — banda magenta GRANDE
+      // ANILLO 2 INTERMEDIO: subtítulo — banda magenta
       {
-        radius: 3.95,
+        radius: 2.85,
         tilt: 0.32,
         yOffset: -0.15,
         speed: -0.035,
-        bandWidth: 0.78,
+        bandWidth: 0.56,
         color: '#d946ef',
         opacity: 0.82,
         fontSize: 56,
         text: '   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   ',
       },
-      // ANILLO 3 INTERIOR: métricas vivas — banda cian GRANDE
+      // ANILLO 3 INTERIOR: métricas vivas — banda cian
       {
-        radius: 3.2,
+        radius: 2.45,
         tilt: 0.12,
         yOffset: -0.75,
         speed: 0.04,
-        bandWidth: 0.65,
+        bandWidth: 0.49,
         color: '#22d3ee',
         opacity: 0.75,
         fontSize: 44,
@@ -348,15 +348,13 @@ function VisibleWireframe() {
           }
 
           float ambientSparkle(vec3 pos, float t) {
+            // Dyson megastructure: no sparkles, only faint structural grid-pulse
             float s = 0.0;
             float angle = atan(pos.z, pos.x);
             float lat = asin(pos.y / 2.2);
-            // Subtle grid-node pulse — like distant reactor nodes on a Dyson megastructure
-            s += pow(sin(angle * 12.0 + t * 1.5) * 0.5 + 0.5, 8.0) * 0.005;
-            s += pow(sin(lat * 8.0 - t * 0.8) * 0.5 + 0.5, 10.0) * 0.003;
-            // Sparse hash spark — very faint, rare
-            float hash = fract(sin(dot(floor(pos * 20.0), vec3(12.9898,78.233,45.164))) * 43758.5453);
-            s += step(0.985, hash) * 0.012 * (0.5 + 0.5 * sin(t * 3.0 + hash * 20.0));
+            // Barely perceptible grid-node breathing — like distant reactor nodes
+            s += pow(sin(angle * 12.0 + t * 1.5) * 0.5 + 0.5, 8.0) * 0.001;
+            s += pow(sin(lat * 8.0 - t * 0.8) * 0.5 + 0.5, 10.0) * 0.0005;
             return s;
           }
 
@@ -373,9 +371,9 @@ function VisibleWireframe() {
 
             float polar = polarGlow(vPos);
             col += polar * vec3(0.1, 0.05, 0.3);
-            col += vec3(0.3, 0.6, 0.8) * sparkle * 0.04;
+            col += vec3(0.3, 0.6, 0.8) * sparkle * 0.01;
 
-            float alpha = (0.10 + polar * 0.05 + cyanPulse * 0.04) * pulse * fade + sparkle * 0.003;
+            float alpha = (0.10 + polar * 0.05 + cyanPulse * 0.04) * pulse * fade + sparkle * 0.0005;
             gl_FragColor = vec4(col, alpha);
           }
         `}
