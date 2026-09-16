@@ -8,24 +8,24 @@ import './os.css';
 
 /* Window definitions — each app available in the sidebar */
 const APPS = [
-  { id: 'catalog',   label: 'API Catalog',    icon: '⟐', color: '#a855f7', component: 'catalog' },
-  { id: 'explorer',  label: 'Explorer',        icon: '⊛', color: '#ec4899', component: 'explorer' },
-  { id: 'metrics',   label: 'Live Metrics',    icon: '◉', color: '#00f0ff', component: 'metrics' },
-  { id: 'network',   label: 'Network Health',  icon: '⊘', color: '#0052FF', component: 'metrics', sub: 'network' },
-  { id: 'defi',      label: 'DeFi Intel',      icon: '⟁', color: '#f59e0b', component: 'metrics', sub: 'defi' },
-  { id: 'wallet',    label: 'Wallet Intel',    icon: '◈', color: '#d946ef', component: 'metrics', sub: 'wallet' },
-  { id: 'brain',     label: 'QuantumXBrain',   icon: '⟐', color: '#d946ef', component: 'metrics', sub: 'brain' },
+  { id: 'catalog',   label: 'API Catalog',    icon: '⬡', color: '#a855f7', component: 'catalog' },
+  { id: 'explorer',  label: 'Explorer',        icon: '⊕', color: '#ec4899', component: 'explorer' },
+  { id: 'metrics',   label: 'Live Metrics',    icon: '◎', color: '#00f0ff', component: 'metrics' },
+  { id: 'network',   label: 'Network Health',  icon: '⏣', color: '#0052FF', component: 'metrics', sub: 'network' },
+  { id: 'defi',      label: 'DeFi Intel',      icon: '◆', color: '#f59e0b', component: 'metrics', sub: 'defi' },
+  { id: 'wallet',    label: 'Wallet Intel',    icon: '◇', color: '#d946ef', component: 'metrics', sub: 'wallet' },
+  { id: 'brain',     label: 'QuantumXBrain',   icon: '∿', color: '#d946ef', component: 'metrics', sub: 'brain' },
 ];
 
 /* Default positions for each window when first opened */
 const DEFAULT_POS = {
-  catalog:  { x: 60,  y: 40,  w: 820, h: 520 },
-  explorer: { x: 140, y: 60,  w: 880, h: 540 },
-  metrics:  { x: 200, y: 80,  w: 700, h: 480 },
-  network:  { x: 180, y: 100, w: 640, h: 440 },
-  defi:     { x: 220, y: 90,  w: 700, h: 480 },
-  wallet:   { x: 260, y: 70,  w: 640, h: 440 },
-  brain:    { x: 160, y: 50,  w: 640, h: 440 },
+  catalog:  { x: 230, y: 50,  w: 820, h: 520 },
+  explorer: { x: 250, y: 60,  w: 880, h: 540 },
+  metrics:  { x: 240, y: 55,  w: 700, h: 480 },
+  network:  { x: 235, y: 70,  w: 640, h: 440 },
+  defi:     { x: 245, y: 65,  w: 700, h: 480 },
+  wallet:   { x: 260, y: 55,  w: 640, h: 440 },
+  brain:    { x: 230, y: 50,  w: 640, h: 440 },
 };
 
 export default function AetheriusOS() {
@@ -42,13 +42,18 @@ export default function AetheriusOS() {
   const [activeWindow, setActiveWindow] = useState('metrics');
   const sidebarTimer = useRef(null);
 
-  /* IntersectionObserver: only show fixed elements when OS is in viewport */
+  /* IntersectionObserver: only show fixed elements when OS is mostly in viewport */
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold: 0.1 }
+      ([entry]) => {
+        // Only show when OS is 40%+ visible AND its top half is in viewport
+        const rect = entry.boundingClientRect;
+        const inView = entry.isIntersecting && entry.intersectionRatio > 0.35 && rect.top < window.innerHeight * 0.6;
+        setIsVisible(inView);
+      },
+      { threshold: [0, 0.1, 0.2, 0.35, 0.5, 0.75, 1] }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -129,7 +134,7 @@ export default function AetheriusOS() {
         return <ExplorerWindow />;
       case 'metrics':
       default:
-        return <MetricsWindow />;
+        return <MetricsWindow sub={app.sub} />;
     }
   }
 
@@ -192,7 +197,7 @@ export default function AetheriusOS() {
                 key={app.id}
                 className="ae-sidebar-item"
                 style={{ '--app-color': app.color }}
-                onClick={() => { openWindow(app.id); setSidebarOpen(false); }}
+                onClick={() => { openWindow(app.id); }}
               >
                 <span className="ae-sidebar-icon">{app.icon}</span>
                 <span className="ae-sidebar-label">{app.label}</span>

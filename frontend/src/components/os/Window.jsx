@@ -104,8 +104,15 @@ export default function Window({
           <button className="ae-win-btn min" onPointerDown={(e) => { e.stopPropagation(); onMinimize?.(); }} title="Minimize">
             <svg width="10" height="10" viewBox="0 0 10 10"><line x1="1" y1="5" x2="9" y2="5" stroke="currentColor" strokeWidth="1.4"/></svg>
           </button>
-          <button className={`ae-win-btn max ${isMaximized ? 'active' : ''}`} onPointerDown={(e) => { e.stopPropagation(); toggleMax(); }} title="Maximize">
-            <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1" fill="none" stroke="currentColor" strokeWidth="1.3"/></svg>
+          <button className={`ae-win-btn max ${isMaximized ? 'active' : ''}`} onPointerDown={(e) => { e.stopPropagation(); toggleMax(); }} title={isMaximized ? "Restore" : "Maximize"}>
+            {isMaximized ? (
+              <svg width="10" height="10" viewBox="0 0 10 10">
+                <rect x="0.5" y="2.5" width="6" height="6" rx="0.8" fill="none" stroke="currentColor" strokeWidth="1.2"/>
+                <rect x="3" y="0.5" width="6" height="6" rx="0.8" fill="none" stroke="currentColor" strokeWidth="1.2" fill="rgba(12,12,24,0.94)"/>
+              </svg>
+            ) : (
+              <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1" fill="none" stroke="currentColor" strokeWidth="1.3"/></svg>
+            )}
           </button>
           <button className="ae-win-btn close" onPointerDown={(e) => { e.stopPropagation(); onClose?.(); }} title="Close">
             <svg width="10" height="10" viewBox="0 0 10 10"><line x1="1.5" y1="1.5" x2="8.5" y2="8.5" stroke="currentColor" strokeWidth="1.3"/><line x1="8.5" y1="1.5" x2="1.5" y2="8.5" stroke="currentColor" strokeWidth="1.3"/></svg>

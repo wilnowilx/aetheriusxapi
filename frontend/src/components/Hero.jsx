@@ -92,8 +92,8 @@ function FluidLoader({ onComplete }) {
           height: bigbangProgress * 200 + 'vmax',
           transform: 'translate(-50%, -50%)',
           borderRadius: '50%',
-          border: `1px solid rgba(168,85,247,${(1 - bigbangProgress) * 0.3})`,
-          boxShadow: `0 0 ${bigbangProgress * 30}px rgba(168,85,247,${(1 - bigbangProgress) * 0.15}), inset 0 0 ${bigbangProgress * 15}px rgba(34,211,238,${(1 - bigbangProgress) * 0.08})`,
+          border: `1px solid rgba(168,85,247,${(1 - bigbangProgress) * 0.15})`,
+          boxShadow: `0 0 ${bigbangProgress * 15}px rgba(168,85,247,${(1 - bigbangProgress) * 0.06}), inset 0 0 ${bigbangProgress * 8}px rgba(34,211,238,${(1 - bigbangProgress) * 0.03})`,
         }} />
       )}
       {phase === 'bigbang' && (
@@ -655,7 +655,7 @@ return (
         }}>
           <div style={{
             position: 'absolute', width: '100%', height: '100%',
-            background: 'radial-gradient(circle at 50% 48%, rgba(168,85,247,0.06) 0%, rgba(217,70,239,0.04) 20%, rgba(34,211,238,0.02) 40%, transparent 60%)',
+            background: 'radial-gradient(circle at 50% 48%, rgba(168,85,247,0.03) 0%, rgba(217,70,239,0.02) 20%, rgba(34,211,238,0.01) 40%, transparent 60%)',
             filter: 'blur(60px)',
             animation: 'holoPulse 8s ease-in-out infinite alternate',
           }} />

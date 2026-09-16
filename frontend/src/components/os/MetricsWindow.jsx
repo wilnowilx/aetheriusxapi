@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiFetch, fmtUptime } from './api';
 
 /* Live Metrics — real server telemetry, auto-refreshes every 10s */
-export default function MetricsWindow() {
+export default function MetricsWindow({ sub }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
@@ -45,11 +45,20 @@ export default function MetricsWindow() {
 
   const mx = Math.max(...latencySamples, 1);
 
+  /* Different focus per sub-type */
+  const titles = {
+    network: { label: 'Network Health', icon: '⌬', desc: 'Latency, uptime, error rates' },
+    defi:    { label: 'DeFi Intel',     icon: '⟁', desc: 'Volume, challenges, wallet flow' },
+    wallet:  { label: 'Wallet Intel',   icon: '◈', desc: 'Wallets seen, recent calls' },
+    brain:   { label: 'QuantumXBrain',  icon: '⊛', desc: 'API patterns, agent behavior' },
+  };
+  const meta = titles[sub] || { label: 'Live Metrics', icon: '◉', desc: 'Full server telemetry' };
+
   return (
     <div className="ae-metrics">
       {/* Status row */}
       <div className="ae-metrics-status">
-        <span className="ae-dot-on" /> LIVE · VM Connected
+        <span className="ae-dot-on" /> LIVE · {meta.desc}
       </div>
 
       {/* Grid of metric cards */}
