@@ -23,7 +23,7 @@ const TextBandRings = ({ liveData }) => {
         bandWidth: 0.65,
         color: '#ffffff',
         opacity: 0.9,
-        fontSize: 72,
+        fontSize: 80,
         text: '   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   ',
       },
       // ANILLO 2 INTERMEDIO: subtítulo — banda magenta
@@ -35,7 +35,7 @@ const TextBandRings = ({ liveData }) => {
         bandWidth: 0.56,
         color: '#d946ef',
         opacity: 0.82,
-        fontSize: 56,
+        fontSize: 48,
         text: '   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   ',
       },
       // ANILLO 3 INTERIOR: métricas vivas — banda cian
@@ -47,7 +47,7 @@ const TextBandRings = ({ liveData }) => {
         bandWidth: 0.49,
         color: '#22d3ee',
         opacity: 0.75,
-        fontSize: 44,
+        fontSize: 32,
         text: `   ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE  ${d.latency || ''}   ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE  ${d.latency || ''}   `,
       },
     ]

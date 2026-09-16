@@ -29,6 +29,8 @@ const DEFAULT_POS = {
 };
 
 export default function AetheriusOS() {
+  const sectionRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
   const [windows, setWindows] = useState(() => {
     // Auto-open Live Metrics on first mount so the OS isn't empty
     return [{
@@ -40,12 +42,26 @@ export default function AetheriusOS() {
   const [activeWindow, setActiveWindow] = useState('metrics');
   const sidebarTimer = useRef(null);
 
-  /* Flash sidebar open briefly on mount so user sees where apps are */
+  /* IntersectionObserver: only show fixed elements when OS is in viewport */
   useEffect(() => {
-    setSidebarOpen(true);
-    const t = setTimeout(() => setSidebarOpen(false), 2500);
-    return () => clearTimeout(t);
+    const el = sectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
+
+  /* Show sidebar when OS first becomes visible, keep it until user closes */
+  useEffect(() => {
+    if (isVisible) {
+      setSidebarOpen(true);
+    } else {
+      setSidebarOpen(false);
+    }
+  }, [isVisible]);
 
   /* Open a window — or bring to front if already open */
   const openWindow = useCallback((appId) => {
@@ -130,7 +146,7 @@ export default function AetheriusOS() {
   const minimizedWindows = windows.filter(w => w.isMin);
 
   return (
-    <section className="ae-os" id="ae-os">
+    <section className="ae-os" id="ae-os" ref={sectionRef}>
       {/* Plasma background blobs */}
       <div className="ae-os-plasma">
         <div className="ae-plasma-blob b1" />
@@ -140,100 +156,98 @@ export default function AetheriusOS() {
 
       {/* Desktop surface */}
       <div className="ae-desktop">
-        {/* Top bar */}
-        <div className="ae-topbar">
-          <button className="ae-topbar-menu" onClick={toggleSidebar} title="Toggle menu">
-            <svg width="18" height="14" viewBox="0 0 18 14">
-              <line x1="0" y1="1" x2="18" y2="1" stroke="currentColor" strokeWidth="1.6"/>
-              <line x1="0" y1="7" x2="14" y2="7" stroke="currentColor" strokeWidth="1.6"/>
-              <line x1="0" y1="13" x2="18" y2="13" stroke="currentColor" strokeWidth="1.6"/>
-            </svg>
-          </button>
-          <div className="ae-topbar-brand">
-            <svg width="16" height="16" viewBox="0 0 14 14" className="ae-topbar-logo">
-              <polygon points="7,1 13,13 1,13" fill="none" stroke="#a855f7" strokeWidth="1.4"/>
-              <circle cx="7" cy="9.2" r="1.5" fill="#d946ef"/>
-            </svg>
-            <span>AETHERIUS</span>
-          </div>
-          <div className="ae-topbar-status">
-            <span className="ae-dot-on" /> OS Active
-          </div>
-          <div className="ae-topbar-right">
-            <span className="ae-topbar-label">AETHERIUS OS v1.0</span>
-          </div>
-        </div>
-
-        {/* Sidebar — slide-in apps panel */}
-        <div
-          className={`ae-sidebar ${sidebarOpen ? 'open' : ''}`}
-          onMouseLeave={hideSidebar}
-        >
-          <div className="ae-sidebar-title">Applications</div>
-          {APPS.map(app => (
-            <button
-              key={app.id}
-              className="ae-sidebar-item"
-              style={{ '--app-color': app.color }}
-              onClick={() => { openWindow(app.id); setSidebarOpen(false); }}
-            >
-              <span className="ae-sidebar-icon">{app.icon}</span>
-              <span className="ae-sidebar-label">{app.label}</span>
+        {isVisible && (<>
+          {/* Top bar */}
+          <div className="ae-topbar">
+            <button className="ae-topbar-menu" onClick={toggleSidebar} title="Toggle menu">
+              <svg width="18" height="14" viewBox="0 0 18 14">
+                <line x1="0" y1="1" x2="18" y2="1" stroke="currentColor" strokeWidth="1.6"/>
+                <line x1="0" y1="7" x2="14" y2="7" stroke="currentColor" strokeWidth="1.6"/>
+                <line x1="0" y1="13" x2="18" y2="13" stroke="currentColor" strokeWidth="1.6"/>
+              </svg>
             </button>
-          ))}
-          <div className="ae-sidebar-divider" />
-          <div className="ae-sidebar-hint">
-            Hover left edge to open
+            <div className="ae-topbar-brand">
+              <svg width="16" height="16" viewBox="0 0 14 14" className="ae-topbar-logo">
+                <polygon points="7,1 13,13 1,13" fill="none" stroke="#a855f7" strokeWidth="1.4"/>
+                <circle cx="7" cy="9.2" r="1.5" fill="#d946ef"/>
+              </svg>
+              <span>AETHERIUS</span>
+            </div>
+            <div className="ae-topbar-status">
+              <span className="ae-dot-on" /> OS Active
+            </div>
+            <div className="ae-topbar-right">
+              <span className="ae-topbar-label">AETHERIUS OS v1.0</span>
+            </div>
           </div>
-        </div>
 
-        {/* Windows */}
-        {openWindows.map(win => {
-          const app = APPS.find(a => a.id === win.appId);
-          const def = DEFAULT_POS[win.appId] || { x: 200, y: 100, w: 700, h: 480 };
-          return (
-            <Window
-              key={win.id}
-              id={win.appId}
-              title={getLabel(win.appId)}
-              icon={getIcon(win.appId)}
-              x={win.pos.x}
-              y={win.pos.y}
-              width={def.w}
-              height={def.h}
-              isMinimized={win.isMin}
-              isMaximized={win.isMax}
-              onClose={() => closeWindow(win.appId)}
-              onMinimize={() => minimizeWindow(win.appId)}
-              onMaximize={() => maximizeWindow(win.appId)}
-            >
-              {renderContent(app)}
-            </Window>
-          );
-        })}
-      </div>
-
-      {/* Dock */}
-      {(openWindows.length > 0 || minimizedWindows.length > 0) && (
-        <div className="ae-dock">
-          {APPS.map(app => {
-            const win = windows.find(w => w.appId === app.id);
-            if (!win) return null;
-            return (
+          {/* Sidebar — slide-in apps panel */}
+          <div
+            className={`ae-sidebar ${sidebarOpen ? 'open' : ''}`}
+            onMouseLeave={hideSidebar}
+          >
+            <div className="ae-sidebar-title">Applications</div>
+            {APPS.map(app => (
               <button
                 key={app.id}
-                className={`ae-dock-item ${win.isMin ? 'minimized' : 'open'} ${activeWindow === app.id ? 'active' : ''}`}
-                style={{ '--dock-color': app.color }}
-                onClick={() => win.isMin ? openWindow(app.id) : setActiveWindow(app.id)}
-                title={app.label}
+                className="ae-sidebar-item"
+                style={{ '--app-color': app.color }}
+                onClick={() => { openWindow(app.id); setSidebarOpen(false); }}
               >
-                <span className="ae-dock-icon">{app.icon}</span>
-                <span className="ae-dock-label">{app.label}</span>
+                <span className="ae-sidebar-icon">{app.icon}</span>
+                <span className="ae-sidebar-label">{app.label}</span>
               </button>
+            ))}
+          </div>
+
+          {/* Windows */}
+          {openWindows.map(win => {
+            const app = APPS.find(a => a.id === win.appId);
+            const def = DEFAULT_POS[win.appId] || { x: 200, y: 100, w: 700, h: 480 };
+            return (
+              <Window
+                key={win.id}
+                id={win.appId}
+                title={getLabel(win.appId)}
+                icon={getIcon(win.appId)}
+                x={win.pos.x}
+                y={win.pos.y}
+                width={def.w}
+                height={def.h}
+                isMinimized={win.isMin}
+                isMaximized={win.isMax}
+                onClose={() => closeWindow(win.appId)}
+                onMinimize={() => minimizeWindow(win.appId)}
+                onMaximize={() => maximizeWindow(win.appId)}
+              >
+                {renderContent(app)}
+              </Window>
             );
           })}
-        </div>
-      )}
+
+          {/* Dock */}
+          {(openWindows.length > 0 || minimizedWindows.length > 0) && (
+            <div className="ae-dock">
+              {APPS.map(app => {
+                const win = windows.find(w => w.appId === app.id);
+                if (!win) return null;
+                return (
+                  <button
+                    key={app.id}
+                    className={`ae-dock-item ${win.isMin ? 'minimized' : 'open'} ${activeWindow === app.id ? 'active' : ''}`}
+                    style={{ '--dock-color': app.color }}
+                    onClick={() => win.isMin ? openWindow(app.id) : setActiveWindow(app.id)}
+                    title={app.label}
+                  >
+                    <span className="ae-dock-icon">{app.icon}</span>
+                    <span className="ae-dock-label">{app.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </>)}
+      </div>
     </section>
   );
 }

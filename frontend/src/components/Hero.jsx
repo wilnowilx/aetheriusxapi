@@ -282,10 +282,10 @@ function CosmicVoid() {
           animation-delay: -16s; animation-duration: 34s;
         }
         @keyframes auroraBreath {
-          0%, 100% { opacity: 0.12; transform: translateX(-4%) scaleY(1); }
-          25% { opacity: 0.25; transform: translateX(3%) scaleY(1.12); }
-          50% { opacity: 0.18; transform: translateX(-2%) scaleY(0.88); }
-          75% { opacity: 0.30; transform: translateX(5%) scaleY(1.08); }
+          0%, 100% { opacity: 0.06; transform: translateX(-4%) scaleY(1); }
+          25% { opacity: 0.12; transform: translateX(3%) scaleY(1.12); }
+          50% { opacity: 0.08; transform: translateX(-2%) scaleY(0.88); }
+          75% { opacity: 0.14; transform: translateX(5%) scaleY(1.08); }
         }
 
         .void-rays {
@@ -318,9 +318,9 @@ function CosmicVoid() {
         }
         @keyframes rayPulse {
           0%, 100% { opacity: 0; }
-          25% { opacity: 0.18; }
-          50% { opacity: 0.08; }
-          75% { opacity: 0.22; }
+          25% { opacity: 0.08; }
+          50% { opacity: 0.03; }
+          75% { opacity: 0.10; }
         }
 
         .void-nebula {
@@ -354,9 +354,9 @@ function CosmicVoid() {
           animation-delay: -15s; animation-duration: 38s;
         }
         @keyframes nebulaPulse {
-          0%, 100% { opacity: 0.12; transform: scale(1) translate(0, 0); }
-          33% { opacity: 0.25; transform: scale(1.04) translate(8px, -4px); }
-          66% { opacity: 0.16; transform: scale(0.97) translate(-4px, 3px); }
+          0%, 100% { opacity: 0.06; transform: scale(1) translate(0, 0); }
+          33% { opacity: 0.12; transform: scale(1.04) translate(8px, -4px); }
+          66% { opacity: 0.08; transform: scale(0.97) translate(-4px, 3px); }
         }
 
         .void-vignette {
