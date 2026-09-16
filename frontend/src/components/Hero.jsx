@@ -635,10 +635,10 @@ return (
         padding: '80px 24px 60px',
         isolation: 'isolate', zIndex: 0,
       }}>
-        {/* Vignette — cinematic depth */}
+        {/* Vignette — cinematic depth (subtle) */}
         <div style={{
           position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(1,0,8,0.5) 100%)',
+          background: 'radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(1,0,8,0.35) 100%)',
         }} />
         {/* Film grain — premium texture */}
         <div style={{

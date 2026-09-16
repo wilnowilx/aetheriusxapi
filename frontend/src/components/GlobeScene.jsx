@@ -154,11 +154,11 @@ const TextBandRings = ({ liveData }) => {
         <group key={ringIdx} position={[0, ring.yOffset, 0]} rotation={[ring.tilt, 0, 0]}>
           {/* Bloom glow — wider, softer, additive behind the ring */}
           <mesh>
-            <cylinderGeometry args={[ring.radius, ring.radius, ring.bandWidth * 1.6, 64, 1, true]} />
+            <cylinderGeometry args={[ring.radius, ring.radius, ring.bandWidth * 1.3, 64, 1, true]} />
             <meshBasicMaterial
               color={ring.color}
               transparent
-              opacity={ring.opacity * 0.12}
+              opacity={ring.opacity * 0.04}
               side={THREE.DoubleSide}
               depthWrite={false}
               blending={THREE.AdditiveBlending}
