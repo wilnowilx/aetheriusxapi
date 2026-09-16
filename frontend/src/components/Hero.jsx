@@ -635,17 +635,6 @@ return (
         padding: '80px 24px 60px',
         isolation: 'isolate', zIndex: 0,
       }}>
-        {/* Vignette — cinematic depth (subtle) */}
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(1,0,8,0.35) 100%)',
-        }} />
-        {/* Film grain — premium texture */}
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
-          opacity: 0.035, mixBlendMode: 'overlay',
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E")`,
-        }} />
         <CosmicVoid />
 
         {/* Globe — no transforms, just flex centering */}
@@ -723,39 +712,34 @@ return (
         }}>
         </div>
 
-        {/* Launch OS — big floating button with glow + pulsing ring */}
-        <div style={{ position: 'absolute', bottom: 48, left: '50%', transform: 'translateX(-50%)', zIndex: 5 }}>
-          {/* Pulsing radar ring */}
-          <div className="launch-ring launch-ring-1" />
-          <div className="launch-ring launch-ring-2" />
-          <div className="hero-launch-btn" role="button" tabIndex={0}
-            onClick={() => document.getElementById('ae-os')?.scrollIntoView({ behavior: 'smooth' })}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') document.getElementById('ae-os')?.scrollIntoView({ behavior: 'smooth' }) }}
-            style={{
-              position: 'relative',
-              display: 'flex', alignItems: 'center', gap: 14,
-              padding: '18px 40px', borderRadius: 16,
-              background: 'linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(217,70,239,0.10) 100%)',
-              border: '1.5px solid rgba(168,85,247,0.4)',
-              backdropFilter: 'blur(16px)',
-              cursor: 'pointer',
-              transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)',
-              boxShadow: '0 0 50px rgba(168,85,247,0.25), 0 0 100px rgba(217,70,239,0.12), 0 12px 40px rgba(0,0,0,0.4)',
-              animation: 'launchBtnFloat 3s ease-in-out infinite',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(168,85,247,0.25) 0%, rgba(217,70,239,0.18) 100%)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.6)'; e.currentTarget.style.boxShadow = '0 0 70px rgba(168,85,247,0.35), 0 0 140px rgba(217,70,239,0.18), 0 16px 48px rgba(0,0,0,0.5)'; e.currentTarget.style.transform = 'scale(1.05)' }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(217,70,239,0.10) 100%)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.4)'; e.currentTarget.style.boxShadow = '0 0 50px rgba(168,85,247,0.25), 0 0 100px rgba(217,70,239,0.12), 0 12px 40px rgba(0,0,0,0.4)'; e.currentTarget.style.transform = 'scale(1)' }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            <span style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '1rem', fontWeight: 700,
-              color: '#c084fc',
-              letterSpacing: '0.08em',
-              textShadow: '0 0 20px rgba(168,85,247,0.5)',
-            }}>Launch OS</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d946ef" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </div>
+        {/* Launch OS — big floating button with glow */}
+        <div className="hero-launch-btn" role="button" tabIndex={0}
+          onClick={() => document.getElementById('ae-os')?.scrollIntoView({ behavior: 'smooth' })}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') document.getElementById('ae-os')?.scrollIntoView({ behavior: 'smooth' }) }}
+          style={{
+            position: 'absolute', bottom: 48, left: '50%', transform: 'translateX(-50%)',
+            display: 'flex', alignItems: 'center', gap: 14,
+            padding: '18px 40px', borderRadius: 16,
+            background: 'linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(217,70,239,0.10) 100%)',
+            border: '1.5px solid rgba(168,85,247,0.4)',
+            backdropFilter: 'blur(16px)',
+            cursor: 'pointer', zIndex: 5,
+            transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)',
+            boxShadow: '0 0 50px rgba(168,85,247,0.25), 0 0 100px rgba(217,70,239,0.12), 0 12px 40px rgba(0,0,0,0.4)',
+            animation: 'launchBtnFloat 3s ease-in-out infinite',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(168,85,247,0.25) 0%, rgba(217,70,239,0.18) 100%)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.6)'; e.currentTarget.style.boxShadow = '0 0 70px rgba(168,85,247,0.35), 0 0 140px rgba(217,70,239,0.18), 0 16px 48px rgba(0,0,0,0.5)'; e.currentTarget.style.transform = 'translateX(-50%) scale(1.05)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(217,70,239,0.10) 100%)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.4)'; e.currentTarget.style.boxShadow = '0 0 50px rgba(168,85,247,0.25), 0 0 100px rgba(217,70,239,0.12), 0 12px 40px rgba(0,0,0,0.4)'; e.currentTarget.style.transform = 'translateX(-50%) scale(1)' }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <span style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '1rem', fontWeight: 700,
+            color: '#c084fc',
+            letterSpacing: '0.08em',
+            textShadow: '0 0 20px rgba(168,85,247,0.5)',
+          }}>Launch OS</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d946ef" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </div>
 
         <style>{`
@@ -765,29 +749,11 @@ return (
           }
           @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
           @keyframes launchBtnFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-8px); }
           }
           .hero-launch-btn:hover {
             animation: none !important;
-          }
-          /* Pulsing radar rings around Launch OS button */
-          .launch-ring {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 100%; height: 100%;
-            transform: translate(-50%, -50%);
-            border-radius: 16px;
-            border: 1.5px solid rgba(168,85,247,0.3);
-            pointer-events: none;
-            animation: launchRingPulse 2.5s ease-out infinite;
-          }
-          .launch-ring-2 {
-            animation-delay: 1.25s;
-          }
-          @keyframes launchRingPulse {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
-            100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
           }
           @media (max-width: 768px) {
             #hero { padding: 80px 0 36px !important; }

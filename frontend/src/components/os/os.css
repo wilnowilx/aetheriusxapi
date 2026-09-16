@@ -271,7 +271,6 @@
 .ae-sidebar-item:hover {
   background: rgba(255, 255, 255, 0.04);
   border-left-color: var(--app-color, #a855f7);
-  box-shadow: inset 3px 0 20px -8px var(--app-color, #a855f7);
 }
 
 .ae-sidebar-item.active {
@@ -306,7 +305,7 @@
 
 /* === WINDOWS — Floating glass panels === */
 .ae-window {
-  position: absolute;
+  position: fixed;
   display: flex;
   flex-direction: column;
   background: rgba(8, 8, 20, 0.88);
@@ -325,22 +324,6 @@
   min-height: 200px;
   user-select: none;
   transition: box-shadow 0.3s ease;
-  animation: ae-window-open 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes ae-window-open {
-  0% {
-    opacity: 0;
-    transform: scale(0.92) translateY(12px);
-    box-shadow:
-      0 0 0 1px rgba(168, 85, 247, 0.3),
-      0 0 60px rgba(168, 85, 247, 0.25),
-      0 0 120px rgba(217, 70, 239, 0.1);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
 }
 
 .ae-window:hover {
@@ -462,25 +445,15 @@
   border-radius: 10px;
   color: var(--sec);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.15s;
   min-width: 56px;
 }
 
 .ae-dock-item:hover {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text);
-  transform: translateY(-6px) scale(1.25);
-  filter: brightness(1.15);
+  transform: translateY(-2px);
 }
-
-/* Magnification spread: siblings scale based on CSS :has() proximity */
-.ae-dock:has(.ae-dock-item:hover) .ae-dock-item:not(:hover) {
-  transform: scale(1.08);
-}
-.ae-dock:has(.ae-dock-item:hover) .ae-dock-item:not(:hover):nth-child(1) { transform: scale(1.04); }
-.ae-dock:has(.ae-dock-item:hover) .ae-dock-item:not(:hover):nth-child(2) { transform: scale(1.06); }
-.ae-dock:has(.ae-dock-item:hover) .ae-dock-item:not(:hover):nth-last-child(2) { transform: scale(1.06); }
-.ae-dock:has(.ae-dock-item:hover) .ae-dock-item:not(:hover):last-child { transform: scale(1.04); }
 
 .ae-dock-item.open { color: var(--text); }
 .ae-dock-item.active { 
