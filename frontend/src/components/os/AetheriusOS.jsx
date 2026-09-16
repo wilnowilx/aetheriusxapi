@@ -59,9 +59,9 @@ export default function AetheriusOS() {
       const hero = document.getElementById('hero');
       if (!hero) { setIsVisible(true); return; }
       const heroRect = hero.getBoundingClientRect();
-      // Hero is "gone" when its bottom is above the viewport top
-      // Add a 100px buffer so windows hide BEFORE hero fully disappears
-      const heroGone = heroRect.bottom < -100;
+      // Show OS windows when hero bottom is above 60% of viewport
+      // (user has scrolled past most of the hero)
+      const heroGone = heroRect.bottom < window.innerHeight * 0.6;
       setIsVisible(heroGone);
     };
     window.addEventListener('scroll', check, { passive: true });

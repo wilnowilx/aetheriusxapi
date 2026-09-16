@@ -712,31 +712,34 @@ return (
         }}>
         </div>
 
-        {/* Launch OS — floating button at bottom of hero */}
-        <div className="hero-cue" role="button" tabIndex={0}
+        {/* Launch OS — big floating button with glow */}
+        <div className="hero-launch-btn" role="button" tabIndex={0}
           onClick={() => document.getElementById('ae-os')?.scrollIntoView({ behavior: 'smooth' })}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') document.getElementById('ae-os')?.scrollIntoView({ behavior: 'smooth' }) }}
           style={{
-            position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)',
-            display: 'flex', alignItems: 'center', gap: 10,
-            padding: '12px 28px', borderRadius: 12,
-            background: 'rgba(168,85,247,0.08)',
-            border: '1px solid rgba(168,85,247,0.2)',
-            backdropFilter: 'blur(12px)',
+            position: 'absolute', bottom: 48, left: '50%', transform: 'translateX(-50%)',
+            display: 'flex', alignItems: 'center', gap: 14,
+            padding: '18px 40px', borderRadius: 16,
+            background: 'linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(217,70,239,0.10) 100%)',
+            border: '1.5px solid rgba(168,85,247,0.4)',
+            backdropFilter: 'blur(16px)',
             cursor: 'pointer', zIndex: 5,
-            transition: 'all 0.3s ease',
-            boxShadow: '0 0 30px rgba(168,85,247,0.1), 0 8px 24px rgba(0,0,0,0.3)',
+            transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)',
+            boxShadow: '0 0 50px rgba(168,85,247,0.25), 0 0 100px rgba(217,70,239,0.12), 0 12px 40px rgba(0,0,0,0.4)',
+            animation: 'launchBtnFloat 3s ease-in-out infinite',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.14)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.35)'; e.currentTarget.style.boxShadow = '0 0 40px rgba(168,85,247,0.18), 0 12px 32px rgba(0,0,0,0.4)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.08)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.2)'; e.currentTarget.style.boxShadow = '0 0 30px rgba(168,85,247,0.1), 0 8px 24px rgba(0,0,0,0.3)' }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(168,85,247,0.25) 0%, rgba(217,70,239,0.18) 100%)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.6)'; e.currentTarget.style.boxShadow = '0 0 70px rgba(168,85,247,0.35), 0 0 140px rgba(217,70,239,0.18), 0 16px 48px rgba(0,0,0,0.5)'; e.currentTarget.style.transform = 'translateX(-50%) scale(1.05)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(217,70,239,0.10) 100%)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.4)'; e.currentTarget.style.boxShadow = '0 0 50px rgba(168,85,247,0.25), 0 0 100px rgba(217,70,239,0.12), 0 12px 40px rgba(0,0,0,0.4)'; e.currentTarget.style.transform = 'translateX(-50%) scale(1)' }}
         >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           <span style={{
             fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '0.78rem', fontWeight: 600,
+            fontSize: '1rem', fontWeight: 700,
             color: '#c084fc',
-            letterSpacing: '0.06em',
+            letterSpacing: '0.08em',
+            textShadow: '0 0 20px rgba(168,85,247,0.5)',
           }}>Launch OS</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d946ef" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </div>
 
         <style>{`
@@ -745,6 +748,13 @@ return (
             100% { opacity: 0.4; transform: scale(1.02); }
           }
           @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+          @keyframes launchBtnFloat {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-8px); }
+          }
+          .hero-launch-btn:hover {
+            animation: none !important;
+          }
           @media (max-width: 768px) {
             #hero { padding: 80px 0 36px !important; }
           }
