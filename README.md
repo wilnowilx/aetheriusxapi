@@ -127,11 +127,8 @@ timeline
     Sep 11 : Oracle layer : verified catalog : circuit breaker : anti-replay : MCP discovery : pip package
     Sep 11 : Middleware hardening : scope hardening : budget hardening : evidence hardening (telemetry tx_hash) : verified catalog
     Sep 12 : Canary #3 LIVE - /v1/token/analyze settling real $0.005 USDC via CDP facilitator
-    Sep 12 : MEV-Share integration : order flow listener active on Base Mainnet
-    Sep 12 : Flashbots Protect RPC + Bundle Submission : atomic execution via Flashbots Relay
     Sep 12 : Gravity Well v1 : batch settlement layer (threshold: $0.50 / 100 tx / 5min)
     Sep 12 : Oracle Auto-Sync : hourly MCP Discovery - health check + canary settlement test
-    Sep 12 : Alpha Hunter MVP : Unified agent (SentinelBrain + AETHERIUS Oracle + Flashloan) - $10-100/day target
 
 ```
 
@@ -162,11 +159,11 @@ timeline
 | **Sep 12** — 22nd deploy | **Canary #2 LIVE** — `/v1/token/price` settling real $0.005 USDC via CDP + middleware hardening (scope, budget, evidence `tx_hash`) | **t+240h** | `curl https://34-156-149-38.sslip.io/aetherapi/v1/token/price` |
 | **Sep 13** — 23rd deploy | **Canary #3 LIVE** — `/v1/token/analyze` settling real $0.02 USDC via CDP + ReputationAnchor deployed & verified on Base Mainnet | **t+264h** | `curl https://34-156-149-38.sslip.io/aetherapi/v1/token/analyze` |
 | **Sep 14** — 24th deploy | **Gravity Wells + Oracle Auto-Sync** — batch settlement thresholds, hourly MCP discovery health checks, contingency daemon + RUNBOOK | **t+288h** | `curl https://34-156-149-38.sslip.io/aetherapi/v1/gravity/well/status` |
-| **Sep 15** — 25th deploy | **MEV/Flashbots + Alpha Hunter track** — MEV-Share order flow, Flashbots Protect RPC + bundle submission, M2M swarm test, dashboard 3D reputation stream, Batch 004 manifesto | **t+312h** | `git log --oneline` |
+| **Sep 15** — 25th deploy | **Load testing + evidence pack** — M2M swarm test, dashboard 3D reputation stream, Batch 004 manifesto | **t+312h** | `git log --oneline` |
 
 **Total commits:** 300+ and counting (`git log --oneline | wc -l` — velocity is public).
 
-**Build velocity:** 100+ live endpoints (60 paid + 40 free) + 3 canaries REAL on Base Mainnet + Oracle Layer + Gravity Wells + ReputationAnchor + MEV/Flashbots track + M2M swarm + dashboard 3D + 39 tests + 2 SDKs + R3F landing + playground + demo + Telegram bot + GitHub Actions in **13 days** (300+ commits).
+**Build velocity:** 100+ live endpoints (60 paid + 40 free) + 3 canaries REAL on Base Mainnet + Oracle Layer + Gravity Wells + ReputationAnchor + M2M swarm + dashboard 3D + 39 tests + 2 SDKs + R3F landing + playground + demo + Telegram bot + GitHub Actions in **13 days** (300+ commits).
 Velocity is public — `git log --oneline | wc -l`.
 
 ---
@@ -286,10 +283,7 @@ flowchart TB
         RISK2[Credit Velocity<br/>Risk Scoring]
     end
 
-    subgraph "Execution Layer"
-        MEV[MEV-Share<br/>Order Flow]
-        FLASH[Flashbots Protect<br/>Bundles]
-        ALPHA[Alpha Hunter<br/>Unified Agent]
+    subgraph "Testing"
         SWARM[M2M Swarm<br/>Load Test]
     end
 
@@ -307,7 +301,6 @@ flowchart TB
     subgraph "External"
         CDP[Coinbase CDP<br/>USDC Settlement]
         UPSTREAM[Upstreams<br/>CoinGecko, OSM, etc.]
-        AAVE[Aave V3<br/>Flashloans]
     end
 
     PY --> NGINX
@@ -333,10 +326,6 @@ flowchart TB
     ROUTER --> GW0
     GW0 --> GW1
     GW1 --> CDP
-    MEV --> ALPHA
-    ALPHA --> FLASH
-    FLASH --> AAVE
-    FLASH --> CDP
     SWARM --> ROUTER
     SWARM --> REPUT
     AXIOMS --> UPSTREAM
@@ -357,9 +346,6 @@ flowchart TB
     style GW1 fill:#4F46E5,color:#fff
     style REPUT fill:#F43F5E,color:#fff
     style RISK2 fill:#E11D48,color:#fff
-    style MEV fill:#F59E0B,color:#fff
-    style FLASH fill:#EA580C,color:#fff
-    style ALPHA fill:#16A34A,color:#fff
     style SWARM fill:#0891B2,color:#fff
     style AXIOMS fill:#8B5CF6,color:#fff
     style ONTO fill:#EC4899,color:#fff
@@ -497,9 +483,8 @@ The Research Layer is exposed via MCP (Model Context Protocol):
 | **Axioms** | `GET /v1/axioms` — 3 fundamental axioms (JSON-LD, M2M-native) |
 | **Ontology** | `GET /v1/ontology` — RDF ontology (9 classes, 11 properties) |
 | **ReputationAnchor** | `0x7d31b0683a46Ad793248A8590f77dF7d1c2b782A` — verified on Base Mainnet, `ORACLE_ROLE` granted |
-| **ArbitrageReceiver** | `0x120E93C8C88Ea46236Ab8f95DA838A737a05Cf0b` — verified on Base Mainnet, owner `0xB7B4...A37c`, AAVE V3 Pool `0xA238...d1c5` |
 | **Gravity Wells** | `GET /v1/gravity/well/status` + `GET /v1/gravity/singularity/status` — batch settlement + singularities |
-| **Execution Track** | MEV-Share listener + Flashbots bundles + M2M swarm (`scripts/m2m_swarm_test.py`) + 3D reputation stream |
+| **Load Testing** | M2M swarm (`scripts/m2m_swarm_test.py`) + 3D reputation stream |
 | **Manifesto** | `MANIFESTO_TECNICO_BATCH004.md` — Batch 004 evidence pack |
 | Version | v2.1.0 · 100+ live endpoints · Oracle Layer · Research Layer · 39 tests · Python SDK v2.0 |
 | YouTube | [`▶ Demo`](https://youtu.be/TDzMALSe00A) — real 402→200 mainnet USDC |
@@ -915,7 +900,7 @@ Every response carries the `X-AETHERIUS-Fingerprint: quantumxbrain-v1` header.
 | **Oracle Layer** | `aether-oracle` (pip) + `aether_oracle_mcp` | Verified catalog, circuit breaker, risk validator, auto-sync |
 | **Survival Layer** | Contingency daemon + Gravity Well v0/v1 | 5-min Base anchors, batch settlement, executable RUNBOOK |
 | **Reputation Layer** | `ReputationAnchor` on Base + Credit Velocity | On-chain agent reputation, risk scoring, behavior anchoring |
-| **Execution Layer** | MEV-Share + Flashbots + Alpha Hunter + M2M swarm | Order flow, atomic bundles, unified yield/arb agent, load test |
+| **Testing** | M2M swarm + dashboard 3D stream | Load testing, real-time reputation visualization |
 | **Research Layer** | `research/` + `aether_axioms_mcp` | Axioms, ontology, MCP server (stdio + SSE) |
 | **MCP Bridge** | `aether_oracle_mcp` + `aether_axioms_mcp` | Agent-native discovery (stdio + SSE/HTTP) |
 
@@ -995,7 +980,6 @@ Every response carries the `X-AETHERIUS-Fingerprint: quantumxbrain-v1` header.
 - [x] **ReputationAnchor** (Sep 13) — deployed & verified on Base Mainnet (`0x7d31b0683a46Ad793248A8590f77dF7d1c2b782A`), `ORACLE_ROLE` granted, Basescan + Sourcify verified
 - [x] **Gravity Wells + Contingency** (Sep 14) — batch settlement thresholds, contingency daemon with 5-min Base anchors, executable `RUNBOOK.md`
 - [x] **Oracle Auto-Sync** (Sep 14) — hourly MCP discovery health checks + canary settlement tests, verified catalog auto-population
-- [x] **MEV/Flashbots track** (Sep 15) — MEV-Share order-flow listener, Flashbots Protect RPC, bundle submission with mandatory pre-flight simulation + dynamic gas ceilings
 - [x] **M2M swarm test** (Sep 15) — 50 concurrent workers against 3 REAL canaries, settlement + reputation anchoring metrics
 - [x] **Dashboard 3D reputation stream** (Sep 15) — `useReputationStream` hook, R3F reputation particles, Base network status
 - [x] **Batch 004 manifesto** (Sep 15) — `MANIFESTO_TECNICO_BATCH004.md` technical evidence pack for evaluators
