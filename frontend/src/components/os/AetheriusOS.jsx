@@ -42,21 +42,22 @@ export default function AetheriusOS() {
   const [activeWindow, setActiveWindow] = useState('metrics');
   const sidebarTimer = useRef(null);
 
-  /* IntersectionObserver: only show fixed elements when OS is mostly in viewport */
+  /* IntersectionObserver: only show fixed elements when Hero is NOT the primary view */
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        // Only show when OS is 40%+ visible AND its top half is in viewport
-        const rect = entry.boundingClientRect;
-        const inView = entry.isIntersecting && entry.intersectionRatio > 0.35 && rect.top < window.innerHeight * 0.6;
-        setIsVisible(inView);
-      },
-      { threshold: [0, 0.1, 0.2, 0.35, 0.5, 0.75, 1] }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
+    const check = () => {
+      const rect = el.getBoundingClientRect();
+      // OS visible when its top is above 55% of viewport (hero scrolled past)
+      // AND it fills at least 35% of viewport height
+      const topInView = rect.top < window.innerHeight * 0.55;
+      const fillsEnough = rect.height > 0 && (rect.bottom - Math.max(0, rect.top)) / window.innerHeight > 0.35;
+      setIsVisible(topInView && fillsEnough);
+    };
+    // Use scroll listener for instant response (IntersectionObserver lags on fast scroll)
+    window.addEventListener('scroll', check, { passive: true });
+    check();
+    return () => window.removeEventListener('scroll', check);
   }, []);
 
   /* Show sidebar when OS first becomes visible, keep it until user closes */
