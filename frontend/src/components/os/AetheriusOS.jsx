@@ -39,26 +39,30 @@ export default function AetheriusOS() {
   const sectionRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
   const [windows, setWindows] = useState(() => {
-    // Auto-open Live Metrics centered
-    const def = getDefaultPos('metrics');
-    return [{
-      id: 1, appId: 'metrics', isMin: false, isMax: false,
-      pos: { x: def.x, y: def.y },
-    }];
+    // Auto-open Live Metrics + API Catalog centered
+    const mDef = getDefaultPos('metrics');
+    const cDef = getDefaultPos('catalog');
+    return [
+      { id: 1, appId: 'metrics', isMin: false, isMax: false, pos: { x: mDef.x, y: mDef.y } },
+      { id: 2, appId: 'catalog', isMin: false, isMax: false, pos: { x: cDef.x, y: cDef.y } },
+    ];
   });
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeWindow, setActiveWindow] = useState('metrics');
+  const [activeWindow, setActiveWindow] = useState('catalog');
   const sidebarTimer = useRef(null);
 
-  /* Scroll-based visibility: show fixed elements only when Hero is NOT the primary view */
+  /* Scroll-based visibility: hide windows when Hero is visible at all.
+     We track the HERO element (#hero) — if its bottom is above viewport top, Hero is gone → show OS.
+     This is more aggressive than tracking the OS section. */
   useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
     const check = () => {
-      const rect = el.getBoundingClientRect();
-      const topInView = rect.top < window.innerHeight * 0.55;
-      const fillsEnough = rect.height > 0 && (rect.bottom - Math.max(0, rect.top)) / window.innerHeight > 0.35;
-      setIsVisible(topInView && fillsEnough);
+      const hero = document.getElementById('hero');
+      if (!hero) { setIsVisible(true); return; }
+      const heroRect = hero.getBoundingClientRect();
+      // Hero is "gone" when its bottom is above the viewport top
+      // Add a 100px buffer so windows hide BEFORE hero fully disappears
+      const heroGone = heroRect.bottom < -100;
+      setIsVisible(heroGone);
     };
     window.addEventListener('scroll', check, { passive: true });
     check();

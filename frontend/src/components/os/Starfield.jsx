@@ -1,42 +1,45 @@
 import { useRef, useEffect, useCallback } from 'react';
 
-/* Cosmic starfield: 3D stars + dust particles reacting to mouse.
-   Renders on a <canvas> that fills the OS section. */
+/* Cosmic starfield: 3D stars + dust + slow auto-drift + mouse parallax.
+   Listens on window for mouse (not just canvas) so it always works. */
 export default function Starfield({ className }) {
   const canvasRef = useRef(null);
   const mouseRef = useRef({ x: 0, y: 0 });
+  const smoothMouse = useRef({ x: 0, y: 0 });
   const starsRef = useRef([]);
   const dustRef = useRef([]);
   const frameRef = useRef(null);
 
   const init = useCallback((w, h) => {
-    // Stars: depth 0-1, x/y normalized -1..1
     const stars = [];
-    for (let i = 0; i < 220; i++) {
+    for (let i = 0; i < 280; i++) {
       stars.push({
-        x: (Math.random() - 0.5) * 2,
-        y: (Math.random() - 0.5) * 2,
+        x: (Math.random() - 0.5) * 2.4,
+        y: (Math.random() - 0.5) * 2.4,
         z: Math.random(),
-        size: Math.random() * 1.8 + 0.3,
+        size: Math.random() * 2 + 0.3,
         brightness: Math.random() * 0.6 + 0.4,
-        twinkleSpeed: Math.random() * 0.02 + 0.005,
+        twinkleSpeed: Math.random() * 0.03 + 0.008,
         twinkleOffset: Math.random() * Math.PI * 2,
-        hue: Math.random() > 0.85 ? (Math.random() > 0.5 ? 280 : 190) : 0, // some purple/cyan stars
+        hue: Math.random() > 0.82 ? (Math.random() > 0.5 ? 280 : 190) : 0,
+        // Auto-drift velocity
+        vx: (Math.random() - 0.5) * 0.00008,
+        vy: (Math.random() - 0.5) * 0.00006,
       });
     }
     starsRef.current = stars;
 
-    // Dust particles: larger, slower, more transparent
     const dust = [];
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 50; i++) {
       dust.push({
-        x: (Math.random() - 0.5) * 2,
-        y: (Math.random() - 0.5) * 2,
+        x: (Math.random() - 0.5) * 2.4,
+        y: (Math.random() - 0.5) * 2.4,
         z: Math.random() * 0.5 + 0.3,
-        size: Math.random() * 3 + 1,
-        speed: Math.random() * 0.0003 + 0.0001,
-        opacity: Math.random() * 0.15 + 0.03,
+        size: Math.random() * 4 + 1.5,
+        opacity: Math.random() * 0.12 + 0.02,
         hue: Math.random() > 0.5 ? 280 : 190,
+        vx: (Math.random() - 0.5) * 0.00015,
+        vy: (Math.random() - 0.5) * 0.0001,
       });
     }
     dustRef.current = dust;
@@ -50,20 +53,20 @@ export default function Starfield({ className }) {
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      w = canvas.parentElement?.offsetWidth || window.innerWidth;
-      h = canvas.parentElement?.offsetHeight || window.innerHeight;
+      w = window.innerWidth;
+      h = window.innerHeight;
       canvas.width = w * dpr;
       canvas.height = h * dpr;
-      canvas.style.width = w + 'px';
-      canvas.style.height = h + 'px';
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       init(w, h);
     };
 
+    // Listen on WINDOW for mouse — always works even if canvas is behind other elements
     const onMouse = (e) => {
-      const rect = canvas.getBoundingClientRect();
-      mouseRef.current.x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-      mouseRef.current.y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+      mouseRef.current.x = (e.clientX / window.innerWidth - 0.5) * 2;
+      mouseRef.current.y = (e.clientY / window.innerHeight - 0.5) * 2;
     };
 
     let time = 0;
@@ -71,66 +74,82 @@ export default function Starfield({ className }) {
       time += 1;
       ctx.clearRect(0, 0, w, h);
 
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
+      // Smooth mouse interpolation (lerp)
+      smoothMouse.current.x += (mouseRef.current.x - smoothMouse.current.x) * 0.04;
+      smoothMouse.current.y += (mouseRef.current.y - smoothMouse.current.y) * 0.04;
+
+      const mx = smoothMouse.current.x;
+      const my = smoothMouse.current.y;
       const cx = w / 2;
       const cy = h / 2;
 
-      // Draw dust first (behind stars)
+      // === DUST ===
       for (const d of dustRef.current) {
-        const parallax = 1 - d.z * 0.5;
-        const dx = cx + (d.x + mx * parallax * 0.08) * cx;
-        const dy = cy + (d.y + my * parallax * 0.08) * cy;
-        // Slow drift
-        d.x += d.speed * Math.sin(time * 0.003 + d.y * 5);
-        d.y += d.speed * Math.cos(time * 0.002 + d.x * 5);
-        if (d.x > 1.2) d.x = -1.2;
-        if (d.x < -1.2) d.x = 1.2;
-        if (d.y > 1.2) d.y = -1.2;
-        if (d.y < -1.2) d.y = 1.2;
+        // Auto-drift
+        d.x += d.vx;
+        d.y += d.vy;
+        // Wrap
+        if (d.x > 1.4) d.x = -1.4;
+        if (d.x < -1.4) d.x = 1.4;
+        if (d.y > 1.4) d.y = -1.4;
+        if (d.y < -1.4) d.y = 1.4;
 
-        const grad = ctx.createRadialGradient(dx, dy, 0, dx, dy, d.size * (1 + d.z));
-        grad.addColorStop(0, `hsla(${d.hue}, 70%, 70%, ${d.opacity})`);
-        grad.addColorStop(1, `hsla(${d.hue}, 70%, 70%, 0)`);
+        const parallax = 1 - d.z * 0.4;
+        const dx = cx + (d.x + mx * parallax * 0.12) * cx;
+        const dy = cy + (d.y + my * parallax * 0.12) * cy;
+        const r = d.size * (1 + d.z * 0.5);
+
+        const grad = ctx.createRadialGradient(dx, dy, 0, dx, dy, r);
+        grad.addColorStop(0, `hsla(${d.hue}, 60%, 65%, ${d.opacity})`);
+        grad.addColorStop(1, `hsla(${d.hue}, 60%, 65%, 0)`);
         ctx.fillStyle = grad;
         ctx.beginPath();
-        ctx.arc(dx, dy, d.size * (1 + d.z), 0, Math.PI * 2);
+        ctx.arc(dx, dy, r, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Draw stars
+      // === STARS ===
       for (const s of starsRef.current) {
-        const depth = 0.3 + s.z * 0.7; // 0.3-1.0
-        const parallax = depth;
-        const sx = cx + (s.x + mx * parallax * 0.15) * cx * depth;
-        const sy = cy + (s.y + my * parallax * 0.15) * cy * depth;
+        // Auto-drift
+        s.x += s.vx;
+        s.y += s.vy;
+        // Wrap
+        if (s.x > 1.4) s.x = -1.4;
+        if (s.x < -1.4) s.x = 1.4;
+        if (s.y > 1.4) s.y = -1.4;
+        if (s.y < -1.4) s.y = 1.4;
 
-        // Twinkle
+        const depth = 0.25 + s.z * 0.75;
+        const parallax = depth;
+        const sx = cx + (s.x + mx * parallax * 0.25) * cx * depth;
+        const sy = cy + (s.y + my * parallax * 0.25) * cy * depth;
+
         const twinkle = 0.5 + 0.5 * Math.sin(time * s.twinkleSpeed + s.twinkleOffset);
-        const alpha = s.brightness * twinkle * depth;
-        const size = s.size * (0.5 + depth * 0.5);
+        const alpha = s.brightness * (0.4 + twinkle * 0.6) * depth;
+        const size = s.size * (0.4 + depth * 0.6);
 
         if (s.hue > 0) {
-          // Colored star
           ctx.fillStyle = `hsla(${s.hue}, 80%, 75%, ${alpha})`;
         } else {
-          // White star
-          const g = Math.round(200 + alpha * 55);
-          ctx.fillStyle = `rgba(${g},${g},${g + 10},${alpha})`;
+          const g = Math.round(190 + alpha * 65);
+          ctx.fillStyle = `rgba(${g},${g},${g + 12},${alpha})`;
         }
         ctx.beginPath();
         ctx.arc(sx, sy, size, 0, Math.PI * 2);
         ctx.fill();
 
-        // Glow for bright stars
-        if (alpha > 0.5 && size > 1) {
-          const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, size * 3);
-          const gc = s.hue > 0 ? `hsla(${s.hue}, 80%, 75%, ${alpha * 0.15})` : `rgba(200,210,255,${alpha * 0.12})`;
+        // Glow for bright/close stars
+        if (alpha > 0.45 && size > 0.8) {
+          const glowR = size * (2.5 + depth);
+          const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, glowR);
+          const gc = s.hue > 0
+            ? `hsla(${s.hue}, 80%, 75%, ${alpha * 0.12})`
+            : `rgba(180,200,255,${alpha * 0.10})`;
           glow.addColorStop(0, gc);
           glow.addColorStop(1, 'transparent');
           ctx.fillStyle = glow;
           ctx.beginPath();
-          ctx.arc(sx, sy, size * 3, 0, Math.PI * 2);
+          ctx.arc(sx, sy, glowR, 0, Math.PI * 2);
           ctx.fill();
         }
       }
@@ -140,13 +159,12 @@ export default function Starfield({ className }) {
 
     resize();
     window.addEventListener('resize', resize);
-    canvas.addEventListener('mousemove', onMouse);
-
+    window.addEventListener('mousemove', onMouse);
     frameRef.current = requestAnimationFrame(draw);
 
     return () => {
       window.removeEventListener('resize', resize);
-      canvas.removeEventListener('mousemove', onMouse);
+      window.removeEventListener('mousemove', onMouse);
       if (frameRef.current) cancelAnimationFrame(frameRef.current);
     };
   }, [init]);
@@ -155,7 +173,7 @@ export default function Starfield({ className }) {
     <canvas
       ref={canvasRef}
       className={className}
-      style={{ position: 'absolute', inset: 0, pointerEvents: 'auto', zIndex: 0 }}
+      style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}
     />
   );
 }
