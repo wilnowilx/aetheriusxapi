@@ -658,7 +658,7 @@ return (
                 animation: 'pulse 3s ease-in-out infinite' }} />
             }>
               <div style={{ position: 'absolute', inset: '-12%', pointerEvents: 'auto' }}>
-                <GlobeScene liveData={liveData} paused={false} />
+                <GlobeScene liveData={liveData} paused={globePaused} />
               </div>
             </Suspense>
           </GlobeBoundary>
