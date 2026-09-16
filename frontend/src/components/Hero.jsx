@@ -264,28 +264,28 @@ function CosmicVoid() {
         .void-aurora--1 {
           top: 8%;
           background: linear-gradient(135deg, transparent 0%,
-            rgba(168,85,247,0.16) 20%, rgba(217,70,239,0.22) 45%,
-            rgba(34,211,238,0.12) 65%, transparent 100%);
+            rgba(168,85,247,0.04) 20%, rgba(217,70,239,0.05) 45%,
+            rgba(34,211,238,0.02) 65%, transparent 100%);
           animation-delay: 0s; animation-duration: 24s;
         }
         .void-aurora--2 {
           top: 18%;
           background: linear-gradient(225deg, transparent 0%,
-            rgba(34,211,238,0.12) 25%, rgba(168,85,247,0.18) 50%,
-            rgba(236,72,153,0.10) 75%, transparent 100%);
+            rgba(34,211,238,0.03) 25%, rgba(168,85,247,0.04) 50%,
+            rgba(236,72,153,0.02) 75%, transparent 100%);
           animation-delay: -8s; animation-duration: 28s;
         }
         .void-aurora--3 {
           top: 2%; height: 30%;
           background: linear-gradient(180deg,
-            rgba(217,70,239,0.10) 0%, rgba(168,85,247,0.08) 35%, transparent 65%);
+            rgba(217,70,239,0.02) 0%, rgba(168,85,247,0.015) 35%, transparent 65%);
           animation-delay: -16s; animation-duration: 34s;
         }
         @keyframes auroraBreath {
-          0%, 100% { opacity: 0.18; transform: translateX(-4%) scaleY(1); }
-          25% { opacity: 0.38; transform: translateX(3%) scaleY(1.15); }
-          50% { opacity: 0.22; transform: translateX(-2%) scaleY(0.85); }
-          75% { opacity: 0.42; transform: translateX(5%) scaleY(1.10); }
+          0%, 100% { opacity: 0.02; transform: translateX(-4%) scaleY(1); }
+          25% { opacity: 0.06; transform: translateX(3%) scaleY(1.05); }
+          50% { opacity: 0.03; transform: translateX(-2%) scaleY(0.95); }
+          75% { opacity: 0.07; transform: translateX(5%) scaleY(1.03); }
         }
 
         .void-rays {
@@ -301,62 +301,52 @@ function CosmicVoid() {
           animation: rayPulse 14s ease-in-out infinite;
         }
         .void-ray--1 {
-          background: linear-gradient(180deg, rgba(168,85,247,0.3) 0%, transparent 100%);
+          background: linear-gradient(180deg, rgba(168,85,247,0.06) 0%, transparent 100%);
           transform: translate(-50%, 0) rotate(-22deg); animation-delay: 0s;
         }
         .void-ray--2 {
-          background: linear-gradient(180deg, rgba(34,211,238,0.25) 0%, transparent 100%);
+          background: linear-gradient(180deg, rgba(34,211,238,0.05) 0%, transparent 100%);
           transform: translate(-50%, 0) rotate(12deg); animation-delay: -3s;
         }
         .void-ray--3 {
-          background: linear-gradient(180deg, rgba(217,70,239,0.22) 0%, transparent 100%);
+          background: linear-gradient(180deg, rgba(217,70,239,0.04) 0%, transparent 100%);
           transform: translate(-50%, 0) rotate(-6deg); animation-delay: -7s;
         }
         .void-ray--4 {
-          background: linear-gradient(180deg, rgba(236,72,153,0.18) 0%, transparent 100%);
+          background: linear-gradient(180deg, rgba(236,72,153,0.03) 0%, transparent 100%);
           transform: translate(-50%, 0) rotate(28deg); animation-delay: -10s;
         }
         @keyframes rayPulse {
           0%, 100% { opacity: 0; }
-          25% { opacity: 0.28; }
-          50% { opacity: 0.12; }
-          75% { opacity: 0.35; }
+          25% { opacity: 0.06; }
+          50% { opacity: 0.03; }
+          75% { opacity: 0.08; }
         }
 
         .void-nebula {
           position: absolute; border-radius: 50%;
           filter: blur(180px); mix-blend-mode: screen;
-          opacity: 0.12; animation: nebulaPulse 25s ease-in-out infinite;
+          opacity: 0.04; animation: nebulaPulse 25s ease-in-out infinite;
         }
         .void-nebula--1 {
           width: 1500px; height: 900px; top: -22%; left: -15%;
-          background: radial-gradient(ellipse, rgba(168,85,247,0.45) 0%, rgba(217,70,239,0.30) 45%, transparent 70%);
+          background: radial-gradient(ellipse, rgba(168,85,247,0.10) 0%, rgba(217,70,239,0.06) 45%, transparent 70%);
           animation-delay: 0s; animation-duration: 35s;
         }
         .void-nebula--2 {
           width: 1300px; height: 750px; top: 25%; right: -15%;
-          background: radial-gradient(ellipse, rgba(34,211,238,0.35) 0%, rgba(168,85,247,0.25) 50%, transparent 70%);
+          background: radial-gradient(ellipse, rgba(34,211,238,0.08) 0%, rgba(168,85,247,0.05) 50%, transparent 70%);
           animation-delay: -12s; animation-duration: 30s;
         }
         .void-nebula--3 {
           width: 1100px; height: 650px; bottom: 12%; left: 5%;
-          background: radial-gradient(ellipse, rgba(236,72,153,0.30) 0%, rgba(217,70,239,0.20) 55%, transparent 70%);
+          background: radial-gradient(ellipse, rgba(236,72,153,0.07) 0%, rgba(217,70,239,0.04) 55%, transparent 70%);
           animation-delay: -20s; animation-duration: 42s;
         }
-        .void-nebula--4 {
-          width: 1700px; height: 1000px; bottom: -15%; left: -18%;
-          background: radial-gradient(ellipse, rgba(168,85,247,0.18) 0%, rgba(34,211,238,0.10) 50%, transparent 70%);
-          animation-delay: -8s; animation-duration: 33s;
-        }
-        .void-nebula--5 {
-          width: 1600px; height: 950px; top: -10%; right: -20%;
-          background: radial-gradient(ellipse, rgba(34,211,238,0.16) 0%, rgba(236,72,153,0.12) 45%, rgba(168,85,247,0.08) 70%, transparent 85%);
-          animation-delay: -15s; animation-duration: 38s;
-        }
         @keyframes nebulaPulse {
-          0%, 100% { opacity: 0.14; transform: scale(1) translate(0, 0); }
-          33% { opacity: 0.32; transform: scale(1.06) translate(8px, -4px); }
-          66% { opacity: 0.20; transform: scale(0.97) translate(-4px, 3px); }
+          0%, 100% { opacity: 0.03; transform: scale(1) translate(0, 0); }
+          33% { opacity: 0.06; transform: scale(1.02) translate(4px, -2px); }
+          66% { opacity: 0.04; transform: scale(0.99) translate(-2px, 1px); }
         }
 
         .void-vignette {
@@ -722,21 +712,31 @@ return (
         }}>
         </div>
 
-        {/* Scroll cue */}
+        {/* Launch OS — floating button at bottom of hero */}
         <div className="hero-cue" role="button" tabIndex={0}
           onClick={() => document.getElementById('ae-os')?.scrollIntoView({ behavior: 'smooth' })}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') document.getElementById('ae-os')?.scrollIntoView({ behavior: 'smooth' }) }}
           style={{
-            position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+            position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)',
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '12px 28px', borderRadius: 12,
+            background: 'rgba(168,85,247,0.08)',
+            border: '1px solid rgba(168,85,247,0.2)',
+            backdropFilter: 'blur(12px)',
             cursor: 'pointer', zIndex: 5,
-          }}>
+            transition: 'all 0.3s ease',
+            boxShadow: '0 0 30px rgba(168,85,247,0.1), 0 8px 24px rgba(0,0,0,0.3)',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.14)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.35)'; e.currentTarget.style.boxShadow = '0 0 40px rgba(168,85,247,0.18), 0 12px 32px rgba(0,0,0,0.4)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.08)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.2)'; e.currentTarget.style.boxShadow = '0 0 30px rgba(168,85,247,0.1), 0 8px 24px rgba(0,0,0,0.3)' }}
+        >
           <span style={{
             fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '0.5rem', letterSpacing: '0.35em',
-            color: 'rgba(168,85,247,0.3)',
-          }}>SCROLL</span>
-          <svg className="cue-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(168,85,247,0.25)" strokeWidth="1.5"><path d="M6 9l6 6 6-6" strokeLinejoin="round" strokeLinecap="round"/></svg>
+            fontSize: '0.78rem', fontWeight: 600,
+            color: '#c084fc',
+            letterSpacing: '0.06em',
+          }}>Launch OS</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </div>
 
         <style>{`
@@ -745,11 +745,6 @@ return (
             100% { opacity: 0.4; transform: scale(1.02); }
           }
           @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-          .hero-cue .cue-chev { animation: cueDrop 2s ease-in-out infinite; }
-          @keyframes cueDrop {
-            0%, 100% { transform: translateY(0); opacity: 0.2; }
-            50% { transform: translateY(6px); opacity: 0.6; }
-          }
           @media (max-width: 768px) {
             #hero { padding: 80px 0 36px !important; }
           }

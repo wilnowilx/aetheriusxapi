@@ -157,6 +157,14 @@ export default function AetheriusOS() {
       {/* Starfield background */}
       <Starfield className="ae-starfield" />
 
+      {/* Aurora overlays — living space background */}
+      <div className="ae-aurora-layer">
+        <div className="ae-aurora a1" />
+        <div className="ae-aurora a2" />
+        <div className="ae-aurora a3" />
+        <div className="ae-aurora a4" />
+      </div>
+
       {/* Subtle nebula overlays */}
       <div className="ae-nebula-layer">
         <div className="ae-nebula n1" />

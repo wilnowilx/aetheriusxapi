@@ -10,14 +10,15 @@
     "deploy": "vite build && cp -r dist/* ../docs/ 2>/dev/null || true"
   },
   "dependencies": {
+    "@react-three/drei": "^10.0.0",
+    "@react-three/fiber": "^9.0.0",
+    "@react-three/postprocessing": "^3.0.0",
+    "ethers": "^6.17.0",
+    "gsap": "^3.12.7",
+    "lenis": "^1.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@react-three/fiber": "^9.0.0",
-    "@react-three/drei": "^10.0.0",
-    "@react-three/postprocessing": "^3.0.0",
-    "three": "^0.175.0",
-    "gsap": "^3.12.7",
-    "lenis": "^1.2.3"
+    "three": "^0.175.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.0",

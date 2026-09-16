@@ -29,39 +29,16 @@ function Nav() {
   return (
     <>
       <nav style={{ background: scrolled ? 'rgba(5,2,15,0.88)' : 'rgba(3,1,8,0.06)', backdropFilter: 'blur(12px)', borderBottom: scrolled ? '1px solid rgba(168,85,247,0.18)' : '1px solid rgba(168,85,247,0.05)', transition: 'background 0.4s ease, border-color 0.4s ease' }} className={scrolled ? 'scrolled' : ''}>
-        <div className="nav-wrap">
-          <a href="#hero" className="brand">AETHERIUS</a>
-          <div className="nav-links">
-            <a href="#hero" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Home
-            </a>
-            <a href="#ae-os" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-              OS
-            </a>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.72rem', fontWeight: 600, color: 'var(--green)', padding: '6px 14px', border: '1px solid rgba(16,185,129,0.25)', borderRadius: 9999, background: 'rgba(16,185,129,0.06)', fontFamily: 'JetBrains Mono, monospace', backdropFilter: 'blur(8px)' }}>
-              <span className="glow-dot" style={{ width: 6, height: 6 }} />
-              Mainnet
-            </span>
-            <a href="#ae-os" className="btn-nav" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              Launch OS
-            </a>
-          </div>
-          <button className="mobile-toggle" onClick={() => setMobileOpen(true)}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth="1.5"><path strokeLinejoin="round" strokeLinecap="round" d="M3 12h18M3 6h18M3 18h18"/></svg>
-          </button>
+        <div className="nav-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+          {/* Mainnet badge — left */}
+          <span style={{ position: 'absolute', left: 0, display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.72rem', fontWeight: 600, color: 'var(--green)', padding: '6px 14px', border: '1px solid rgba(16,185,129,0.25)', borderRadius: 9999, background: 'rgba(16,185,129,0.06)', fontFamily: 'JetBrains Mono, monospace', backdropFilter: 'blur(8px)' }}>
+            <span className="glow-dot" style={{ width: 6, height: 6 }} />
+            Mainnet
+          </span>
+          {/* Brand — centered */}
+          <a href="#hero" className="brand" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>AETHERIUS</a>
         </div>
       </nav>
-      {mobileOpen && (
-        <div className="mobile-nav open">
-          <button className="close-btn" onClick={() => setMobileOpen(false)}>×</button>
-          <a href="#hero" onClick={() => setMobileOpen(false)}>Home</a>
-          <a href="#ae-os" onClick={() => setMobileOpen(false)}>OS</a>
-          <a href="#ae-os" className="btn btn-primary" onClick={() => setMobileOpen(false)}>Launch OS</a>
-        </div>
-      )}
     </>
   )
 }

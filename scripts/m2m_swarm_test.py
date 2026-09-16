@@ -74,13 +74,19 @@ FACILITATOR_URL = "https://x402.org/facilitator"
 # LOGGING SETUP
 # ============================================================================
 
+# Fix encoding on Windows
+if sys.platform == "win32":
+    import codecs
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer)
+    sys.stderr = codecs.getwriter("utf-8")(sys.stderr.buffer)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%H:%M:%S",
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler("m2m_swarm_test.log", mode="a")
+        logging.FileHandler("m2m_swarm_test.log", mode="a", encoding="utf-8")
     ]
 )
 logger = logging.getLogger(__name__)

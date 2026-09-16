@@ -169,17 +169,6 @@ const TextBandRings = ({ liveData }) => {
               toneMapped={false}
             />
           </mesh>
-          {/* Dark backing band — opaque surface that blocks the sphere behind text */}
-          <mesh>
-            <cylinderGeometry args={[ring.radius - 0.01, ring.radius - 0.01, ring.bandWidth * 0.92, 128, 1, true]} />
-            <meshBasicMaterial
-              color="#030308"
-              transparent
-              opacity={0.85}
-              side={THREE.FrontSide}
-              depthWrite={true}
-            />
-          </mesh>
           {/* Reflejo trasero: espejo desenfocado tenue */}
           <mesh>
             <cylinderGeometry args={[ring.radius, ring.radius, ring.bandWidth, 128, 1, true]} />

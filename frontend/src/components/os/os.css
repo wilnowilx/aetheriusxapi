@@ -43,29 +43,92 @@
 }
 
 .ae-nebula.n1 {
-  width: 500px; height: 500px;
+  width: 600px; height: 600px;
   top: -8%; left: 15%;
-  background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%);
   animation: ae-nebula-drift 30s ease-in-out infinite alternate;
 }
 
 .ae-nebula.n2 {
-  width: 400px; height: 400px;
+  width: 500px; height: 500px;
   bottom: 10%; right: 10%;
-  background: radial-gradient(circle, rgba(217,70,239,0.10) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(217,70,239,0.12) 0%, transparent 70%);
   animation: ae-nebula-drift 25s ease-in-out infinite alternate-reverse;
 }
 
 .ae-nebula.n3 {
-  width: 350px; height: 350px;
+  width: 450px; height: 450px;
   top: 45%; left: 55%;
-  background: radial-gradient(circle, rgba(0,240,255,0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(0,240,255,0.08) 0%, transparent 70%);
   animation: ae-nebula-drift 35s ease-in-out infinite alternate;
 }
 
 @keyframes ae-nebula-drift {
   0%   { transform: translate(0, 0) scale(1); }
   100% { transform: translate(30px, 20px) scale(1.12); }
+}
+
+/* === AURORA OVERLAYS — living animated auroras === */
+.ae-aurora-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ae-aurora {
+  position: absolute;
+  width: 140%;
+  height: 40%;
+  left: -20%;
+  filter: blur(100px);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: ae-aurora-breathe 20s ease-in-out infinite;
+}
+
+.ae-aurora.a1 {
+  top: 5%;
+  background: linear-gradient(135deg, transparent 0%,
+    rgba(168,85,247,0.12) 20%, rgba(217,70,239,0.15) 45%,
+    rgba(34,211,238,0.08) 65%, transparent 100%);
+  animation-delay: 0s;
+  animation-duration: 24s;
+}
+
+.ae-aurora.a2 {
+  top: 20%;
+  background: linear-gradient(225deg, transparent 0%,
+    rgba(34,211,238,0.10) 25%, rgba(168,85,247,0.12) 50%,
+    rgba(236,72,153,0.06) 75%, transparent 100%);
+  animation-delay: -6s;
+  animation-duration: 28s;
+}
+
+.ae-aurora.a3 {
+  bottom: 10%;
+  height: 35%;
+  background: linear-gradient(180deg,
+    rgba(217,70,239,0.08) 0%, rgba(168,85,247,0.06) 35%, transparent 65%);
+  animation-delay: -12s;
+  animation-duration: 32s;
+}
+
+.ae-aurora.a4 {
+  top: 40%;
+  height: 30%;
+  background: linear-gradient(90deg, transparent 0%,
+    rgba(0,240,255,0.06) 30%, rgba(168,85,247,0.08) 60%, transparent 100%);
+  animation-delay: -18s;
+  animation-duration: 36s;
+}
+
+@keyframes ae-aurora-breathe {
+  0%, 100% { opacity: 0.15; transform: translateX(-3%) scaleY(1); }
+  25% { opacity: 0.35; transform: translateX(2%) scaleY(1.05); }
+  50% { opacity: 0.20; transform: translateX(-1%) scaleY(0.97); }
+  75% { opacity: 0.40; transform: translateX(4%) scaleY(1.03); }
 }
 
 /* === TOP BAR === */
@@ -168,8 +231,8 @@
 }
 
 @keyframes sidebarGlow {
-  0%, 100% { opacity: 0.3; height: 50px; box-shadow: 0 0 8px rgba(168,85,247,0.2); }
-  50% { opacity: 0.8; height: 70px; box-shadow: 0 0 16px rgba(168,85,247,0.5), 0 0 30px rgba(217,70,239,0.3); }
+  0%, 100% { opacity: 0.4; height: 50px; box-shadow: 0 0 12px rgba(168,85,247,0.3); }
+  50% { opacity: 1; height: 80px; box-shadow: 0 0 24px rgba(168,85,247,0.6), 0 0 50px rgba(217,70,239,0.35); }
 }
 
 .ae-sidebar.open {
@@ -243,14 +306,15 @@
   flex-direction: column;
   background: rgba(8, 8, 20, 0.88);
   backdrop-filter: blur(24px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   box-shadow:
-    0 0 0 1px rgba(168, 85, 247, 0.08),
+    0 0 0 1px rgba(168, 85, 247, 0.12),
     0 8px 32px rgba(0, 0, 0, 0.5),
-    0 0 120px rgba(168, 85, 247, 0.06),
+    0 0 160px rgba(168, 85, 247, 0.1),
+    0 0 300px rgba(217, 70, 239, 0.04),
     0 20px 60px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
   overflow: hidden;
   min-width: 300px;
   min-height: 200px;
@@ -260,12 +324,13 @@
 
 .ae-window:hover {
   box-shadow:
-    0 0 0 1px rgba(168, 85, 247, 0.15),
+    0 0 0 1px rgba(168, 85, 247, 0.2),
     0 12px 40px rgba(0, 0, 0, 0.6),
-    0 0 160px rgba(168, 85, 247, 0.1),
+    0 0 200px rgba(168, 85, 247, 0.14),
+    0 0 400px rgba(217, 70, 239, 0.06),
     0 25px 80px rgba(0, 0, 0, 0.5),
-    0 0 40px rgba(217, 70, 239, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    0 0 60px rgba(168, 85, 247, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .ae-window .ae-wintitle {
@@ -356,13 +421,13 @@
   padding: 6px 14px;
   background: rgba(6, 6, 14, 0.88);
   backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   z-index: 9997;
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.5), 
-    0 0 80px rgba(168, 85, 247, 0.06),
-    0 -2px 20px rgba(168, 85, 247, 0.04);
+    0 0 120px rgba(168, 85, 247, 0.1),
+    0 -2px 30px rgba(168, 85, 247, 0.06);
 }
 
 .ae-dock-item {

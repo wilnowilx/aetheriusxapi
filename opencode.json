@@ -1,0 +1,81 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "automaton",
+  "agent": {
+    "automaton": {
+      "mode": "primary",
+      "description": "AUTOMATON v3.0 (OMNI-AUTOMATON) — Sovereign Ambient Polymorphic Self-Improving Agent. Native V3.0 protocol: Ambient background daemon monitoring, Base Web3 telemetry via AETHERIUS, strict zero-smoke invariant, auto-fix engine, and real-time multi-model compatibility.",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "task": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "read": "allow",
+        "list": "allow",
+        "webfetch": "allow",
+        "websearch": "allow"
+      },
+      "subagent": {
+        "automaton-auditor": {
+          "mode": "subagent",
+          "description": "Polymorphic auditor — audits codebase with universal + domain + cross-domain rules",
+          "permission": {
+            "edit": "allow",
+            "bash": "allow",
+            "read": "allow",
+            "glob": "allow",
+            "grep": "allow"
+          }
+        },
+        "automaton-developer": {
+          "mode": "subagent",
+          "description": "Polymorphic developer — implements tasks with domain-aware code generation",
+          "permission": {
+            "edit": "allow",
+            "bash": "allow",
+            "read": "allow",
+            "glob": "allow",
+            "grep": "allow"
+          }
+        },
+        "automaton-reviewer": {
+          "mode": "subagent",
+          "description": "Polymorphic reviewer — reviews implementations against universal + domain standards",
+          "permission": {
+            "edit": "allow",
+            "bash": "allow",
+            "read": "allow",
+            "glob": "allow",
+            "grep": "allow"
+          }
+        },
+        "automaton-fixer": {
+          "mode": "subagent",
+          "description": "Auto-fix engine agent — applies universal + domain + cross-domain fixes always",
+          "permission": {
+            "edit": "allow",
+            "bash": "allow",
+            "read": "allow",
+            "glob": "allow",
+            "grep": "allow"
+          }
+        },
+        "automaton-architect": {
+          "mode": "subagent",
+          "description": "Polymorphic architect — cross-domain architecture decisions",
+          "permission": {
+            "edit": "allow",
+            "bash": "allow",
+            "read": "allow",
+            "glob": "allow",
+            "grep": "allow"
+          }
+        }
+      }
+    }
+  },
+  "skills": {
+    "paths": [".opencode/skills"]
+  }
+}
