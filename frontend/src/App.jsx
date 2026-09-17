@@ -23,17 +23,17 @@ function Nav() {
 
   return (
     <>
-      <nav style={{ background: 'transparent', backdropFilter: 'none', borderBottom: 'none', transition: 'none', padding: '0 40px' }}>
-        <div className="nav-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', height: 60 }}>
-          {/* Mainnet badge — left, floating with green shadow */}
-          <span style={{ position: 'absolute', left: 0, display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', fontWeight: 700, color: 'var(--green)', padding: '8px 20px', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 9999, background: 'rgba(16,185,129,0.08)', fontFamily: 'JetBrains Mono, monospace', backdropFilter: 'blur(8px)', letterSpacing: '0.04em', boxShadow: '0 0 18px rgba(16,185,129,0.25), 0 0 4px rgba(16,185,129,0.4), inset 0 0 8px rgba(16,185,129,0.1)' }}>
+      <nav style={{ background: 'transparent', backdropFilter: 'none', borderBottom: 'none', transition: 'none', padding: '0 48px' }}>
+        <div className="nav-wrap" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', position: 'relative', height: 80 }}>
+          {/* Mainnet badge — left, vertically centered */}
+          <span style={{ position: 'absolute', left: 0, bottom: 14, display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', fontWeight: 700, color: 'var(--green)', padding: '8px 20px', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 9999, background: 'rgba(16,185,129,0.08)', fontFamily: 'JetBrains Mono, monospace', backdropFilter: 'blur(8px)', letterSpacing: '0.04em', boxShadow: '0 0 18px rgba(16,185,129,0.25), 0 0 4px rgba(16,185,129,0.4), inset 0 0 8px rgba(16,185,129,0.1)' }}>
             <span className="glow-dot" style={{ width: 7, height: 7 }} />
             Mainnet
           </span>
-          {/* Brand — centered */}
-          <a href="#hero" className="brand" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>AETHERIUS</a>
-          {/* x402 badge — right, floating with purple shadow */}
-          <span style={{ position: 'absolute', right: 0, display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', fontWeight: 700, color: '#a855f7', padding: '8px 20px', border: '1px solid rgba(168,85,247,0.3)', borderRadius: 9999, background: 'rgba(168,85,247,0.08)', fontFamily: 'JetBrains Mono, monospace', backdropFilter: 'blur(8px)', letterSpacing: '0.04em', boxShadow: '0 0 18px rgba(168,85,247,0.25), 0 0 4px rgba(168,85,247,0.4), inset 0 0 8px rgba(168,85,247,0.1)' }}>
+          {/* Brand — centered, justified toward bottom edge */}
+          <a href="#hero" className="brand" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', bottom: 10 }}>AETHERIUS</a>
+          {/* x402 badge — right, vertically centered */}
+          <span style={{ position: 'absolute', right: 0, bottom: 14, display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', fontWeight: 700, color: '#a855f7', padding: '8px 20px', border: '1px solid rgba(168,85,247,0.3)', borderRadius: 9999, background: 'rgba(168,85,247,0.08)', fontFamily: 'JetBrains Mono, monospace', backdropFilter: 'blur(8px)', letterSpacing: '0.04em', boxShadow: '0 0 18px rgba(168,85,247,0.25), 0 0 4px rgba(168,85,247,0.4), inset 0 0 8px rgba(168,85,247,0.1)' }}>
             x402 <span style={{ opacity: 0.5, fontSize: '0.72rem', fontWeight: 500 }}>PROTOCOL</span>
           </span>
         </div>

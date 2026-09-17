@@ -2,22 +2,23 @@ import React, { useEffect, useState } from 'react'
 import { useReputationStream } from '../hooks/useReputationStream'
 
 export function NetworkStatus() {
-  const { connected, chainId, error, switchToBase, reconnect } = useReputationStream()
+  const { connected, online, chainId, error, switchToBase, reconnect } = useReputationStream()
   const [showDetails, setShowDetails] = useState(false)
   const [isSwitching, setIsSwitching] = useState(false)
 
   const isCorrectChain = chainId === 8453
+  const isOnline = online // WebSocket connected OR REST polling active
 
   useEffect(() => {
-    if (error && !connected) {
+    if (error && !isOnline) {
       const timer = setTimeout(() => {
         reconnect()
       }, 5000)
       return () => clearTimeout(timer)
     }
-  }, [error, connected, reconnect])
+  }, [error, isOnline, reconnect])
 
-  if (!window.ethereum && !connected) {
+  if (!window.ethereum && !isOnline) {
     return (
       <div className="network-status offline">
         <div className="status-indicator">
@@ -32,16 +33,16 @@ export function NetworkStatus() {
   }
 
   return (
-    <div className={`network-status ${connected ? 'connected' : 'connecting'}`}>
+    <div className={`network-status ${isOnline ? 'connected' : 'connecting'}`}>
       <button
         className="status-trigger"
         onClick={() => setShowDetails(!showDetails)}
         aria-expanded={showDetails}
       >
         <div className="status-indicator">
-          <span className={`dot ${connected ? 'connected' : 'connecting'}`} />
+          <span className={`dot ${isOnline ? 'connected' : 'connecting'}`} />
           <span className="status-text">
-            {connected ? 'Base Mainnet' : 'Connecting...'}
+            {isOnline ? 'Base Mainnet' : 'Connecting...'}
           </span>
         </div>
         <span className="chevron">{showDetails ? '▲' : '▼'}</span>
@@ -58,14 +59,14 @@ export function NetworkStatus() {
 
           <div className="status-row">
             <span className="label">Status</span>
-            <span className={`value ${connected ? 'connected' : 'disconnected'}`}>
-              {connected ? '● Connected' : '○ Disconnected'}
+            <span className={`value ${isOnline ? 'connected' : 'disconnected'}`}>
+              {isOnline ? '● Connected' : '○ Disconnected'}
             </span>
           </div>
 
           <div className="status-row">
             <span className="label">Events</span>
-            <span className="value">{connected ? 'Streaming' : 'Waiting...'}</span>
+            <span className="value">{isOnline ? 'Streaming' : 'Waiting...'}</span>
           </div>
 
           {!isCorrectChain && chainId && (
@@ -82,7 +83,7 @@ export function NetworkStatus() {
             </button>
           )}
 
-          {!connected && (
+          {!isOnline && (
             <button className="reconnect-btn" onClick={reconnect}>
               Reconnect
             </button>

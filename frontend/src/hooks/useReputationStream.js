@@ -79,6 +79,7 @@ export function useReputationStream() {
     avgScore: 0
   })
   const [connected, setConnected] = useState(false)
+  const [pollingActive, setPollingActive] = useState(false)
   const [chainId, setChainId] = useState(null)
   const [account, setAccount] = useState(null)
   const [error, setError] = useState(null)
@@ -280,6 +281,7 @@ export function useReputationStream() {
   const startPollingFallback = useCallback(async () => {
     console.log('[ReputationStream] Starting REST polling fallback')
     setError(prev => prev ? `${prev} | Using REST polling` : 'Using REST polling fallback')
+    setPollingActive(true)
 
     const poll = async () => {
       if (!isMountedRef.current || !providerRef.current) return
@@ -416,6 +418,7 @@ export function useReputationStream() {
     events: currentParticles,
     stats,
     connected,
+    online: connected || pollingActive,
     chainId,
     account,
     error,

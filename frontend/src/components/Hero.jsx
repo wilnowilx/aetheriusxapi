@@ -685,21 +685,40 @@ return (
         }}>
         </div>
 
-        {/* Launch OS — full-width bottom gradient shadow + floating chevron */}
-        {/* Full-width gradient at the very bottom of the hero */}
+        {/* Launch OS — full-width bottom gradient + edge particles + floating chevron */}
+        {/* Full-width gradient — more intense */}
         <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: 160,
-          background: 'linear-gradient(0deg, rgba(217,70,239,0.18) 0%, rgba(168,85,247,0.10) 30%, rgba(168,85,247,0.03) 60%, transparent 100%)',
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: 180,
+          background: 'linear-gradient(0deg, rgba(217,70,239,0.35) 0%, rgba(168,85,247,0.18) 25%, rgba(168,85,247,0.06) 55%, transparent 100%)',
           pointerEvents: 'none', zIndex: 4,
         }} />
-        {/* Clickable area with ▽ chevron + LAUNCH OS text */}
+        {/* Edge particles — small dots emanating upward from the bottom edge */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: 120,
+          pointerEvents: 'none', zIndex: 4, overflow: 'hidden',
+        }}>
+          {Array.from({ length: 18 }).map((_, i) => (
+            <span key={i} className="edge-particle" style={{
+              position: 'absolute',
+              bottom: -4,
+              left: `${5 + (i / 18) * 90 + (Math.sin(i * 2.3) * 3)}%`,
+              width: i % 3 === 0 ? 3 : 2,
+              height: i % 3 === 0 ? 3 : 2,
+              borderRadius: '50%',
+              background: i % 3 === 0 ? '#d946ef' : i % 3 === 1 ? '#a855f7' : '#ec4899',
+              opacity: 0,
+              animation: `edgeParticleRise ${2.5 + (i % 5) * 0.6}s ${(i * 0.18) % 2}s infinite ease-out`,
+            }} />
+          ))}
+        </div>
+        {/* Clickable area with ▽ chevron + LAUNCH OS text — bigger */}
         <div className="hero-launch-btn" role="button" tabIndex={0}
           onClick={() => document.getElementById('ae-os')?.scrollIntoView({ behavior: 'smooth' })}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') document.getElementById('ae-os')?.scrollIntoView({ behavior: 'smooth' }) }}
           style={{
             position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-            padding: '14px 40px 10px', borderRadius: '50% 50% 0 0 / 40% 40% 0 0',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+            padding: '16px 48px 12px', borderRadius: '50% 50% 0 0 / 40% 40% 0 0',
             background: 'transparent',
             border: 'none', cursor: 'pointer', zIndex: 5,
             transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)',
@@ -707,11 +726,11 @@ return (
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateX(-50%) translateY(-4px)' }}
           onMouseLeave={e => { e.currentTarget.style.transform = 'translateX(-50%) translateY(0)' }}
         >
-          {/* ▽ chevron pointing down */}
-          <svg width="28" height="16" viewBox="0 0 28 16" fill="none" style={{ opacity: 0.8 }}>
-            <path d="M2 2L14 13L26 2" stroke="url(#launchGrad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          {/* ▽ chevron pointing down — bigger */}
+          <svg width="36" height="20" viewBox="0 0 36 20" fill="none" style={{ opacity: 0.85 }}>
+            <path d="M2 2L18 17L34 2" stroke="url(#launchGrad)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/>
             <defs>
-              <linearGradient id="launchGrad" x1="14" y1="2" x2="14" y2="13" gradientUnits="userSpaceOnUse">
+              <linearGradient id="launchGrad" x1="18" y1="2" x2="18" y2="17" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stopColor="#d946ef"/>
                 <stop offset="100%" stopColor="#a855f7"/>
               </linearGradient>
@@ -719,11 +738,11 @@ return (
           </svg>
           <span style={{
             fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '0.75rem', fontWeight: 700,
+            fontSize: '1rem', fontWeight: 700,
             background: 'linear-gradient(135deg, #d946ef 0%, #a855f7 100%)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
-            letterSpacing: '0.14em',
+            letterSpacing: '0.16em',
             textAlign: 'center',
           }}>LAUNCH OS</span>
         </div>
@@ -737,6 +756,11 @@ return (
           @keyframes launchBtnFloat {
             0%, 100% { transform: translateX(-50%) translateY(0); }
             50% { transform: translateX(-50%) translateY(-6px); }
+          }
+          @keyframes edgeParticleRise {
+            0% { transform: translateY(0); opacity: 0; }
+            10% { opacity: 0.9; }
+            100% { transform: translateY(-110px); opacity: 0; }
           }
           .hero-launch-btn:hover {
             animation: none !important;

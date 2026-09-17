@@ -24,7 +24,7 @@ const TextBandRings = ({ liveData }) => {
         color: '#ffffff',
         opacity: 0.9,
         fontSize: 52,
-        text: '   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   ',
+        text: ' THE MARKETPLACE THAT LIVES  THE MARKETPLACE THAT LIVES  THE MARKETPLACE THAT LIVES ',
       },
       {
         radius: 2.55,
@@ -35,7 +35,7 @@ const TextBandRings = ({ liveData }) => {
         color: '#d946ef',
         opacity: 0.82,
         fontSize: 42,
-        text: '   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   ',
+        text: ' API INFRASTRUCTURE FOR AI AGENTS THAT PAY  API INFRASTRUCTURE FOR AI AGENTS THAT PAY ',
       },
       {
         radius: 2.35,
@@ -46,12 +46,12 @@ const TextBandRings = ({ liveData }) => {
         color: '#22d3ee',
         opacity: 0.75,
         fontSize: 34,
-        text: `   ${d.endpoints || '100+'} ENDPOINTS  ·  ${d.freeEndpoints || '40'} FREE  ·  ${d.latency || ''}   ${d.endpoints || '100+'} ENDPOINTS  ·  ${d.freeEndpoints || '40'} FREE  ·  ${d.latency || ''}   `,
+        text: ` ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE  ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE `,
       },
     ]
   }, [liveData])
 
-  // Canvas 2048×96 — texturas sin bloom/sombra, solo texto sólido para legibilidad
+  // Canvas 2048×96 — texturas con glow sutil + DoubleSide para ver parte trasera
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
@@ -67,10 +67,14 @@ const TextBandRings = ({ liveData }) => {
       const phraseW = ctx.measureText(phrase).width
       const repeats = Math.ceil((canvas.width + phraseW) / phraseW)
       const startOffset = (canvas.width - phraseW * repeats) / 2 + phraseW / 2
-      // NO shadow, NO bloom — pure solid text for crisp Saturn-ring look
-      ctx.shadowBlur = 0
-      ctx.shadowColor = 'transparent'
+      // Glow pass — subtle bloom behind text
+      ctx.shadowBlur = 18
+      ctx.shadowColor = ring.color
       ctx.fillStyle = ring.color
+      ctx.globalAlpha = 0.35
+      for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
+      // Solid text pass — crisp foreground
+      ctx.shadowBlur = 0
       ctx.globalAlpha = 1.0
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       ctx.globalAlpha = 1
@@ -83,22 +87,14 @@ const TextBandRings = ({ liveData }) => {
   , [ringsConfig])
 
   const [hoveredRing, setHoveredRing] = useState(null)
-  const neonPulse = useRef(0)
 
   useFrame((state, delta) => {
-    elapsed.current += delta
-    neonPulse.current += delta
     if (groupRef.current) {
       ringsConfig.forEach((ring, i) => {
         const ringGroup = groupRef.current.children[i]
         if (ringGroup) {
           const paused = hoveredRing === i
           if (!paused) ringGroup.rotation.y += delta * ring.speed
-          const frontMesh = ringGroup.children[0]
-          if (frontMesh?.material) {
-            const breath = 0.88 + 0.12 * Math.sin(neonPulse.current * 0.6 + i * 1.5)
-            frontMesh.material.opacity = (hoveredRing === i ? 1 : ring.opacity) * breath
-          }
         }
       })
     }
@@ -119,7 +115,7 @@ const TextBandRings = ({ liveData }) => {
               map={ringTextures[ringIdx]}
               transparent
               opacity={ring.opacity}
-              side={THREE.FrontSide}
+              side={THREE.DoubleSide}
               depthWrite={false}
               blending={THREE.AdditiveBlending}
               toneMapped={false}
@@ -134,11 +130,9 @@ const TextBandRings = ({ liveData }) => {
 // === OUTER HALO ===
 function OuterHalo() {
   const uniforms = useMemo(() => ({
-    time: { value: 0 },
     colorA: { value: new THREE.Color(0xa855f7) },
     colorB: { value: new THREE.Color(0xd946ef) },
   }), [])
-  useFrame((state, delta) => { uniforms.time.value += delta * 0.4 })
   return (
     <mesh scale={1.4}>
       <sphereGeometry args={[2.2, 24, 18]} />
@@ -154,13 +148,11 @@ function OuterHalo() {
         `}
         fragmentShader={`
           varying vec3 vNormal; varying vec3 vWorldPos;
-          uniform float time; uniform vec3 colorA; uniform vec3 colorB;
+          uniform vec3 colorA; uniform vec3 colorB;
           void main() {
             float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.5);
-            float pulse = 0.85 + 0.15 * sin(time * 0.4 + vWorldPos.y * 1.2);
-            float wave = 0.5 + 0.5 * sin(time * 0.3 + vWorldPos.x * 1.8);
-            vec3 col = mix(colorA, colorB, wave * 0.2);
-            gl_FragColor = vec4(col, fresnel * pulse * 0.05);
+            vec3 col = mix(colorA, colorB, 0.15);
+            gl_FragColor = vec4(col, fresnel * 0.05);
           }
         `}
         side={THREE.BackSide} transparent depthWrite={false} blending={THREE.AdditiveBlending}
@@ -173,12 +165,10 @@ function OuterHalo() {
 // Un solo mesh con shader unificado: fresnel + pulse + wave. Un draw call menos.
 function UnifiedHalo() {
   const uniforms = useMemo(() => ({
-    time: { value: 0 },
     colorA: { value: new THREE.Color(0x22d3ee) },
     colorB: { value: new THREE.Color(0xa855f7) },
     colorC: { value: new THREE.Color(0xd946ef) },
   }), [])
-  useFrame((state, delta) => { uniforms.time.value += delta * 0.6 })
   return (
     <mesh>
       <sphereGeometry args={[2.65, 28, 20]} />
@@ -195,18 +185,14 @@ function UnifiedHalo() {
         `}
         fragmentShader={`
           varying vec3 vPos; varying vec3 vNormal; varying vec3 vWorldPos;
-          uniform float time; uniform vec3 colorA; uniform vec3 colorB; uniform vec3 colorC;
+          uniform vec3 colorA; uniform vec3 colorB; uniform vec3 colorC;
           void main() {
             float dist = length(vPos) / 2.65;
             float radial = pow(1.0 - dist, 2.0);
-            // Sombra que emana hacia afuera desde la superficie, sin borde contenido
-            float pulse = 0.7 + 0.3 * sin(time * 0.5 + vWorldPos.y * 1.2);
-            float wave = 0.5 + 0.5 * sin(time * 0.3 + vWorldPos.x * 1.5);
             float polar = pow(abs(vPos.y / 2.65), 2.0);
-            vec3 col = mix(colorA, colorB, wave * 0.3);
-            col = mix(col, colorC, 0.15 * sin(time * 0.3 + vWorldPos.y));
+            vec3 col = mix(colorA, colorB, 0.15);
             col += polar * vec3(0.2, 0.08, 0.35) * 0.5;
-            float alpha = radial * 0.10 * pulse * (1.0 + polar * 0.8);
+            float alpha = radial * 0.10 * (1.0 + polar * 0.8);
             alpha *= smoothstep(1.0, 0.3, dist);
             gl_FragColor = vec4(col, alpha);
           }
@@ -219,13 +205,10 @@ function UnifiedHalo() {
 
 // === INNER CORE ===
 function InnerCore() {
-  const uniforms = useMemo(() => ({ time: { value: 0 } }), [])
-  useFrame((state, delta) => { uniforms.time.value += delta * 0.4 })
   return (
     <mesh scale={0.85}>
       <sphereGeometry args={[2.2, 32, 32]} />
       <shaderMaterial
-        uniforms={uniforms}
         vertexShader={`
           varying vec3 vNormal;
           void main() {
@@ -234,12 +217,11 @@ function InnerCore() {
           }
         `}
         fragmentShader={`
-          varying vec3 vNormal; uniform float time;
+          varying vec3 vNormal;
           void main() {
             float rim = pow(1.0 - abs(dot(vNormal, vec3(0, 0, 1))), 2.0);
-            float pulse = 0.85 + 0.15 * sin(time * 0.4);
             vec3 col = vec3(0.659, 0.333, 0.969);
-            gl_FragColor = vec4(col, rim * pulse * 0.04);
+            gl_FragColor = vec4(col, rim * 0.04);
           }
         `}
         side={THREE.FrontSide} transparent depthWrite={false} blending={THREE.AdditiveBlending}
@@ -360,13 +342,12 @@ function PulsarCore({ gasUniforms }) {
         uniforms={gasUniforms}
         vertexShader={`
           attribute float aSize; attribute vec3 aColor;
-          varying vec3 vColor; varying float vAlpha; uniform float pulse;
+          varying vec3 vColor; varying float vAlpha;
           void main() {
             vColor = aColor;
-            float beat = 0.5 + 0.5 * pulse;
-            vAlpha = beat;
+            vAlpha = 1.0;
             vec4 mv = modelViewMatrix * vec4(position, 1.0);
-            gl_PointSize = aSize * (220.0 / -mv.z) * (0.9 + 0.5 * beat);
+            gl_PointSize = aSize * (220.0 / -mv.z);
             gl_Position = projectionMatrix * mv;
           }
         `}
@@ -374,10 +355,10 @@ function PulsarCore({ gasUniforms }) {
           varying vec3 vColor; varying float vAlpha;
           void main() {
             vec2 uv = gl_PointCoord * 2.0 - 1.0;
-            float d = abs(uv.x) + abs(uv.y) * 0.5; // tiny diamond
+            float d = abs(uv.x) + abs(uv.y) * 0.5;
             if (d > 1.0) discard;
             float glow = pow(1.0 - d, 2.0);
-            float core = pow(1.0 - d, 6.0); // hot white center
+            float core = pow(1.0 - d, 6.0);
             vec3 col = mix(vColor, vec3(1.0), core * 0.7);
             col += vec3(0.3, 0.6, 0.8) * glow * 0.4;
             gl_FragColor = vec4(col, glow * vAlpha * 0.9);
@@ -396,29 +377,48 @@ function BaseCore({ flowRef }) {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Base 3D Logo: bloques con BoxGeometry — mayor separación, bordes oscuros, solidez
+  // Base 3D Logo: L is ONE continuous shape (ExtrudeGeometry), then 3 separate squares
   const baseLogoBlocks = useMemo(() => {
     const s = 0.18        // block size
-    const g = 0.06        // gap between blocks (increased from 0.02)
-    const d = 0.06        // depth (thinner)
-    const tabW = s * 0.42 // raised tab width (40%)
-    const tabH = s * 0.42 // raised tab height (40%)
-    const tabY = s / 2 + tabH / 2 + 0.01 // tab sits on top with tiny offset to avoid shadow on block below
+    const g = 0.06        // gap between L and first square
+    const d = 0.06        // depth (extrude)
+    const tabW = s * 0.40 // tab width = 40%
+    const tabH = s * 0.40 // tab height = 40%
+    const r = s * 0.05    // corner radius = 5%
+
+    // L-shape as single ExtrudeGeometry: base square + tab on top-left = ONE mesh
+    const shape = new THREE.Shape()
+    // Start bottom-left of base, go clockwise
+    shape.moveTo(-s / 2, -s / 2)
+    shape.lineTo(s / 2, -s / 2)
+    shape.lineTo(s / 2, s / 2)
+    shape.lineTo(-s / 2 + tabW, s / 2)
+    shape.lineTo(-s / 2 + tabW, s / 2 + tabH)
+    shape.lineTo(-s / 2, s / 2 + tabH)
+    shape.lineTo(-s / 2, -s / 2)
+
+    const extrudeSettings = {
+      depth: d,
+      bevelEnabled: true,
+      bevelThickness: 0.005,
+      bevelSize: 0.005,
+      bevelSegments: 2,
+    }
+    const lGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
+    lGeometry.center()
+
+    // Center X for the 3 squares (after L + gap)
     const totalW = 4 * s + 3 * g
     const cx = -totalW / 2
 
-    return [
-      // Block 1: base square (left, part of L)
-      { pos: [cx + s / 2, 0, 0], size: [s, s, d] },
-      // Block 1: raised tab (top-left) — offset up to not shadow block 2
-      { pos: [cx + tabW / 2 - 0.01, tabY, 0], size: [tabW, tabH, d] },
-      // Block 2 — separated by gap
-      { pos: [cx + s + g + s / 2, 0, 0], size: [s, s, d] },
-      // Block 3 — separated by gap
-      { pos: [cx + 2 * (s + g) + s / 2, 0, 0], size: [s, s, d] },
-      // Block 4 — separated by gap
-      { pos: [cx + 3 * (s + g) + s / 2, 0, 0], size: [s, s, d] },
-    ]
+    return {
+      lGeometry,
+      squares: [
+        { pos: [cx + s + g + s / 2, 0, 0], size: [s, s, d] },
+        { pos: [cx + 2 * (s + g) + s / 2, 0, 0], size: [s, s, d] },
+        { pos: [cx + 3 * (s + g) + s / 2, 0, 0], size: [s, s, d] },
+      ],
+    }
   }, [])
 
   useFrame((state, delta) => {
@@ -433,7 +433,7 @@ function BaseCore({ flowRef }) {
       // BREATHING: respiración orgánica + beat del flujo (toned down)
       const breath = Math.sin(elapsed.current * 1.5)
       const breathY = Math.sin(elapsed.current * 0.9) * 0.03 // bob vertical sutil
-      const beat = flow.pulse * 0.5 // toned down from full pulse
+      const beat = 0 // static — no scale pulse
       const s = 1 + 0.03 * breath + 0.08 * beat
       groupRef.current.scale.set(s, s, s)
       groupRef.current.position.y = breathY // vida, no anclado
@@ -443,20 +443,18 @@ function BaseCore({ flowRef }) {
       if (logoGroup?.isGroup) {
         logoGroup.children.forEach(child => {
           if (child?.material) {
-            child.material.opacity = 0.88 + 0.12 * breath
+            child.material.opacity = 1.0
           }
         })
       }
     }
   })
 
-  // Gas sincronizado: pulsa con el mismo flowRef del núcleo
-  const gasUniforms = useMemo(() => ({ time: { value: 0 }, flow: { value: 1 }, pulse: { value: 0 } }), [])
+  // Gas sincronizado — static opacity, no pulse-driven beats
+  const gasUniforms = useMemo(() => ({ time: { value: 0 }, flow: { value: 1 } }), [])
   useFrame((_, delta) => {
     gasUniforms.time.value += delta * 0.5
     gasUniforms.flow.value = flowRef?.current?.intensity || 1
-    // Pulsación sincronizada con el latido del BASE (dampened to prevent flashy bursts)
-    gasUniforms.pulse.value = (flowRef?.current?.pulse || 0.3) * 0.4
   })
 
   return (
@@ -468,7 +466,7 @@ function BaseCore({ flowRef }) {
           uniforms={gasUniforms}
           vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
-            varying vec3 vPos; uniform float time; uniform float pulse; uniform float flow;
+            varying vec3 vPos; uniform float time; uniform float flow;
             void main(){
               float dist = length(vPos) / 1.5;
               float fog1 = pow(1.0 - dist, 2.0) * pow(dist, 0.4) * 1.5;
@@ -476,11 +474,9 @@ function BaseCore({ flowRef }) {
               float fog = fog1 + fog2;
               float swirl = sin(vPos.x*5.0+time*0.4)*sin(vPos.y*4.0+time*0.3)*sin(vPos.z*3.5+time*0.35);
               float turbulence = 0.5 + 0.5 * swirl;
-              float beat = 0.4 + 0.6 * pulse;
-              // Efecto neón cian y azul base puro
               vec3 col = mix(vec3(0.0,0.3,1.0), vec3(0.0,0.85,1.0), dist*0.5);
               col += vec3(0.0,0.5,1.0) * (1.0-dist) * 0.4;
-              float alpha = fog * turbulence * 0.18 * beat * (0.5 + 0.5*flow);
+              float alpha = fog * turbulence * 0.18 * (0.5 + 0.5*flow);
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.BackSide}
@@ -493,34 +489,44 @@ function BaseCore({ flowRef }) {
           uniforms={gasUniforms}
           vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
-            varying vec3 vPos; uniform float time; uniform float flow; uniform float pulse;
+            varying vec3 vPos; uniform float time; uniform float flow;
             void main(){
               float dist = length(vPos) / 1.2;
               float radial = pow(1.0 - dist, 2.5);
               float swirl = sin(vPos.x*6.0+time*0.5)*sin(vPos.y*5.0+time*0.4)*sin(vPos.z*4.0+time*0.45);
               float tendrils = 0.4 + 0.6 * swirl;
               float noise = tendrils * 0.7 + 0.3;
-              float beat = 0.3 + 0.7 * pulse;
-              // Efecto neón cian y azul base
               vec3 col = mix(vec3(0.0,0.4,1.0), vec3(0.0,0.9,1.0), noise*0.5);
               col += vec3(0.0,0.5,1.0) * (1.0-dist) * 0.4;
-              float alpha = radial * noise * 0.20 * beat * (0.4 + 0.6*flow);
+              float alpha = radial * noise * 0.20 * (0.4 + 0.6*flow);
               alpha *= smoothstep(1.0, 0.15, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
-      {/* BASE 3D Logo: bloques sólidos con bordes oscuros + "BASE" text below */}
+      {/* BASE 3D Logo: L-shape (single extruded mesh) + 3 separate squares + "BASE" text */}
       <group renderOrder={-1}>
-        {baseLogoBlocks.map((block, i) => (
+        {/* L-shape as ONE continuous block */}
+        <mesh geometry={baseLogoBlocks.lGeometry}>
+          <meshBasicMaterial
+            color="#003399"
+            transparent
+            opacity={1.0}
+            side={THREE.DoubleSide}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+        {/* 3 separate square blocks */}
+        {baseLogoBlocks.squares.map((block, i) => (
           <mesh key={i} position={block.pos}>
             <boxGeometry args={block.size} />
             <meshBasicMaterial
               color="#003399"
               transparent
               opacity={1.0}
-              side={THREE.FrontSide}
+              side={THREE.DoubleSide}
               depthWrite={false}
               toneMapped={false}
             />
@@ -961,7 +967,7 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
             float travel = clamp(dist / 2.2, 0.0, 1.0);
             // PARTS visible through entire journey — fade gently at edge, don't vanish
             float edgeFade = 1.0 - smoothstep(0.5, 0.95, travel) * 0.6;
-            vAlpha = (0.7 + 0.2 * sin(time * 2.0 + dist * 4.0)) * (0.8 + 0.15 * flow) * edgeFade;
+            vAlpha = 0.8 * (0.8 + 0.15 * flow) * edgeFade;
             vec4 mv = modelViewMatrix * vec4(position, 1.0);
             float sz = aSize * (1.0 + travel * 0.3);
             gl_PointSize = sz * (1.0 + 0.3 * flow) * (220.0 / -mv.z);
@@ -1033,13 +1039,11 @@ function AgentNodes() {
         uniforms={uniforms}
         vertexShader={`
           attribute float aSize; attribute vec3 aColor;
-          varying vec3 vColor; varying float vAlpha; uniform float time;
+          varying vec3 vColor; varying float vAlpha;
           void main() {
             vColor = aColor;
-            vec3 pos = position;
-            pos += normalize(position) * sin(time * 1.0 + position.x * 2.5) * 0.025;
-            vAlpha = 0.5 + 0.5 * sin(time * 1.6 + position.y * 1.8);
-            vec4 mv = modelViewMatrix * vec4(pos, 1.0);
+            vAlpha = 0.6;
+            vec4 mv = modelViewMatrix * vec4(position, 1.0);
             gl_PointSize = aSize * (360.0 / -mv.z);
             gl_Position = projectionMatrix * mv;
           }
@@ -1117,7 +1121,7 @@ function OrbitalData({ liveData }) {
     spriteRefs.current.forEach((sprite, i) => {
       if (sprite) {
         const isHovered = hovered === i
-        sprite.material.opacity = isHovered ? 0.9 : (0.45 + 0.2 * Math.sin(elapsed.current * 1.5 + i * 1.2))
+        sprite.material.opacity = isHovered ? 0.9 : 0.45
         const targetScale = isHovered ? labels[i].size * 2.4 : labels[i].size * 1.8
         sprite.scale.x += (targetScale - sprite.scale.x) * 0.1
       }
@@ -1199,10 +1203,10 @@ function DataStream() {
           uniforms={uniforms}
           vertexShader={`
             attribute float aSize; attribute vec3 aColor;
-            varying vec3 vColor; varying float vAlpha; uniform float time;
+            varying vec3 vColor; varying float vAlpha;
             void main() {
               vColor = aColor;
-              vAlpha = 0.4 + 0.6 * sin(time * 2.0 + position.x * 3.0);
+              vAlpha = 0.5;
               vec4 mv = modelViewMatrix * vec4(position, 1.0);
               gl_PointSize = aSize * (280.0 / -mv.z);
               gl_Position = projectionMatrix * mv;
@@ -1258,7 +1262,7 @@ function CosmicComets() {
     const sz = ref.current?.geometry?.attributes?.aSize
     if (sz) {
       for (let i = 0; i < 2; i++) {
-        sz.array[i] = 0.02 + 0.02 * Math.sin(elapsed.current * 2 + i * 1.5)
+        sz.array[i] = 0.03
       }
       sz.needsUpdate = true
     }
@@ -1272,7 +1276,7 @@ function CosmicComets() {
       </bufferGeometry>
       <shaderMaterial
         uniforms={uniforms}
-        vertexShader={`attribute float aSize; attribute vec3 aColor; varying vec3 vColor; varying float vAlpha; uniform float time; void main(){vColor=aColor; vAlpha=0.6+0.4*sin(time*1.2+position.x*2.0); vec4 mv=modelViewMatrix*vec4(position,1.0); gl_PointSize=aSize*(500.0/-mv.z); gl_Position=projectionMatrix*mv;}`}
+        vertexShader={`attribute float aSize; attribute vec3 aColor; varying vec3 vColor; varying float vAlpha; void main(){vColor=aColor; vAlpha=0.6; vec4 mv=modelViewMatrix*vec4(position,1.0); gl_PointSize=aSize*(500.0/-mv.z); gl_Position=projectionMatrix*mv;}`}
         fragmentShader={`varying vec3 vColor; varying float vAlpha; void main(){ float d=length(gl_PointCoord-vec2(0.5)); if(d>0.5)discard; float g=pow(1.0-d*2.0,1.5); gl_FragColor=vec4(vColor,g*vAlpha);}`}
         transparent depthWrite={false} blending={THREE.AdditiveBlending}
       />
