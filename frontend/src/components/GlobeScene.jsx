@@ -136,7 +136,7 @@ const TextBandRings = ({ liveData }) => {
               map={ringTextures[ringIdx]}
               transparent
               opacity={ring.opacity}
-              side={THREE.DoubleSide}
+              side={THREE.FrontSide}
               depthWrite={false}
               blending={THREE.AdditiveBlending}
               toneMapped={false}
@@ -298,14 +298,8 @@ function VisibleWireframe() {
           }
 
           float ambientSparkle(vec3 pos, float t) {
-            // Dyson megastructure: no sparkles, only faint structural grid-pulse
-            float s = 0.0;
-            float angle = atan(pos.z, pos.x);
-            float lat = asin(pos.y / 2.2);
-            // Barely perceptible grid-node breathing — like distant reactor nodes
-            s += pow(sin(angle * 12.0 + t * 1.5) * 0.5 + 0.5, 8.0) * 0.001;
-            s += pow(sin(lat * 8.0 - t * 0.8) * 0.5 + 0.5, 10.0) * 0.0005;
-            return s;
+            // No sparkles — clean structural grid only
+            return 0.0;
           }
 
           void main() {
@@ -439,11 +433,11 @@ function BaseCore({ flowRef }) {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Base 3D Logo: 4 bloques con BoxGeometry (simple y confiable)
+  // Base 3D Logo: bloques con BoxGeometry — compactos, no dominan el núcleo
   const baseLogoBlocks = useMemo(() => {
-    const s = 0.32        // block size
-    const g = 0.032       // gap (10%)
-    const d = 0.1         // depth (thickness)
+    const s = 0.18        // block size (reduced from 0.32)
+    const g = 0.02        // gap
+    const d = 0.06        // depth (thinner)
     const tabW = s * 0.42 // raised tab width (40%)
     const tabH = s * 0.42 // raised tab height (40%)
     const tabY = s / 2 + tabH / 2 // tab sits on top of base
@@ -562,7 +556,7 @@ function BaseCore({ flowRef }) {
             <meshBasicMaterial
               color="#0052FF"
               transparent
-              opacity={0.85}
+              opacity={0.7}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
               toneMapped={false}
