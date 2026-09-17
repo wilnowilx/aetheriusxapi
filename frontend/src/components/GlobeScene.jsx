@@ -104,17 +104,37 @@ const TextBandRings = ({ liveData }) => {
     <group ref={groupRef}>
       {ringsConfig.map((ring, ringIdx) => (
         <group key={ringIdx} position={[0, ring.yOffset, 0]} rotation={[ring.tilt, 0, 0]}>
-          {/* Banda interna — visible desde fuera a través del wireframe */}
+          {/* Banda interna — DoubleSide con perspectiva: frente=100%, trasero=20% */}
           <mesh
             onPointerOver={(e) => { e.stopPropagation(); setHoveredRing(ringIdx); document.body.style.cursor = 'pointer' }}
             onPointerOut={() => { setHoveredRing(null); document.body.style.cursor = 'auto' }}
             onClick={() => {}}
           >
             <cylinderGeometry args={[ring.radius, ring.radius, ring.bandWidth, 128, 1, true]} />
-            <meshBasicMaterial
-              map={ringTextures[ringIdx]}
+            <shaderMaterial
+              uniforms={{
+                uMap: { value: ringTextures[ringIdx] },
+                uOpacity: { value: ring.opacity },
+              }}
+              vertexShader={`
+                varying vec2 vUv;
+                void main() {
+                  vUv = uv;
+                  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+              `}
+              fragmentShader={`
+                uniform sampler2D uMap;
+                uniform float uOpacity;
+                varying vec2 vUv;
+                void main() {
+                  vec4 texColor = texture2D(uMap, vUv);
+                  // gl_FrontFacing: true = facing camera (front), false = away (back)
+                  float faceFactor = gl_FrontFacing ? 1.0 : 0.2; // backface 80% dimmer
+                  gl_FragColor = vec4(texColor.rgb, texColor.a * uOpacity * faceFactor);
+                }
+              `}
               transparent
-              opacity={ring.opacity}
               side={THREE.DoubleSide}
               depthWrite={false}
               blending={THREE.AdditiveBlending}
@@ -379,16 +399,14 @@ function BaseCore({ flowRef }) {
 
   // Base 3D Logo: L is ONE continuous shape (ExtrudeGeometry), then 3 separate squares
   const baseLogoBlocks = useMemo(() => {
-    const s = 0.18        // block size
-    const g = 0.06        // gap between L and first square
-    const d = 0.06        // depth (extrude)
+    const s = 0.24        // block size (bigger from 0.18)
+    const g = 0.08        // gap between blocks
+    const d = 0.08        // depth (thicker)
     const tabW = s * 0.40 // tab width = 40%
     const tabH = s * 0.40 // tab height = 40%
-    const r = s * 0.05    // corner radius = 5%
 
-    // L-shape as single ExtrudeGeometry: base square + tab on top-left = ONE mesh
+    // L-shape: base square + tab on top-left = ONE mesh
     const shape = new THREE.Shape()
-    // Start bottom-left of base, go clockwise
     shape.moveTo(-s / 2, -s / 2)
     shape.lineTo(s / 2, -s / 2)
     shape.lineTo(s / 2, s / 2)
@@ -405,18 +423,22 @@ function BaseCore({ flowRef }) {
       bevelSegments: 2,
     }
     const lGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-    lGeometry.center()
+    // DON'T center — L goes leftmost, shape already centered on X
 
-    // Center X for the 3 squares (after L + gap)
+    // Layout: [L] gap [□] gap [□] gap [□]
+    // Total width = s(L) + g + s + g + s + g + s = 4s + 3g
+    // L center X = -(4s+3g)/2 + s/2
+    // Square i center X = L_center + s/2 + g + s/2 + i*(s+g)
     const totalW = 4 * s + 3 * g
-    const cx = -totalW / 2
+    const lCenterX = -totalW / 2 + s / 2
 
     return {
       lGeometry,
+      lPos: [lCenterX, 0, 0],
       squares: [
-        { pos: [cx + s + g + s / 2, 0, 0], size: [s, s, d] },
-        { pos: [cx + 2 * (s + g) + s / 2, 0, 0], size: [s, s, d] },
-        { pos: [cx + 3 * (s + g) + s / 2, 0, 0], size: [s, s, d] },
+        { pos: [lCenterX + s / 2 + g + s / 2, 0, 0], size: [s, s, d] },
+        { pos: [lCenterX + s / 2 + g + s + g + s / 2, 0, 0], size: [s, s, d] },
+        { pos: [lCenterX + s / 2 + g + s + g + s + g + s / 2, 0, 0], size: [s, s, d] },
       ],
     }
   }, [])
@@ -450,10 +472,10 @@ function BaseCore({ flowRef }) {
     }
   })
 
-  // Gas sincronizado — static opacity, no pulse-driven beats
+  // Gas sincronizado — very subtle swirl, no pulse-driven beats
   const gasUniforms = useMemo(() => ({ time: { value: 0 }, flow: { value: 1 } }), [])
   useFrame((_, delta) => {
-    gasUniforms.time.value += delta * 0.5
+    gasUniforms.time.value += delta * 0.15 // very slow (was 0.5)
     gasUniforms.flow.value = flowRef?.current?.intensity || 1
   })
 
@@ -473,10 +495,10 @@ function BaseCore({ flowRef }) {
               float fog2 = pow(1.0 - dist, 0.8) * 0.4;
               float fog = fog1 + fog2;
               float swirl = sin(vPos.x*5.0+time*0.4)*sin(vPos.y*4.0+time*0.3)*sin(vPos.z*3.5+time*0.35);
-              float turbulence = 0.5 + 0.5 * swirl;
+              float turbulence = 0.6 + 0.3 * swirl; // reduced from 0.5+0.5*swirl
               vec3 col = mix(vec3(0.0,0.3,1.0), vec3(0.0,0.85,1.0), dist*0.5);
               col += vec3(0.0,0.5,1.0) * (1.0-dist) * 0.4;
-              float alpha = fog * turbulence * 0.18 * (0.5 + 0.5*flow);
+              float alpha = fog * turbulence * 0.14 * (0.5 + 0.5*flow); // reduced from 0.18
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.BackSide}
@@ -494,21 +516,21 @@ function BaseCore({ flowRef }) {
               float dist = length(vPos) / 1.2;
               float radial = pow(1.0 - dist, 2.5);
               float swirl = sin(vPos.x*6.0+time*0.5)*sin(vPos.y*5.0+time*0.4)*sin(vPos.z*4.0+time*0.45);
-              float tendrils = 0.4 + 0.6 * swirl;
+              float tendrils = 0.55 + 0.35 * swirl; // reduced from 0.4+0.6*swirl
               float noise = tendrils * 0.7 + 0.3;
               vec3 col = mix(vec3(0.0,0.4,1.0), vec3(0.0,0.9,1.0), noise*0.5);
               col += vec3(0.0,0.5,1.0) * (1.0-dist) * 0.4;
-              float alpha = radial * noise * 0.20 * (0.4 + 0.6*flow);
+              float alpha = radial * noise * 0.14 * (0.4 + 0.6*flow); // reduced from 0.20
               alpha *= smoothstep(1.0, 0.15, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
-      {/* BASE 3D Logo: L-shape (single extruded mesh) + 3 separate squares + "BASE" text */}
+      {/* BASE 3D Logo: L-shape (single extruded mesh) FIRST + 3 separate squares + "BASE" text */}
       <group renderOrder={-1}>
-        {/* L-shape as ONE continuous block */}
-        <mesh geometry={baseLogoBlocks.lGeometry}>
+        {/* L-shape as ONE continuous block — LEFTMOST */}
+        <mesh geometry={baseLogoBlocks.lGeometry} position={baseLogoBlocks.lPos}>
           <meshBasicMaterial
             color="#003399"
             transparent
