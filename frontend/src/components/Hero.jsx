@@ -676,33 +676,6 @@ return (
           <div style={{ width: 2, height: 24, background: 'linear-gradient(180deg, rgba(168,85,247,0.6), transparent)', borderRadius: 1 }} />
         </div>
 
-        {/* x402 badge — arriba, fuera del centro del globo */}
-        <div style={{
-          position: 'absolute', top: 90, left: '50%', transform: 'translateX(-50%)',
-          zIndex: 15,
-          display: 'inline-flex', alignItems: 'center', gap: 8,
-          padding: '6px 16px', borderRadius: 20,
-          background: 'rgba(168,85,247,0.06)',
-          border: '1px solid rgba(168,85,247,0.15)',
-          backdropFilter: 'blur(12px)',
-        }}>
-          <span style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '0.72rem', fontWeight: 700,
-            color: '#a855f7',
-            letterSpacing: '0.08em',
-          }}>x402</span>
-          <span style={{
-            width: 1, height: 12, background: 'rgba(168,85,247,0.3)',
-          }} />
-          <span style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '0.6rem',
-            color: '#d946ef',
-            letterSpacing: '0.1em',
-          }}>PROTOCOL</span>
-        </div>
-
         {/* Content — text lives in orbital bands */}
         <div className="hero-fade" style={{
           position: 'relative', zIndex: 10,
@@ -712,34 +685,42 @@ return (
         }}>
         </div>
 
-        {/* Launch OS — big floating button with glow */}
+        {/* Launch OS — bottom-edge gradient with ▽ chevron */}
         <div className="hero-launch-btn" role="button" tabIndex={0}
           onClick={() => document.getElementById('ae-os')?.scrollIntoView({ behavior: 'smooth' })}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') document.getElementById('ae-os')?.scrollIntoView({ behavior: 'smooth' }) }}
           style={{
-            position: 'absolute', bottom: 48, left: '50%', transform: 'translateX(-50%)',
-            display: 'flex', alignItems: 'center', gap: 14,
-            padding: '18px 40px', borderRadius: 16,
-            background: 'linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(217,70,239,0.10) 100%)',
-            border: '1.5px solid rgba(168,85,247,0.4)',
-            backdropFilter: 'blur(16px)',
+            position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+            padding: '14px 28px 16px', borderRadius: 12,
+            background: 'linear-gradient(0deg, rgba(168,85,247,0.14) 0%, rgba(217,70,239,0.06) 60%, transparent 100%)',
+            border: 'none',
             cursor: 'pointer', zIndex: 5,
             transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)',
-            boxShadow: '0 0 50px rgba(168,85,247,0.25), 0 0 100px rgba(217,70,239,0.12), 0 12px 40px rgba(0,0,0,0.4)',
             animation: 'launchBtnFloat 3s ease-in-out infinite',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(168,85,247,0.25) 0%, rgba(217,70,239,0.18) 100%)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.6)'; e.currentTarget.style.boxShadow = '0 0 70px rgba(168,85,247,0.35), 0 0 140px rgba(217,70,239,0.18), 0 16px 48px rgba(0,0,0,0.5)'; e.currentTarget.style.transform = 'translateX(-50%) scale(1.05)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(217,70,239,0.10) 100%)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.4)'; e.currentTarget.style.boxShadow = '0 0 50px rgba(168,85,247,0.25), 0 0 100px rgba(217,70,239,0.12), 0 12px 40px rgba(0,0,0,0.4)'; e.currentTarget.style.transform = 'translateX(-50%) scale(1)' }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateX(-50%) scale(1.05)' }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateX(-50%) scale(1)' }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          {/* ▽ chevron pointing down */}
+          <svg width="22" height="14" viewBox="0 0 22 14" fill="none" style={{ opacity: 0.6 }}>
+            <path d="M2 2L11 11L20 2" stroke="url(#launchGrad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <defs>
+              <linearGradient id="launchGrad" x1="11" y1="2" x2="11" y2="11" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#d946ef"/>
+                <stop offset="100%" stopColor="#a855f7"/>
+              </linearGradient>
+            </defs>
+          </svg>
           <span style={{
             fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '1rem', fontWeight: 700,
-            color: '#c084fc',
-            letterSpacing: '0.08em',
-            textShadow: '0 0 20px rgba(168,85,247,0.5)',
-          }}>Launch OS</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d946ef" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            fontSize: '0.8rem', fontWeight: 700,
+            background: 'linear-gradient(135deg, #d946ef 0%, #a855f7 100%)',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            letterSpacing: '0.12em',
+            textAlign: 'center',
+          }}>LAUNCH OS</span>
         </div>
 
         <style>{`
@@ -750,7 +731,7 @@ return (
           @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
           @keyframes launchBtnFloat {
             0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-8px); }
+            50% { transform: translateX(-50%) translateY(-6px); }
           }
           .hero-launch-btn:hover {
             animation: none !important;

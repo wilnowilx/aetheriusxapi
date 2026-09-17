@@ -19,47 +19,47 @@ const TextBandRings = ({ liveData }) => {
     const d = liveData || {}
     return [
       {
-        radius: 2.0,
+        radius: 2.05,
         tilt: 0.15,
         yOffset: 0.4,
         speed: 0.015,
-        bandWidth: 0.18,
+        bandWidth: 0.24,
         color: '#ffffff',
         opacity: 0.85,
-        fontSize: 30,
+        fontSize: 38,
         text: '   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   ',
       },
       {
-        radius: 1.7,
+        radius: 1.72,
         tilt: -0.1,
         yOffset: 0.0,
         speed: -0.025,
-        bandWidth: 0.14,
+        bandWidth: 0.19,
         color: '#d946ef',
         opacity: 0.8,
-        fontSize: 24,
+        fontSize: 30,
         text: '   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   ',
       },
       {
-        radius: 1.4,
+        radius: 1.42,
         tilt: 0.06,
         yOffset: -0.4,
         speed: 0.035,
-        bandWidth: 0.1,
+        bandWidth: 0.14,
         color: '#22d3ee',
         opacity: 0.75,
-        fontSize: 20,
+        fontSize: 26,
         text: `   ${d.endpoints || '100+'} ENDPOINTS  ·  ${d.freeEndpoints || '40'} FREE  ·  ${d.latency || ''}   ${d.endpoints || '100+'} ENDPOINTS  ·  ${d.freeEndpoints || '40'} FREE  ·  ${d.latency || ''}   `,
       },
     ]
   }, [liveData])
 
-  // Canvas 2048×64 — texturas de las bandas internas
+  // Canvas 2048×80 — texturas de las bandas internas (mayor resolución para texto más grande)
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
       canvas.width = 2048
-      canvas.height = 64
+      canvas.height = 80
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       const font = `900 ${ring.fontSize}px 'JetBrains Mono', 'Fira Code', monospace`
@@ -72,12 +72,12 @@ const TextBandRings = ({ liveData }) => {
       const startOffset = (canvas.width - phraseW * repeats) / 2 + phraseW / 2
       // Pass 1: Wide bloom
       ctx.shadowColor = ring.color
-      ctx.shadowBlur = 32
+      ctx.shadowBlur = 40
       ctx.fillStyle = ring.color
       ctx.globalAlpha = 0.4
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       // Pass 2: Mid bloom
-      ctx.shadowBlur = 14
+      ctx.shadowBlur = 16
       ctx.globalAlpha = 0.7
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       // Pass 3: Core solid
@@ -313,17 +313,17 @@ function VisibleWireframe() {
             float fade = smoothstep(0.0, 0.3, abs(vPos.y));
             float sparkle = ambientSparkle(vPos, time * 2.0);
 
-            vec3 cyanBase = vec3(0.0, 0.75, 1.0);
-            vec3 purpleAccent = vec3(0.55, 0.25, 0.9);
+            vec3 cyanBase = vec3(0.0, 0.85, 1.0);
+            vec3 purpleAccent = vec3(0.65, 0.33, 0.97);
             float cyanPulse = 0.6 + 0.4 * sin(time * 0.6 + vPos.x * 2.0);
-            vec3 col = mix(cyanBase, purpleAccent, 0.25 + 0.15 * sin(time * 0.25));
-            col *= (0.7 + 0.3 * cyanPulse);
+            vec3 col = mix(cyanBase, purpleAccent, 0.3 + 0.2 * sin(time * 0.25));
+            col *= (0.8 + 0.2 * cyanPulse);
 
             float polar = polarGlow(vPos);
-            col += polar * vec3(0.1, 0.05, 0.3);
+            col += polar * vec3(0.15, 0.08, 0.35);
             col += vec3(0.3, 0.6, 0.8) * sparkle * 0.01;
 
-            float alpha = (0.10 + polar * 0.05 + cyanPulse * 0.04) * pulse * fade + sparkle * 0.0005;
+            float alpha = (0.18 + polar * 0.08 + cyanPulse * 0.06) * pulse * fade + sparkle * 0.0005;
             gl_FragColor = vec4(col, alpha);
           }
         `}
@@ -473,11 +473,11 @@ function BaseCore({ flowRef }) {
       groupRef.current.rotation.y = elapsed.current * 0.08
       groupRef.current.rotation.x = Math.sin(elapsed.current * 0.12) * 0.08
 
-      // BREATHING: respiración orgánica + beat del flujo
+      // BREATHING: respiración orgánica + beat del flujo (toned down)
       const breath = Math.sin(elapsed.current * 1.5)
       const breathY = Math.sin(elapsed.current * 0.9) * 0.03 // bob vertical sutil
-      const beat = flow.pulse
-      const s = 1 + 0.04 * breath + 0.18 * beat
+      const beat = flow.pulse * 0.5 // toned down from full pulse
+      const s = 1 + 0.03 * breath + 0.08 * beat
       groupRef.current.scale.set(s, s, s)
       groupRef.current.position.y = breathY // vida, no anclado
 
@@ -486,7 +486,7 @@ function BaseCore({ flowRef }) {
       if (logoGroup?.isGroup) {
         logoGroup.children.forEach(child => {
           if (child?.material) {
-            child.material.opacity = 0.65 + 0.2 * breath + 0.2 * beat
+            child.material.opacity = 0.65 + 0.15 * breath + 0.1 * beat
           }
         })
       }
@@ -498,8 +498,8 @@ function BaseCore({ flowRef }) {
   useFrame((_, delta) => {
     gasUniforms.time.value += delta * 0.5
     gasUniforms.flow.value = flowRef?.current?.intensity || 1
-    // Pulsación sincronizada con el latido del BASE (0.25→1.0)
-    gasUniforms.pulse.value = flowRef?.current?.pulse || 0.3
+    // Pulsación sincronizada con el latido del BASE (dampened to prevent flashy bursts)
+    gasUniforms.pulse.value = (flowRef?.current?.pulse || 0.3) * 0.4
   })
 
   return (
@@ -888,7 +888,7 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
     const { positions, velocities, colors, sizes, lifetimes, maxLifetimes, hit } = state
     const tmp = [0, 0, 0]
     let visualsDirty = false
-    let burstCount = isBurst ? 8 : 0
+    let burstCount = isBurst ? 3 : 0
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       lifetimes[i] += delta
       // Burst fuerza respawn inmediato en varias partículas
@@ -1578,16 +1578,18 @@ function GlobeScene({ liveData, paused }) {
     >
       <ambientLight intensity={0.05} />
       <group scale={1.3}>
-        {/* CAPA 1-4: Gas + nebula + BASE (renderOrder 0-2, sin depthWrite) */}
+        {/* CAPA 1: Core + Gas (innermost — energy source) */}
         <BaseCore flowRef={flowRef} />
-        {/* CAPA 5: Wireframe DYSON (renderOrder 3, depthWrite=true → OCLUYE gas detrás) */}
-        <VisibleWireframe />
-        {/* CAPA 6-7: Partículas (renderOrder 4-10, encima del wireframe) */}
+        {/* CAPA 2: Energy particles — flowing from core outward to wireframe */}
         <EnergyParticles liveData={liveData} onImpact={handleImpact} flowRef={flowRef} />
+        {/* CAPA 3: Text rings — inside wireframe, visible through gaps */}
+        <TextBandRings liveData={liveData} />
+        {/* CAPA 4: Wireframe DYSON — the Dyson sphere structure */}
+        <VisibleWireframe />
+        {/* CAPA 5: Outer layers — halo, agents, streams */}
         <UnifiedHalo />
         <InnerCore />
         <AgentNodes />
-        <TextBandRings liveData={liveData} />
         <DataStream />
         <ReputationParticles />
       </group>
