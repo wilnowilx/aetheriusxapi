@@ -160,7 +160,7 @@ function NetworkHealth({ data }) {
       {/* Waveform */}
       {lat.length > 0 && (
         <div className="ae-latency-section">
-          <span className="ae-section-title">Live Waveform</span>
+          <span className="ae-section-title">Live Pulse</span>
           <WaveGraph data={lat} color="#22d3ee" secondaryColor="#0052FF" height={75} />
         </div>
       )}

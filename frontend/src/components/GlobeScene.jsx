@@ -9,74 +9,122 @@ import * as THREE from 'three'
 // Arquitectura: Core(0.38) → Gas(1.2-1.5) → Wireframe(2.2) → **BANDS(2.5/2.3/2.1→outside)** → Halo(2.65)
 const TextBandRings = ({ liveData }) => {
   const groupRef = useRef()
-  const elapsed = useRef(0)
+  const [cyanText, setCyanText] = useState('100+ ENDPOINTS  40 FREE  0ms')
+  const cyanTextRef = useRef(cyanText)
 
-  // Bigger than wireframe (2.2) — orbits OUTSIDE the structure like Saturn rings
-  const ringsConfig = useMemo(() => {
-    const d = liveData || {}
-    return [
-      {
-        radius: 2.8,
-        tilt: 0.18,
-        yOffset: 0.4,
-        speed: 0.010,
-        bandWidth: 0.35,
-        color: '#ffffff',
-        opacity: 0.9,
-        fontSize: 52,
-        text: ' THE MARKETPLACE THAT LIVES  THE MARKETPLACE THAT LIVES  THE MARKETPLACE THAT LIVES ',
-      },
-      {
-        radius: 2.55,
-        tilt: -0.10,
-        yOffset: -0.1,
-        speed: -0.015,
-        bandWidth: 0.28,
-        color: '#d946ef',
-        opacity: 0.82,
-        fontSize: 42,
-        text: ' API INFRASTRUCTURE FOR AI AGENTS THAT PAY  API INFRASTRUCTURE FOR AI AGENTS THAT PAY ',
-      },
-      {
-        radius: 2.35,
-        tilt: 0.06,
-        yOffset: -0.55,
-        speed: 0.022,
-        bandWidth: 0.22,
-        color: '#22d3ee',
-        opacity: 0.75,
-        fontSize: 34,
-        text: ` ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE  ${d.endpoints || '100+'} ENDPOINTS  ${d.freeEndpoints || '40'} FREE `,
-      },
-    ]
-  }, [liveData])
+  // Real telemetry update at 200ms for the cyan ring
+  useEffect(() => {
+    const fetchTelemetry = async () => {
+      try {
+        const res = await fetch('https://34-156-149-38.sslip.io/aetherapi/metrics')
+        if (res.ok) {
+          const d = await res.json()
+          const ep = d.totalEndpoints || d.endpoints || '100+'
+          const free = d.freeEndpoints || d.freeEndpoints === 0 ? d.freeEndpoints : '40'
+          const lat = d.avgLatency || d.latency || '<1'
+          const text = `${ep} ENDPOINTS  ${free} FREE  ${lat}ms  ${ep} ENDPOINTS  ${free} FREE  ${lat}ms`
+          cyanTextRef.current = text
+          setCyanText(text)
+        }
+      } catch {
+        // keep last known
+      }
+    }
+    fetchTelemetry()
+    const id = setInterval(fetchTelemetry, 200)
+    return () => clearInterval(id)
+  }, [])
 
-  // Canvas 2048×96 — texturas con glow sutil + DoubleSide para ver parte trasera
+  // Single phrase per ring — canvas repeats to fill. No overlap.
+  const ringsConfig = useMemo(() => [
+    {
+      radius: 2.8,
+      tilt: 0.18,
+      yOffset: 0.4,
+      speed: 0.012,
+      bandWidth: 0.38,
+      color: '#ffffff',
+      opacity: 0.92,
+      fontSize: 56,
+      phrase: 'THE MARKETPLACE THAT LIVES',
+    },
+    {
+      radius: 2.55,
+      tilt: -0.10,
+      yOffset: -0.1,
+      speed: -0.018, // counter-rotation
+      bandWidth: 0.30,
+      color: '#d946ef',
+      opacity: 0.85,
+      fontSize: 48,
+      phrase: 'API INFRASTRUCTURE FOR AI AGENTS THAT PAY',
+    },
+    {
+      radius: 2.35,
+      tilt: 0.06,
+      yOffset: -0.55,
+      speed: 0.035, // fastest — telemetry ring
+      bandWidth: 0.24,
+      color: '#22d3ee',
+      opacity: 0.78,
+      fontSize: 36,
+      phrase: cyanText,
+    },
+  ], [cyanText])
+
+  // Canvas textures — multi-pass neon glow + crisp text
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
       canvas.width = 2048
-      canvas.height = 96
+      canvas.height = 128 // taller for glow
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
+
       const font = `900 ${ring.fontSize}px 'JetBrains Mono', 'Fira Code', monospace`
       ctx.font = font
-      ctx.textAlign = 'center'
+      ctx.textAlign = 'left'
       ctx.textBaseline = 'middle'
-      const phrase = ring.text
-      const phraseW = ctx.measureText(phrase).width
-      const repeats = Math.ceil((canvas.width + phraseW) / phraseW)
-      const startOffset = (canvas.width - phraseW * repeats) / 2 + phraseW / 2
-      // Glow pass — subtle bloom behind text
-      ctx.shadowBlur = 18
+
+      // Measure single phrase width
+      const phraseW = ctx.measureText(ring.phrase).width
+      // Gap between repetitions (in pixels) — prevents overlap
+      const gap = phraseW * 0.35
+      const stride = phraseW + gap
+      const totalNeeded = canvas.width + stride
+      const repeats = Math.ceil(totalNeeded / stride)
+
+      // PASS 1: Wide outer glow (big blur, very faint)
+      ctx.shadowBlur = 40
       ctx.shadowColor = ring.color
       ctx.fillStyle = ring.color
-      ctx.globalAlpha = 0.35
-      for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      // Solid text pass — crisp foreground
+      ctx.globalAlpha = 0.15
+      for (let i = 0; i < repeats; i++) {
+        ctx.fillText(ring.phrase, i * stride, canvas.height / 2)
+      }
+
+      // PASS 2: Medium glow
+      ctx.shadowBlur = 20
+      ctx.globalAlpha = 0.3
+      for (let i = 0; i < repeats; i++) {
+        ctx.fillText(ring.phrase, i * stride, canvas.height / 2)
+      }
+
+      // PASS 3: Tight glow
+      ctx.shadowBlur = 8
+      ctx.globalAlpha = 0.6
+      for (let i = 0; i < repeats; i++) {
+        ctx.fillText(ring.phrase, i * stride, canvas.height / 2)
+      }
+
+      // PASS 4: Crisp solid text (no shadow)
       ctx.shadowBlur = 0
       ctx.globalAlpha = 1.0
-      for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
+      ctx.fillStyle = '#ffffff' // always white core for 3D neon look
+      for (let i = 0; i < repeats; i++) {
+        ctx.fillText(ring.phrase, i * stride, canvas.height / 2)
+      }
+
       ctx.globalAlpha = 1
       const tex = new THREE.CanvasTexture(canvas)
       tex.anisotropy = 4
@@ -104,7 +152,6 @@ const TextBandRings = ({ liveData }) => {
     <group ref={groupRef}>
       {ringsConfig.map((ring, ringIdx) => (
         <group key={ringIdx} position={[0, ring.yOffset, 0]} rotation={[ring.tilt, 0, 0]}>
-          {/* Banda interna — DoubleSide con perspectiva: frente=100%, trasero=20% */}
           <mesh
             onPointerOver={(e) => { e.stopPropagation(); setHoveredRing(ringIdx); document.body.style.cursor = 'pointer' }}
             onPointerOut={() => { setHoveredRing(null); document.body.style.cursor = 'auto' }}
@@ -129,8 +176,7 @@ const TextBandRings = ({ liveData }) => {
                 varying vec2 vUv;
                 void main() {
                   vec4 texColor = texture2D(uMap, vUv);
-                  // gl_FrontFacing: true = facing camera (front), false = away (back)
-                  float faceFactor = gl_FrontFacing ? 1.0 : 0.2; // backface 80% dimmer
+                  float faceFactor = gl_FrontFacing ? 1.0 : 0.15;
                   gl_FragColor = vec4(texColor.rgb, texColor.a * uOpacity * faceFactor);
                 }
               `}
@@ -292,11 +338,10 @@ function VisibleWireframe() {
   )
 }
 
-// === PULSAR CORE — cluster vibrante alrededor del sprite BASE ===
-// ~20 partículas tiny que vibran en una zona compacta (r=0.15→0.45)
-// forman una "nube de energía" que da forma visual al núcleo.
+// === PULSAR CORE — tiny ambient particles near the nucleus ===
+// Reduced to 10 dim particles — user reported aggressive destellos
 function PulsarCore({ gasUniforms }) {
-  const COUNT = 40
+  const COUNT = 10
   const ref = useRef()
   const elapsed = useRef(0)
 
@@ -306,30 +351,18 @@ function PulsarCore({ gasUniforms }) {
     const col = new Float32Array(COUNT * 3)
     const sz = new Float32Array(COUNT)
     for (let i = 0; i < COUNT; i++) {
-      // Wider cluster: r=0.15 to 0.65, elongated horizontally (nucleus shape)
       const theta = Math.random() * Math.PI * 2
       const phi = Math.acos(2 * Math.random() - 1)
-      const r = 0.15 + Math.random() * 0.5
-      pos[i*3]   = r * Math.sin(phi) * Math.cos(theta) * 2.0 // wider X
-      pos[i*3+1] = r * Math.cos(phi) * 0.7                    // slightly taller Y
-      pos[i*3+2] = r * Math.sin(phi) * Math.sin(theta) * 0.9  // compressed Z
-      // Vibration speeds — varied for organic feel
-      seed[i*3]   = 1.5 + Math.random() * 5
-      seed[i*3+1] = 1.0 + Math.random() * 4
-      seed[i*3+2] = 1.5 + Math.random() * 4.5
-      // Cyan-blue-white core colors — brighter
-      const t = Math.random()
-      if (t < 0.4) {
-        // Bright cyan core
-        col[i*3] = 0.1 + t * 0.2; col[i*3+1] = 0.7 + t * 0.3; col[i*3+2] = 0.9 + t * 0.1
-      } else if (t < 0.7) {
-        // White-hot center
-        col[i*3] = 0.8; col[i*3+1] = 0.9; col[i*3+2] = 1.0
-      } else {
-        // Blue accent
-        col[i*3] = 0.05; col[i*3+1] = 0.5 + t * 0.3; col[i*3+2] = 0.9 + t * 0.1
-      }
-      sz[i] = 0.025 + Math.random() * 0.04
+      const r = 0.2 + Math.random() * 0.4
+      pos[i*3]   = r * Math.sin(phi) * Math.cos(theta) * 1.8
+      pos[i*3+1] = r * Math.cos(phi) * 0.6
+      pos[i*3+2] = r * Math.sin(phi) * Math.sin(theta) * 0.8
+      seed[i*3]   = 1.0 + Math.random() * 2.5
+      seed[i*3+1] = 0.8 + Math.random() * 2.0
+      seed[i*3+2] = 1.0 + Math.random() * 2.5
+      // Very dim cyan — no white-hot
+      col[i*3] = 0.1; col[i*3+1] = 0.5; col[i*3+2] = 0.7
+      sz[i] = 0.012 + Math.random() * 0.015 // much smaller
     }
     return { positions: pos, seeds: seed, colors: col, sizes: sz }
   }, [])
@@ -343,10 +376,10 @@ function PulsarCore({ gasUniforms }) {
       const sx = state.seeds[i*3]
       const sy = state.seeds[i*3+1]
       const sz = state.seeds[i*3+2]
-      // Vibration: sinusoidal displacement around rest position
-      pos[i*3]   = state.positions[i*3]   + Math.sin(t * sx + i * 0.7) * 0.05
-      pos[i*3+1] = state.positions[i*3+1] + Math.cos(t * sy + i * 1.1) * 0.035
-      pos[i*3+2] = state.positions[i*3+2] + Math.sin(t * sz + i * 0.9) * 0.04
+      // Very subtle vibration (reduced from 0.05 to 0.015)
+      pos[i*3]   = state.positions[i*3]   + Math.sin(t * sx + i * 0.7) * 0.015
+      pos[i*3+1] = state.positions[i*3+1] + Math.cos(t * sy + i * 1.1) * 0.012
+      pos[i*3+2] = state.positions[i*3+2] + Math.sin(t * sz + i * 0.9) * 0.015
     }
     ref.current.geometry.attributes.position.needsUpdate = true
   })
@@ -367,7 +400,7 @@ function PulsarCore({ gasUniforms }) {
             vColor = aColor;
             vAlpha = 1.0;
             vec4 mv = modelViewMatrix * vec4(position, 1.0);
-            gl_PointSize = aSize * (220.0 / -mv.z);
+            gl_PointSize = aSize * (180.0 / -mv.z); // smaller size multiplier
             gl_Position = projectionMatrix * mv;
           }
         `}
@@ -377,14 +410,15 @@ function PulsarCore({ gasUniforms }) {
             vec2 uv = gl_PointCoord * 2.0 - 1.0;
             float d = abs(uv.x) + abs(uv.y) * 0.5;
             if (d > 1.0) discard;
-            float glow = pow(1.0 - d, 2.0);
-            float core = pow(1.0 - d, 6.0);
-            vec3 col = mix(vColor, vec3(1.0), core * 0.7);
-            col += vec3(0.3, 0.6, 0.8) * glow * 0.4;
-            gl_FragColor = vec4(col, glow * vAlpha * 0.9);
+            float glow = pow(1.0 - d, 3.0); // softer falloff
+            float core = pow(1.0 - d, 8.0); // tinier core
+            vec3 col = mix(vColor, vec3(1.0), core * 0.3); // less white
+            col += vec3(0.2, 0.4, 0.6) * glow * 0.2; // dimmer accent
+            gl_FragColor = vec4(col, glow * vAlpha * 0.35); // much dimmer
           }
         `}
         transparent depthWrite={false} blending={THREE.AdditiveBlending}
+        toneMapped={false}
       />
     </points>
   )
@@ -399,9 +433,9 @@ function BaseCore({ flowRef }) {
 
   // Base 3D Logo: L is ONE continuous shape (ExtrudeGeometry), then 3 separate squares
   const baseLogoBlocks = useMemo(() => {
-    const s = 0.24        // block size (bigger from 0.18)
-    const g = 0.08        // gap between blocks
-    const d = 0.08        // depth (thicker)
+    const s = 0.28        // block size (bigger)
+    const g = 0.09        // gap between blocks
+    const d = 0.09        // depth
     const tabW = s * 0.40 // tab width = 40%
     const tabH = s * 0.40 // tab height = 40%
 
@@ -418,17 +452,20 @@ function BaseCore({ flowRef }) {
     const extrudeSettings = {
       depth: d,
       bevelEnabled: true,
-      bevelThickness: 0.005,
-      bevelSize: 0.005,
+      bevelThickness: 0.006,
+      bevelSize: 0.006,
       bevelSegments: 2,
     }
     const lGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-    // DON'T center — L goes leftmost, shape already centered on X
+    // Center geometry properly — center XY, offset Z so it's centered in depth too
+    lGeometry.computeBoundingBox()
+    const bb = lGeometry.boundingBox
+    const cx = (bb.max.x + bb.min.x) / 2
+    const cy = (bb.max.y + bb.min.y) / 2
+    const cz = (bb.max.z + bb.min.z) / 2
+    lGeometry.translate(-cx, -cy, -cz)
 
     // Layout: [L] gap [□] gap [□] gap [□]
-    // Total width = s(L) + g + s + g + s + g + s = 4s + 3g
-    // L center X = -(4s+3g)/2 + s/2
-    // Square i center X = L_center + s/2 + g + s/2 + i*(s+g)
     const totalW = 4 * s + 3 * g
     const lCenterX = -totalW / 2 + s / 2
 
@@ -472,10 +509,10 @@ function BaseCore({ flowRef }) {
     }
   })
 
-  // Gas sincronizado — very subtle swirl, no pulse-driven beats
+  // Gas — ultra-subtle ambient glow, no aggressive swirl
   const gasUniforms = useMemo(() => ({ time: { value: 0 }, flow: { value: 1 } }), [])
   useFrame((_, delta) => {
-    gasUniforms.time.value += delta * 0.15 // very slow (was 0.5)
+    gasUniforms.time.value += delta * 0.08 // barely moving
     gasUniforms.flow.value = flowRef?.current?.intensity || 1
   })
 
@@ -494,11 +531,10 @@ function BaseCore({ flowRef }) {
               float fog1 = pow(1.0 - dist, 2.0) * pow(dist, 0.4) * 1.5;
               float fog2 = pow(1.0 - dist, 0.8) * 0.4;
               float fog = fog1 + fog2;
-              float swirl = sin(vPos.x*5.0+time*0.4)*sin(vPos.y*4.0+time*0.3)*sin(vPos.z*3.5+time*0.35);
-              float turbulence = 0.6 + 0.3 * swirl; // reduced from 0.5+0.5*swirl
-              vec3 col = mix(vec3(0.0,0.3,1.0), vec3(0.0,0.85,1.0), dist*0.5);
-              col += vec3(0.0,0.5,1.0) * (1.0-dist) * 0.4;
-              float alpha = fog * turbulence * 0.14 * (0.5 + 0.5*flow); // reduced from 0.18
+              float swirl = sin(vPos.x*3.0+time*0.2)*sin(vPos.y*2.5+time*0.15)*sin(vPos.z*2.0+time*0.18);
+              float turbulence = 0.7 + 0.15 * swirl; // barely moves
+              vec3 col = mix(vec3(0.0,0.25,0.8), vec3(0.0,0.6,0.9), dist*0.5);
+              float alpha = fog * turbulence * 0.08 * (0.5 + 0.5*flow); // much dimmer
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.BackSide}
@@ -515,12 +551,11 @@ function BaseCore({ flowRef }) {
             void main(){
               float dist = length(vPos) / 1.2;
               float radial = pow(1.0 - dist, 2.5);
-              float swirl = sin(vPos.x*6.0+time*0.5)*sin(vPos.y*5.0+time*0.4)*sin(vPos.z*4.0+time*0.45);
-              float tendrils = 0.55 + 0.35 * swirl; // reduced from 0.4+0.6*swirl
+              float swirl = sin(vPos.x*3.0+time*0.25)*sin(vPos.y*2.5+time*0.2)*sin(vPos.z*2.0+time*0.22);
+              float tendrils = 0.7 + 0.15 * swirl; // barely moves
               float noise = tendrils * 0.7 + 0.3;
-              vec3 col = mix(vec3(0.0,0.4,1.0), vec3(0.0,0.9,1.0), noise*0.5);
-              col += vec3(0.0,0.5,1.0) * (1.0-dist) * 0.4;
-              float alpha = radial * noise * 0.14 * (0.4 + 0.6*flow); // reduced from 0.20
+              vec3 col = mix(vec3(0.0,0.3,0.8), vec3(0.0,0.7,0.9), noise*0.3);
+              float alpha = radial * noise * 0.08 * (0.4 + 0.6*flow); // much dimmer
               alpha *= smoothstep(1.0, 0.15, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
@@ -587,18 +622,17 @@ function BaseCore({ flowRef }) {
           uniforms={gasUniforms}
           vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
-            varying vec3 vPos; uniform float time; uniform float flow; uniform float pulse;
+            varying vec3 vPos; uniform float time; uniform float flow;
             void main(){
               float dist = length(vPos) / 0.38;
               float radial = pow(1.0 - dist, 3.0);
-              float swirl = sin(vPos.x*8.0+time*0.8)*sin(vPos.y*6.0+time*0.5)*sin(vPos.z*5.0+time*0.6);
+              float swirl = sin(vPos.x*8.0+time*0.4)*sin(vPos.y*6.0+time*0.25)*sin(vPos.z*5.0+time*0.3);
               float noise = 0.7 + 0.3*swirl;
-              float beat = 0.6 + 0.4*pulse;
               vec3 deepBlue = vec3(0.0,0.2,0.85);
               vec3 coreCyan = vec3(0.0,0.65,1.0);
               vec3 col = mix(deepBlue, coreCyan, (1.0-dist)*0.6 + noise*0.15);
               col += vec3(0.05,0.25,0.35) * (1.0-dist) * 0.4;
-              float alpha = radial * 0.88 * noise * (0.75 + 0.4*flow) * beat;
+              float alpha = radial * 0.75 * noise * (0.75 + 0.25*flow);
               alpha *= smoothstep(1.0, 0.5, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
@@ -612,54 +646,51 @@ function BaseCore({ flowRef }) {
           uniforms={gasUniforms}
           vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
-            varying vec3 vPos; uniform float time; uniform float flow; uniform float pulse;
+            varying vec3 vPos; uniform float time; uniform float flow;
             void main(){
               float dist = length(vPos) / 0.62;
               float radial = pow(1.0 - dist, 2.4);
-              float beat = 0.55 + 0.45*pulse;
               vec3 col = mix(vec3(0.0,0.7,1.0), vec3(0.12,0.5,0.9), dist*0.5);
-              float alpha = radial * 0.45 * beat * (0.7+0.35*flow);
+              float alpha = radial * 0.35 * (0.7+0.35*flow);
               alpha *= smoothstep(1.0, 0.4, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
-      {/* Gas 3: velo galaxia exterior — bright argua */}
+      {/* Gas 3: velo galaxia exterior */}
       <mesh>
         <sphereGeometry args={[0.88, 16, 12]} />
         <shaderMaterial
           uniforms={gasUniforms}
           vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
-            varying vec3 vPos; uniform float time; uniform float pulse;
+            varying vec3 vPos; uniform float time;
             void main(){
               float dist = length(vPos) / 0.88;
               float radial = pow(1.0 - dist, 3.2);
-              float beat = 0.5 + 0.5*pulse;
               vec3 col = mix(vec3(0.0,0.6,1.0), vec3(0.12,0.8,0.75), dist*0.4);
-              float alpha = radial * 0.25 * beat;
+              float alpha = radial * 0.20;
               alpha *= smoothstep(1.0, 0.3, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
-      {/* Aura intermedia 3D: entre gas y malla — bright argua */}
+      {/* Aura intermedia 3D: entre gas y malla */}
       <mesh>
         <sphereGeometry args={[1.45, 20, 16]} />
         <shaderMaterial
           uniforms={gasUniforms}
           vertexShader={`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
           fragmentShader={`
-            varying vec3 vPos; uniform float time; uniform float pulse;
+            varying vec3 vPos; uniform float time;
             void main(){
               float dist = length(vPos) / 1.45;
               float radial = pow(1.0 - dist, 2.0) * pow(dist, 0.3);
-              float beat = 0.4 + 0.6*pulse;
-              float phase = sin(time*0.4 + 2.0)*0.5+0.5;
-              vec3 col = mix(vec3(0.0,0.55,0.95), vec3(0.12,0.75,0.8), dist*0.5+phase*0.15);
-              float alpha = radial * 0.14 * beat;
+              float phase = sin(time*0.2 + 2.0)*0.5+0.5;
+              vec3 col = mix(vec3(0.0,0.55,0.95), vec3(0.12,0.75,0.8), dist*0.5+phase*0.10);
+              float alpha = radial * 0.10;
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
