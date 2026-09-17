@@ -439,21 +439,71 @@ function BaseCore({ flowRef }) {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Texto BASE 3D: el sprite fluye mejor que el emblema geométrico.
-  // El pulso vivo (flowRef) se mantiene: respiración + latido por bloque.
-  const baseLogoTexture = useMemo(() => {
-    const canvas = document.createElement('canvas')
-    canvas.width = 512; canvas.height = 128
-    const ctx = canvas.getContext('2d')
-    ctx.clearRect(0, 0, 512, 128)
-    ctx.font = 'bold 72px monospace'
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-    ctx.fillStyle = '#0052FF'
-    ctx.shadowColor = '#0052FF'; ctx.shadowBlur = 30
-    ctx.fillText('BASE', 256, 64)
-    ctx.shadowBlur = 0
-    ctx.fillText('BASE', 256, 64)
-    return new THREE.CanvasTexture(canvas)
+  // Base 3D Logo: 4 bloques redondeados con geometría real, no sprite 2D
+  const baseLogoShapes = useMemo(() => {
+    const s = 0.32        // block size
+    const g = 0.032       // gap (10%)
+    const r = s * 0.12    // corner radius
+    const d = 0.1         // depth (thickness)
+    const tabW = s * 0.42 // raised tab width (40%)
+    const tabH = s * 0.42 // raised tab height (40%)
+
+    // Rounded rectangle shape
+    const rr = (w, h) => {
+      const sh = new THREE.Shape()
+      const x = -w / 2, y = -h / 2
+      sh.moveTo(x + r, y)
+      sh.lineTo(x + w - r, y)
+      sh.quadraticCurveTo(x + w, y, x + w, y + r)
+      sh.lineTo(x + w, y + h - r)
+      sh.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+      sh.lineTo(x + r, y + h)
+      sh.quadraticCurveTo(x, y + h, x, y + h - r)
+      sh.lineTo(x, y + r)
+      sh.quadraticCurveTo(x, y, x + r, y)
+      return sh
+    }
+
+    // L-shape for block 1: base square + raised tab top-left
+    const lShape = (() => {
+      const sh = new THREE.Shape()
+      const bx = -s / 2, by = -s / 2
+      // Start at bottom-left, go clockwise
+      sh.moveTo(bx + r, by)
+      // Bottom edge
+      sh.lineTo(bx + s - r, by)
+      sh.quadraticCurveTo(bx + s, by, bx + s, by + r)
+      // Right edge up
+      sh.lineTo(bx + s, by + s - r)
+      sh.quadraticCurveTo(bx + s, by + s, bx + s - r, by + s)
+      // Top edge left (to tab)
+      sh.lineTo(bx + tabW + r, by + s)
+      sh.quadraticCurveTo(bx + tabW, by + s, bx + tabW, by + s - r)
+      // Tab inner right edge down
+      sh.lineTo(bx + tabW, by + s - tabH + r)
+      sh.quadraticCurveTo(bx + tabW, by + s - tabH, bx + tabW - r, by + s - tabH)
+      // Tab top edge left
+      sh.lineTo(bx + r, by + s - tabH)
+      sh.quadraticCurveTo(bx, by + s - tabH, bx, by + s - tabH - r)
+      // Left edge down
+      sh.lineTo(bx, by + r)
+      sh.quadraticCurveTo(bx, by, bx + r, by)
+      return sh
+    })()
+
+    const totalW = 4 * s + 3 * g
+    const positions = [
+      -totalW / 2 + s / 2,
+      -totalW / 2 + s + g + s / 2,
+      -totalW / 2 + 2 * (s + g) + s / 2,
+      -totalW / 2 + 3 * (s + g) + s / 2,
+    ]
+
+    return {
+      lShape, rr: rr(s, s), d,
+      positions,
+      extrudeOpts: { depth: d, bevelEnabled: false },
+    }
   }, [])
 
   useFrame((state, delta) => {
@@ -473,9 +523,15 @@ function BaseCore({ flowRef }) {
       groupRef.current.scale.set(s, s, s)
       groupRef.current.position.y = breathY // vida, no anclado
 
-      // Sprite material
-      const spriteMat = groupRef.current.children[0]?.material
-      if (spriteMat) spriteMat.opacity = 0.7 + 0.18 * breath + 0.18 * beat
+      // 3D Logo materials — pulse opacity on all 4 blocks
+      const logoGroup = groupRef.current.children[0]
+      if (logoGroup?.isGroup) {
+        logoGroup.children.forEach(child => {
+          if (child?.material) {
+            child.material.opacity = 0.65 + 0.2 * breath + 0.2 * beat
+          }
+        })
+      }
     }
   })
 
@@ -540,16 +596,57 @@ function BaseCore({ flowRef }) {
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
-      <sprite scale={[2.2, 0.55, 1]} renderOrder={-1}>
-        <spriteMaterial
-          map={baseLogoTexture}
-          transparent
-          blending={THREE.AdditiveBlending}
-          opacity={0.85}
-          depthWrite={false}
-          depthTest={true}
-        />
-      </sprite>
+      {/* BASE 3D Logo: 4 bloques reales con geometría, no sprite plano */}
+      <group renderOrder={-1}>
+        {/* Block 1: L-shape (base + raised tab) */}
+        <mesh position={[baseLogoShapes.positions[0], 0, 0]}>
+          <extrudeGeometry args={[baseLogoShapes.lShape, baseLogoShapes.extrudeOpts]} />
+          <meshBasicMaterial
+            color="#0052FF"
+            transparent
+            opacity={0.85}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+        {/* Block 2 */}
+        <mesh position={[baseLogoShapes.positions[1], 0, 0]}>
+          <extrudeGeometry args={[baseLogoShapes.rr, baseLogoShapes.extrudeOpts]} />
+          <meshBasicMaterial
+            color="#0052FF"
+            transparent
+            opacity={0.85}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+        {/* Block 3 */}
+        <mesh position={[baseLogoShapes.positions[2], 0, 0]}>
+          <extrudeGeometry args={[baseLogoShapes.rr, baseLogoShapes.extrudeOpts]} />
+          <meshBasicMaterial
+            color="#0052FF"
+            transparent
+            opacity={0.85}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+        {/* Block 4 */}
+        <mesh position={[baseLogoShapes.positions[3], 0, 0]}>
+          <extrudeGeometry args={[baseLogoShapes.rr, baseLogoShapes.extrudeOpts]} />
+          <meshBasicMaterial
+            color="#0052FF"
+            transparent
+            opacity={0.85}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+      </group>
       {/* PULSAR CORE: cluster de partículas vibrantes que dan forma al núcleo */}
       <PulsarCore gasUniforms={gasUniforms} />
       {/* BASE galaxia: núcleo denso pequeño con swirl — se diluye en la malla */}
