@@ -472,7 +472,7 @@ The Research Layer is exposed via MCP (Model Context Protocol):
 |--------|-------|
 | **Network** | **Base Mainnet `eip155:8453`** 🔴 LIVE |
 | **Mode** | **`real` — Three canaries live: `/v1/data/uuid`, `/v1/token/price`, `/v1/token/analyze`, all CDP facilitator settling USDC on-chain** |
-| Health | `GET /health` (free) |
+| Health | `GET /api/v1/health` (free) |
 | Telemetry | `GET /v1/telemetry` (free): uptime, per-endpoint stats, settled USDC volume |
 | Playground | [`/`](https://wilnowilx.github.io/aetheriusxapi/) — interactive endpoint testing |
 | Dashboard | [`/dashboard/`](https://wilnowilx.github.io/aetheriusxapi/dashboard/) + backend bar |
