@@ -429,11 +429,11 @@ function BaseCore({ flowRef }) {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Base 3D Logo: L is ONE continuous shape (ExtrudeGeometry), then 3 separate squares
+  // Base 3D Logo: L is ONE continuous shape + 3 separate squares, perfectly centered
   const baseLogoBlocks = useMemo(() => {
-    const s = 0.28        // block size (bigger)
-    const g = 0.09        // gap between blocks
-    const d = 0.09        // depth
+    const s = 0.25        // block size
+    const g = 0.06        // gap between blocks
+    const d = 0.08        // depth
     const tabW = s * 0.40 // tab width = 40%
     const tabH = s * 0.40 // tab height = 40%
 
@@ -450,12 +450,11 @@ function BaseCore({ flowRef }) {
     const extrudeSettings = {
       depth: d,
       bevelEnabled: true,
-      bevelThickness: 0.006,
-      bevelSize: 0.006,
+      bevelThickness: 0.004,
+      bevelSize: 0.004,
       bevelSegments: 2,
     }
     const lGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-    // Center geometry properly — center XY, offset Z so it's centered in depth too
     lGeometry.computeBoundingBox()
     const bb = lGeometry.boundingBox
     const cx = (bb.max.x + bb.min.x) / 2
@@ -463,17 +462,17 @@ function BaseCore({ flowRef }) {
     const cz = (bb.max.z + bb.min.z) / 2
     lGeometry.translate(-cx, -cy, -cz)
 
-    // Layout: [L] gap [□] gap [□] gap [□]
+    // Exact mathematical centering for 4 items (L + 3 squares)
     const totalW = 4 * s + 3 * g
-    const lCenterX = -totalW / 2 + s / 2
+    const startX = -totalW / 2 + s / 2
 
     return {
       lGeometry,
-      lPos: [lCenterX, 0, 0],
+      lPos: [startX, 0, 0],
       squares: [
-        { pos: [lCenterX + s / 2 + g + s / 2, 0, 0], size: [s, s, d] },
-        { pos: [lCenterX + s / 2 + g + s + g + s / 2, 0, 0], size: [s, s, d] },
-        { pos: [lCenterX + s / 2 + g + s + g + s + g + s / 2, 0, 0], size: [s, s, d] },
+        { pos: [startX + (s + g), 0, 0], size: [s, s, d] },
+        { pos: [startX + 2 * (s + g), 0, 0], size: [s, s, d] },
+        { pos: [startX + 3 * (s + g), 0, 0], size: [s, s, d] },
       ],
     }
   }, [])
@@ -535,7 +534,7 @@ function BaseCore({ flowRef }) {
               float alpha = fog * turbulence * 0.12 * (0.5 + 0.5*flow); // boosted from 0.08
               gl_FragColor = vec4(col, alpha);
             }`}
-          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.BackSide}
+           transparent depthWrite={false} blending={THREE.NormalBlending} side={THREE.BackSide}
         />
       </mesh>
       {/* Nebula envelope: gas fino envolvente — CYAN GLOW */}
@@ -557,7 +556,7 @@ function BaseCore({ flowRef }) {
               alpha *= smoothstep(1.0, 0.15, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
-          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
+           transparent depthWrite={false} blending={THREE.NormalBlending} side={THREE.FrontSide}
         />
       </mesh>
       {/* BASE 3D Logo: L-shape (single extruded mesh) FIRST + 3 separate squares + "BASE" text */}
@@ -634,7 +633,7 @@ function BaseCore({ flowRef }) {
               alpha *= smoothstep(1.0, 0.5, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
-          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
+           transparent depthWrite={false} blending={THREE.NormalBlending} side={THREE.FrontSide}
         />
       </mesh>
       {/* Gas 2: manto medio — bright cyan→blue */}
@@ -653,7 +652,7 @@ function BaseCore({ flowRef }) {
               alpha *= smoothstep(1.0, 0.4, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
-          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
+           transparent depthWrite={false} blending={THREE.NormalBlending} side={THREE.FrontSide}
         />
       </mesh>
       {/* Gas 3: velo galaxia exterior */}
@@ -672,7 +671,7 @@ function BaseCore({ flowRef }) {
               alpha *= smoothstep(1.0, 0.3, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
-          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
+           transparent depthWrite={false} blending={THREE.NormalBlending} side={THREE.FrontSide}
         />
       </mesh>
       {/* Aura intermedia 3D: entre gas y malla */}
@@ -691,7 +690,7 @@ function BaseCore({ flowRef }) {
               float alpha = radial * 0.10;
               gl_FragColor = vec4(col, alpha);
             }`}
-          transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
+           transparent depthWrite={false} blending={THREE.NormalBlending} side={THREE.FrontSide}
         />
       </mesh>
     </group>
@@ -840,7 +839,7 @@ function CosmicDustField() {
                 gl_FragColor = vec4(color, alpha);
               }
             `}
-            transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.DoubleSide}
+             transparent depthWrite={false} blending={THREE.NormalBlending} side={THREE.DoubleSide}
           />
         </mesh>
       ))}
