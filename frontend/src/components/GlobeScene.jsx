@@ -3,58 +3,55 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Stars, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
-// === TEXT BAND RINGS — Dyson Sphere: energía DENTRO de la estructura ===
-// Los anillos viven DENTRO del wireframe (radio 2.2), como capas de energía
-// que fluyen desde el núcleo hacia afuera. Visibles a través de los huecos de la malla.
-// Arquitectura: Core(0.38) → Gas(1.2-1.5) → Bandas → Wireframe(2.2) → Halo(2.65)
+// === TEXT BAND RINGS — Saturn-style orbital rings OUTSIDE the Dyson sphere ===
+// Los anillos orbitan FUERA del wireframe (r > 2.2), como los anillos de Saturno.
+// Visibles por encima de toda la estructura. Sin sombras, cara al usuario.
+// Arquitectura: Core(0.38) → Gas(1.2-1.5) → Wireframe(2.2) → **BANDS(2.5/2.3/2.1→outside)** → Halo(2.65)
 const TextBandRings = ({ liveData }) => {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Wireframe = 2.2. Las bandas van ADENTRO, de afuera hacia adentro:
-  // Anillo 1 (cercano al wireframe): radio 2.0 — visible a través de la malla
-  // Anillo 2 (medio): radio 1.7 — entre wireframe y gas
-  // Anillo 3 (cerca del core): radio 1.4 — capa más interna
+  // Bigger than wireframe (2.2) — orbits OUTSIDE the structure like Saturn rings
   const ringsConfig = useMemo(() => {
     const d = liveData || {}
     return [
       {
-        radius: 2.15,
-        tilt: 0.12,
-        yOffset: 0.5,
-        speed: 0.012,
-        bandWidth: 0.28,
+        radius: 2.8,
+        tilt: 0.18,
+        yOffset: 0.4,
+        speed: 0.010,
+        bandWidth: 0.35,
         color: '#ffffff',
-        opacity: 0.85,
-        fontSize: 42,
+        opacity: 0.9,
+        fontSize: 52,
         text: '   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   ',
       },
       {
-        radius: 1.85,
-        tilt: -0.08,
-        yOffset: 0.0,
-        speed: -0.018,
-        bandWidth: 0.22,
+        radius: 2.55,
+        tilt: -0.10,
+        yOffset: -0.1,
+        speed: -0.015,
+        bandWidth: 0.28,
         color: '#d946ef',
-        opacity: 0.8,
-        fontSize: 34,
+        opacity: 0.82,
+        fontSize: 42,
         text: '   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   ',
       },
       {
-        radius: 1.55,
-        tilt: 0.05,
-        yOffset: -0.5,
-        speed: 0.025,
-        bandWidth: 0.16,
+        radius: 2.35,
+        tilt: 0.06,
+        yOffset: -0.55,
+        speed: 0.022,
+        bandWidth: 0.22,
         color: '#22d3ee',
         opacity: 0.75,
-        fontSize: 28,
+        fontSize: 34,
         text: `   ${d.endpoints || '100+'} ENDPOINTS  ·  ${d.freeEndpoints || '40'} FREE  ·  ${d.latency || ''}   ${d.endpoints || '100+'} ENDPOINTS  ·  ${d.freeEndpoints || '40'} FREE  ·  ${d.latency || ''}   `,
       },
     ]
   }, [liveData])
 
-  // Canvas 2048×96 — texturas de las bandas internas (alta resolución para texto grande)
+  // Canvas 2048×96 — texturas sin bloom/sombra, solo texto sólido para legibilidad
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
@@ -70,25 +67,11 @@ const TextBandRings = ({ liveData }) => {
       const phraseW = ctx.measureText(phrase).width
       const repeats = Math.ceil((canvas.width + phraseW) / phraseW)
       const startOffset = (canvas.width - phraseW * repeats) / 2 + phraseW / 2
-      // Pass 1: Wide bloom
-      ctx.shadowColor = ring.color
-      ctx.shadowBlur = 40
-      ctx.fillStyle = ring.color
-      ctx.globalAlpha = 0.4
-      for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      // Pass 2: Mid bloom
-      ctx.shadowBlur = 16
-      ctx.globalAlpha = 0.7
-      for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      // Pass 3: Core solid
-      ctx.shadowBlur = 3
-      ctx.globalAlpha = 1
-      ctx.fillStyle = ring.color
-      for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
-      // Pass 4: White center for legibility through wireframe
+      // NO shadow, NO bloom — pure solid text for crisp Saturn-ring look
       ctx.shadowBlur = 0
-      ctx.fillStyle = '#ffffff'
-      ctx.globalAlpha = 0.55
+      ctx.shadowColor = 'transparent'
+      ctx.fillStyle = ring.color
+      ctx.globalAlpha = 1.0
       for (let i = 0; i < repeats; i++) ctx.fillText(phrase, startOffset + i * phraseW, canvas.height / 2)
       ctx.globalAlpha = 1
       const tex = new THREE.CanvasTexture(canvas)
@@ -265,25 +248,16 @@ function InnerCore() {
   )
 }
 
-// === WIREFRAME — clean ambient pulse ===
+// === WIREFRAME — fully static, no pulse, no color flicker ===
 function VisibleWireframe() {
   const ref = useRef()
-  const uniforms = useMemo(() => ({
-    time: { value: 0 },
-  }), [])
-
-  useFrame((_, delta) => {
-    uniforms.time.value += delta * 0.5
-  })
 
   return (
     <mesh ref={ref}>
       <sphereGeometry args={[2.2, 36, 24]} />
       <shaderMaterial
-        uniforms={uniforms}
         vertexShader={`
           varying vec3 vPos;
-          uniform float time;
           void main() {
             vPos = position;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
@@ -291,33 +265,22 @@ function VisibleWireframe() {
         `}
         fragmentShader={`
           varying vec3 vPos;
-          uniform float time;
 
           float polarGlow(vec3 pos) {
             return pow(abs(pos.y / 2.2), 2.5) * 0.6;
           }
 
-          float ambientSparkle(vec3 pos, float t) {
-            // No sparkles — clean structural grid only
-            return 0.0;
-          }
-
           void main() {
-            float pulse = 0.5 + 0.5 * sin(time * 0.8 + vPos.y * 3.0);
+            // STATIC: no time uniform, no sin(), no pulse — fixed color
             float fade = smoothstep(0.0, 0.3, abs(vPos.y));
-            float sparkle = ambientSparkle(vPos, time * 2.0);
 
-            vec3 cyanBase = vec3(0.0, 0.85, 1.0);
-            vec3 purpleAccent = vec3(0.65, 0.33, 0.97);
-            float cyanPulse = 0.6 + 0.4 * sin(time * 0.6 + vPos.x * 2.0);
-            vec3 col = mix(cyanBase, purpleAccent, 0.3 + 0.2 * sin(time * 0.25));
-            col *= (0.8 + 0.2 * cyanPulse);
+            vec3 staticColor = vec3(0.0, 0.72, 0.92); // fixed cyan, no purple shift
 
             float polar = polarGlow(vPos);
-            col += polar * vec3(0.15, 0.08, 0.35);
-            col += vec3(0.3, 0.6, 0.8) * sparkle * 0.01;
+            vec3 col = staticColor;
+            col += polar * vec3(0.12, 0.06, 0.25);
 
-            float alpha = (0.18 + polar * 0.08 + cyanPulse * 0.06) * pulse * fade + sparkle * 0.0005;
+            float alpha = (0.18 + polar * 0.08) * fade;
             gl_FragColor = vec4(col, alpha);
           }
         `}
@@ -433,27 +396,27 @@ function BaseCore({ flowRef }) {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Base 3D Logo: bloques con BoxGeometry — compactos, no dominan el núcleo
+  // Base 3D Logo: bloques con BoxGeometry — mayor separación, bordes oscuros, solidez
   const baseLogoBlocks = useMemo(() => {
-    const s = 0.18        // block size (reduced from 0.32)
-    const g = 0.02        // gap
+    const s = 0.18        // block size
+    const g = 0.06        // gap between blocks (increased from 0.02)
     const d = 0.06        // depth (thinner)
     const tabW = s * 0.42 // raised tab width (40%)
     const tabH = s * 0.42 // raised tab height (40%)
-    const tabY = s / 2 + tabH / 2 // tab sits on top of base
+    const tabY = s / 2 + tabH / 2 + 0.01 // tab sits on top with tiny offset to avoid shadow on block below
     const totalW = 4 * s + 3 * g
     const cx = -totalW / 2
 
     return [
-      // Block 1: base square
+      // Block 1: base square (left, part of L)
       { pos: [cx + s / 2, 0, 0], size: [s, s, d] },
-      // Block 1: raised tab (top-left)
-      { pos: [cx + tabW / 2, tabY, 0], size: [tabW, tabH, d] },
-      // Block 2
+      // Block 1: raised tab (top-left) — offset up to not shadow block 2
+      { pos: [cx + tabW / 2 - 0.01, tabY, 0], size: [tabW, tabH, d] },
+      // Block 2 — separated by gap
       { pos: [cx + s + g + s / 2, 0, 0], size: [s, s, d] },
-      // Block 3
+      // Block 3 — separated by gap
       { pos: [cx + 2 * (s + g) + s / 2, 0, 0], size: [s, s, d] },
-      // Block 4
+      // Block 4 — separated by gap
       { pos: [cx + 3 * (s + g) + s / 2, 0, 0], size: [s, s, d] },
     ]
   }, [])
@@ -475,12 +438,12 @@ function BaseCore({ flowRef }) {
       groupRef.current.scale.set(s, s, s)
       groupRef.current.position.y = breathY // vida, no anclado
 
-      // 3D Logo materials — pulse opacity on all 4 blocks
+      // 3D Logo materials — subtle opacity pulse for solid blocks
       const logoGroup = groupRef.current.children[0]
       if (logoGroup?.isGroup) {
         logoGroup.children.forEach(child => {
           if (child?.material) {
-            child.material.opacity = 0.65 + 0.15 * breath + 0.1 * beat
+            child.material.opacity = 0.88 + 0.12 * breath
           }
         })
       }
@@ -548,16 +511,16 @@ function BaseCore({ flowRef }) {
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
-      {/* BASE 3D Logo: bloques con BoxGeometry + "BASE" text below */}
+      {/* BASE 3D Logo: bloques sólidos con bordes oscuros + "BASE" text below */}
       <group renderOrder={-1}>
         {baseLogoBlocks.map((block, i) => (
           <mesh key={i} position={block.pos}>
             <boxGeometry args={block.size} />
             <meshBasicMaterial
-              color="#0052FF"
+              color="#003399"
               transparent
-              opacity={0.92}
-              blending={THREE.AdditiveBlending}
+              opacity={1.0}
+              side={THREE.FrontSide}
               depthWrite={false}
               toneMapped={false}
             />
@@ -1599,7 +1562,7 @@ function GlobeScene({ liveData, paused }) {
         <BaseCore flowRef={flowRef} />
         {/* CAPA 2: Energy particles — flowing from core outward to wireframe */}
         <EnergyParticles liveData={liveData} onImpact={handleImpact} flowRef={flowRef} />
-        {/* CAPA 3: Text rings — inside wireframe, visible through gaps */}
+        {/* CAPA 3: Text rings — OUTSIDE wireframe (Saturn-style orbital bands) */}
         <TextBandRings liveData={liveData} />
         {/* CAPA 4: Wireframe DYSON — the Dyson sphere structure */}
         <VisibleWireframe />
