@@ -9,75 +9,89 @@ import * as THREE from 'three'
 // Arquitectura: Core(0.38) → Gas(1.2-1.5) → Wireframe(2.2) → **BANDS(2.5/2.3/2.1→outside)** → Halo(2.65)
 const TextBandRings = ({ liveData }) => {
   const groupRef = useRef()
-  const [cyanText, setCyanText] = useState('100+ ENDPOINTS  40 FREE  0ms')
-  const cyanTextRef = useRef(cyanText)
+  const [cyanText, setCyanText] = useState('70+ ENDPOINTS  40 FREE  VM ONLINE')
 
-  // Real telemetry update at 200ms for the cyan ring
+  // Real telemetry — use /v1/telemetry (same as OS MetricsWindow)
   useEffect(() => {
+    let alive = true
     const fetchTelemetry = async () => {
       try {
-        const res = await fetch('https://34-156-149-38.sslip.io/aetherapi/metrics')
-        if (res.ok) {
-          const d = await res.json()
-          const ep = d.totalEndpoints || d.endpoints || '100+'
-          const free = d.freeEndpoints || d.freeEndpoints === 0 ? d.freeEndpoints : '40'
-          const lat = d.avgLatency || d.latency || '<1'
-          const text = `${ep} ENDPOINTS  ${free} FREE  ${lat}ms  ${ep} ENDPOINTS  ${free} FREE  ${lat}ms`
-          cyanTextRef.current = text
-          setCyanText(text)
-        }
+        const base = 'https://34-156-149-38.sslip.io/aetherapi'
+        // Fetch telemetry + base-stats in parallel for rich data
+        const [telRes, statsRes] = await Promise.allSettled([
+          fetch(`${base}/v1/telemetry`),
+          fetch(`${base}/v1/x402/base-stats`),
+        ])
+        if (!alive) return
+        const tel = telRes.status === 'fulfilled' && telRes.value.ok ? await telRes.value.json() : {}
+        const stats = statsRes.status === 'fulfilled' && statsRes.value.ok ? await statsRes.value.json() : {}
+        const totals = tel.totals || {}
+        const calls = totals.calls || 0
+        const avgLat = totals.avg_latency_ms || 0
+        const endpoints = Object.keys(tel.endpoint_hits || {}).length || 70
+        const block = stats.block_number || stats.block || ''
+        const gas = stats.gas_price_gwei || stats.gas_price || ''
+        const parts = []
+        parts.push(`${endpoints}+ ENDPOINTS`)
+        parts.push('40 FREE')
+        if (avgLat > 0) parts.push(`${Math.round(avgLat)}ms`)
+        if (block) parts.push(`BLK ${block}`)
+        if (gas) parts.push(`GAS ${gas}`)
+        if (calls > 0) parts.push(`${calls} CALLS`)
+        const text = parts.join('  ')
+        setCyanText(text)
       } catch {
         // keep last known
       }
     }
     fetchTelemetry()
-    const id = setInterval(fetchTelemetry, 200)
-    return () => clearInterval(id)
+    const id = setInterval(fetchTelemetry, 500) // 500ms for smooth update
+    return () => { alive = false; clearInterval(id) }
   }, [])
 
   // Single phrase per ring — canvas repeats to fill. No overlap.
   const ringsConfig = useMemo(() => [
     {
       radius: 2.8,
-      tilt: 0.18,
-      yOffset: 0.4,
+      tilt: 0.22,
+      yOffset: 0.55,       // more separation from magenta
       speed: 0.012,
       bandWidth: 0.38,
       color: '#ffffff',
-      opacity: 0.92,
+      opacity: 0.85,       // slightly reduced
       fontSize: 56,
       phrase: 'THE MARKETPLACE THAT LIVES',
     },
     {
       radius: 2.55,
-      tilt: -0.10,
-      yOffset: -0.1,
-      speed: -0.018, // counter-rotation
+      tilt: -0.12,
+      yOffset: -0.15,      // more separation from white
+      speed: -0.018,       // counter-rotation
       bandWidth: 0.30,
       color: '#d946ef',
-      opacity: 0.85,
+      opacity: 0.75,       // slightly reduced
       fontSize: 48,
       phrase: 'API INFRASTRUCTURE FOR AI AGENTS THAT PAY',
     },
     {
       radius: 2.35,
       tilt: 0.06,
-      yOffset: -0.55,
-      speed: 0.035, // fastest — telemetry ring
+      yOffset: -0.65,      // well below magenta
+      speed: 0.035,        // fastest — telemetry ring
       bandWidth: 0.24,
       color: '#22d3ee',
-      opacity: 0.78,
+      opacity: 0.68,       // slightly reduced
       fontSize: 36,
       phrase: cyanText,
     },
   ], [cyanText])
 
-  // Canvas textures — multi-pass neon glow + crisp text
+  // Canvas textures — 2-pass glow + crisp text (reduced from 4 passes to cut destellos)
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
       canvas.width = 2048
-      canvas.height = 128 // taller for glow
+      canvas.height = 96
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
@@ -86,41 +100,25 @@ const TextBandRings = ({ liveData }) => {
       ctx.textAlign = 'left'
       ctx.textBaseline = 'middle'
 
-      // Measure single phrase width
       const phraseW = ctx.measureText(ring.phrase).width
-      // Gap between repetitions (in pixels) — prevents overlap
       const gap = phraseW * 0.35
       const stride = phraseW + gap
       const totalNeeded = canvas.width + stride
       const repeats = Math.ceil(totalNeeded / stride)
 
-      // PASS 1: Wide outer glow (big blur, very faint)
-      ctx.shadowBlur = 40
+      // PASS 1: Soft glow (reduced blur + alpha)
+      ctx.shadowBlur = 12
       ctx.shadowColor = ring.color
       ctx.fillStyle = ring.color
-      ctx.globalAlpha = 0.15
+      ctx.globalAlpha = 0.25
       for (let i = 0; i < repeats; i++) {
         ctx.fillText(ring.phrase, i * stride, canvas.height / 2)
       }
 
-      // PASS 2: Medium glow
-      ctx.shadowBlur = 20
-      ctx.globalAlpha = 0.3
-      for (let i = 0; i < repeats; i++) {
-        ctx.fillText(ring.phrase, i * stride, canvas.height / 2)
-      }
-
-      // PASS 3: Tight glow
-      ctx.shadowBlur = 8
-      ctx.globalAlpha = 0.6
-      for (let i = 0; i < repeats; i++) {
-        ctx.fillText(ring.phrase, i * stride, canvas.height / 2)
-      }
-
-      // PASS 4: Crisp solid text (no shadow)
+      // PASS 2: Crisp solid text (no shadow)
       ctx.shadowBlur = 0
       ctx.globalAlpha = 1.0
-      ctx.fillStyle = '#ffffff' // always white core for 3D neon look
+      ctx.fillStyle = '#ffffff'
       for (let i = 0; i < repeats; i++) {
         ctx.fillText(ring.phrase, i * stride, canvas.height / 2)
       }
@@ -176,7 +174,7 @@ const TextBandRings = ({ liveData }) => {
                 varying vec2 vUv;
                 void main() {
                   vec4 texColor = texture2D(uMap, vUv);
-                  float faceFactor = gl_FrontFacing ? 1.0 : 0.15;
+                  float faceFactor = gl_FrontFacing ? 1.0 : 0.05; // backface nearly invisible — no shadows
                   gl_FragColor = vec4(texColor.rgb, texColor.a * uOpacity * faceFactor);
                 }
               `}
@@ -534,7 +532,7 @@ function BaseCore({ flowRef }) {
               float swirl = sin(vPos.x*3.0+time*0.2)*sin(vPos.y*2.5+time*0.15)*sin(vPos.z*2.0+time*0.18);
               float turbulence = 0.7 + 0.15 * swirl; // barely moves
               vec3 col = mix(vec3(0.0,0.25,0.8), vec3(0.0,0.6,0.9), dist*0.5);
-              float alpha = fog * turbulence * 0.08 * (0.5 + 0.5*flow); // much dimmer
+              float alpha = fog * turbulence * 0.12 * (0.5 + 0.5*flow); // boosted from 0.08
               gl_FragColor = vec4(col, alpha);
             }`}
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.BackSide}
@@ -555,7 +553,7 @@ function BaseCore({ flowRef }) {
               float tendrils = 0.7 + 0.15 * swirl; // barely moves
               float noise = tendrils * 0.7 + 0.3;
               vec3 col = mix(vec3(0.0,0.3,0.8), vec3(0.0,0.7,0.9), noise*0.3);
-              float alpha = radial * noise * 0.08 * (0.4 + 0.6*flow); // much dimmer
+              float alpha = radial * noise * 0.12 * (0.4 + 0.6*flow); // boosted from 0.08
               alpha *= smoothstep(1.0, 0.15, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
@@ -632,7 +630,7 @@ function BaseCore({ flowRef }) {
               vec3 coreCyan = vec3(0.0,0.65,1.0);
               vec3 col = mix(deepBlue, coreCyan, (1.0-dist)*0.6 + noise*0.15);
               col += vec3(0.05,0.25,0.35) * (1.0-dist) * 0.4;
-              float alpha = radial * 0.75 * noise * (0.75 + 0.25*flow);
+              float alpha = radial * 0.85 * noise * (0.75 + 0.25*flow);
               alpha *= smoothstep(1.0, 0.5, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
@@ -856,7 +854,7 @@ function CosmicDustField() {
 // flowRef (ticker ≤500ms derivado de USDC/mercado): intensidad, velocidad,
 // tamaño y color (verde USDC vs azul→púrpura mercado). 36 pts para 60fps.
 function EnergyParticles({ liveData, onImpact, flowRef }) {
-  const PARTICLE_COUNT = 35 // Optimized from 52
+  const PARTICLE_COUNT = 20 // reduced from 35 to cut destellos
   const elapsed = useRef(0)
   const pointsRef = useRef()
   const WIRE_RADIUS = 2.2
@@ -1020,7 +1018,7 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
             float travel = clamp(dist / 2.2, 0.0, 1.0);
             // PARTS visible through entire journey — fade gently at edge, don't vanish
             float edgeFade = 1.0 - smoothstep(0.5, 0.95, travel) * 0.6;
-            vAlpha = 0.8 * (0.8 + 0.15 * flow) * edgeFade;
+            vAlpha = 0.5 * (0.8 + 0.15 * flow) * edgeFade; // reduced from 0.8
             vec4 mv = modelViewMatrix * vec4(position, 1.0);
             float sz = aSize * (1.0 + travel * 0.3);
             gl_PointSize = sz * (1.0 + 0.3 * flow) * (220.0 / -mv.z);
@@ -1043,7 +1041,7 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
             float centerGlow = pow(1.0 - r, 3.0);
             float hotCore = pow(1.0 - r, 8.0);
             vec3 hotColor = mix(vColor, vec3(1.0), hotCore * 0.5);
-            float alpha = (starCross * 0.3 + centerGlow * 0.3) * vAlpha;
+            float alpha = (starCross * 0.15 + centerGlow * 0.2) * vAlpha; // reduced from 0.3+0.3
 
             gl_FragColor = vec4(hotColor, alpha);
           }

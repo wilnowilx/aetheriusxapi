@@ -375,8 +375,8 @@ function CosmicVoid() {
           left: 50%; top: 50%; width: 300px; height: 300px;
           transform: translate(-50%,-50%) scale(0.5); opacity: 0;
         }
-        .void-pulse--1 { border-color: rgba(168,85,247,0.15); animation: voidPulse 12s ease-out infinite; }
-        .void-pulse--2 { border-color: rgba(34,211,238,0.12); animation: voidPulse 12s ease-out infinite 6s; }
+        .void-pulse--1 { border-color: rgba(168,85,247,0.08); animation: voidPulse 16s ease-out infinite; }
+        .void-pulse--2 { border-color: rgba(34,211,238,0.06); animation: voidPulse 16s ease-out infinite 8s; }
         @keyframes voidPulse {
           0% { transform: translate(-50%,-50%) scale(0.5); opacity: 0.4; }
           100% { transform: translate(-50%,-50%) scale(3.5); opacity: 0; }
