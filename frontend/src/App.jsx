@@ -26,8 +26,8 @@ function Nav() {
 
   return (
     <>
-      <nav style={{ background: scrolled ? 'rgba(5,2,15,0.88)' : 'rgba(3,1,8,0.06)', backdropFilter: 'blur(12px)', borderBottom: scrolled ? '1px solid rgba(168,85,247,0.18)' : '1px solid rgba(168,85,247,0.05)', transition: 'background 0.4s ease, border-color 0.4s ease' }} className={scrolled ? 'scrolled' : ''}>
-        <div className="nav-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+      <nav style={{ background: scrolled ? 'rgba(5,2,15,0.88)' : 'rgba(3,1,8,0.04)', backdropFilter: 'blur(12px)', borderBottom: scrolled ? '1px solid rgba(168,85,247,0.18)' : '1px solid rgba(168,85,247,0.05)', transition: 'background 0.4s ease, border-color 0.4s ease', padding: '0 40px' }} className={scrolled ? 'scrolled' : ''}>
+        <div className="nav-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', height: 60 }}>
           {/* Mainnet badge — left, bigger */}
           <span style={{ position: 'absolute', left: 0, display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', fontWeight: 700, color: 'var(--green)', padding: '8px 20px', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 9999, background: 'rgba(16,185,129,0.08)', fontFamily: 'JetBrains Mono, monospace', backdropFilter: 'blur(8px)', letterSpacing: '0.04em' }}>
             <span className="glow-dot" style={{ width: 7, height: 7 }} />
@@ -37,7 +37,7 @@ function Nav() {
           <a href="#hero" className="brand" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>AETHERIUS</a>
           {/* x402 badge — right, bigger */}
           <span style={{ position: 'absolute', right: 0, display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', fontWeight: 700, color: '#a855f7', padding: '8px 20px', border: '1px solid rgba(168,85,247,0.3)', borderRadius: 9999, background: 'rgba(168,85,247,0.08)', fontFamily: 'JetBrains Mono, monospace', backdropFilter: 'blur(8px)', letterSpacing: '0.04em' }}>
-            x402
+            x402 <span style={{ opacity: 0.5, fontSize: '0.72rem', fontWeight: 500 }}>PROTOCOL</span>
           </span>
         </div>
       </nav>

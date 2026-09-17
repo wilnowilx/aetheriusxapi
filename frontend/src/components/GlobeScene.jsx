@@ -19,47 +19,47 @@ const TextBandRings = ({ liveData }) => {
     const d = liveData || {}
     return [
       {
-        radius: 2.05,
-        tilt: 0.15,
-        yOffset: 0.4,
-        speed: 0.015,
-        bandWidth: 0.24,
+        radius: 2.15,
+        tilt: 0.12,
+        yOffset: 0.5,
+        speed: 0.012,
+        bandWidth: 0.28,
         color: '#ffffff',
         opacity: 0.85,
-        fontSize: 38,
+        fontSize: 42,
         text: '   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   THE MARKETPLACE THAT LIVES   ',
       },
       {
-        radius: 1.72,
-        tilt: -0.1,
+        radius: 1.85,
+        tilt: -0.08,
         yOffset: 0.0,
-        speed: -0.025,
-        bandWidth: 0.19,
+        speed: -0.018,
+        bandWidth: 0.22,
         color: '#d946ef',
         opacity: 0.8,
-        fontSize: 30,
+        fontSize: 34,
         text: '   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   API INFRASTRUCTURE FOR AI AGENTS THAT PAY   ',
       },
       {
-        radius: 1.42,
-        tilt: 0.06,
-        yOffset: -0.4,
-        speed: 0.035,
-        bandWidth: 0.14,
+        radius: 1.55,
+        tilt: 0.05,
+        yOffset: -0.5,
+        speed: 0.025,
+        bandWidth: 0.16,
         color: '#22d3ee',
         opacity: 0.75,
-        fontSize: 26,
+        fontSize: 28,
         text: `   ${d.endpoints || '100+'} ENDPOINTS  ·  ${d.freeEndpoints || '40'} FREE  ·  ${d.latency || ''}   ${d.endpoints || '100+'} ENDPOINTS  ·  ${d.freeEndpoints || '40'} FREE  ·  ${d.latency || ''}   `,
       },
     ]
   }, [liveData])
 
-  // Canvas 2048×80 — texturas de las bandas internas (mayor resolución para texto más grande)
+  // Canvas 2048×96 — texturas de las bandas internas (alta resolución para texto grande)
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
       canvas.width = 2048
-      canvas.height = 80
+      canvas.height = 96
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       const font = `900 ${ring.fontSize}px 'JetBrains Mono', 'Fira Code', monospace`
@@ -548,7 +548,7 @@ function BaseCore({ flowRef }) {
           transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.FrontSide}
         />
       </mesh>
-      {/* BASE 3D Logo: bloques con BoxGeometry, no sprite plano */}
+      {/* BASE 3D Logo: bloques con BoxGeometry + "BASE" text below */}
       <group renderOrder={-1}>
         {baseLogoBlocks.map((block, i) => (
           <mesh key={i} position={block.pos}>
@@ -556,13 +556,36 @@ function BaseCore({ flowRef }) {
             <meshBasicMaterial
               color="#0052FF"
               transparent
-              opacity={0.7}
+              opacity={0.92}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
               toneMapped={false}
             />
           </mesh>
         ))}
+        {/* "BASE" label below the logo blocks */}
+        <sprite position={[0, -0.22, 0]} scale={[0.45, 0.1, 1]}>
+          <spriteMaterial
+            map={(() => {
+              const c = document.createElement('canvas')
+              c.width = 256; c.height = 64
+              const ctx = c.getContext('2d')
+              ctx.clearRect(0, 0, 256, 64)
+              ctx.font = "bold 38px 'JetBrains Mono', monospace"
+              ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+              ctx.shadowColor = '#0052FF'; ctx.shadowBlur = 8
+              ctx.fillStyle = '#0052FF'
+              ctx.globalAlpha = 0.9
+              ctx.fillText('BASE', 128, 32)
+              const tex = new THREE.CanvasTexture(c)
+              tex.minFilter = THREE.LinearFilter
+              return tex
+            })()}
+            transparent
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </sprite>
       </group>
       {/* PULSAR CORE: cluster de partículas vibrantes que dan forma al núcleo */}
       <PulsarCore gasUniforms={gasUniforms} />
@@ -882,7 +905,7 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
     const { positions, velocities, colors, sizes, lifetimes, maxLifetimes, hit } = state
     const tmp = [0, 0, 0]
     let visualsDirty = false
-    let burstCount = isBurst ? 3 : 0
+    let burstCount = isBurst ? 2 : 0
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       lifetimes[i] += delta
       // Burst fuerza respawn inmediato en varias partículas
@@ -942,8 +965,8 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
           // Vida suficiente para disiparse VISIBLE en la red (no desaparecer de golpe)
           lifetimes[i] = maxLifetimes[i] - 0.8
         } else {
-          // Ya impactada: se expande y se desvanece contra la malla
-          sizes[i] *= 1.06
+          // Ya impactada: se desvanece RÁPIDO contra la malla (NO crecer)
+          sizes[i] *= 0.92  // shrink, not grow — prevents flash explosion
           // No se mueve más
         }
       }
@@ -974,11 +997,11 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
             float dist = length(position);
             float travel = clamp(dist / 2.2, 0.0, 1.0);
             // PARTS visible through entire journey — fade gently at edge, don't vanish
-            float edgeFade = 1.0 - smoothstep(0.7, 1.05, travel) * 0.4;
-            vAlpha = (0.8 + 0.2 * sin(time * 2.0 + dist * 4.0)) * (0.9 + 0.25 * flow) * edgeFade;
+            float edgeFade = 1.0 - smoothstep(0.5, 0.95, travel) * 0.6;
+            vAlpha = (0.7 + 0.2 * sin(time * 2.0 + dist * 4.0)) * (0.8 + 0.15 * flow) * edgeFade;
             vec4 mv = modelViewMatrix * vec4(position, 1.0);
-            float sz = aSize * (1.0 + travel * 0.8);
-            gl_PointSize = sz * (1.0 + 0.6 * flow) * (220.0 / -mv.z);
+            float sz = aSize * (1.0 + travel * 0.3);
+            gl_PointSize = sz * (1.0 + 0.3 * flow) * (220.0 / -mv.z);
             gl_Position = projectionMatrix * mv;
           }
         `}
@@ -995,10 +1018,10 @@ function EnergyParticles({ liveData, onImpact, flowRef }) {
             float spikeY = smoothstep(0.18, 0.0, ax) * pow(1.0 - ay, 2.0);
             float starCross = max(spikeX, spikeY);
 
-            float centerGlow = pow(1.0 - r, 2.5);
-            float hotCore = pow(1.0 - r, 10.0);
-            vec3 hotColor = mix(vColor, vec3(1.0), hotCore * 0.8);
-            float alpha = (starCross * 0.6 + centerGlow * 0.4) * vAlpha;
+            float centerGlow = pow(1.0 - r, 3.0);
+            float hotCore = pow(1.0 - r, 8.0);
+            vec3 hotColor = mix(vColor, vec3(1.0), hotCore * 0.5);
+            float alpha = (starCross * 0.3 + centerGlow * 0.3) * vAlpha;
 
             gl_FragColor = vec4(hotColor, alpha);
           }
