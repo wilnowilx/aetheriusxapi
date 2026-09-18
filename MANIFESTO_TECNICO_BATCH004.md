@@ -178,7 +178,7 @@ Reputation = SettlementRate(30%) + Uptime(30%) + Latency(15%) + AgentTrust(25%)
 **Verification:**
 ```bash
 # Health check
-curl https://34-156-149-38.sslip.io/aetherapi/health
+curl https://34-156-149-38.sslip.io/aetherapi/api/v1/health
 
 # Telemetry (real-time)
 curl https://34-156-149-38.sslip.io/aetherapi/v1/telemetry
@@ -351,7 +351,7 @@ python scripts/m2m_swarm_test.py
 
 ## ✅ Verification Checklist for Evaluators
 
-- [ ] **Health check:** `curl https://34-156-149-38.sslip.io/aetherapi/health` → `{"status":"alive"}`
+- [ ] **Health check:** `curl https://34-156-149-38.sslip.io/aetherapi/api/v1/health` → `{"status":"alive"}`
 - [ ] **Canary #1:** `curl -H "X-PAYMENT: <proof>" /v1/data/uuid` → 200 + data
 - [ ] **Canary #2:** `curl -H "X-PAYMENT: <proof>" /v1/token/price` → 200 + price
 - [ ] **Canary #3:** `curl -H "X-PAYMENT: <proof>" /v1/token/analyze` → 200 + analysis
