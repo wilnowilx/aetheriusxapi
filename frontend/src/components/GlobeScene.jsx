@@ -86,12 +86,12 @@ const TextBandRings = ({ liveData }) => {
     },
   ], [cyanText])
 
-  // Canvas textures — 2-pass glow + crisp text (reduced from 4 passes to cut destellos)
+  // Canvas textures — mathematical tile repetition (no overlap or corruption)
   const ringTextures = useMemo(() =>
     ringsConfig.map(ring => {
       const canvas = document.createElement('canvas')
       canvas.width = 2048
-      canvas.height = 96
+      canvas.height = 120
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
@@ -101,30 +101,32 @@ const TextBandRings = ({ liveData }) => {
       ctx.textBaseline = 'middle'
 
       const phraseW = ctx.measureText(ring.phrase).width
-      const gap = phraseW * 0.35
+      // Generous spacing so phrases never collide
+      const gap = Math.max(160, phraseW * 0.45)
       const stride = phraseW + gap
-      const totalNeeded = canvas.width + stride
-      const repeats = Math.ceil(totalNeeded / stride)
 
-      // PASS 1: Soft glow (reduced blur + alpha)
-      ctx.shadowBlur = 12
+      // PASS 1: Soft glow
+      ctx.shadowBlur = 10
       ctx.shadowColor = ring.color
       ctx.fillStyle = ring.color
-      ctx.globalAlpha = 0.25
-      for (let i = 0; i < repeats; i++) {
-        ctx.fillText(ring.phrase, i * stride, canvas.height / 2)
+      ctx.globalAlpha = 0.3
+      for (let x = 0; x < canvas.width + stride; x += stride) {
+        ctx.fillText(ring.phrase, x, canvas.height / 2)
       }
 
-      // PASS 2: Crisp solid text (no shadow)
+      // PASS 2: Crisp solid core text
       ctx.shadowBlur = 0
       ctx.globalAlpha = 1.0
       ctx.fillStyle = '#ffffff'
-      for (let i = 0; i < repeats; i++) {
-        ctx.fillText(ring.phrase, i * stride, canvas.height / 2)
+      for (let x = 0; x < canvas.width + stride; x += stride) {
+        ctx.fillText(ring.phrase, x, canvas.height / 2)
       }
 
       ctx.globalAlpha = 1
       const tex = new THREE.CanvasTexture(canvas)
+      tex.wrapS = THREE.RepeatWrapping
+      tex.wrapT = THREE.ClampToEdgeWrapping
+      tex.repeat.set(1, 1)
       tex.anisotropy = 4
       tex.minFilter = THREE.LinearFilter
       tex.magFilter = THREE.LinearFilter
