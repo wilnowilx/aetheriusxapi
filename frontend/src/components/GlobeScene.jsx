@@ -431,56 +431,30 @@ function BaseCore({ flowRef }) {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Base 3D Logo: L-shape + 3 squares, aligned on baseline Y=0, original size
+  // Base 3D Logo: Built with precision box geometry primitives for 100% flawless alignment
   const baseLogoBlocks = useMemo(() => {
-    const s = 0.28        // original size user liked
-    const g = 0.09        // original gap
-    const d = 0.09        // original depth
-    const tabW = s * 0.40 // tab width = 40%
-    const tabH = s * 0.40 // tab height = 40%
+    const s = 0.22        // block size (proportional & elegant inside sphere)
+    const g = 0.05        // gap between blocks
+    const d = 0.07        // depth
 
-    // L-shape: base square + tab on top-left = ONE mesh
-    const shape = new THREE.Shape()
-    shape.moveTo(-s / 2, -s / 2)
-    shape.lineTo(s / 2, -s / 2)
-    shape.lineTo(s / 2, s / 2)
-    shape.lineTo(-s / 2 + tabW, s / 2)
-    shape.lineTo(-s / 2 + tabW, s / 2 + tabH)
-    shape.lineTo(-s / 2, s / 2 + tabH)
-    shape.lineTo(-s / 2, -s / 2)
-
-    const extrudeSettings = {
-      depth: d,
-      bevelEnabled: true,
-      bevelThickness: 0.006,
-      bevelSize: 0.006,
-      bevelSegments: 2,
-    }
-    const lGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-    
-    // Baseline alignment: align bottom (min.y) to 0, and center X
-    lGeometry.computeBoundingBox()
-    const bb = lGeometry.boundingBox
-    const cx = (bb.max.x + bb.min.x) / 2
-    const cy = bb.min.y // bottom baseline
-    const cz = (bb.max.z + bb.min.z) / 2
-    lGeometry.translate(-cx, -cy, -cz)
-
-    // Layout: 4 items total (L + 3 squares) centered around X=0
+    // Total width for 4 blocks: L-shape + 3 squares
     const totalW = 4 * s + 3 * g
     const startX = -totalW / 2 + s / 2
 
-    const squareGeo = new THREE.BoxGeometry(s, s, d)
-    squareGeo.translate(0, s / 2, 0)
+    // L-shape consists of:
+    // 1. Main vertical/base square (centered at base Y=0)
+    // 2. Top-left tab square
+    const tabSize = s * 0.42
 
     return {
-      lGeometry,
-      lPos: [startX, 0, 0],
-      squareGeo,
+      size: [s, s, d],
+      lMainPos: [startX, s / 2, 0],
+      lTabPos: [startX - s / 2 + tabSize / 2, s - tabSize / 2, 0],
+      tabSize: [tabSize, tabSize, d],
       squares: [
-        { pos: [startX + (s + g), 0, 0] },
-        { pos: [startX + 2 * (s + g), 0, 0] },
-        { pos: [startX + 3 * (s + g), 0, 0] },
+        { pos: [startX + (s + g), s / 2, 0] },
+        { pos: [startX + 2 * (s + g), s / 2, 0] },
+        { pos: [startX + 3 * (s + g), s / 2, 0] },
       ],
     }
   }, [])
@@ -567,30 +541,23 @@ function BaseCore({ flowRef }) {
            transparent depthWrite={false} blending={THREE.NormalBlending} side={THREE.FrontSide}
         />
       </mesh>
-      {/* BASE 3D Logo: L-shape (single extruded mesh) FIRST + 3 separate squares + "BASE" text */}
-      <group renderOrder={-1}>
-        {/* L-shape as ONE continuous block — LEFTMOST */}
-        <mesh geometry={baseLogoBlocks.lGeometry} position={baseLogoBlocks.lPos}>
-          <meshBasicMaterial
-            color="#003399"
-            transparent
-            opacity={1.0}
-            side={THREE.DoubleSide}
-            depthWrite={false}
-            toneMapped={false}
-          />
+      {/* BASE Logo built with primitive boxes for 100% precise baseline alignment */}
+      <group renderOrder={-1} position={[0, -0.1, 0]}>
+        {/* L-Shape Main vertical block */}
+        <mesh position={baseLogoBlocks.lMainPos}>
+          <boxGeometry args={baseLogoBlocks.size} />
+          <meshBasicMaterial color="#0052FF" transparent opacity={0.95} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
         </mesh>
-        {/* 3 separate square blocks using baseline-aligned geometry */}
+        {/* L-Shape Top-left Tab */}
+        <mesh position={baseLogoBlocks.lTabPos}>
+          <boxGeometry args={baseLogoBlocks.tabSize} />
+          <meshBasicMaterial color="#0052FF" transparent opacity={0.95} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
+        </mesh>
+        {/* 3 Square blocks */}
         {baseLogoBlocks.squares.map((block, i) => (
-          <mesh key={i} geometry={baseLogoBlocks.squareGeo} position={block.pos}>
-            <meshBasicMaterial
-              color="#003399"
-              transparent
-              opacity={1.0}
-              side={THREE.DoubleSide}
-              depthWrite={false}
-              toneMapped={false}
-            />
+          <mesh key={i} position={block.pos}>
+            <boxGeometry args={baseLogoBlocks.size} />
+            <meshBasicMaterial color="#0052FF" transparent opacity={0.95} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
           </mesh>
         ))}
         {/* "BASE" label below the logo blocks */}
