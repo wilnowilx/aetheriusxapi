@@ -431,11 +431,11 @@ function BaseCore({ flowRef }) {
   const groupRef = useRef()
   const elapsed = useRef(0)
 
-  // Base 3D Logo: L is ONE continuous shape + 3 separate squares, perfectly centered
+  // Base 3D Logo: L-shape + 3 squares, aligned on baseline Y=0, original size
   const baseLogoBlocks = useMemo(() => {
-    const s = 0.25        // block size
-    const g = 0.06        // gap between blocks
-    const d = 0.08        // depth
+    const s = 0.28        // original size user liked
+    const g = 0.09        // original gap
+    const d = 0.09        // original depth
     const tabW = s * 0.40 // tab width = 40%
     const tabH = s * 0.40 // tab height = 40%
 
@@ -452,29 +452,35 @@ function BaseCore({ flowRef }) {
     const extrudeSettings = {
       depth: d,
       bevelEnabled: true,
-      bevelThickness: 0.004,
-      bevelSize: 0.004,
+      bevelThickness: 0.006,
+      bevelSize: 0.006,
       bevelSegments: 2,
     }
     const lGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
+    
+    // Baseline alignment: align bottom (min.y) to 0, and center X
     lGeometry.computeBoundingBox()
     const bb = lGeometry.boundingBox
     const cx = (bb.max.x + bb.min.x) / 2
-    const cy = (bb.max.y + bb.min.y) / 2
+    const cy = bb.min.y // bottom baseline
     const cz = (bb.max.z + bb.min.z) / 2
     lGeometry.translate(-cx, -cy, -cz)
 
-    // Exact mathematical centering for 4 items (L + 3 squares)
+    // Layout: 4 items total (L + 3 squares) centered around X=0
     const totalW = 4 * s + 3 * g
     const startX = -totalW / 2 + s / 2
+
+    const squareGeo = new THREE.BoxGeometry(s, s, d)
+    squareGeo.translate(0, s / 2, 0)
 
     return {
       lGeometry,
       lPos: [startX, 0, 0],
+      squareGeo,
       squares: [
-        { pos: [startX + (s + g), 0, 0], size: [s, s, d] },
-        { pos: [startX + 2 * (s + g), 0, 0], size: [s, s, d] },
-        { pos: [startX + 3 * (s + g), 0, 0], size: [s, s, d] },
+        { pos: [startX + (s + g), 0, 0] },
+        { pos: [startX + 2 * (s + g), 0, 0] },
+        { pos: [startX + 3 * (s + g), 0, 0] },
       ],
     }
   }, [])
@@ -574,10 +580,9 @@ function BaseCore({ flowRef }) {
             toneMapped={false}
           />
         </mesh>
-        {/* 3 separate square blocks */}
+        {/* 3 separate square blocks using baseline-aligned geometry */}
         {baseLogoBlocks.squares.map((block, i) => (
-          <mesh key={i} position={block.pos}>
-            <boxGeometry args={block.size} />
+          <mesh key={i} geometry={baseLogoBlocks.squareGeo} position={block.pos}>
             <meshBasicMaterial
               color="#003399"
               transparent
