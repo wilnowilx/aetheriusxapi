@@ -1,17 +1,56 @@
 import React, { useRef, useMemo, useEffect, useState, useCallback } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Stars, OrbitControls } from '@react-three/drei'
+import { Stars, OrbitControls, Text } from '@react-three/drei'
 import * as THREE from 'three'
 import { useDesign } from './DesignPanel'
 
 // === TEXT BAND RINGS — Saturn-style orbital rings OUTSIDE the Dyson sphere ===
-// Los anillos orbitan FUERA del wireframe (r > 2.2), como los anillos de Saturno.
-// Visibles por encima de toda la estructura. Sin sombras, cara al usuario.
-// Arquitectura: Core(0.38) → Gas(1.2-1.5) → Wireframe(2.2) → **BANDS(2.5/2.3/2.1→outside)** → Halo(2.65)
-const TextBandRings = ({ liveData }) => {
+// Uses drei <Text curveRadius> for SDF-crisp text along circular arcs.
+// Architecture: Core(0.38) → Gas(1.2-1.5) → Wireframe(2.2) → BANDS(2.8/2.55/2.35) → Halo(2.65)
+const JB_MONO_WOFF = 'https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2'
+
+// Single text ring rendered via drei <Text curveRadius>
+function TextRing({ radius, tilt, yOffset, speed, fontSize, color, opacity, phrase, repeatCount = 5, hovered }) {
   const groupRef = useRef()
+  // Repeat phrase around the circumference for density (minimum 3 clean reps)
+  const repeatedText = useMemo(() => {
+    const parts = []
+    for (let i = 0; i < repeatCount; i++) parts.push(phrase)
+    return parts.join('       ')
+  }, [phrase, repeatCount])
+
+  useFrame((_, delta) => {
+    if (groupRef.current && !hovered) {
+      groupRef.current.rotation.y += delta * speed
+    }
+  })
+
+  const worldFontSize = fontSize / 200
+
+  return (
+    <group ref={groupRef} position={[0, yOffset, 0]} rotation={[tilt, 0, 0]}>
+      <Text
+        font={JB_MONO_WOFF}
+        fontSize={worldFontSize}
+        color={color}
+        anchorX="center"
+        anchorY="middle"
+        curveRadius={-radius}
+        letterSpacing={0.08}
+        fillOpacity={opacity}
+        depthWrite={false}
+        renderOrder={10}
+      >
+        {repeatedText}
+      </Text>
+    </group>
+  )
+}
+
+const TextBandRings = ({ liveData }) => {
   const [cyanText, setCyanText] = useState('70+ ENDPOINTS  40 FREE  VM ONLINE')
   const { params: dp } = useDesign() || { params: {} }
+  const [hoveredRing, setHoveredRing] = useState(null)
 
   // Real telemetry — use /v1/telemetry (same as OS MetricsWindow)
   useEffect(() => {
@@ -19,7 +58,6 @@ const TextBandRings = ({ liveData }) => {
     const fetchTelemetry = async () => {
       try {
         const base = 'https://34-156-149-38.sslip.io/aetherapi'
-        // Fetch telemetry + base-stats in parallel for rich data
         const [telRes, statsRes] = await Promise.allSettled([
           fetch(`${base}/v1/telemetry`),
           fetch(`${base}/v1/x402/base-stats`),
@@ -51,147 +89,48 @@ const TextBandRings = ({ liveData }) => {
     return () => { alive = false; clearInterval(id) }
   }, [])
 
-  // Single phrase per ring — uses design panel params for live tuning
   const ringsConfig = useMemo(() => [
     {
       radius: dp.ring0Radius ?? 2.8,
       tilt: 0.22,
       yOffset: dp.ring0YOffset ?? 0.55,
       speed: dp.ring0Speed ?? 0.012,
-      bandWidth: 0.38,
       color: '#ffffff',
       opacity: dp.ring0Opacity ?? 0.85,
       fontSize: dp.ring0FontSize ?? 56,
       phrase: 'THE MARKETPLACE THAT LIVES',
+      repeatCount: 5,
     },
     {
       radius: dp.ring1Radius ?? 2.55,
       tilt: -0.12,
       yOffset: dp.ring1YOffset ?? -0.15,
       speed: dp.ring1Speed ?? -0.018,
-      bandWidth: 0.30,
       color: '#d946ef',
       opacity: dp.ring1Opacity ?? 0.75,
       fontSize: dp.ring1FontSize ?? 48,
       phrase: 'API INFRASTRUCTURE FOR AI AGENTS THAT PAY',
+      repeatCount: 4,
     },
     {
       radius: dp.ring2Radius ?? 2.35,
       tilt: 0.06,
       yOffset: dp.ring2YOffset ?? -0.65,
       speed: dp.ring2Speed ?? 0.035,
-      bandWidth: 0.24,
       color: '#22d3ee',
       opacity: dp.ring2Opacity ?? 0.68,
       fontSize: dp.ring2FontSize ?? 36,
       phrase: cyanText,
+      repeatCount: 4,
     },
   ], [cyanText, dp.ring0Radius, dp.ring0Speed, dp.ring0FontSize, dp.ring0Opacity, dp.ring0YOffset,
        dp.ring1Radius, dp.ring1Speed, dp.ring1FontSize, dp.ring1Opacity, dp.ring1YOffset,
        dp.ring2Radius, dp.ring2Speed, dp.ring2FontSize, dp.ring2Opacity, dp.ring2YOffset])
 
-  // Canvas textures — mathematical tile repetition (no overlap or corruption)
-  const ringTextures = useMemo(() =>
-    ringsConfig.map(ring => {
-      const canvas = document.createElement('canvas')
-      canvas.width = 2048
-      canvas.height = 120
-      const ctx = canvas.getContext('2d')
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-      const font = `900 ${ring.fontSize}px 'JetBrains Mono', 'Fira Code', monospace`
-      ctx.font = font
-      ctx.textAlign = 'left'
-      ctx.textBaseline = 'middle'
-
-      const phraseW = ctx.measureText(ring.phrase).width
-      // Generous spacing so phrases never collide
-      const gap = Math.max(160, phraseW * 0.45)
-      const stride = phraseW + gap
-
-      // PASS 1: Soft glow
-      ctx.shadowBlur = 10
-      ctx.shadowColor = ring.color
-      ctx.fillStyle = ring.color
-      ctx.globalAlpha = 0.3
-      for (let x = 0; x < canvas.width + stride; x += stride) {
-        ctx.fillText(ring.phrase, x, canvas.height / 2)
-      }
-
-      // PASS 2: Crisp solid core text
-      ctx.shadowBlur = 0
-      ctx.globalAlpha = 1.0
-      ctx.fillStyle = '#ffffff'
-      for (let x = 0; x < canvas.width + stride; x += stride) {
-        ctx.fillText(ring.phrase, x, canvas.height / 2)
-      }
-
-      ctx.globalAlpha = 1
-      const tex = new THREE.CanvasTexture(canvas)
-      tex.wrapS = THREE.RepeatWrapping
-      tex.wrapT = THREE.ClampToEdgeWrapping
-      tex.repeat.set(1, 1)
-      tex.anisotropy = 4
-      tex.minFilter = THREE.LinearFilter
-      tex.magFilter = THREE.LinearFilter
-      return tex
-    })
-  , [ringsConfig])
-
-  const [hoveredRing, setHoveredRing] = useState(null)
-
-  useFrame((state, delta) => {
-    if (groupRef.current) {
-      ringsConfig.forEach((ring, i) => {
-        const ringGroup = groupRef.current.children[i]
-        if (ringGroup) {
-          const paused = hoveredRing === i
-          if (!paused) ringGroup.rotation.y += delta * ring.speed
-        }
-      })
-    }
-  })
-
   return (
-    <group ref={groupRef}>
-      {ringsConfig.map((ring, ringIdx) => (
-        <group key={ringIdx} position={[0, ring.yOffset, 0]} rotation={[ring.tilt, 0, 0]}>
-          <mesh
-            onPointerOver={(e) => { e.stopPropagation(); setHoveredRing(ringIdx); document.body.style.cursor = 'pointer' }}
-            onPointerOut={() => { setHoveredRing(null); document.body.style.cursor = 'auto' }}
-            onClick={() => {}}
-          >
-            <cylinderGeometry args={[ring.radius, ring.radius, ring.bandWidth, 128, 1, true]} />
-            <shaderMaterial
-              uniforms={{
-                uMap: { value: ringTextures[ringIdx] },
-                uOpacity: { value: ring.opacity },
-              }}
-              vertexShader={`
-                varying vec2 vUv;
-                void main() {
-                  vUv = uv;
-                  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-              `}
-              fragmentShader={`
-                uniform sampler2D uMap;
-                uniform float uOpacity;
-                varying vec2 vUv;
-                void main() {
-                  vec4 texColor = texture2D(uMap, vUv);
-                  float faceFactor = gl_FrontFacing ? 1.0 : 0.05; // backface nearly invisible — no shadows
-                  gl_FragColor = vec4(texColor.rgb, texColor.a * uOpacity * faceFactor);
-                }
-              `}
-              transparent
-              side={THREE.DoubleSide}
-              depthWrite={false}
-              blending={THREE.AdditiveBlending}
-              toneMapped={false}
-            />
-          </mesh>
-        </group>
+    <group>
+      {ringsConfig.map((ring, i) => (
+        <TextRing key={i} {...ring} hovered={hoveredRing === i} />
       ))}
     </group>
   )
