@@ -2,6 +2,7 @@ import React, { useRef, useMemo, useEffect, useState, useCallback } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Stars, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
+import { useDesign } from './DesignPanel'
 
 // === TEXT BAND RINGS — Saturn-style orbital rings OUTSIDE the Dyson sphere ===
 // Los anillos orbitan FUERA del wireframe (r > 2.2), como los anillos de Saturno.
@@ -10,6 +11,7 @@ import * as THREE from 'three'
 const TextBandRings = ({ liveData }) => {
   const groupRef = useRef()
   const [cyanText, setCyanText] = useState('70+ ENDPOINTS  40 FREE  VM ONLINE')
+  const { params: dp } = useDesign() || { params: {} }
 
   // Real telemetry — use /v1/telemetry (same as OS MetricsWindow)
   useEffect(() => {
@@ -49,42 +51,44 @@ const TextBandRings = ({ liveData }) => {
     return () => { alive = false; clearInterval(id) }
   }, [])
 
-  // Single phrase per ring — canvas repeats to fill. No overlap.
+  // Single phrase per ring — uses design panel params for live tuning
   const ringsConfig = useMemo(() => [
     {
-      radius: 2.8,
+      radius: dp.ring0Radius ?? 2.8,
       tilt: 0.22,
-      yOffset: 0.55,       // more separation from magenta
-      speed: 0.012,
+      yOffset: dp.ring0YOffset ?? 0.55,
+      speed: dp.ring0Speed ?? 0.012,
       bandWidth: 0.38,
       color: '#ffffff',
-      opacity: 0.85,       // slightly reduced
-      fontSize: 56,
+      opacity: dp.ring0Opacity ?? 0.85,
+      fontSize: dp.ring0FontSize ?? 56,
       phrase: 'THE MARKETPLACE THAT LIVES',
     },
     {
-      radius: 2.55,
+      radius: dp.ring1Radius ?? 2.55,
       tilt: -0.12,
-      yOffset: -0.15,      // more separation from white
-      speed: -0.018,       // counter-rotation
+      yOffset: dp.ring1YOffset ?? -0.15,
+      speed: dp.ring1Speed ?? -0.018,
       bandWidth: 0.30,
       color: '#d946ef',
-      opacity: 0.75,       // slightly reduced
-      fontSize: 48,
+      opacity: dp.ring1Opacity ?? 0.75,
+      fontSize: dp.ring1FontSize ?? 48,
       phrase: 'API INFRASTRUCTURE FOR AI AGENTS THAT PAY',
     },
     {
-      radius: 2.35,
+      radius: dp.ring2Radius ?? 2.35,
       tilt: 0.06,
-      yOffset: -0.65,      // well below magenta
-      speed: 0.035,        // fastest — telemetry ring
+      yOffset: dp.ring2YOffset ?? -0.65,
+      speed: dp.ring2Speed ?? 0.035,
       bandWidth: 0.24,
       color: '#22d3ee',
-      opacity: 0.68,       // slightly reduced
-      fontSize: 36,
+      opacity: dp.ring2Opacity ?? 0.68,
+      fontSize: dp.ring2FontSize ?? 36,
       phrase: cyanText,
     },
-  ], [cyanText])
+  ], [cyanText, dp.ring0Radius, dp.ring0Speed, dp.ring0FontSize, dp.ring0Opacity, dp.ring0YOffset,
+       dp.ring1Radius, dp.ring1Speed, dp.ring1FontSize, dp.ring1Opacity, dp.ring1YOffset,
+       dp.ring2Radius, dp.ring2Speed, dp.ring2FontSize, dp.ring2Opacity, dp.ring2YOffset])
 
   // Canvas textures — mathematical tile repetition (no overlap or corruption)
   const ringTextures = useMemo(() =>
@@ -430,20 +434,16 @@ function PulsarCore({ gasUniforms }) {
 function BaseCore({ flowRef }) {
   const groupRef = useRef()
   const elapsed = useRef(0)
+  const { params: dp } = useDesign() || { params: {} }
 
   // Base 3D Logo: Built with precision box geometry primitives for 100% flawless alignment
   const baseLogoBlocks = useMemo(() => {
-    const s = 0.22        // block size (proportional & elegant inside sphere)
-    const g = 0.05        // gap between blocks
+    const s = dp.logoSize ?? 0.22        // block size from design panel
+    const g = dp.logoGap ?? 0.05         // gap from design panel
     const d = 0.07        // depth
 
-    // Total width for 4 blocks: L-shape + 3 squares
     const totalW = 4 * s + 3 * g
     const startX = -totalW / 2 + s / 2
-
-    // L-shape consists of:
-    // 1. Main vertical/base square (centered at base Y=0)
-    // 2. Top-left tab square
     const tabSize = s * 0.42
 
     return {
@@ -457,7 +457,7 @@ function BaseCore({ flowRef }) {
         { pos: [startX + 3 * (s + g), s / 2, 0] },
       ],
     }
-  }, [])
+  }, [dp.logoSize, dp.logoGap])
 
   useFrame((state, delta) => {
     elapsed.current += delta
@@ -468,13 +468,14 @@ function BaseCore({ flowRef }) {
       groupRef.current.rotation.y = elapsed.current * 0.08
       groupRef.current.rotation.x = Math.sin(elapsed.current * 0.12) * 0.08
 
-      // BREATHING: respiración orgánica + beat del flujo (toned down)
+      // BREATHING: respiración orgánica + design panel controls
       const breath = Math.sin(elapsed.current * 1.5)
-      const breathY = Math.sin(elapsed.current * 0.9) * 0.03 // bob vertical sutil
-      const beat = 0 // static — no scale pulse
-      const s = 1 + 0.03 * breath + 0.08 * beat
+      const breathY = Math.sin(elapsed.current * 0.9) * (dp.coreBreathing ?? 0.03)
+      const beat = 0
+      const sc = dp.coreScale ?? 1.3
+      const s = sc * (1 + 0.03 * breath + 0.08 * beat)
       groupRef.current.scale.set(s, s, s)
-      groupRef.current.position.y = breathY // vida, no anclado
+      groupRef.current.position.y = breathY
 
       // 3D Logo materials — subtle opacity pulse for solid blocks
       const logoGroup = groupRef.current.children[0]
@@ -491,7 +492,7 @@ function BaseCore({ flowRef }) {
   // Gas — ultra-subtle ambient glow, no aggressive swirl
   const gasUniforms = useMemo(() => ({ time: { value: 0 }, flow: { value: 1 } }), [])
   useFrame((_, delta) => {
-    gasUniforms.time.value += delta * 0.08 // barely moving
+    gasUniforms.time.value += delta * (dp.gasSpeed ?? 0.08)
     gasUniforms.flow.value = flowRef?.current?.intensity || 1
   })
 
@@ -513,7 +514,7 @@ function BaseCore({ flowRef }) {
               float swirl = sin(vPos.x*3.0+time*0.2)*sin(vPos.y*2.5+time*0.15)*sin(vPos.z*2.0+time*0.18);
               float turbulence = 0.7 + 0.15 * swirl; // barely moves
               vec3 col = mix(vec3(0.0,0.25,0.8), vec3(0.0,0.6,0.9), dist*0.5);
-              float alpha = fog * turbulence * 0.12 * (0.5 + 0.5*flow); // boosted from 0.08
+              float alpha = fog * turbulence * ${(dp.gasAlpha ?? 0.12).toFixed(3)} * (0.5 + 0.5*flow);
               gl_FragColor = vec4(col, alpha);
             }`}
            transparent depthWrite={false} blending={THREE.NormalBlending} side={THREE.BackSide}
@@ -534,7 +535,7 @@ function BaseCore({ flowRef }) {
               float tendrils = 0.7 + 0.15 * swirl; // barely moves
               float noise = tendrils * 0.7 + 0.3;
               vec3 col = mix(vec3(0.0,0.3,0.8), vec3(0.0,0.7,0.9), noise*0.3);
-              float alpha = radial * noise * 0.12 * (0.4 + 0.6*flow); // boosted from 0.08
+              float alpha = radial * noise * ${(dp.gasAlpha ?? 0.12).toFixed(3)} * (0.4 + 0.6*flow);
               alpha *= smoothstep(1.0, 0.15, dist);
               gl_FragColor = vec4(col, alpha);
             }`}
@@ -542,22 +543,22 @@ function BaseCore({ flowRef }) {
         />
       </mesh>
       {/* BASE Logo built with primitive boxes for 100% precise baseline alignment */}
-      <group renderOrder={-1} position={[0, -0.1, 0]}>
+      <group renderOrder={-1} position={[0, dp.logoY ?? -0.1, 0]}>
         {/* L-Shape Main vertical block */}
         <mesh position={baseLogoBlocks.lMainPos}>
           <boxGeometry args={baseLogoBlocks.size} />
-          <meshBasicMaterial color="#0052FF" transparent opacity={0.95} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
+          <meshBasicMaterial color={dp.logoColor ?? '#0052FF'} transparent opacity={0.95} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
         </mesh>
         {/* L-Shape Top-left Tab */}
         <mesh position={baseLogoBlocks.lTabPos}>
           <boxGeometry args={baseLogoBlocks.tabSize} />
-          <meshBasicMaterial color="#0052FF" transparent opacity={0.95} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
+          <meshBasicMaterial color={dp.logoColor ?? '#0052FF'} transparent opacity={0.95} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
         </mesh>
         {/* 3 Square blocks */}
         {baseLogoBlocks.squares.map((block, i) => (
           <mesh key={i} position={block.pos}>
             <boxGeometry args={baseLogoBlocks.size} />
-            <meshBasicMaterial color="#0052FF" transparent opacity={0.95} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
+            <meshBasicMaterial color={dp.logoColor ?? '#0052FF'} transparent opacity={0.95} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
           </mesh>
         ))}
         {/* "BASE" label below the logo blocks */}

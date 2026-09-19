@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, Suspense, useCallback } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { DesignProvider, DesignPanel } from './DesignPanel'
 
 const GlobeScene = React.lazy(() => import('./GlobeScene'))
 
@@ -575,7 +576,15 @@ function Hero() {
   const [globePaused, setGlobePaused] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [webglOK, setWebglOK] = useState(true)
+  const [designOpen, setDesignOpen] = useState(false)
   const heroRef = useRef(null)
+
+  // Ctrl+D toggle for Design Panel
+  useEffect(() => {
+    const handler = (e) => { if (e.ctrlKey && e.key === 'd') { e.preventDefault(); setDesignOpen(v => !v) } }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
 
   // WebGL availability probe — strict fingerprinting blockers (Brave Shields)
   // return a null context. Detect once, fall back to the CSS globe.
@@ -623,7 +632,9 @@ function Hero() {
   }, [])
 
 return (
+    <DesignProvider>
     <>
+      {designOpen && <DesignPanel />}
       {!loaded && <FluidLoader onComplete={handleLoaded} />}
       <CosmicSound />
 
@@ -771,6 +782,7 @@ return (
         `}</style>
       </section>
     </>
+    </DesignProvider>
   )
 }
 
