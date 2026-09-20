@@ -10,8 +10,9 @@
 
 ## Español
 - [01 — Tu Primera Llamada x402 (ES)](01-primera-llamada-x402.md) — 402 sin pago → 200 con `X-PAYMENT` (simulado en local, USDC real en testnet)
+- [02 — Panel Dashboard en Vivo (ES)](02-panel-dashboard-en-vivo.md) — catálogo + explorador + telemetría en vivo sin cuenta
 - [03 — Llamada Pagada del Agente (ES)](03-llamada-pagada-agente.md) — agente Python descubre el endpoint más barato y liquida
-- *02 en ES — en traducción. El código es idéntico; solo cambia el texto.*
+- [04 — Deriva de Slots de Almacenamiento (ES)](04-storage-drift.md) — deriva de slots cross-RPC: convergido / divergido / degradado
 
 ## Roadmap EN→ES (honesto)
 La serie completa prometida para el Creator Grant es **8 piezas en 6 semanas, con versión EN y ES** (o subtítulos). Hoy tienes **1 ES 100% + 5 EN** revisables. Las traducciones faltantes no bloquean el uso — el código y los endpoints son los mismos.

@@ -18,7 +18,7 @@ https://34-156-149-38.sslip.io/aetherapi
 The dashboard should then call paths such as:
 
 ```text
-https://34-156-149-38.sslip.io/aetherapi/health
+https://34-156-149-38.sslip.io/aetherapi/api/v1/health
 https://34-156-149-38.sslip.io/aetherapi/v1/telemetry
 ```
 
@@ -57,11 +57,11 @@ Run these from a terminal:
 
 ```bash
 curl -i "https://wilnowilx.github.io/aetheriusxapi/dashboard/"
-curl -i "https://34-156-149-38.sslip.io/aetherapi/health"
+curl -i "https://34-156-149-38.sslip.io/aetherapi/api/v1/health"
 curl -i -X OPTIONS \
   -H "Origin: https://wilnowilx.github.io" \
   -H "Access-Control-Request-Method: GET" \
-  "https://34-156-149-38.sslip.io/aetherapi/health"
+  "https://34-156-149-38.sslip.io/aetherapi/api/v1/health"
 ```
 
 Expected state after deployment: the first two should return `200`, and the preflight should include an `Access-Control-Allow-Origin` value matching the Pages origin. **Status 2026-09-03: LIVE** — HTTPS health `200`, preflight `200` with matching origin, dashboard `200`, telemetry streaming. The earlier timeout was a closed firewall (GCP ingress + OS iptables for `tcp:443`, both opened since). If you ever see `000` again, check those two layers first.
