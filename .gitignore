@@ -33,3 +33,6 @@ docs/sentinel/
 
 # Local ops scripts (execution fire: daemons, snipers, mirror) — NEVER public
 .local-ops/
+
+# Private IP vault — NEVER public (strategy, recon, venue internals)
+ip/
