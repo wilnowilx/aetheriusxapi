@@ -1,6 +1,8 @@
 # Secrets — NEVER commit these (public repo, bots harvest in minutes)
 *.pem
 *.key
+*.enc
+.vault*
 id_rsa*
 id_ed25519*
 *_rsa
